@@ -271,7 +271,6 @@ namespace ACTP0Tools
                 /// </summary>
                 public static ActiveProfileProxy ActiveProfileProxy => ActiveProfileProxy.Get();
 
-
                 public static string GetFullPathOfExternalMapsMeshes(string profilePath, string meshesFile)
                 {
                     profilePath = Path.GetFullPath(profilePath);
@@ -286,11 +285,7 @@ namespace ACTP0Tools
                 /// <summary>
                 /// Имя файла загруженного (выполняемого) Quester-профиля (без пути)
                 /// </summary>
-                public static string CurrentProfileName
-                {
-                    get => _currentProfileName.Value;
-                    set => _currentProfileName.Value = value;
-                }
+                public static string CurrentProfileName => _currentProfileName.Value;
                 private static readonly StaticPropertyAccessor<string> _currentProfileName;
 
                 /// <summary>

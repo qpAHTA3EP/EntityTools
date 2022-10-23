@@ -51,18 +51,18 @@ namespace EntityTools.Patches
                     // Подмена штатного окна Mapper'a
                     ComplexPatch_Mapper.Apply(); 
                 }
-                //else
-                //{
-                //    ETLogger.WriteLine($@"Incorrect version of 'AStar.dll' therefore the patches  '{nameof(ComplexPatch_Navigation)}' and '{nameof(ComplexPatch_Mapper)}' did not applied.", true);
-                //}
+
                 // Изменение команды квестера AddUCCAction и сопутствующие патчи
                 ComplexPatch_Quester_UccEditing.Apply();
+                // Изменение окна добавления quester-команды/условия
+                ComplexPatch_Quester.Apply();
 
                 // Подмена окна выбора Ауры
                 Patch_AuraDetector.Apply();
 
                 // Патч методов UCCCondition
                 ComplexPatch_Ucc.Apply();
+
 
                 try
                 {

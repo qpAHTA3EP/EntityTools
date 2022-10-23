@@ -10,6 +10,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using Astral.Quester.Classes.Conditions;
+using EntityTools.Quester.Conditions;
 using QuesterAction = Astral.Quester.Classes.Action;
 using QuesterCondition = Astral.Quester.Classes.Condition;
 
@@ -141,10 +143,10 @@ namespace EntityCore.Tools
         /// <param name="action"></param>
         /// <param name="clone">Флаг принудительного создания копии quester-команды для узла дерева</param>
         /// <returns></returns>
-        public static TreeNode MakeTreeNode(this QuesterAction action, bool clone = false)
+        public static ActionBaseTreeNode MakeTreeNode(this QuesterAction action, bool clone = false)
         {
-            if (action is ActionPack actPack)
-                return new ActionPackTreeNode(clone ? CopyHelper.CreateDeepCopy(actPack) : actPack);
+            if (action is ActionPack actionPack)
+                return new ActionPackTreeNode(clone ? CopyHelper.CreateDeepCopy(actionPack) : actionPack);
             return new ActionTreeNode(clone ? CopyHelper.CreateDeepCopy(action) : action);
         }
 
@@ -177,17 +179,7 @@ namespace EntityCore.Tools
         /// <returns></returns>
         public static TreeNode[] ToTreeNodes(this IEnumerable<QuesterCondition> questerConditionList, bool clone = false)
         {
-            if (questerConditionList?.Any() == true)
-            {
-                return questerConditionList.Select(item =>
-                {
-                    if (item.IsConditionPack())
-                        return (TreeNode)new ConditionPackTreeNode(clone ? CopyHelper.CreateDeepCopy(item) : item);
-                    return (TreeNode)new ConditionTreeNode(clone ? CopyHelper.CreateDeepCopy(item) : item);
-                }).ToArray();
-            }
-
-            return Array.Empty<TreeNode>();
+            return questerConditionList.Select(item => MakeTreeNode(item, clone)).ToArray();
         }
 
         /// <summary>
@@ -209,12 +201,18 @@ namespace EntityCore.Tools
         /// <param name="condition"></param>
         /// <param name="clone">Флаг принудительного создания копии quester-условия для узла дерева</param>
         /// <returns></returns>
-        public static TreeNode MakeTreeNode(this QuesterCondition condition, bool clone = false)
+        public static ConditionBaseTreeNode MakeTreeNode(this QuesterCondition condition, bool clone = false)
         {
             var instance = clone ? CopyHelper.CreateDeepCopy(condition) : condition;
-            if (condition.IsConditionPack())
-                return new ConditionPackTreeNode(instance);
-            return new ConditionTreeNode(instance);
+            switch (condition)
+            {
+                case ConditionPack conditionPack:
+                    return new ConditionPackTreeNode(conditionPack);
+                case IsInCustomRegion isInCustomRegion:
+                    return new ConditionIsInCustomRegionTreeNode(isInCustomRegion);
+                default:
+                    return new ConditionTreeNode(instance);
+            }
         }
 
         /// <summary>
@@ -250,14 +248,14 @@ namespace EntityCore.Tools
         /// <param name="nodes"></param>
         /// <param name="clone">Флаг принудительного создания копии quester-условия из соответствующего узла дерева</param>
         /// <returns></returns>
-        public static List<QuesterCondition> ToQuesterConditionList(this TreeNode[] nodes, bool clone = false)
+        public static List<T> ToListOf<T>(this TreeNode[] nodes, bool clone = false)
         {
             if (nodes?.Length > 0)
             {
-                var cndList = new List<QuesterCondition>(nodes.Length);
+                var cndList = new List<T>(nodes.Length);
                 foreach (var node in nodes)
                 {
-                    if (node is ITreeNode<QuesterCondition> cndNode)
+                    if (node is ITreeNode<T> cndNode)
                     {
                         var cnd = cndNode.ReconstructInternal();
                         if (cnd != null)
@@ -268,7 +266,7 @@ namespace EntityCore.Tools
                 return cndList;
             }
 
-            return new List<QuesterCondition>();
+            return new List<T>();
         }
 
         /// <summary>

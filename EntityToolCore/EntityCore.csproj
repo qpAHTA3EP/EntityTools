@@ -275,7 +275,8 @@
     <Compile Include="Quester\Action\MoveToTeammateEngine.cs" />
     <Compile Include="Quester\Action\MoveToEntityEngine.cs" />
     <Compile Include="Quester\Action\TurnInMissionEngine.cs" />
-    <Compile Include="Quester\Classes\IActionTreeNode.cs" />
+    <Compile Include="Quester\Classes\ConditionIsInCustomRegionTreeNode.cs" />
+    <Compile Include="Quester\Classes\ActionBaseTreeNode.cs" />
     <Compile Include="Quester\Classes\IQuesterAction.cs" />
     <Compile Include="Quester\Classes\IQuesterCondition.cs" />
     <Compile Include="Quester\Classes\ConditionBaseTreeNode.cs" />

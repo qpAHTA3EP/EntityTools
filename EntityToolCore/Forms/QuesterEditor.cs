@@ -1,9 +1,12 @@
 ﻿using ACTP0Tools;
+using ACTP0Tools.Classes.Quester;
+using ACTP0Tools.Patches;
 using ACTP0Tools.Reflection;
 using AStar;
 using Astral.Classes.ItemFilter;
 using Astral.Logic.NW;
 using Astral.Quester.Classes;
+using Astral.Quester.Classes.Conditions;
 using Astral.Quester.Forms;
 using DevExpress.Utils.DragDrop;
 using DevExpress.XtraEditors;
@@ -12,8 +15,9 @@ using DevExpress.XtraGrid.Views.Grid;
 using DevExpress.XtraGrid.Views.Grid.ViewInfo;
 using EntityCore.Quester.Classes;
 using EntityCore.Tools;
-using EntityCore.UCC.Classes;
+using EntityTools.Annotations;
 using EntityTools.Enums;
+using EntityTools.Patches.Mapper;
 using EntityTools.Quester.Conditions;
 using EntityTools.Tools;
 using MyNW.Classes;
@@ -28,13 +32,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using ACTP0Tools.Classes.Quester;
-using ACTP0Tools.Patches;
-using Astral.Quester.Classes.Conditions;
-using DevExpress.Utils;
-using DevExpress.XtraBars.Docking2010;
-using EntityTools.Annotations;
-using EntityTools.Patches.Mapper;
 using QuesterAction = Astral.Quester.Classes.Action;
 using QuesterCondition = Astral.Quester.Classes.Condition;
 
@@ -45,30 +42,24 @@ namespace EntityCore.Forms
         /// <summary>
         /// Редактируемый профиль
         /// </summary>
-        public QuesterProfileProxy Profile => _profile;
+        public QuesterProfileProxy Profile => profile;
 
-        private readonly ProfileProxy _profile;
+        private readonly ProfileProxy profile;
 
         // Функтор, выполняемый при изменении pgProperties
         private System.Action propertyCallback;
 
         // Функтор, выполняемый при изменении списка treeConditions
-        private System.Action conditionCallback;
+        private Action<TreeNodeCollection> conditionCallback;
 
         // Функтор, выполняемый при изменении списка treeConditions
         private System.Action hotSpotCallback;
 
         // Скопированная команда
-        private QuesterAction actionCache;
+        private static QuesterAction actionCache;
 
         // Скопированная условие
         private static QuesterCondition conditionCache;
-
-        // Команда, с которым сопоставлен список условий
-        private static QuesterAction selectedAction;
-
-        // Выбранный элемент ГИП
-        private Control selectedControl;
 
         //TODO: Исправить валидацию и настройка команд и условий, привязаных к данным профиля: PushProfileToStackAndLoad (путь к профилю), IsInCustomRegion, IsInCustomRegionSet
 
@@ -137,7 +128,7 @@ namespace EntityCore.Forms
         {
             InitializeComponent();
 
-            _profile = profile is null 
+            this.profile = profile is null 
                 ? new ProfileProxy()
                 : new ProfileProxy(profile, fileName);
 
@@ -214,13 +205,11 @@ namespace EntityCore.Forms
             pgSettings.SelectedObject = profile;
             pgProperties.SelectedObject = null;
 
-            selectedControl = null;
-            selectedAction = null;
             propertyCallback = null;
             conditionCallback = null;
             hotSpotCallback = null;
 
-            ChangeWindowCaption();
+            UpdateWindowCaption();
             ResetFilter();
         }
 
@@ -241,22 +230,21 @@ namespace EntityCore.Forms
             pgProperties.SelectedObject = null;
             pgSettings.SelectedObject = null;
 
-            selectedControl = null;
-            selectedAction = null;
             propertyCallback = null;
             conditionCallback = null;
+            hotSpotCallback = null;
 
-            ChangeWindowCaption();
+            UpdateWindowCaption();
             ResetFilter();
         }
 
-        private void ChangeWindowCaption()
+        private void UpdateWindowCaption()
         {
-            if (_profile is null
-                || string.IsNullOrEmpty(_profile.FileName))
+            if (profile is null
+                || string.IsNullOrEmpty(profile.FileName))
                 Text = "* New profile";
-            else Text = (_profile.Saved ? string.Empty : "* ")
-                       + _profile.FileName;
+            else Text = (profile.Saved ? string.Empty : "* ")
+                       + profile.FileName;
         }
 
         private void handler_Form_Load(object sender, EventArgs e)
@@ -278,12 +266,12 @@ namespace EntityCore.Forms
             }
 
 
-            UI_fill(_profile);
+            UI_fill(profile);
         }
 
         private void handler_Form_Closing(object sender, FormClosingEventArgs e)
         {
-            if (!_profile.Saved)
+            if (!profile.Saved)
             {
                 switch (XtraMessageBox.Show("Profile was modified but did not saved!\n" +
                                             "Would you like to save it ?\n" +
@@ -309,8 +297,8 @@ namespace EntityCore.Forms
         #region TreeViewNode Drag & Drop
         private void handler_TreeView_ItemDrag(object sender, ItemDragEventArgs e)
         {
-            conditionCallback?.Invoke();
             propertyCallback?.Invoke();
+            conditionCallback?.Invoke(treeConditions.Nodes);
 
             // Move the dragged node when the left mouse button is used.
             if (e.Button == MouseButtons.Left)
@@ -373,14 +361,14 @@ namespace EntityCore.Forms
                             if(parent is ActionPackTreeNode parentActionPackTreeNode)
                                 parentActionPackTreeNode.UpdateView();
                             actionPackNode.Nodes.Insert(0, draggedNode);
-                            _profile.Saved = false;
+                            profile.Saved = false;
                         }
                         // Вставляем копию перетаскиваемого узла во внутрь целевого узла
                         else if (e.Effect == DragDropEffects.Copy)
                         {
                             //Logger.WriteLine(Logger.LogType.Debug, $"Copy [{draggedNode.Index}]'{draggedNode.Text}' into Children of [{targetNode.Index}]'{targetNode.Text}'");
                             targetNode.Nodes.Insert(0, (TreeNode) draggedNode.Clone());
-                            _profile.Saved = false;
+                            profile.Saved = false;
                         }
 
                         actionPackNode.UpdateView();
@@ -400,14 +388,14 @@ namespace EntityCore.Forms
                             //Logger.WriteLine(Logger.LogType.Debug, $"Move [{draggedNode.Index}]'{draggedNode.Text}' into Children of [{targetNode.Index}]'{targetNode.Text}'");
                             draggedNode.Remove();
                             conditionPackNode.Nodes.Insert(0, draggedNode);
-                            _profile.Saved = false;
+                            profile.Saved = false;
                         }
                         // Вставляем копию перетаскиваемого узла во внутрь целевого узла
                         else if (e.Effect == DragDropEffects.Copy)
                         {
                             //Logger.WriteLine(Logger.LogType.Debug, $"Copy [{draggedNode.Index}]'{draggedNode.Text}' into Children of [{targetNode.Index}]'{targetNode.Text}'");
                             targetNode.Nodes.Insert(0, (TreeNode) draggedNode.Clone());
-                            _profile.Saved = false;
+                            profile.Saved = false;
                         }
 
                         // Раскрываем целевой узел дерева, в который перемещен/скопирован перетаскиваемый узел
@@ -430,18 +418,18 @@ namespace EntityCore.Forms
                             if (parent is ActionPackTreeNode draggedParentTreeNode)
                                 draggedParentTreeNode.UpdateView();
                             treeNodeCollection.Insert(targetNode.Index + 1, draggedNode);
-                            _profile.Saved = false;
+                            profile.Saved = false;
                         }
                         // Копирование узла
                         else if (e.Effect == DragDropEffects.Copy)
                         {
                             treeNodeCollection.Insert(targetNode.Index + 1, (TreeNode)draggedNode.Clone());
-                            _profile.Saved = false;
+                            profile.Saved = false;
                         }
                         if (targetNode.Parent is ActionPackTreeNode targetParentTreeNode)
                             targetParentTreeNode.UpdateView();
                     }
-                    ChangeWindowCaption();
+                    UpdateWindowCaption();
                     treeView.EndUpdate();
                 }
                 else
@@ -453,15 +441,15 @@ namespace EntityCore.Forms
                         draggedNode.Remove();
 
                         treeView.Nodes.Add(draggedNode);
-                        _profile.Saved = false;
-                        ChangeWindowCaption();
+                        profile.Saved = false;
+                        UpdateWindowCaption();
                     }
                     // Копирование узла
                     else if (e.Effect == DragDropEffects.Copy)
                     {
                         treeView.Nodes.Add((TreeNode) draggedNode.Clone());
-                        _profile.Saved = false;
-                        ChangeWindowCaption();
+                        profile.Saved = false;
+                        UpdateWindowCaption();
                     }
                     treeView.EndUpdate();
                 }
@@ -555,10 +543,10 @@ namespace EntityCore.Forms
             switch (e.Button.Properties.Caption)
             {
                 case "Add Condition":
-                    handler_Condition_Add(sender);
+                    AddCondition(sender);
                     break;
                 case "Delete Condition":
-                    handler_Condition_Delete(sender);
+                    DeleteCondition(sender);
                     break;
                 case "Delete all Conditions":
                     if (XtraMessageBox.Show("Confirm the deletion of all Conditions from the list", "Confirmation",
@@ -569,37 +557,36 @@ namespace EntityCore.Forms
 
                     break;
                 case "Copy Condition":
-                    handler_Condition_Copy(sender);
+                    CopyCondition(sender);
                     break;
                 case "Paste Condition":
-                    handler_Condition_Paste(sender);
+                    PasteCondition(sender);
                     break;
                 case "Test Condition":
-                    handler_Condition_Test(sender);
+                    TestCondition(sender);
                     break;
                 case "Test all Conditions":
-                    handler_Condition_TestAll(sender);
+                    TestAllConditions(sender);
                     break;
             }
         }
 
-        private void handler_Condition_Add(object sender, EventArgs e = null)
+        private void AddCondition(object sender, EventArgs e = null)
         {
             // Добавление 
             //if (ItemSelectForm.GetAnInstance(out QuesterCondition newCondition, false))
-            if (AddAction.Show(typeof(Condition)) is Condition newCondition)
+            if (Astral.Quester.Forms.AddAction.Show(typeof(QuesterCondition)) is QuesterCondition newCondition)
             {
                 propertyCallback?.Invoke();
 
                 var newTreeNode = newCondition.MakeTreeNode();
-                var selectedNode = treeConditions.SelectedNode;
-                if (selectedNode != null)
+                if (treeConditions.SelectedNode is ConditionBaseTreeNode selectedNode)
                 {
-                    if (selectedNode is ConditionPackTreeNode conditionPackTreeNode)
+                    if (selectedNode.AllowChildren)
                     {
                         // Если выделенный узел является ActionPackTreeNode
                         // добавляем новую команду в список его узлов
-                        conditionPackTreeNode.Nodes.Insert(0, newTreeNode);
+                        selectedNode.Nodes.Insert(0, newTreeNode);
                     }
                     else
                     {
@@ -611,41 +598,20 @@ namespace EntityCore.Forms
                 }
                 // добавляем новую команду в конец списка узлов дерева
                 else treeConditions.Nodes.Add(newTreeNode);
-#if false
-                if (newCondition is IsInCustomRegionSet crSet)
-                {
-#if false
-                TypeDescriptor.AddAttributes(crSet.CustomRegions,
-                    new EditorAttribute(typeof(CustomRegionSetEditor), typeof(UITypeEditor)));
-#elif false
-                EntityTools.EntityTools.AddAttributes(crSet.CustomRegions,
-                    new EditorAttribute(typeof(CustomRegionSetEditor), typeof(UITypeEditor)));
 
-                var properties = TypeDescriptor.GetProperties(crSet);
-#elif false
-                pgProperties.SelectedObject = Engine.CustomRegionCollectionDecorator.Decorate(crSet);
-#else
-                    crSet.CustomRegions.DebugContext = profile;
-#endif
-                } 
-#endif
-                _profile.Saved = false;
+                profile.Saved = false;
                 pgProperties.SelectedObject = newCondition;
-                if (newTreeNode is ITreeNode<QuesterCondition> conditionPackNode)
-                    propertyCallback = conditionPackNode.UpdateView;
-                else propertyCallback = null;
+                propertyCallback = newTreeNode.UpdateView;
 
-                ChangeWindowCaption();
+                UpdateWindowCaption();
             }
         }
 
-        private void handler_Condition_Delete(object sender, EventArgs e = null)
+        private void DeleteCondition(object sender, EventArgs e = null)
         {
-            var conditionNode = treeConditions.SelectedNode;
-
-            if (conditionNode != null)
+            if (treeConditions.SelectedNode is ConditionBaseTreeNode conditionNode)
             {
-                if (conditionNode is ConditionPackTreeNode)
+                if (conditionNode.Nodes.Count > 0)
                 {
                     if (XtraMessageBox.Show("Confirm deleting of the ConditionPack",
                         "Confirmation",
@@ -653,26 +619,28 @@ namespace EntityCore.Forms
                         return;
                 }
 
-                if (ReferenceEquals(pgProperties.SelectedObject, conditionNode.Tag))
+                if (ReferenceEquals(pgProperties.SelectedObject, conditionNode.Content))
                     propertyCallback = null;
                 pgProperties.SelectedObject = null;
                 conditionNode.Remove();
-                _profile.Saved = false;
-                ChangeWindowCaption();
+                profile.Saved = false;
+                UpdateWindowCaption();
             }
         }
 
-        private void handler_Condition_Copy(object sender, EventArgs e = null)
+        private void CopyCondition(object sender, EventArgs e = null)
         {
-            if (treeConditions.SelectedNode?.Tag is QuesterCondition condition)
+            if (treeConditions.SelectedNode is ConditionBaseTreeNode conditionNode)
             {
                 propertyCallback?.Invoke();
-
-                conditionCache = CopyHelper.CreateDeepCopy(condition);
+                if (conditionNode.AllowChildren)
+                    conditionCallback?.Invoke(treeConditions.Nodes);
+                    
+                conditionCache = CopyHelper.CreateDeepCopy(conditionNode.Content);
             }
         }
 
-        private void handler_Condition_Paste(object sender, EventArgs e = null)
+        private void PasteCondition(object sender, EventArgs e = null)
         {
             if (conditionCache != null)
             {
@@ -681,13 +649,12 @@ namespace EntityCore.Forms
                 // Добавляем команду
                 var newCondition = CopyHelper.CreateDeepCopy(conditionCache);
                 var newNode = newCondition.MakeTreeNode();
-                var selectedNode = treeConditions.SelectedNode;
-                if (selectedNode != null)
+                if (treeConditions.SelectedNode is ConditionBaseTreeNode selectedNode)
                 {
-                    if (selectedNode is ConditionPackTreeNode conditionPackNode)
+                    if (selectedNode.AllowChildren)
                         // Если выделенный узел является ActionPackTreeNode
                         // добавляем новую команду в список его узлов
-                        conditionPackNode.Nodes.Insert(0, newNode);
+                        selectedNode.Nodes.Insert(0, newNode);
                     else
                     {
                         // добавляем новую команду после выделенного узла
@@ -699,77 +666,50 @@ namespace EntityCore.Forms
                 // добавляем новую команду в конец списка узлов дерева
                 else treeConditions.Nodes.Add(newNode);
 
-#if false
-                if (newCondition is IsInCustomRegionSet crSet)
-                {
-
-#if false
-                TypeDescriptor.AddAttributes(crSet.CustomRegions,
-                    new EditorAttribute(typeof(CustomRegionSetEditor), typeof(UITypeEditor)));
-#elif false
-                EntityTools.EntityTools.AddAttributes(crSet.CustomRegions,
-                    new EditorAttribute(typeof(CustomRegionSetEditor), typeof(UITypeEditor)));
-
-                var properties = TypeDescriptor.GetProperties(crSet);
-#elif false
-                pgProperties.SelectedObject = Engine.CustomRegionCollectionDecorator.Decorate(crSet);
-#else
-                    crSet.CustomRegions.DebugContext = profile;
-#endif
-                } 
-#endif
                 pgProperties.SelectedObject = newCondition;
-                if (newNode is ITreeNode<QuesterCondition> conditionTreeNode)
-                    propertyCallback = conditionTreeNode.UpdateView;
+                propertyCallback = newNode.UpdateView;
 
-                _profile.Saved = false;
-                ChangeWindowCaption();
+                profile.Saved = false;
+                UpdateWindowCaption();
             }
         }
 
         private void handler_Condition_ShortCut(object sender, KeyEventArgs e)
         {
-            //if (ReferenceEquals(sender, treeConditions))
+            if (e.Control)
             {
-                if (e.Control)
+                if (e.KeyCode == Keys.C || e.KeyData == Keys.C)
                 {
-                    if (e.KeyCode == Keys.C || e.KeyData == Keys.C)
-                    {
-                        handler_Condition_Copy(sender);
-                    }
-                    else if (e.KeyCode == Keys.V || e.KeyData == Keys.V)
-                    {
-                        handler_Condition_Paste(sender);
-                    }
-                    else if (e.KeyCode == Keys.Delete || e.KeyData == Keys.Delete)
-                    {
-                        handler_Condition_Delete(sender);
-                    }
-
-                    return;
+                    CopyCondition(sender);
+                }
+                else if (e.KeyCode == Keys.V || e.KeyData == Keys.V)
+                {
+                    PasteCondition(sender);
+                }
+                else if (e.KeyCode == Keys.Delete || e.KeyData == Keys.Delete)
+                {
+                    DeleteCondition(sender);
                 }
 
-                if (e.KeyCode == Keys.Insert || e.KeyData == Keys.Insert)
-                {
-                    handler_Condition_Add(sender);
-                }
+                return;
+            }
+
+            if (e.KeyCode == Keys.Insert || e.KeyData == Keys.Insert)
+            {
+                AddCondition(sender);
             }
         }
 
-        private void handler_Condition_Test(object sender, EventArgs e = null)
+        private void TestCondition(object sender, EventArgs e = null)
         {
-            conditionCallback?.Invoke();
             propertyCallback?.Invoke();
-            var selectedNode = treeConditions.SelectedNode;
-            if (selectedNode is ConditionPackTreeNode conditionPackNode)
-                conditionPackNode.ReconstructInternal();
-            if (selectedNode?.Tag is QuesterCondition condition)
+            if (treeConditions.SelectedNode is ConditionBaseTreeNode selectedNode)
             {
-                // Тестирование выбранного условия
-                bool result = condition.IsValid;
-                string msg = $"{condition.TestInfos}\nResult: {result}";
+                var result = selectedNode.IsValid(profile);
+                var testInfo = selectedNode.TestInfo(profile);
+                var msg = $"{selectedNode.Text}\n{testInfo}\nResult: {result}";
                 XtraMessageBox.Show(msg, "Condition Test", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                txtLog.AppendText($"\n{msg}");
+                txtLog.AppendText(msg);
                 return;
             }
 
@@ -778,27 +718,21 @@ namespace EntityCore.Forms
             txtLog.AppendText("\nNo condition selected.");
         }
 
-        private void handler_Condition_TestAll(object sender, EventArgs e = null)
+        private void TestAllConditions(object sender, EventArgs e = null)
         {
-            conditionCallback?.Invoke();
             propertyCallback?.Invoke();
 
-            if (treeConditions.Nodes?.Count > 0)
+            if (treeConditions.Nodes.Count > 0)
             {
                 var stringBuilder = new StringBuilder();
-                foreach (TreeNode node in treeConditions.Nodes)
+                foreach (ConditionBaseTreeNode node in treeConditions.Nodes)
                 {
-                    if (node is ConditionPackTreeNode conditionPackNode)
-                        conditionPackNode.ReconstructInternal();
-                    if (node.Tag is QuesterCondition condition)
-                    {
-                        // Тестирование выбранного условия
-                        bool result = condition.IsValid;
-                        stringBuilder.Append('\t')
-                                     .Append(condition)
-                                     .Append(" | Result: ")
-                                     .AppendLine(result.ToString());
-                    }
+                    // Тестирование выбранного условия
+                    bool result = node.IsValid(profile);
+                    stringBuilder.Append('\t')
+                                 .Append(node.Text)
+                                 .Append(" | Result: ")
+                                 .AppendLine(result.ToString());
                 }
 
                 var msg = stringBuilder.ToString();
@@ -812,40 +746,35 @@ namespace EntityCore.Forms
             txtLog.AppendText("\nThe condition list is empty.");
         }
 
-        private void handler_Condition_GetFocus(object sender, EventArgs e)
+        private void handler_Condition_Selected(object sender, TreeViewEventArgs e)
         {
-            var node = treeConditions.SelectedNode;
-            if (node != null)
+            if (treeConditions.SelectedNode is ConditionBaseTreeNode node)
             {
-                var tag = node.Tag;
-                if (tag != null && !ReferenceEquals(tag, pgProperties.SelectedObject))
-                {
-                    ChangeTreeNodeCallback(node);
-#if false
-                if (tag is IsInCustomRegionSet crSet)
-                {
-
-#if false
-                TypeDescriptor.AddAttributes(crSet.CustomRegions,
-                    new EditorAttribute(typeof(CustomRegionSetEditor), typeof(UITypeEditor)));
-#elif false
-                EntityTools.EntityTools.AddAttributes(crSet.CustomRegions,
-                    new EditorAttribute(typeof(CustomRegionSetEditor), typeof(UITypeEditor)));
-
-                var properties = TypeDescriptor.GetProperties(crSet);
-#elif false
-                pgProperties.SelectedObject = Engine.CustomRegionCollectionDecorator.Decorate(crSet);
-                return; 
-#else
-                    crSet.CustomRegions.DebugContext = profile;
-#endif
-                } 
-#endif
-                    pgProperties.SelectedObject = tag;
-                }
-                //node.BackColor = treeConditions.BackColor; 
+                BindControlTo(node);
             }
         }
+
+        private void handler_Condition_GetFocus(object sender, EventArgs e)
+        {
+            if (treeConditions.SelectedNode is ConditionBaseTreeNode node)
+            {
+                if (!ReferenceEquals(node.Content, pgProperties.SelectedObject))
+                {
+                    BindControlTo(node);
+                }
+            }
+        }
+
+        private void BindControlTo(ConditionBaseTreeNode node)
+        {
+            if (node is null)
+                return;
+
+            propertyCallback?.Invoke();
+            pgProperties.SelectedObject = node.Content;
+            propertyCallback = node.UpdateView;
+        }
+
         #endregion
 
 
@@ -857,30 +786,33 @@ namespace EntityCore.Forms
             switch (e.Button.Properties.Caption)
             {
                 case "Add Action":
-                    handler_Action_Add(sender);
+                    AddAction(sender);
                     break;
                 case "Delete Action":
-                    handler_Action_Delete(sender);
+                    DeleteAction(sender);
+                    break;
+                case "Gather Info":
+                    GatherActionInfo(sender);
                     break;
                 case "Copy Action":
-                    handler_Action_Copy(sender);
+                    CopyAction(sender);
                     break;
                 case "Paste Action":
-                    handler_Action_Paste(sender);
+                    PasteAction(sender);
                     break;
                 case "Test Action":
-                    handler_Action_Test(sender);
+                    TestAction(sender);
                     break;
                 case "Test all Actions":
-                    handler_Action_TestAll(sender);
+                    TestAllActions(sender);
                     break;
                 case "Edit XML":
-                    handler_Action_EditXML(sender);
+                    EditActionXML(sender);
                     break;
             }
         }
 
-        private void handler_Action_Add(object sender, EventArgs e = null)
+        private void AddAction(object sender, EventArgs e = null)
         {
             if (Astral.Quester.Forms.AddAction.Show(typeof(QuesterAction)) is QuesterAction newAction)
             {
@@ -888,15 +820,15 @@ namespace EntityCore.Forms
                 var newNode = newAction.MakeTreeNode();
 
                 propertyCallback?.Invoke();
-                conditionCallback?.Invoke();
+                conditionCallback?.Invoke(treeConditions.Nodes);
 
-                var selectedNode = treeActions.SelectedNode;
+                var selectedNode = treeActions.SelectedNode as ActionBaseTreeNode;
                 if (selectedNode is null)
                     treeActions.Nodes.Add(newNode);
-                else if (selectedNode is ActionPackTreeNode actionPackNode)
+                else if (selectedNode.AllowChildren)
                 {
-                    actionPackNode.Nodes.Insert(0, newNode);
-                    actionPackNode.UpdateView();
+                    selectedNode.Nodes.Insert(0, newNode);
+                    selectedNode.UpdateView();
                 }
                 else if (selectedNode.Parent is null)
                 {
@@ -909,16 +841,15 @@ namespace EntityCore.Forms
                         parentActionPack.UpdateView();
                 }
 
-                _profile.Saved = false;
+                profile.Saved = false;
 
                 treeActions.SelectedNode = newNode;
-                selectedAction = newAction;
 
-                ChangeWindowCaption();
+                UpdateWindowCaption();
             }
         }
 
-        private void handler_Action_Delete(object sender, EventArgs e = null)
+        private void DeleteAction(object sender, EventArgs e = null)
         {
             var actionNode = treeActions.SelectedNode;
 
@@ -938,161 +869,184 @@ namespace EntityCore.Forms
                 hotSpotCallback = null;
 
                 treeConditions.Nodes.Clear();
-                selectedAction = null;
                 pgProperties.SelectedObject = null;
                 
                 actionNode.Remove();
                 parentNode?.UpdateView();
 
-                _profile.Saved = false;
+                profile.Saved = false;
 
-                ChangeWindowCaption();
+                UpdateWindowCaption();
             }
         }
 
-        private void handler_Action_Copy(object sender, EventArgs e = null)
+        private void GatherActionInfo(object sender, EventArgs e = null)
         {
-            if (treeActions.SelectedNode?.Tag is QuesterAction action)
+            propertyCallback?.Invoke();
+            conditionCallback?.Invoke(treeConditions.Nodes);
+
+            if (treeActions.SelectedNode is ActionBaseTreeNode actionNode)
+                actionNode.GatherActionInfo(profile);
+        }
+
+        private void CopyAction(object sender, EventArgs e = null)
+        {
+            if (treeActions.SelectedNode is ActionBaseTreeNode actionNode)
             {
                 propertyCallback?.Invoke();
-                conditionCallback?.Invoke();
+                conditionCallback?.Invoke(treeConditions.Nodes);
 
+                if (actionNode.AllowChildren)
+                    actionNode.ReconstructInternal();
+
+                var action = actionNode.Content;
                 actionCache = CopyHelper.CreateDeepCopy(action);
             }
         }
 
-        private void handler_Action_Paste(object sender, EventArgs e = null)
+        private void PasteAction(object sender, EventArgs e = null)
         {
             if (actionCache != null)
             {
                 propertyCallback?.Invoke();
-                conditionCallback?.Invoke();
+                conditionCallback?.Invoke(treeConditions.Nodes);
 
                 // Добавляем команду
                 var newAction = CopyHelper.CreateDeepCopy(actionCache);
-                newAction.ActionID = Guid.NewGuid();
                 var newNode = newAction.MakeTreeNode();
-                var selectedNode = treeActions.SelectedNode;
-                if (selectedNode != null)
+                newNode.NewID();
+                if (treeActions.SelectedNode is ActionBaseTreeNode selectedNode)
                 {
-                    if (selectedNode is UccActionPackTreeNode actPackNode)
+                    if (selectedNode.AllowChildren)
                     {
-                        // Если выделенный узел является UccActionPackTreeNode
+                        // Если выделенный узел является ActionPackTreeNode
                         // добавляем новую команду в список его узлов
-                        actPackNode.Nodes.Add(newNode);
-                        actPackNode.UpdateView();
+                        selectedNode.Nodes.Add(newNode);
+                        selectedNode.UpdateView();
                     }
                     else
                     {
                         // добавляем новую команду после выделенного узла
-                        if (selectedNode.Parent is null)
-                            treeActions.Nodes.Insert(selectedNode.Index + 1, newNode);
-                        else
+                        if (selectedNode.Parent is ActionBaseTreeNode parentNode)
                         {
-                            selectedNode.Parent.Nodes.Insert(selectedNode.Index + 1, newNode);
-                            (selectedNode.Parent as ActionPackTreeNode)?.UpdateView();
+                            parentNode.Nodes.Insert(selectedNode.Index + 1, newNode);
+                            parentNode.UpdateView();
                         }
+                        else treeActions.Nodes.Insert(selectedNode.Index + 1, newNode);
                     }
                 }
-                // добавляем новую команду в конец списка узлов дерева
-                else treeActions.Nodes.Add(newNode);
+                else
+                {
+                    // добавляем новую команду в конец списка узлов дерева
+                    treeActions.Nodes.Add(newNode);
+                }
 
                 pgProperties.SelectedObject = newAction;
-                if (newNode is IActionTreeNode actionTreeNode)
-                    propertyCallback = actionTreeNode.UpdateView;
+                propertyCallback = newNode.UpdateView;
 
-                ChangeWindowCaption();
+                UpdateWindowCaption();
             }
         }
 
         private void handler_Action_ShortCut(object sender, KeyEventArgs e)
         {
-            //if (!ReferenceEquals(((Control) sender).Parent, panActions)
-            //    && !ReferenceEquals(((Control) sender).Parent, treeActions))
-            //    return;
-
             if (e.Control)
             {
                 if (e.KeyCode == Keys.C || e.KeyData == Keys.C)
                 {
-                    handler_Action_Copy(sender);
+                    CopyAction(sender);
                 }
                 else if (e.KeyCode == Keys.V || e.KeyData == Keys.V)
                 {
-                    handler_Action_Paste(sender);
+                    PasteAction(sender);
                 }
                 else if (e.KeyCode == Keys.Delete || e.KeyData == Keys.Delete)
                 {
-                    handler_Action_Delete(sender);
+                    DeleteAction(sender);
                 }
             }
 
             if (e.KeyCode == Keys.Insert || e.KeyData == Keys.Insert)
             {
-                handler_Action_Add(sender);
+                AddAction(sender);
             }
         }
 
-        private void handler_Action_Test(object sender, EventArgs e = null)
+        private void TestAction(object sender, EventArgs e = null)
         {
             XtraMessageBox.Show(
                 "Not implemented yet.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        private void handler_Action_TestAll(object sender, EventArgs e = null)
+        private void TestAllActions(object sender, EventArgs e = null)
         {
             XtraMessageBox.Show(
                 "Not implemented yet.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        private void handler_Action_EditXML(object sender, EventArgs e = null)
+        private void EditActionXML(object sender, EventArgs e = null)
         {
             propertyCallback?.Invoke();
-            conditionCallback?.Invoke();
+            conditionCallback?.Invoke(treeConditions.Nodes);
 
-            var selectedNode = treeActions.SelectedNode;
-            if (selectedNode?.Tag is QuesterAction action
-                && XMLEdit.Show(action) is QuesterAction modifiedAction)
+            if (treeActions.SelectedNode is ActionBaseTreeNode actionNode
+                && XMLEdit.Show(actionNode.Content) is QuesterAction modifiedAction)
             {
                 var newActionNode = modifiedAction.MakeTreeNode();
-                int selectedInd = selectedNode.Index;
-                var parentNode = selectedNode.Parent;
+                int selectedInd = actionNode.Index;
+                var parentNode = actionNode.Parent as ActionBaseTreeNode;
                 treeActions.BeginUpdate();
-                selectedNode.Remove();
-                if (parentNode is null)
-                {
-                    treeActions.Nodes.Insert(selectedInd, newActionNode);
-                }
-                else
+                actionNode.Remove();
+                if (parentNode !=  null)
                 {
                     parentNode.Nodes.Insert(selectedInd, newActionNode);
-                    (parentNode as IActionTreeNode)?.UpdateView();
+                    parentNode.UpdateView();
                 }
+                else treeActions.Nodes.Insert(selectedInd, newActionNode); 
+
                 treeActions.EndUpdate();
                 treeActions.SelectedNode = newActionNode;
             }
         }
 
+        private void handler_Action_Selected(object sender, TreeViewEventArgs e)
+        {
+            if (e.Node is ActionBaseTreeNode node)
+            {
+                BindControlTo(node);
+            }
+        }
+
         private void handler_Action_GetFocus(object sender, EventArgs e)
         {
-            var node = treeActions.SelectedNode;
-            if (node != null)
+            if (treeActions.SelectedNode is ActionBaseTreeNode node)
             {
-                var tag = node.Tag;
-                if (tag != null && !ReferenceEquals(tag, pgProperties.SelectedObject))
+                var action = node.Content;
+                if (!ReferenceEquals(action, pgProperties.SelectedObject))
                 {
-                    ChangeTreeNodeCallback(node);
-                    pgProperties.SelectedObject = tag;
-                    if (tag is QuesterAction action)
-                    {
-                        selectedAction = action;
-                        gridHotSpots.DataSource = action.HotSpots;
-                    }
+                    BindControlTo(node);
                 }
-                //node.BackColor = highlightedTreeNodes.Contains(node)
-                //    ? Color.Yellow
-                //    : Color.Empty; 
             }
+        }
+
+        private void BindControlTo(ActionBaseTreeNode node)
+        {
+            if (node is null)
+                return;
+
+            propertyCallback?.Invoke();
+            conditionCallback?.Invoke(treeConditions.Nodes);
+            hotSpotCallback?.Invoke();
+
+            treeConditions.Nodes.Clear();
+            treeConditions.Nodes.AddRange(node.GetConditionTreeNodes());
+            pgProperties.SelectedObject = node.Content;
+            gridHotSpots.Enabled = node.UseHotSpots;
+            gridHotSpots.DataSource = node.HotSpots;
+
+            propertyCallback = node.UpdateView;
+            conditionCallback = node.CopyConditionNodesFrom;
+            hotSpotCallback = node.UpdateView;
         }
         #endregion
 
@@ -1100,102 +1054,22 @@ namespace EntityCore.Forms
 
 
         #region TreeViewNode manipulation
-        private void handler_TreeView_NodeSelected(object sender, TreeViewEventArgs e)
-        {
-            ChangeTreeNodeCallback(e.Node);
-            var tag = e.Node.Tag;
-            if (tag is QuesterAction action)
-            {
-                selectedAction = action;
-                if (action.UseHotSpots)
-                {
-                    gridHotSpots.DataSource = action.HotSpots;
-                    panHotSpots.Enabled = true;
-                }
-                else
-                {
-                    gridHotSpots.DataSource = null;
-                    panHotSpots.Enabled = false;
-                }
-            }
-            else if (tag is IsInCustomRegionSet crSet)
-            {
-#if false
-                TypeDescriptor.AddAttributes(crSet.CustomRegions,
-                    new EditorAttribute(typeof(CustomRegionSetEditor), typeof(UITypeEditor)));
-#elif false
-                EntityTools.EntityTools.AddAttributes(crSet.CustomRegions,
-                    new EditorAttribute(typeof(CustomRegionSetEditor), typeof(UITypeEditor)));
-
-                var properties = TypeDescriptor.GetProperties(crSet);
-#elif false
-                pgProperties.SelectedObject = Engine.CustomRegionCollectionDecorator.Decorate(crSet);
-                return; 
-#else
-                crSet.CustomRegions.DebugContext = _profile;
-#endif
-            }
-            pgProperties.SelectedObject = tag;
-        }
-
-        void handler_TreeView_Leave(object sender, EventArgs e)
-        {
-            if (sender is TreeView treeView)
-            {
-                var selectedNode = treeView.SelectedNode;
-                if (selectedNode != null)
-                    selectedNode.BackColor = SystemColors.Highlight;
-            }
-        }
-
-        private void ChangeTreeNodeCallback(TreeNode treeNode)
-        {
-            if (treeNode is null)
-                return;
-
-            switch (treeNode)
-            {
-                case IActionTreeNode actionNode:
-                    conditionCallback?.Invoke();
-                    hotSpotCallback?.Invoke();
-                    treeConditions.Nodes.Clear();
-                    treeConditions.Nodes.AddRange(actionNode.ConditionTreeNodes);
-                    propertyCallback = actionNode.UpdateView;
-                    if (treeNode.Parent is IActionTreeNode parentPackNode)
-                        propertyCallback += parentPackNode.UpdateView;
-                    conditionCallback = () => {
-                        TreeNode[] condNodes = new TreeNode[treeConditions.Nodes.Count];
-                        treeConditions.Nodes.CopyTo(condNodes, 0);
-                        actionNode.ConditionTreeNodes = condNodes;
-                    };
-                    if (treeNode.Tag is QuesterAction action
-                        && action.UseHotSpots)
-                        hotSpotCallback = actionNode.UpdateView;
-                    else hotSpotCallback = null;
-                    break;
-                case ITreeNode<QuesterCondition> conditionNode:
-                    propertyCallback = conditionNode.UpdateView;
-                    break;
-            }
-        }
-
         private void handler_TreeView_NodeCheckedChanged(object sender, TreeViewEventArgs e)
         {
-            switch (e.Node.Tag)
+            switch (e.Node)
             {
-                case QuesterAction action:
-                    action.Disabled = !e.Node.Checked;
-                    if (ReferenceEquals(action, pgProperties.SelectedObject))
+                case ActionBaseTreeNode actionNode:
+                    actionNode.Disabled = !actionNode.Checked;
+                    if (ReferenceEquals(actionNode.Content, pgProperties.SelectedObject))
                         pgProperties.Refresh();
                     break;
-                case QuesterCondition condition:
-                    condition.Locked = e.Node.Checked;
-                    if (ReferenceEquals(condition, pgProperties.SelectedObject))
+                case ConditionBaseTreeNode conditionNode:
+                    conditionNode.Locked = conditionNode.Checked;
+                    if (ReferenceEquals(conditionNode.Content, pgProperties.SelectedObject))
                         pgProperties.Refresh();
                     break;
             }
-
-            _profile.Saved = false;
+            profile.Saved = false;
         }
 
         private void handler_PropertyChanged(object sender, PropertyValueChangedEventArgs e)
@@ -1206,8 +1080,8 @@ namespace EntityCore.Forms
 
             }
             propertyCallback?.Invoke();
-            _profile.Saved = false;
-            ChangeWindowCaption();
+            profile.Saved = false;
+            UpdateWindowCaption();
         }
         #endregion
 
@@ -1217,7 +1091,7 @@ namespace EntityCore.Forms
         #region Profile manipulation
         private void handler_Profile_New(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
         {
-            if (!_profile.Saved)
+            if (!profile.Saved)
             {
                 switch (XtraMessageBox.Show("Profile was modified but did not saved!\n" +
                                             "Would you like to save it ?\n" +
@@ -1232,15 +1106,15 @@ namespace EntityCore.Forms
                 }
             }
 
-            _profile.SetProfile(new Profile { Saved = true }, string.Empty);
-            UI_fill(_profile);
+            profile.SetProfile(new Profile { Saved = true }, string.Empty);
+            UI_fill(profile);
 
             txtLog.AppendText($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] Make new Profile.");
         }
 
         private void handler_Profile_Load(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
         {
-            if (!_profile.Saved)
+            if (!profile.Saved)
             {
                 switch (XtraMessageBox.Show("Profile was modified but did not saved!\n" +
                                             "Would you like to save it ?\n" +
@@ -1259,9 +1133,9 @@ namespace EntityCore.Forms
             var prof = AstralAccessors.Quester.Core.Load(ref path);
             if (prof != null)
             {
-                _profile.SetProfile(prof, path);
+                profile.SetProfile(prof, path);
                 txtLog.AppendText($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] Profile '{path}' loaded.");
-                UI_fill(_profile);
+                UI_fill(profile);
             }
         }
 
@@ -1271,12 +1145,12 @@ namespace EntityCore.Forms
             {
                 txtLog.AppendText(string.Concat("[", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
                     "] Profile",
-                    string.IsNullOrEmpty(_profile.FileName)
+                    string.IsNullOrEmpty(profile.FileName)
                         ? string.Empty
-                        : " '" + _profile.FileName + "'",
+                        : " '" + profile.FileName + "'",
                     " saved.",
                     Environment.NewLine));
-                ChangeWindowCaption();
+                UpdateWindowCaption();
             }
         }
 
@@ -1286,12 +1160,36 @@ namespace EntityCore.Forms
             {
                 txtLog.AppendText(string.Concat("[", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
                     "] Profile",
-                    string.IsNullOrEmpty(_profile.FileName)
+                    string.IsNullOrEmpty(profile.FileName)
                         ? string.Empty
-                        : " '" + _profile.FileName + "'",
+                        : " '" + profile.FileName + "'",
                     " saved.",
                     Environment.NewLine));
-                ChangeWindowCaption();
+                UpdateWindowCaption();
+            }
+        }
+
+        private void handler_Profile_Upload(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
+        {
+            if (SaveProfile())
+            {
+                txtLog.AppendText(string.Concat("[", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+                    "] Profile",
+                    string.IsNullOrEmpty(profile.FileName)
+                        ? string.Empty
+                        : " '" + profile.FileName + "'",
+                    " saved and uploaded to the Quester-engine.",
+                    Environment.NewLine));
+                UpdateWindowCaption();
+                AstralAccessors.Quester.Core.Profile = CopyHelper.CreateDeepCopy(profile.GetProfile());
+                var fileName = profile.FileName;
+                Astral.Controllers.Settings.Get.LastQuesterProfile = string.IsNullOrEmpty(fileName) 
+                    ? string.Empty
+                    : Path.GetFileName(profile.FileName);
+            }
+            else
+            {
+                XtraMessageBox.Show("Unable to upload profile into Quester-engine because of saving error.", "Upload error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -1305,10 +1203,10 @@ namespace EntityCore.Forms
             try
             {
                 propertyCallback?.Invoke();
-                conditionCallback?.Invoke();
+                conditionCallback?.Invoke(treeConditions.Nodes);
 
                 // Восстановление команд
-                _profile.Actions = ListReconstruction(treeActions.Nodes);
+                profile.Actions = ListReconstruction(treeActions.Nodes);
 
                 // Восстановление не требуется, т.к. списки реализованы через BindingList<T>
                 //profile.Vendors = ListReconstruction<NPCInfos>(listVendor.Items);
@@ -1316,11 +1214,11 @@ namespace EntityCore.Forms
                 //profile.BlackList = ListReconstruction<string>(listBlackList.Items);
 
                 if (saveAs)
-                    _profile.SaveAs();
-                else _profile.Save();
+                    profile.SaveAs();
+                else profile.Save();
 
                 DialogResult = DialogResult.OK;
-                return _profile.Saved;
+                return profile.Saved;
             }
             catch (Exception exc)
             {
@@ -1330,37 +1228,21 @@ namespace EntityCore.Forms
         }
 
         /// <summary>
-        /// Преобразование списка узлов дерева TreeViewNode в перечисление объектов типа <typeparamref name="QuesterAction"/>
+        /// Преобразование списка узлов дерева <paramref name="nodes"/> в перечисление объектов типа <see cref="QuesterAction"/>
         /// </summary>
         /// <param name="nodes">Коллекция узлов</param>
         /// <returns></returns>
-        private IEnumerable<QuesterAction> ListReconstruction(TreeNodeCollection nodes)
+        private static IEnumerable<QuesterAction> ListReconstruction(TreeNodeCollection nodes)
         {
-            if (nodes?.Count > 0)
-            {
-                foreach (TreeNode node in nodes)
+            if (nodes != null)
+            {   
+                foreach (ActionBaseTreeNode node in nodes)
                 {
-                    if (node is IActionTreeNode actionNode)
-                    {
-                        var action = actionNode.ReconstructInternal();
-                        if (action != null)
-                            yield return action;
-                    }
+                    var action = node.ReconstructInternal();
+                    if (action != null)
+                        yield return action;
                 }
             }
-        }
-
-        /// <summary>
-        /// Преобразование списка в перечисление объектов типа <typeparamref name="T"/>
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="items"></param>
-        /// <returns></returns>
-        private IEnumerable<T> ListReconstruction<T>(ListBoxItemCollection items)
-        {
-            foreach (var item in items)
-                if (item is T t)
-                    yield return t;
         }
         #endregion
 
@@ -1372,7 +1254,7 @@ namespace EntityCore.Forms
         {
             if (e.Info.IsRowIndicator && e.RowHandle >= 0)
             {
-                e.Info.DisplayText = (e.RowHandle + 1).ToString();
+                e.Info.DisplayText = e.RowHandle.ToString();
             }
         }
 
@@ -1527,8 +1409,8 @@ namespace EntityCore.Forms
                                 hotSpotsList.Remove(spot);
                                 hotSpotsList.Insert(newSpotIndex, spot);
                             }
-                            _profile.Saved = false;
-                            ChangeWindowCaption();
+                            profile.Saved = false;
+                            UpdateWindowCaption();
                             break;
                         case InsertType.After:
                             newSpotIndex = targetSpotIndex < sourceHandles[0] ? targetSpotIndex + 1 : targetSpotIndex;
@@ -1538,8 +1420,8 @@ namespace EntityCore.Forms
                                 hotSpotsList.Remove(spot);
                                 hotSpotsList.Insert(newSpotIndex, spot);
                             }
-                            _profile.Saved = false;
-                            ChangeWindowCaption();
+                            profile.Saved = false;
+                            UpdateWindowCaption();
                             break;
                         default:
                             newSpotIndex = -1;
@@ -1578,15 +1460,15 @@ namespace EntityCore.Forms
             if (gridHotSpots.DataSource is List<Vector3> hotSpots)
             {
                 var pos = EntityManager.LocalPlayer.Location.Clone();
-                Node node = _profile.CurrentMesh.ClosestNode(pos.X, pos.Y, pos.Z, out double distance, false);
+                Node node = profile.CurrentMesh.ClosestNode(pos.X, pos.Y, pos.Z, out double distance, false);
                 gridViewHotSpots.BeginUpdate();
                 if (node != null
                     && distance < 10)
                     hotSpots.Add(node.Position);
                 else hotSpots.Add(pos);
 
-                _profile.Saved = false;
-                ChangeWindowCaption();
+                profile.Saved = false;
+                UpdateWindowCaption();
 
                 gridViewHotSpots.RefreshData();
                 gridViewHotSpots.EndUpdate();
@@ -1608,8 +1490,8 @@ namespace EntityCore.Forms
                     hotSpots.RemoveAt(ind);
                 }
 
-                _profile.Saved = false;
-                ChangeWindowCaption();
+                profile.Saved = false;
+                UpdateWindowCaption();
 
                 gridViewHotSpots.RefreshData();
                 gridViewHotSpots.EndUpdate();
@@ -1621,7 +1503,6 @@ namespace EntityCore.Forms
         {
             gridViewHotSpots.OptionsBehavior.Editable = allowEdit;
         }
-
         #endregion
 
 
@@ -1632,7 +1513,6 @@ namespace EntityCore.Forms
         {
             if (sender is ListBoxControl listBox)
             {
-                selectedControl = listBox;
                 var obj = listBox.SelectedItem;
                 if (obj != null && !ReferenceEquals(obj, pgProperties.SelectedObject))
                 {
@@ -1677,14 +1557,14 @@ namespace EntityCore.Forms
                             RegionName = player.RegionInternalName
                         };
 
-                        var vendors = _profile.Vendors;
+                        var vendors = profile.Vendors;
                         if (!vendors.Contains(npcInfos))
                         {
                             vendors.Add(npcInfos);
                             listVendor.SelectedItem = npcInfos;
 
-                            _profile.Saved = false;
-                            ChangeWindowCaption();
+                            profile.Saved = false;
+                            UpdateWindowCaption();
                             return;
                         }
 
@@ -1695,9 +1575,9 @@ namespace EntityCore.Forms
                     {
                         if (listVendor.SelectedItem is NPCInfos item)
                         {
-                            _profile.Vendors.Remove(item);
-                            _profile.Saved = false;
-                            ChangeWindowCaption();
+                            profile.Vendors.Remove(item);
+                            profile.Saved = false;
+                            UpdateWindowCaption();
                         }
                         break;
                     }
@@ -1711,9 +1591,9 @@ namespace EntityCore.Forms
             {
                 if (listCustomRegions.SelectedItem is CustomRegion item)
                 {
-                    _profile.CustomRegions.Remove(item);
-                    _profile.Saved = false;
-                    ChangeWindowCaption();
+                    profile.CustomRegions.Remove(item);
+                    profile.Saved = false;
+                    UpdateWindowCaption();
                 }
             }
         }
@@ -1742,12 +1622,12 @@ namespace EntityCore.Forms
                             return;
                         }
 
-                        var blackList = _profile.BlackList;
+                        var blackList = profile.BlackList;
                         if (!blackList.Contains(target.InternalName))
                         {
                             blackList.Add(target.InternalName);
-                            _profile.Saved = false;
-                            ChangeWindowCaption();
+                            profile.Saved = false;
+                            UpdateWindowCaption();
                             return;
                         }
 
@@ -1759,9 +1639,9 @@ namespace EntityCore.Forms
                         var item = listBlackList.SelectedItem?.ToString();
                         if (!string.IsNullOrEmpty(item))
                         {
-                            _profile.BlackList.Remove(item);
-                            _profile.Saved = false;
-                            ChangeWindowCaption();
+                            profile.BlackList.Remove(item);
+                            profile.Saved = false;
+                            UpdateWindowCaption();
                         }
                         break;
                     }
@@ -1778,7 +1658,7 @@ namespace EntityCore.Forms
         {
             if (mapperForm is null || mapperForm.IsDisposed)
             {
-                mapperForm = new MapperFormExt(_profile);
+                mapperForm = new MapperFormExt(profile);
                 mapperForm.OnDraw += DrawSelectedAction;
             }
 
@@ -1815,7 +1695,6 @@ namespace EntityCore.Forms
         #endregion
 
         #region ActionNode Highlighting
-
         private readonly LinkedList<TreeNode> highlightedTreeNodes = new LinkedList<TreeNode>();
         private LinkedListNode<TreeNode> selectedHighlightedNode;
 

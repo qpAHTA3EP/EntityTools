@@ -30,7 +30,7 @@ namespace EntityTools.Editors
                         if (profileProxyAccessor is null)
                             profileProxyAccessor = parentForm.GetProperty<QuesterProfileProxy>("Profile");
                         if (profileProxyAccessor.IsValid)
-                            crCollection.DebugContext = profileProxyAccessor.Value;
+                            crCollection.DesignContext = profileProxyAccessor.Value;
                     }
                 }
 

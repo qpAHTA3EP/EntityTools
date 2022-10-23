@@ -69,7 +69,7 @@ namespace EntityTools.Tools.CustomRegions
                 {
                     if(_collection is null)
                         _customRegion = Astral.Quester.API.CurrentProfile.CustomRegions.FirstOrDefault(cr => cr.Name == _name);
-                    else _customRegion = _collection.DebugContext.CustomRegions.FirstOrDefault(cr => cr.Name == _name);
+                    else _customRegion = _collection.DesignContext.CustomRegions.FirstOrDefault(cr => cr.Name == _name);
                 }
 
                 return _customRegion;

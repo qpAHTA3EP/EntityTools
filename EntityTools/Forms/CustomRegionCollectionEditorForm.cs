@@ -49,7 +49,7 @@ namespace EntityTools.Forms
 
             // Копирование исходной коллекции для возможности отказа от внесения изменений
             var originalCrCollection = crCollection;
-            var customRegions = originalCrCollection.DebugContext.CustomRegions;
+            var customRegions = originalCrCollection.DesignContext.CustomRegions;
             if (crCollection?.Count > 0)
                 @this.fillList = () =>
                 {

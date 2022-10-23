@@ -1213,7 +1213,13 @@ namespace EntityTools.Core
 
         private void handler_EditQuester(object sender, EventArgs e)
         {
-            EntityTools.Core.UserRequest_Edit(Astral.Quester.API.CurrentProfile, Astral.API.CurrentSettings.LastQuesterProfile);
+            var profile = Astral.Quester.API.CurrentProfile;
+            var lastQuesterFilename = Astral.API.CurrentSettings.LastQuesterProfile;
+            var profilePath = profile.Saved && File.Exists(lastQuesterFilename)
+                ? lastQuesterFilename
+                : string.Empty;
+
+            EntityTools.Core.UserRequest_Edit(profile, profilePath);
         }
     }
 }

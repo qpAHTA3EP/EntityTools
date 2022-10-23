@@ -117,7 +117,7 @@ namespace EntityTools.Tools.CustomRegions
         #endregion
 
         [Browsable(false), XmlIgnore]
-        public QuesterProfileProxy DebugContext
+        public QuesterProfileProxy DesignContext
         {
             get => _context ?? (_context = AstralAccessors.Quester.Core.ActiveProfileProxy);
             set => _context = value;
@@ -415,7 +415,7 @@ namespace EntityTools.Tools.CustomRegions
 
         private CustomRegion FindCustomRegionFor(CustomRegionEntry crEntry)
         {
-            return DebugContext.CustomRegions.FirstOrDefault(cr =>
+            return DesignContext.CustomRegions.FirstOrDefault(cr =>
                 cr.Name.Equals(crEntry.Name, StringComparison.Ordinal));
         }
 

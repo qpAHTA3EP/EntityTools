@@ -165,7 +165,13 @@
   <metadata name="$this.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <metadata name="panelContainer1.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+  <metadata name="panProperties.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="dockPanel3_Container.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="pgProperties.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
   <metadata name="panelContainer2.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
@@ -188,7 +194,7 @@
         AAEAAAD/////AQAAAAAAAAAMAgAAAFdTeXN0ZW0uV2luZG93cy5Gb3JtcywgVmVyc2lvbj00LjAuMC4w
         LCBDdWx0dXJlPW5ldXRyYWwsIFB1YmxpY0tleVRva2VuPWI3N2E1YzU2MTkzNGUwODkFAQAAACZTeXN0
         ZW0uV2luZG93cy5Gb3Jtcy5JbWFnZUxpc3RTdHJlYW1lcgEAAAAERGF0YQcCAgAAAAkDAAAADwMAAAC8
-        KQAAAk1TRnQBSQFMAgEBHAEAAagBAgGoAQIBEAEAARABAAT/AQkBAAj/AUIBTQE2AQQGAAE2AQQCAAEo
+        KQAAAk1TRnQBSQFMAgEBHAEAAcABAgHAAQIBEAEAARABAAT/AQkBAAj/AUIBTQE2AQQGAAE2AQQCAAEo
         AwABQAMAAYADAAEBAQABCAYAASAYAAGAAgABgAMAAoABAAGAAwABgAEAAYABAAKAAgADwAEAAcAB3AHA
         AQAB8AHKAaYBAAEzBQABMwEAATMBAAEzAQACMwIAAxYBAAMcAQADIgEAAykBAANVAQADTQEAA0IBAAM5
         AQABgAF8Af8BAAJQAf8BAAGTAQAB1gEAAf8B7AHMAQABxgHWAe8BAAHWAucBAAGQAakBrQIAAf8BMwMA
@@ -222,18 +228,18 @@
         Af8B9AIAAv8BAAEOAQAB7AH/AgAB/wEaARcG+QFHAb0B/wYAAf8B9wHsAfIB7QERAe8LAAHyAm0B8gYA
         Af8BBwEPAQABDwEHAf8B9AIAAf8B6gIAAQ4B/wEAAf8BGgFHCfkBvQH/BQAB7wHsAfEB9AG8ARABQwEH
         CQAB8wHsAg4B7AHzBQAC/wEHAQ8BAAEPAQcB/wH0AfMBEwEAAesCAAEUAQAB/wEXBPkCAAT5AUcB9AQA
-        AQcB+AHwAvQB8wHqAQABFAG8CAABkgEPAhUBDwGSBgAB/wH0AQcBDgEAAQ8BBwG8AREBAAHqAv8BFQEH
-        Af8BvQX5AgAF+QGUAwABvAH4AbwC9AHzAfEB7AEPAQABEgHwBgAB7wEVAQ8C7AEPARUBBwQAAf8BAAL/
-        AQcBDgEAAg4BAAERAfMC9AEAAf8B8wHjDPkB4wHzAQAB8AH4Ae8BvAHvAe0C7ALrAW0BFQFtAfIEAAG8
+        AQcB7AHwAvQB8wHqAQABFAG8CAABkgEPAhUBDwGSBgAB/wH0AQcBDgEAAQ8BBwG8AREBAAHqAv8BFQEH
+        Af8BvQX5AgAF+QGUAwABvAHsAbwC9AHzAfEB7AEPAQABEgHwBgAB7wEVAQ8C7AEPARUBBwQAAf8BAAL/
+        AQcBDgEAAg4BAAERAfMC9AEAAf8B8wHjDPkB4wHzAQAB8AHsAe8BvAHvAe0C7ALrAW0BFQFtAfIEAAG8
         ARMB6gEUAgcBFAHqARIBvAYAAv8BBwEOAgABDgGSAe0B/wH0Af8BAAG9BvkCAAb5Ab0B8gFtARIC7AHt
-        Ae8B8AHyAesBDgEUAesB+AEHAfQCAAHxAW0B6wH4AW0C8wFtAfgCbQHxBAAB/wEAAf8B9wQAAewBDgHw
-        Av8B9AG9BvkCAAb5AZQB8gFtAewB8QHzA/QB8wESAwABEQHvAfQBAAHyAfgB6gEHARIB9wL0AZIBEgEH
-        AeoB+AHyAgAB9AEAAf8B7wUAAUMBAAFDAuwB7QHzAeMF+QIABfkB4wH/AQABvAH4AbwE9AHxAUMDAAES
+        Ae8B8AHyAesBDgEUAesB7AEHAfQCAAHxAW0B6wHsAW0C8wFtAewCbQHxBAAB/wEAAf8B9wQAAewBDgHw
+        Av8B9AG9BvkCAAb5AZQB8gFtAewB8QHzA/QB8wESAwABEQHvAfQBAAHyAewB6gEHARIB9wL0AZIBEgEH
+        AeoB7AHyAgAB9AEAAf8B7wUAAUMBAAFDAuwB7QHzAeMF+QIABfkB4wH/AQABvAHsAbwE9AHxAUMDAAES
         AfABAAHzAe0BQwH3AZIBFQHvArwB7wEVApIBQwHtAfMC/wHvAQ4DAAFtAewBQwUAAZIBAAG9BfkCAAX5
-        AZQDAAEHAfgB8AP0AQcBDwIAARUBvAIAAfEBFQEPARQBQwEOARUCEwEVAQ4BQwEUAQ8BFAHxAvMBDgMA
-        AewB7QEOBQABbQH/AQAB/wEXBPkCAAT5AUcB9AQAAe8B+AHxAvQB9wEOAQABQwEHAwAB8wHsARQB7wEH
+        AZQDAAEHAewB8AP0AQcBDwIAARUBvAIAAfEBFQEPARQBQwEOARUCEwEVAQ4BQwEUAQ8BFAHxAvMBDgMA
+        AewB7QEOBQABbQH/AQAB/wEXBPkCAAT5AUcB9AQAAe8B7AHxAvQB9wEOAQABQwEHAwAB8wHsARQB7wEH
         ARMB6gIHAeoBEwEHAe8BFAHsAfMB9wQAAesB/wH0AbwBQwQAAe8B/wEAAf8BGgFHCPkBRwG9Af8EAAH/
-        AfcB7AHyAfQB+AEAARAB7wUAAfEBEgH4AbwBkgFDAuwBQwGSAbwB+AHqAfEBAAG8BAAE/wHsBAABbQH/
+        AfcB7AHyAfQB7AEAARAB7wUAAfEBEgHsAbwBkgFDAuwBQwGSAbwB7AHqAfEBAAG8BAAE/wHsBAABbQH/
         AQAC/wEaARcG+QFHAb0B/wYAAfQC7QHyAeoBDwGSAf8GAAHvAxMEQwITARQBBwIAAe0DAAHxAQAB/wEA
         AfQB7AEAAW0B7wFtARQB8gIAA/8BvQHjAvkB4wGUAfQB/wgAAfMC7AETAewB9AgAAfAIvAHwAwAC7AG8
         Ae8B9AMAAfQB7QGSA/8B8gHzBgAB8wG9AZQB8wwAAfIB6wHsAfMXAAH/AewB6gHxAZIBbQFDARMB7AHw
@@ -394,15 +400,6 @@
     <value>True</value>
   </metadata>
   <metadata name="barDockControlRight.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
-  <metadata name="panProperties.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
-  <metadata name="dockPanel3_Container.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-    <value>True</value>
-  </metadata>
-  <metadata name="pgProperties.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
   <metadata name="panActions.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">

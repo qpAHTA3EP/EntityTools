@@ -279,6 +279,7 @@
     <Compile Include="Core\Proxies\UCCActionProxy.cs" />
     <Compile Include="Core\Proxies\UCCConditionProxy.cs" />
     <Compile Include="Patches\ComplexPatch_Navigation.cs" />
+    <Compile Include="Patches\Quester\ComplexPatch_Quester.cs" />
     <Compile Include="Patches\Mapper\ComplexPatch_Mapper.cs" />
     <Compile Include="Patches\Mapper\Tools\CustomRegionToolBase.cs" />
     <Compile Include="Patches\Mapper\Tools\CustomRegionToolForm.cs">
@@ -311,6 +312,7 @@
     <Compile Include="Quester\Actions\RemoveIgnoredFoes.cs" />
     <Compile Include="Quester\Actions\AddIgnoredFoes.cs" />
     <Compile Include="Quester\Actions\TurnInMissionExt.cs" />
+    <Compile Include="Quester\Conditions\ConditionPack.cs" />
     <Compile Include="Quester\Conditions\EquipmentLevel.cs" />
     <Compile Include="Quester\Conditions\IsInCustomRegionSet.cs" />
     <Compile Include="Servises\SlideMonitor\CharacterEx.cs" />

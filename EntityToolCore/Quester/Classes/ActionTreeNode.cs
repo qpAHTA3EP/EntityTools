@@ -1,11 +1,12 @@
-﻿using System;
+﻿using ACTP0Tools.Reflection;
+using EntityCore.Tools;
+using MyNW.Classes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
-using ACTP0Tools.Reflection;
-using Astral.Quester.Classes;
-using EntityCore.Tools;
 using QuesterAction = Astral.Quester.Classes.Action;
+using QuesterCondition = Astral.Quester.Classes.Condition;
 
 
 namespace EntityCore.Quester.Classes
@@ -13,27 +14,45 @@ namespace EntityCore.Quester.Classes
     /// <summary>
     /// Узел дерева, отображающий <see cref="QuesterAction"/>
     /// </summary>
-    public class ActionTreeNode : TreeNode, IActionTreeNode
+    public sealed class ActionTreeNode : ActionBaseTreeNode
     {
-        public bool AllowChildren => false;
-
+        private readonly QuesterAction action;
         public ActionTreeNode(QuesterAction action, bool clone = false)
         {
             var act = clone ? CopyHelper.CreateDeepCopy(action) : action;
             Tag = act;
-            SelectIcon(act);
+            this.action = act;
+            UpdateView();
+        }
+
+        public override QuesterAction Content => action;
+
+        public override bool UseHotSpots => action.UseHotSpots;
+
+        public override List<Vector3> HotSpots => action.HotSpots;
+
+        public override QuesterAction.ActionValidity IsValid => action.IsValid;
+
+        public override bool AllowChildren => false;
+
+        public override void NewID() => action.ActionID = Guid.NewGuid();
+
+        public override void UpdateView()
+        {
+            if (Parent is ActionBaseTreeNode parentPackNode)
+                parentPackNode.UpdateView();
+
             var txt = action.ToString();
             var type = action.GetType();
             if (string.IsNullOrEmpty(txt)
                 || txt == type.FullName)
                 txt = type.Name;
             Text = txt;
-            Checked = !act.Disabled;
-
-            _conditionTreeNodes = act.Conditions.ToTreeNodes().ToArray();
+            if (Checked == action.Disabled)
+                Checked = !action.Disabled;
+            SelectIcon();
         }
-
-        private void SelectIcon(QuesterAction action)
+        private void SelectIcon()
         {
             var actionIsValid = action.IsValid;
             if (actionIsValid.IsValid)
@@ -109,34 +128,13 @@ namespace EntityCore.Quester.Classes
                 ToolTipText = actionIsValid.Message;
             }
         }
-        public void UpdateView()
-        {
-            if (TreeView is null)
-                return;
 
-            if (Tag is QuesterAction action)
-            {
-                var txt = action.ToString();
-                var type = action.GetType();
-                if (string.IsNullOrEmpty(txt)
-                    || txt == type.FullName)
-                    txt = type.Name;
-                Text = txt;
-                Checked = !action.Disabled;
-                SelectIcon(action);
-            }
-            else throw new InvalidCastException($"TreeNode[{Index}]({Tag?.GetType().FullName ?? "NULL"}) does not contains {typeof(QuesterAction).FullName}");
-        }
-
-        public QuesterAction ReconstructInternal()
+        public override QuesterAction ReconstructInternal()
         {
-            if (Tag is QuesterAction action)
-            {
-                if(_conditionTreeNodes != null)
-                    action.Conditions = _conditionTreeNodes.ToQuesterConditionList();
-                return action;
-            }
-            throw new InvalidCastException($"TreeNode[{Index}]({Tag?.GetType().FullName ?? "NULL"}) does not contains {typeof(QuesterAction).FullName}");
+            action.Disabled = !Checked;
+            if (conditionTreeNodes != null)
+                action.Conditions = conditionTreeNodes.ToListOf<QuesterCondition>();
+            return action;
         }
 
         public override object Clone()
@@ -146,6 +144,7 @@ namespace EntityCore.Quester.Classes
             return new ActionTreeNode(newAction);
         }
 
+#if false
         /// <summary>
         /// Список узлов дерева, соответствующих условиям <see cref="QuesterAction"/>
         /// </summary>
@@ -153,9 +152,16 @@ namespace EntityCore.Quester.Classes
         {
             get => _conditionTreeNodes ?? (_conditionTreeNodes = ReconstructInternal().Conditions
                                                                                       .ToTreeNodes()
-                                                                                      .ToArray()); 
+                                                                                      .ToArray());
             set => _conditionTreeNodes = value;
         }
-        private TreeNode[] _conditionTreeNodes;
+#else
+        public override TreeNode[] GetConditionTreeNodes()
+        {
+            return conditionTreeNodes ?? (conditionTreeNodes = ReconstructInternal().Conditions
+                                                                                    .ToTreeNodes()
+                                                                                    .ToArray());
+        }
+#endif
     }
 }

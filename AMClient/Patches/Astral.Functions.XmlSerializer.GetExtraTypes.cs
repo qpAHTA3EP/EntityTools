@@ -45,6 +45,28 @@ namespace ACTP0Tools.Patches
         }
         private static readonly List<Type> _questerTypes = new List<Type>(100);
 
+        public static List<Type> QuesterActions
+        {
+            get
+            {
+                if (!_questerActions.Any())
+                    AnalizeAssemblyTypes();
+                return _questerActions;
+            }
+        }
+        private static readonly List<Type> _questerActions = new List<Type>(100);
+
+        public static List<Type> QuesterConditions
+        {
+            get
+            {
+                if (!_questerConditions.Any())
+                    AnalizeAssemblyTypes();
+                return _questerConditions;
+            }
+        }
+        private static readonly List<Type> _questerConditions = new List<Type>(100);
+
         public static List<Type> MultitaskTypes
         {
             get
@@ -236,17 +258,36 @@ namespace ACTP0Tools.Patches
         {
             if(types is null)
                 return;
-            
+            Type qaConditionPackType = null;
+            Type etConditionPackType = null;
             foreach (Type type in types)
             {
+                switch (type.FullName)
+                {
+                    case "QuesterAssistant.Conditions.ConditionPack":
+                        qaConditionPackType = type;
+                        continue;
+                    case "EntityTools.Quester.Conditions.ConditionPack":
+                        etConditionPackType = type;
+                        continue;
+                    case "QuesterAssistant.Actions.PushProfileToStackAndLoad":
+                        _pushProfileToStackAndLoad = type;
+                        break;
+                }
+
                 if (tUccAction.IsAssignableFrom(type) 
                     || tUccCondition.IsAssignableFrom(type) 
-                    || tQuesterCondition.IsAssignableFrom(type) 
                     //|| tUccTargetProcessor.IsAssignableFrom(type)
                     )
                 {
                     _uccTypes.Add(type);
                     _questerTypes.Add(type);
+                }
+                else if (tQuesterCondition.IsAssignableFrom(type))
+                {
+                    _uccTypes.Add(type);
+                    _questerTypes.Add(type);
+                    _questerConditions.Add(type);
                 }
                 //else if(tUccTargetSelector.IsAssignableFrom(type))
                 //{
@@ -256,7 +297,10 @@ namespace ACTP0Tools.Patches
                 //}
                 //else 
                 else if (tQuesterAction.IsAssignableFrom(type))
+                {
                     _questerTypes.Add(type);
+                    _questerActions.Add(type);
+                }
                 else if (tTargetPriorityEntry.IsAssignableFrom(type))
                 {
                     if (tTargetPriorityEntry == type)
@@ -274,11 +318,25 @@ namespace ACTP0Tools.Patches
                 {
                     Before3DDraw_Wrapper = type;
                 }
-
-                if (type.FullName == "QuesterAssistant.Conditions.ConditionPack")
-                    _questerConditionPack = type;
-                if (type.FullName == "QuesterAssistant.Actions.PushProfileToStackAndLoad")
-                    _pushProfileToStackAndLoad = type;
+            }
+            if (etConditionPackType != null)
+            {
+                // Используется реализация ConditionPack из EntityTools
+                _questerConditionPack = etConditionPackType;
+                _questerTypes.Add(_questerConditionPack);
+                _uccTypes.Add(_questerConditionPack);
+                _questerConditions.Add(_questerConditionPack);
+            }
+            else if (qaConditionPackType != null)
+            {
+                // Если тип ConditionPack не найден в EntityTools, используется реализация из QuesterAssistant
+                _questerConditionPack = qaConditionPackType;
+                if (_questerConditionPack != null)
+                {
+                    _questerTypes.Add(_questerConditionPack);
+                    _uccTypes.Add(_questerConditionPack);
+                    _questerConditions.Add(_questerConditionPack);
+                }
             }
         }
 

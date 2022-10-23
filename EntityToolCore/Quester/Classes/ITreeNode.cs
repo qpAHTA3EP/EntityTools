@@ -1,4 +1,6 @@
-﻿namespace EntityCore.Quester.Classes
+﻿using ACTP0Tools.Classes.Quester;
+
+namespace EntityCore.Quester.Classes
 {
     /// <summary>
     /// Вспомогательный интерфейс для отображения элементов quester-профиля
@@ -6,7 +8,6 @@
     /// <typeparam name="T">Тип отображаемых элементом данных</typeparam>
     internal interface ITreeNode<T>
     {
-        
         /// <summary>
         /// Допустимость дочерних узлов
         /// </summary>

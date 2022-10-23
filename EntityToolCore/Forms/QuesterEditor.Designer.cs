@@ -50,6 +50,8 @@ namespace EntityCore.Forms
             DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject19 = new DevExpress.Utils.SerializableAppearanceObject();
             DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions customHeaderButtonImageOptions20 = new DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions();
             DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject20 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions customHeaderButtonImageOptions21 = new DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject21 = new DevExpress.Utils.SerializableAppearanceObject();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(QuesterEditor));
             DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions customHeaderButtonImageOptions6 = new DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions();
             DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject6 = new DevExpress.Utils.SerializableAppearanceObject();
@@ -92,6 +94,7 @@ namespace EntityCore.Forms
             this.btnOpen = new DevExpress.XtraBars.BarButtonItem();
             this.btnSave = new DevExpress.XtraBars.BarButtonItem();
             this.btnSaveAs = new DevExpress.XtraBars.BarButtonItem();
+            this.btnToQuester = new DevExpress.XtraBars.BarButtonItem();
             this.btnShowMapper = new DevExpress.XtraBars.BarButtonItem();
             this.barDockControlTop = new DevExpress.XtraBars.BarDockControl();
             this.barDockControlBottom = new DevExpress.XtraBars.BarDockControl();
@@ -106,6 +109,9 @@ namespace EntityCore.Forms
             this.imageList = new System.Windows.Forms.ImageList(this.components);
             this.txtActionFilter = new DevExpress.XtraEditors.ButtonEdit();
             this.panelContainer1 = new DevExpress.XtraBars.Docking.DockPanel();
+            this.panProperties = new DevExpress.XtraBars.Docking.DockPanel();
+            this.dockPanel3_Container = new DevExpress.XtraBars.Docking.ControlContainer();
+            this.pgProperties = new System.Windows.Forms.PropertyGrid();
             this.panelContainer2 = new DevExpress.XtraBars.Docking.DockPanel();
             this.panConditions = new DevExpress.XtraBars.Docking.DockPanel();
             this.dockPanel4_Container = new DevExpress.XtraBars.Docking.ControlContainer();
@@ -117,11 +123,9 @@ namespace EntityCore.Forms
             this.clmnPointX = new DevExpress.XtraGrid.Columns.GridColumn();
             this.clmnPointY = new DevExpress.XtraGrid.Columns.GridColumn();
             this.clmnPointZ = new DevExpress.XtraGrid.Columns.GridColumn();
-            this.panProperties = new DevExpress.XtraBars.Docking.DockPanel();
-            this.dockPanel3_Container = new DevExpress.XtraBars.Docking.ControlContainer();
-            this.pgProperties = new System.Windows.Forms.PropertyGrid();
             this.behaviorManager = new DevExpress.Utils.Behaviors.BehaviorManager(this.components);
             this.hotSpotsDragDropEvent = new DevExpress.Utils.DragDrop.DragDropEvents(this.components);
+            this.barButtonItem2 = new DevExpress.XtraBars.BarButtonItem();
             ((System.ComponentModel.ISupportInitialize)(this.dockManager)).BeginInit();
             this.hideContainerRight.SuspendLayout();
             this.panelContainer3.SuspendLayout();
@@ -143,6 +147,8 @@ namespace EntityCore.Forms
             this.dockPanel2_Container.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.txtActionFilter.Properties)).BeginInit();
             this.panelContainer1.SuspendLayout();
+            this.panProperties.SuspendLayout();
+            this.dockPanel3_Container.SuspendLayout();
             this.panelContainer2.SuspendLayout();
             this.panConditions.SuspendLayout();
             this.dockPanel4_Container.SuspendLayout();
@@ -150,8 +156,6 @@ namespace EntityCore.Forms
             this.controlContainer1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gridHotSpots)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridViewHotSpots)).BeginInit();
-            this.panProperties.SuspendLayout();
-            this.dockPanel3_Container.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.behaviorManager)).BeginInit();
             this.SuspendLayout();
             // 
@@ -393,8 +397,10 @@ namespace EntityCore.Forms
             this.btnSave,
             this.btnSaveAs,
             this.btnNewProfile,
-            this.btnShowMapper});
-            this.barManager.MaxItemId = 7;
+            this.btnShowMapper,
+            this.btnToQuester,
+            this.barButtonItem2});
+            this.barManager.MaxItemId = 9;
             // 
             // barProfile
             // 
@@ -407,6 +413,7 @@ namespace EntityCore.Forms
             new DevExpress.XtraBars.LinkPersistInfo(this.btnOpen),
             new DevExpress.XtraBars.LinkPersistInfo(this.btnSave),
             new DevExpress.XtraBars.LinkPersistInfo(this.btnSaveAs),
+            new DevExpress.XtraBars.LinkPersistInfo(this.btnToQuester),
             new DevExpress.XtraBars.LinkPersistInfo(this.btnShowMapper, true)});
             this.barProfile.Text = "Tools";
             // 
@@ -441,6 +448,15 @@ namespace EntityCore.Forms
             this.btnSaveAs.ImageOptions.Image = global::EntityCore.Properties.Resources.miniSaveas;
             this.btnSaveAs.Name = "btnSaveAs";
             this.btnSaveAs.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_Profile_SaveAs);
+            // 
+            // btnToQuester
+            // 
+            this.btnToQuester.Caption = "Upload to Quester";
+            this.btnToQuester.Hint = "Upload profile to Quester- engine";
+            this.btnToQuester.Id = 7;
+            this.btnToQuester.ImageOptions.Image = global::EntityCore.Properties.Resources.miniImport;
+            this.btnToQuester.Name = "btnToQuester";
+            this.btnToQuester.ItemClick += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_Profile_Upload);
             // 
             // btnShowMapper
             // 
@@ -524,14 +540,16 @@ namespace EntityCore.Forms
             customHeaderButtonImageOptions16.Image = ((System.Drawing.Image)(resources.GetObject("customHeaderButtonImageOptions16.Image")));
             customHeaderButtonImageOptions17.Image = global::EntityCore.Properties.Resources.miniPaste;
             customHeaderButtonImageOptions18.Image = global::EntityCore.Properties.Resources.miniCopy;
-            customHeaderButtonImageOptions19.Image = global::EntityCore.Properties.Resources.miniCancel;
-            customHeaderButtonImageOptions20.Image = global::EntityCore.Properties.Resources.miniAdd;
+            customHeaderButtonImageOptions19.Image = global::EntityCore.Properties.Resources.miniRefresh;
+            customHeaderButtonImageOptions20.Image = global::EntityCore.Properties.Resources.miniCancel;
+            customHeaderButtonImageOptions21.Image = global::EntityCore.Properties.Resources.miniAdd;
             this.panActions.CustomHeaderButtons.AddRange(new DevExpress.XtraBars.Docking2010.IButton[] {
             new DevExpress.XtraBars.Docking.CustomHeaderButton("Edit XML", false, customHeaderButtonImageOptions16, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Edit selected action in XML", -1, true, null, true, false, true, serializableAppearanceObject16, null, -1),
             new DevExpress.XtraBars.Docking.CustomHeaderButton("Paste Action", false, customHeaderButtonImageOptions17, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Paste Action from Clipboard", -1, true, null, true, false, true, serializableAppearanceObject17, null, -1),
             new DevExpress.XtraBars.Docking.CustomHeaderButton("Copy Action", false, customHeaderButtonImageOptions18, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Copy selected Action to Clipboard", -1, true, null, true, false, true, serializableAppearanceObject18, null, -1),
-            new DevExpress.XtraBars.Docking.CustomHeaderButton("Delete Action", false, customHeaderButtonImageOptions19, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Delete selected Action", -1, true, null, true, false, true, serializableAppearanceObject19, null, -1),
-            new DevExpress.XtraBars.Docking.CustomHeaderButton("Add Action", false, customHeaderButtonImageOptions20, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Add Action", -1, true, null, true, false, true, serializableAppearanceObject20, null, -1)});
+            new DevExpress.XtraBars.Docking.CustomHeaderButton("Gather Info", false, customHeaderButtonImageOptions19, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Run Action initialization wizard", -1, true, null, true, false, true, serializableAppearanceObject19, null, -1),
+            new DevExpress.XtraBars.Docking.CustomHeaderButton("Delete Action", false, customHeaderButtonImageOptions20, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Delete selected Action", -1, true, null, true, false, true, serializableAppearanceObject20, null, -1),
+            new DevExpress.XtraBars.Docking.CustomHeaderButton("Add Action", false, customHeaderButtonImageOptions21, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Add Action", -1, true, null, true, false, true, serializableAppearanceObject21, null, -1)});
             this.panActions.Dock = DevExpress.XtraBars.Docking.DockingStyle.Left;
             this.panActions.ID = new System.Guid("d2da03f2-bc90-487d-ae8c-6667f9707648");
             this.panActions.Location = new System.Drawing.Point(0, 24);
@@ -586,7 +604,7 @@ namespace EntityCore.Forms
             this.treeActions.TabIndex = 4;
             this.treeActions.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.handler_TreeView_NodeCheckedChanged);
             this.treeActions.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.handler_TreeView_ItemDrag);
-            this.treeActions.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.handler_TreeView_NodeSelected);
+            this.treeActions.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.handler_Action_Selected);
             this.treeActions.DragDrop += new System.Windows.Forms.DragEventHandler(this.handler_TreeView_DragDrop);
             this.treeActions.DragEnter += new System.Windows.Forms.DragEventHandler(this.handler_TreeView_DragEnter);
             this.treeActions.DragOver += new System.Windows.Forms.DragEventHandler(this.handler_TreeView_DragOver);
@@ -646,15 +664,51 @@ namespace EntityCore.Forms
             // 
             // panelContainer1
             // 
-            this.panelContainer1.Controls.Add(this.panelContainer2);
+            this.panelContainer1.ChildPanelOrientation = DevExpress.XtraBars.Docking.LayoutOrientation.Vertical;
             this.panelContainer1.Controls.Add(this.panProperties);
+            this.panelContainer1.Controls.Add(this.panelContainer2);
             this.panelContainer1.Dock = DevExpress.XtraBars.Docking.DockingStyle.Fill;
-            this.panelContainer1.ID = new System.Guid("5f601db0-1862-463c-a7c8-e55dd8297f85");
+            this.panelContainer1.ID = new System.Guid("08554fcb-d125-4703-9b1c-cbb440fbed92");
             this.panelContainer1.Location = new System.Drawing.Point(362, 24);
             this.panelContainer1.Name = "panelContainer1";
             this.panelContainer1.OriginalSize = new System.Drawing.Size(129, 200);
             this.panelContainer1.Size = new System.Drawing.Size(615, 594);
             this.panelContainer1.Text = "panelContainer1";
+            // 
+            // panProperties
+            // 
+            this.panProperties.Controls.Add(this.dockPanel3_Container);
+            this.panProperties.Dock = DevExpress.XtraBars.Docking.DockingStyle.Fill;
+            this.panProperties.FloatVertical = true;
+            this.panProperties.ID = new System.Guid("46688bda-f0d5-40cb-bebf-2df1f08c0010");
+            this.panProperties.Location = new System.Drawing.Point(0, 0);
+            this.panProperties.Name = "panProperties";
+            this.panProperties.Options.ShowCloseButton = false;
+            this.panProperties.Options.ShowMaximizeButton = false;
+            this.panProperties.Options.ShowMinimizeButton = false;
+            this.panProperties.OriginalSize = new System.Drawing.Size(615, 345);
+            this.panProperties.Size = new System.Drawing.Size(615, 345);
+            this.panProperties.Text = "Properties";
+            // 
+            // dockPanel3_Container
+            // 
+            this.dockPanel3_Container.Controls.Add(this.pgProperties);
+            this.dockPanel3_Container.Location = new System.Drawing.Point(3, 26);
+            this.dockPanel3_Container.Name = "dockPanel3_Container";
+            this.dockPanel3_Container.Size = new System.Drawing.Size(609, 315);
+            this.dockPanel3_Container.TabIndex = 0;
+            // 
+            // pgProperties
+            // 
+            this.pgProperties.BackColor = System.Drawing.SystemColors.Control;
+            this.pgProperties.CategorySplitterColor = System.Drawing.SystemColors.Window;
+            this.pgProperties.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pgProperties.Location = new System.Drawing.Point(0, 0);
+            this.pgProperties.Name = "pgProperties";
+            this.pgProperties.Size = new System.Drawing.Size(609, 315);
+            this.pgProperties.TabIndex = 4;
+            this.pgProperties.ToolbarVisible = false;
+            this.pgProperties.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.handler_PropertyChanged);
             // 
             // panelContainer2
             // 
@@ -663,12 +717,12 @@ namespace EntityCore.Forms
             this.panelContainer2.Controls.Add(this.panHotSpots);
             this.panelContainer2.Dock = DevExpress.XtraBars.Docking.DockingStyle.Fill;
             this.panelContainer2.ID = new System.Guid("3dc0d645-8be6-4788-b810-f68abc9185d9");
-            this.panelContainer2.Location = new System.Drawing.Point(0, 0);
+            this.panelContainer2.Location = new System.Drawing.Point(0, 345);
             this.panelContainer2.Name = "panelContainer2";
             this.panelContainer2.Options.ShowCloseButton = false;
             this.panelContainer2.Options.ShowMaximizeButton = false;
             this.panelContainer2.Options.ShowMinimizeButton = false;
-            this.panelContainer2.OriginalSize = new System.Drawing.Size(615, 249);
+            this.panelContainer2.OriginalSize = new System.Drawing.Size(129, 200);
             this.panelContainer2.Size = new System.Drawing.Size(615, 249);
             this.panelContainer2.Tabbed = true;
             this.panelContainer2.Text = "panelContainer2";
@@ -699,7 +753,7 @@ namespace EntityCore.Forms
             this.panConditions.Options.ShowMaximizeButton = false;
             this.panConditions.Options.ShowMinimizeButton = false;
             this.panConditions.OriginalSize = new System.Drawing.Size(609, 187);
-            this.panConditions.Size = new System.Drawing.Size(609, 187);
+            this.panConditions.Size = new System.Drawing.Size(609, 188);
             this.panConditions.Text = "Conditions";
             this.panConditions.CustomButtonClick += new DevExpress.XtraBars.Docking2010.ButtonEventHandler(this.handler_Condition_ButtonClick);
             this.panConditions.KeyDown += new System.Windows.Forms.KeyEventHandler(this.handler_Condition_ShortCut);
@@ -709,7 +763,7 @@ namespace EntityCore.Forms
             this.dockPanel4_Container.Controls.Add(this.treeConditions);
             this.dockPanel4_Container.Location = new System.Drawing.Point(0, 0);
             this.dockPanel4_Container.Name = "dockPanel4_Container";
-            this.dockPanel4_Container.Size = new System.Drawing.Size(609, 187);
+            this.dockPanel4_Container.Size = new System.Drawing.Size(609, 188);
             this.dockPanel4_Container.TabIndex = 0;
             // 
             // treeConditions
@@ -728,11 +782,11 @@ namespace EntityCore.Forms
             this.treeConditions.Location = new System.Drawing.Point(0, 0);
             this.treeConditions.Name = "treeConditions";
             this.treeConditions.SelectedImageIndex = 0;
-            this.treeConditions.Size = new System.Drawing.Size(609, 187);
+            this.treeConditions.Size = new System.Drawing.Size(609, 188);
             this.treeConditions.TabIndex = 4;
             this.treeConditions.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.handler_TreeView_NodeCheckedChanged);
             this.treeConditions.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.handler_TreeView_ItemDrag);
-            this.treeConditions.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.handler_TreeView_NodeSelected);
+            this.treeConditions.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.handler_Condition_Selected);
             this.treeConditions.DragDrop += new System.Windows.Forms.DragEventHandler(this.handler_TreeView_DragDrop);
             this.treeConditions.DragEnter += new System.Windows.Forms.DragEventHandler(this.handler_TreeView_DragEnter);
             this.treeConditions.DragOver += new System.Windows.Forms.DragEventHandler(this.handler_TreeView_DragOver);
@@ -758,7 +812,7 @@ namespace EntityCore.Forms
             this.panHotSpots.Options.ShowMaximizeButton = false;
             this.panHotSpots.Options.ShowMinimizeButton = false;
             this.panHotSpots.OriginalSize = new System.Drawing.Size(609, 187);
-            this.panHotSpots.Size = new System.Drawing.Size(609, 187);
+            this.panHotSpots.Size = new System.Drawing.Size(609, 188);
             this.panHotSpots.Text = "HotSpots";
             this.panHotSpots.CustomButtonClick += new DevExpress.XtraBars.Docking2010.ButtonEventHandler(this.handler_HotSpots_ButtonClick);
             this.panHotSpots.CustomButtonUnchecked += new DevExpress.XtraBars.Docking2010.ButtonEventHandler(this.handler_HotSpots_ButtonClick);
@@ -769,7 +823,7 @@ namespace EntityCore.Forms
             this.controlContainer1.Controls.Add(this.gridHotSpots);
             this.controlContainer1.Location = new System.Drawing.Point(0, 0);
             this.controlContainer1.Name = "controlContainer1";
-            this.controlContainer1.Size = new System.Drawing.Size(609, 187);
+            this.controlContainer1.Size = new System.Drawing.Size(609, 188);
             this.controlContainer1.TabIndex = 0;
             // 
             // gridHotSpots
@@ -779,7 +833,7 @@ namespace EntityCore.Forms
             this.gridHotSpots.MainView = this.gridViewHotSpots;
             this.gridHotSpots.MenuManager = this.barManager;
             this.gridHotSpots.Name = "gridHotSpots";
-            this.gridHotSpots.Size = new System.Drawing.Size(609, 187);
+            this.gridHotSpots.Size = new System.Drawing.Size(609, 188);
             this.gridHotSpots.TabIndex = 0;
             this.gridHotSpots.ViewCollection.AddRange(new DevExpress.XtraGrid.Views.Base.BaseView[] {
             this.gridViewHotSpots});
@@ -869,44 +923,16 @@ namespace EntityCore.Forms
             this.clmnPointZ.VisibleIndex = 2;
             this.clmnPointZ.Width = 100;
             // 
-            // panProperties
-            // 
-            this.panProperties.Controls.Add(this.dockPanel3_Container);
-            this.panProperties.Dock = DevExpress.XtraBars.Docking.DockingStyle.Fill;
-            this.panProperties.ID = new System.Guid("46688bda-f0d5-40cb-bebf-2df1f08c0010");
-            this.panProperties.Location = new System.Drawing.Point(0, 249);
-            this.panProperties.Name = "panProperties";
-            this.panProperties.Options.ShowCloseButton = false;
-            this.panProperties.Options.ShowMaximizeButton = false;
-            this.panProperties.Options.ShowMinimizeButton = false;
-            this.panProperties.OriginalSize = new System.Drawing.Size(615, 345);
-            this.panProperties.Size = new System.Drawing.Size(615, 345);
-            this.panProperties.Text = "Properties";
-            // 
-            // dockPanel3_Container
-            // 
-            this.dockPanel3_Container.Controls.Add(this.pgProperties);
-            this.dockPanel3_Container.Location = new System.Drawing.Point(3, 26);
-            this.dockPanel3_Container.Name = "dockPanel3_Container";
-            this.dockPanel3_Container.Size = new System.Drawing.Size(609, 316);
-            this.dockPanel3_Container.TabIndex = 0;
-            // 
-            // pgProperties
-            // 
-            this.pgProperties.BackColor = System.Drawing.SystemColors.Control;
-            this.pgProperties.CategorySplitterColor = System.Drawing.SystemColors.Window;
-            this.pgProperties.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pgProperties.Location = new System.Drawing.Point(0, 0);
-            this.pgProperties.Name = "pgProperties";
-            this.pgProperties.Size = new System.Drawing.Size(609, 316);
-            this.pgProperties.TabIndex = 4;
-            this.pgProperties.ToolbarVisible = false;
-            this.pgProperties.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.handler_PropertyChanged);
-            // 
             // hotSpotsDragDropEvent
             // 
             this.hotSpotsDragDropEvent.DragOver += new DevExpress.Utils.DragDrop.DragOverEventHandler(this.handler_HotSpot_DragOver);
             this.hotSpotsDragDropEvent.DragDrop += new DevExpress.Utils.DragDrop.DragDropEventHandler(this.handler_HotSpot_DragDrop);
+            // 
+            // barButtonItem2
+            // 
+            this.barButtonItem2.Caption = "Mission monitor";
+            this.barButtonItem2.Id = 8;
+            this.barButtonItem2.Name = "barButtonItem2";
             // 
             // QuesterEditor
             // 
@@ -922,7 +948,7 @@ namespace EntityCore.Forms
             this.Controls.Add(this.barDockControlBottom);
             this.Controls.Add(this.barDockControlTop);
             this.Name = "QuesterEditor";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "QuesterEditor";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.handler_Form_Closing);
             this.Load += new System.EventHandler(this.handler_Form_Load);
@@ -948,6 +974,8 @@ namespace EntityCore.Forms
             this.dockPanel2_Container.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.txtActionFilter.Properties)).EndInit();
             this.panelContainer1.ResumeLayout(false);
+            this.panProperties.ResumeLayout(false);
+            this.dockPanel3_Container.ResumeLayout(false);
             this.panelContainer2.ResumeLayout(false);
             this.panConditions.ResumeLayout(false);
             this.dockPanel4_Container.ResumeLayout(false);
@@ -955,8 +983,6 @@ namespace EntityCore.Forms
             this.controlContainer1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.gridHotSpots)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.gridViewHotSpots)).EndInit();
-            this.panProperties.ResumeLayout(false);
-            this.dockPanel3_Container.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.behaviorManager)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -966,7 +992,6 @@ namespace EntityCore.Forms
         #endregion
 
         private DevExpress.XtraBars.Docking.DockManager dockManager;
-        private DevExpress.XtraBars.Docking.DockPanel panelContainer1;
         private DevExpress.XtraBars.Docking.DockPanel panConditions;
         private DevExpress.XtraBars.Docking.ControlContainer dockPanel4_Container;
         private DevExpress.XtraBars.Docking.DockPanel panProperties;
@@ -1016,5 +1041,8 @@ namespace EntityCore.Forms
         private System.Windows.Forms.ImageList imageList;
         private DevExpress.XtraBars.BarButtonItem btnNewProfile;
         private DevExpress.XtraBars.BarButtonItem btnShowMapper;
+        private DevExpress.XtraBars.Docking.DockPanel panelContainer1;
+        private DevExpress.XtraBars.BarButtonItem btnToQuester;
+        private DevExpress.XtraBars.BarButtonItem barButtonItem2;
     }
 }

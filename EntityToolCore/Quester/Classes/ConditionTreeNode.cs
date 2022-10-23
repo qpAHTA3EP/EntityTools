@@ -1,5 +1,5 @@
-﻿using ACTP0Tools.Reflection;
-using System;
+﻿using ACTP0Tools.Classes.Quester;
+using ACTP0Tools.Reflection;
 using QuesterCondition = Astral.Quester.Classes.Condition;
 
 namespace EntityCore.Quester.Classes
@@ -7,64 +7,47 @@ namespace EntityCore.Quester.Classes
     /// <summary>
     /// Узел дерева, отображающий <see cref="QuesterCondition"/>
     /// </summary>
-    internal class ConditionTreeNode : ConditionBaseTreeNode
+    internal sealed class ConditionTreeNode : ConditionBaseTreeNode
     {
         public ConditionTreeNode(QuesterCondition condition)
         {
             Tag = condition;
+            this.condition = condition;
+            UpdateView();
+        }
+
+        public override QuesterCondition Content => condition;
+        private readonly QuesterCondition condition;
+
+        public override bool IsValid(QuesterProfileProxy profile) => condition.IsValid;
+
+        public override string TestInfo(QuesterProfileProxy profile) => condition.TestInfos;
+        
+        public override bool AllowChildren => false;
+
+        public override void UpdateView()
+        {
             var txt = condition.ToString();
             var type = condition.GetType();
             if (string.IsNullOrEmpty(txt)
                 || txt == type.FullName)
                 txt = type.Name;
             Text = txt;
-            SelectIcon(condition);
-            Checked = condition.Locked;
-        }
-
-        public override bool IsValid => ((QuesterCondition) Tag).IsValid;
-
-        public override string TestInfo => ((QuesterCondition) Tag).TestInfos;
-
-        public override bool Locked
-        {
-            get => ((QuesterCondition)Tag).Locked; 
-            set => ((QuesterCondition)Tag).Locked = value;
-        }
-        public override bool AllowChildren => false;
-
-        private void SelectIcon(QuesterCondition condition)
-        {
+            if(Checked != condition.Locked)
+                Checked = condition.Locked;
             ImageKey = "Condition";
             SelectedImageKey = "Condition";
-        }
-        public override void UpdateView()
-        {
-            if (TreeView is null)
-                return;
-
-            if (Tag is QuesterCondition condition)
-            {
-                var txt = condition.ToString();
-                var type = condition.GetType();
-                if (string.IsNullOrEmpty(txt)
-                    || txt == type.FullName)
-                    txt = type.Name;
-                Text = txt;
-                Checked = condition.Locked;
-                SelectIcon(condition);
-            }
-            else throw new InvalidCastException($"TreeNode[{Index}]({Tag?.GetType().FullName ?? "NULL"}) does not contains {typeof(QuesterCondition).FullName}");
         }
 
         public override QuesterCondition ReconstructInternal()
         {
-            return Tag as QuesterCondition;
+            condition.Locked = Checked;
+            return condition;
         }
 
         public override object Clone()
         {
-            return new ConditionTreeNode(CopyHelper.CreateDeepCopy((QuesterCondition)Tag));
+            return new ConditionTreeNode(CopyHelper.CreateDeepCopy(condition));
         }
     }
 }
