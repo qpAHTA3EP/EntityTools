@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Drawing.Design;
 using System.IO;
 using System.Windows.Forms;
+using Astral.Quester.Classes.Actions;
 using PathHelper = ACTP0Tools.Classes.FileTools;
 
 namespace EntityTools.Editors
@@ -14,22 +15,23 @@ namespace EntityTools.Editors
     {
         private static PropertyAccessor<PropertyGrid> pgAccessor;
         private static PropertyAccessor<QuesterProfileProxy> profileProxyAccessor;
-        private static PropertyAccessor<string> profileNameAccessor;
+        //private static PropertyAccessor<string> profileNameAccessor;
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
             var instance = context?.Instance;
-            if (instance?.GetType() == ACTP0Serializer.PushProfileToStackAndLoad)
+            var type = instance?.GetType();
+            if (type == ACTP0Serializer.PushProfileToStackAndLoad
+                || type == typeof(LoadProfile))
             {
                 //string fullProfilePath = string.Empty;
 
                 //string profileDir = string.Empty;
                 //string astralProfilePath = Astral.Controllers.Directories.ProfilesPath;
-                
-                QuesterProfileProxy questerProfile = null;
+
                 string profileFile = string.Empty;
 
-                if (profileNameAccessor is null)
-                    profileNameAccessor = ACTP0Serializer.PushProfileToStackAndLoad.GetProperty<string>("ProfileName");
+                // if (profileNameAccessor is null)
+                //     profileNameAccessor = ACTP0Serializer.PushProfileToStackAndLoad.GetProperty<string>("ProfileName");
 
                 if (pgAccessor is null)
                     pgAccessor = context.GetProperty<PropertyGrid>("OwnerGrid");
@@ -43,8 +45,7 @@ namespace EntityTools.Editors
                             profileProxyAccessor = parentForm.GetProperty<QuesterProfileProxy>("Profile");
                         if (profileProxyAccessor.IsValid)
                         {
-                            questerProfile = profileProxyAccessor.Value;
-                            profileFile = questerProfile.FileName;
+                            profileFile = profileProxyAccessor.Value.FileName;
                         }
                     }
                 }

@@ -26,7 +26,7 @@ namespace EntityTools.Settings
                 }
             }
         }
-        private static int _cacheTime = 500;
+        private int _cacheTime = 500;
 
         /// <summary>
         /// Интервал времени между обновлениями кэша во время боя

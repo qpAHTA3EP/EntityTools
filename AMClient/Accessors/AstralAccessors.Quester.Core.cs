@@ -882,7 +882,7 @@ namespace ACTP0Tools
                     }
                     else Logger.WriteLine(Logger.LogType.Debug, $"Patch of 'Astral.Quester.Core.LoadAllMeshes' failed");
 
-                    _currentProfileName = tCore.GetStaticProperty<string>(nameof(Astral.Quester.Core.CurrentProfileName));
+                    _currentProfileName = tCore.GetStaticProperty<string>("CurrentProfileName");
                 }
             }
         }

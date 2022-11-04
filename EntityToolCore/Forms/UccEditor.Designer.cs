@@ -430,7 +430,7 @@ namespace EntityCore.Forms
             // 
             // btnCndPaste
             // 
-            this.btnCndPaste.ImageOptions.Image = global::EntityCore.Properties.Resources.paste;
+            this.btnCndPaste.ImageOptions.Image = global::EntityCore.Properties.Resources.miniPaste;
             this.btnCndPaste.ImageOptions.Location = DevExpress.XtraEditors.ImageLocation.MiddleCenter;
             this.btnCndPaste.Location = new System.Drawing.Point(67, 1);
             this.btnCndPaste.Margin = new System.Windows.Forms.Padding(1);
@@ -673,7 +673,7 @@ namespace EntityCore.Forms
             // 
             // btnCombatPaste
             // 
-            this.btnCombatPaste.ImageOptions.Image = global::EntityCore.Properties.Resources.paste;
+            this.btnCombatPaste.ImageOptions.Image = global::EntityCore.Properties.Resources.miniPaste;
             this.btnCombatPaste.ImageOptions.Location = DevExpress.XtraEditors.ImageLocation.MiddleCenter;
             this.btnCombatPaste.Location = new System.Drawing.Point(67, 1);
             this.btnCombatPaste.Margin = new System.Windows.Forms.Padding(1);
@@ -814,7 +814,7 @@ namespace EntityCore.Forms
             // 
             // btnPatrolPaste
             // 
-            this.btnPatrolPaste.ImageOptions.Image = global::EntityCore.Properties.Resources.paste;
+            this.btnPatrolPaste.ImageOptions.Image = global::EntityCore.Properties.Resources.miniPaste;
             this.btnPatrolPaste.ImageOptions.Location = DevExpress.XtraEditors.ImageLocation.MiddleCenter;
             this.btnPatrolPaste.Location = new System.Drawing.Point(67, 1);
             this.btnPatrolPaste.Margin = new System.Windows.Forms.Padding(1);

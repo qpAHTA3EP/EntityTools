@@ -2,7 +2,6 @@
 using ACTP0Tools.Reflection;
 using Astral.Logic.UCC.Classes;
 using Astral.Quester.Classes;
-using EntityCore.Quester.Classes;
 using EntityCore.UCC.Classes;
 using EntityTools.UCC.Actions;
 using EntityTools.UCC.Conditions;
@@ -10,8 +9,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using ACTP0Tools.Classes.Quester;
 using Astral.Quester.Classes.Conditions;
+using DevExpress.XtraEditors;
+using EntityCore.Quester.Editor.TreeViewExtension;
 using EntityTools.Quester.Conditions;
+using Action = System.Action;
 using QuesterAction = Astral.Quester.Classes.Action;
 using QuesterCondition = Astral.Quester.Classes.Condition;
 
@@ -73,6 +76,10 @@ namespace EntityCore.Tools
         } 
         #endregion
 
+        public static bool IsPushProfileToStackAndLoad(this QuesterAction action) =>
+            action.GetType() == ACTP0Serializer.PushProfileToStackAndLoad;
+
+
         static TreeViewHelper()
         {
             QuesterConditionPackType = ACTP0Serializer.QuesterConditionPack;
@@ -105,18 +112,36 @@ namespace EntityCore.Tools
         /// <summary>
         /// Конструирование коллекции узлов дерева для отображения списка quester-команд <paramref name="questerActionList"/>
         /// </summary>
-        /// <param name="questerActionList"></param>
         /// <param name="clone">Флаг принудительного создания копии ucc-команд для соответствующего узла дерева</param>
         /// <returns></returns>
-        public static TreeNode[] ToTreeNodes(this IEnumerable<QuesterAction> questerActionList, bool clone = false)
+        public static TreeNode[] ToTreeNodes(this QuesterProfileProxy profile, bool clone = false)
+        {
+            var actions = profile.Actions;
+            if (actions.Any())
+            {
+                TreeNode Selector(QuesterAction action)
+                {
+                    if (action is ActionPack actPack)
+                        return new ActionPackTreeNode(profile, clone ? CopyHelper.CreateDeepCopy(actPack) : actPack);
+                    return new ActionTreeNode(profile, clone ? CopyHelper.CreateDeepCopy(action) : action);
+                }
+
+                return actions.Select(Selector).ToArray();
+            }
+
+            return Array.Empty<TreeNode>();
+        }
+        public static TreeNode[] ToTreeNodes(QuesterProfileProxy profile, IEnumerable<QuesterAction> questerActionList, bool clone = false)
         {
             if (questerActionList?.Any() == true)
             {
                 TreeNode Selector(QuesterAction action)
                 {
                     if (action is ActionPack actPack)
-                        return new ActionPackTreeNode(clone ? CopyHelper.CreateDeepCopy(actPack) : actPack);
-                    return new ActionTreeNode(clone ? CopyHelper.CreateDeepCopy(action) : action);
+                        return new ActionPackTreeNode(profile, clone ? CopyHelper.CreateDeepCopy(actPack) : actPack);
+                    if (action.IsPushProfileToStackAndLoad())
+                        return new ActionPushProfileToStackAndLoadTreeNode(profile, clone ? CopyHelper.CreateDeepCopy(action) : action);
+                    return new ActionTreeNode(profile, clone ? CopyHelper.CreateDeepCopy(action) : action);
                 }
 
                 return questerActionList.Select(Selector).ToArray();
@@ -143,11 +168,13 @@ namespace EntityCore.Tools
         /// <param name="action"></param>
         /// <param name="clone">Флаг принудительного создания копии quester-команды для узла дерева</param>
         /// <returns></returns>
-        public static ActionBaseTreeNode MakeTreeNode(this QuesterAction action, bool clone = false)
+        public static ActionBaseTreeNode MakeTreeNode(this QuesterAction action, QuesterProfileProxy profile, bool clone = false)
         {
             if (action is ActionPack actionPack)
-                return new ActionPackTreeNode(clone ? CopyHelper.CreateDeepCopy(actionPack) : actionPack);
-            return new ActionTreeNode(clone ? CopyHelper.CreateDeepCopy(action) : action);
+                return new ActionPackTreeNode(profile, clone ? CopyHelper.CreateDeepCopy(actionPack) : actionPack);
+            if(action.IsPushProfileToStackAndLoad())
+                return new ActionPushProfileToStackAndLoadTreeNode(profile, clone ? CopyHelper.CreateDeepCopy(action) : action);
+            return new ActionTreeNode(profile, clone ? CopyHelper.CreateDeepCopy(action) : action);
         }
 
         /// <summary>
@@ -348,6 +375,82 @@ namespace EntityCore.Tools
             }
 
             return new TCollection();
+        }
+
+        public class Callback
+        {
+            public delegate void SimpleCallback();
+            private SimpleCallback _callback = DoNothing;
+            private static void DoNothing() { }
+            public void Invoke() => _callback();
+
+            public void Set(SimpleCallback callback)
+            {
+                if (callback is null)
+                    _callback = DoNothing;
+                else
+                {
+                    var target = callback.Target;
+                    if (target is TreeNode node)
+                    {
+                        _callback = () =>
+                        {
+                            node.TreeView?.BeginUpdate();
+                            callback();
+                            node.TreeView?.EndUpdate();
+                        };
+                    }
+                    else if (target is ListBoxControl listBox)
+                    {
+                        _callback = () =>
+                        {
+                            listBox.BeginUpdate();
+                            callback();
+                            listBox.EndUpdate();
+                        };
+                    }
+                    else _callback = callback;
+                }
+            }
+        }
+
+        public class Callback<T>
+        {
+            private ParameterizedCallback<T> _callback = DoNothing;
+            private static void DoNothing(T _) { }
+
+            public delegate void ParameterizedCallback<T>(T input);
+
+            public void Invoke(T input) => _callback(input);
+
+            public void Set(ParameterizedCallback<T> callback)
+            {
+                if (callback is null)
+                    _callback = DoNothing;
+                else
+                {
+                    var target = callback.Target;
+                    if (target is TreeNode node)
+                    {
+                        _callback = input =>
+                        {
+                            node.TreeView?.BeginUpdate();
+                            callback(input);
+                            node.TreeView?.EndUpdate();
+                        };
+                    }
+                    else if (target is ListBoxControl listBox)
+                    {
+                        _callback = input =>
+                        {
+                            listBox.BeginUpdate();
+                            callback(input);
+                            listBox.EndUpdate();
+                        };
+                    }
+                    else _callback = callback;
+                }
+            }
         }
     }
 }

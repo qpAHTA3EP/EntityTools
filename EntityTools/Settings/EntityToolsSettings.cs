@@ -68,6 +68,7 @@ namespace EntityTools
         public PreprocessingSettings QuesterProfilePreprocessing { get; set; } = new PreprocessingSettings(); 
 #endif
 
+
 #if false
         #region Сериализация/десериализация статических полей класса статического класса
         /// <summary>

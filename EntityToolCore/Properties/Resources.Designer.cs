@@ -213,6 +213,16 @@ namespace EntityCore.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap miniImportTo {
+            get {
+                object obj = ResourceManager.GetObject("miniImportTo", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap miniLoad {
             get {
                 object obj = ResourceManager.GetObject("miniLoad", resourceCulture);
@@ -286,6 +296,16 @@ namespace EntityCore.Properties {
         internal static System.Drawing.Bitmap miniRectCR {
             get {
                 object obj = ResourceManager.GetObject("miniRectCR", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap miniRedo {
+            get {
+                object obj = ResourceManager.GetObject("miniRedo", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -383,9 +403,9 @@ namespace EntityCore.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap miniValid {
+        internal static System.Drawing.Bitmap miniUndo {
             get {
-                object obj = ResourceManager.GetObject("miniValid", resourceCulture);
+                object obj = ResourceManager.GetObject("miniUndo", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -393,9 +413,9 @@ namespace EntityCore.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap paste {
+        internal static System.Drawing.Bitmap miniValid {
             get {
-                object obj = ResourceManager.GetObject("paste", resourceCulture);
+                object obj = ResourceManager.GetObject("miniValid", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

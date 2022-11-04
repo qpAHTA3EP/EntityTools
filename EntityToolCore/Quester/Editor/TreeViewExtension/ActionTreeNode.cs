@@ -1,15 +1,16 @@
-﻿using ACTP0Tools.Reflection;
-using EntityCore.Tools;
-using MyNW.Classes;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using ACTP0Tools.Classes.Quester;
+using ACTP0Tools.Reflection;
+using EntityCore.Tools;
+using MyNW.Classes;
 using QuesterAction = Astral.Quester.Classes.Action;
 using QuesterCondition = Astral.Quester.Classes.Condition;
 
 
-namespace EntityCore.Quester.Classes
+namespace EntityCore.Quester.Editor.TreeViewExtension
 {
     /// <summary>
     /// Узел дерева, отображающий <see cref="QuesterAction"/>
@@ -17,7 +18,7 @@ namespace EntityCore.Quester.Classes
     public sealed class ActionTreeNode : ActionBaseTreeNode
     {
         private readonly QuesterAction action;
-        public ActionTreeNode(QuesterAction action, bool clone = false)
+        public ActionTreeNode(QuesterProfileProxy profile, QuesterAction action, bool clone = false) : base(profile)
         {
             var act = clone ? CopyHelper.CreateDeepCopy(action) : action;
             Tag = act;
@@ -141,7 +142,7 @@ namespace EntityCore.Quester.Classes
         {
             var newAction = CopyHelper.CreateDeepCopy(ReconstructInternal());
             newAction.ActionID = Guid.NewGuid();
-            return new ActionTreeNode(newAction);
+            return new ActionTreeNode(owner, newAction);
         }
 
 #if false

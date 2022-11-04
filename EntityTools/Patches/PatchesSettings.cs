@@ -133,7 +133,7 @@ namespace EntityTools.Settings
         [Description("Управление патчем UccComplextPatch.\n" +
                      "Обеспечивает функционирования дополнительных UCC-условий.\n" +
                      "Подменяет редактор UCC-профиля.")]
-        public bool UccComplextPatch
+        public bool UccComplexPatch
         {
             get => uccComplexPatch;
             set

@@ -1,16 +1,22 @@
-﻿using MyNW.Classes;
+﻿using ACTP0Tools.Classes.Quester;
+using MyNW.Classes;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using ACTP0Tools.Classes.Quester;
 using QuesterAction = Astral.Quester.Classes.Action;
 
-namespace EntityCore.Quester.Classes
+namespace EntityCore.Quester.Editor.TreeViewExtension
 {
     public abstract class ActionBaseTreeNode : TreeNode, ITreeNode<QuesterAction>
     {
+        protected readonly QuesterProfileProxy owner;
         public abstract QuesterAction Content { get; }
         public abstract bool UseHotSpots { get; }
         public abstract List<Vector3> HotSpots { get; }
+
+        protected ActionBaseTreeNode(QuesterProfileProxy profile)
+        {
+            owner = profile;
+        }
 
         public abstract QuesterAction.ActionValidity IsValid { get; }
 

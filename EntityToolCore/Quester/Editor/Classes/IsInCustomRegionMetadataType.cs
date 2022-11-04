@@ -1,10 +1,10 @@
-﻿using Astral.Quester.Classes;
+﻿using System.ComponentModel;
+using System.Drawing.Design;
+using Astral.Quester.Classes;
 using Astral.Quester.Classes.Conditions;
 using EntityTools.Editors;
-using System.ComponentModel;
-using System.Drawing.Design;
 
-namespace EntityCore.Quester.Classes
+namespace EntityCore.Quester.Editor.Classes
 {
     public class IsInCustomRegionMetadataType
     {

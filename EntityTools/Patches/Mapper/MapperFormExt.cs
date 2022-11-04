@@ -1459,12 +1459,13 @@ namespace EntityTools.Patches.Mapper
         {
 #if true
             _profile.Save();
-            if (_profile.Saved)
-            {
-                string meshName = EntityManager.LocalPlayer.MapState.MapName + ".bin";
-                Logger.Notify(string.Concat("The profile '", Path.GetFileName(_profile.FileName), "' saved."));
-            }
-            else Logger.Notify(string.Concat("Fail to save profile '", Path.GetFileName(_profile.FileName), '\''), true);
+            if (!_profile.Saved)
+                Logger.Notify($"Fail to save profile '{Path.GetFileName(_profile.FileName)}'", true);
+            //else
+            //{
+            //    string meshName = EntityManager.LocalPlayer.MapState.MapName + ".bin";
+            //    Logger.Notify(string.Concat("The profile '", Path.GetFileName(_profile.FileName), "' saved."));
+            //}
 #else
             // Штатное сохранение профиля реализовано в
             // Astral.Quester.Core.Save(false)

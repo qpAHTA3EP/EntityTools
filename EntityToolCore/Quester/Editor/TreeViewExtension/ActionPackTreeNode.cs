@@ -1,17 +1,17 @@
-﻿using ACTP0Tools.Reflection;
-using Astral.Quester.Classes;
-using EntityCore.Tools;
-using MyNW.Classes;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using ACTP0Tools.Classes.Quester;
+using ACTP0Tools.Reflection;
+using Astral.Quester.Classes;
+using EntityCore.Tools;
+using MyNW.Classes;
 using QuesterAction = Astral.Quester.Classes.Action;
 using QuesterCondition = Astral.Quester.Classes.Condition;
 
 
-namespace EntityCore.Quester.Classes
+namespace EntityCore.Quester.Editor.TreeViewExtension
 {
     /// <summary>
     /// Узел дерева, отображающий <see cref="ActionPack"/>
@@ -20,12 +20,12 @@ namespace EntityCore.Quester.Classes
     {
         private readonly ActionPack actionPack;
 
-        public ActionPackTreeNode(ActionPack actionPack, bool clone = false)
+        public ActionPackTreeNode(QuesterProfileProxy profile, ActionPack actionPack, bool clone = false) : base(profile)
         {
             ActionPack actPack = clone ? CopyHelper.CreateDeepCopy(actionPack) : actionPack;
             Tag = actPack;
             this.actionPack = actPack;
-            Nodes.AddRange(actPack.Actions.ToTreeNodes());
+            Nodes.AddRange(TreeViewHelper.ToTreeNodes(owner, actPack.Actions, clone));
             UpdateViewInternal(null);
         }
 
@@ -44,7 +44,7 @@ namespace EntityCore.Quester.Classes
             var copy = CopyHelper.CreateDeepCopy((ActionPack) ReconstructInternal());
             UpdateId(copy);
 
-            return new ActionPackTreeNode(copy);
+            return new ActionPackTreeNode(owner, copy);
         }
 
         public override void NewID() => UpdateId(actionPack);
@@ -103,7 +103,7 @@ namespace EntityCore.Quester.Classes
                 SelectedImageKey = "BoxRed";
                 ToolTipText = "There are some internal Action problem.";
             }
-            if(Parent is ActionPackTreeNode parentActionPackNode)
+            if (Parent is ActionPackTreeNode parentActionPackNode)
                 parentActionPackNode.UpdateViewInternal(this);
         }
         private static bool AreInternalsValid(TreeNodeCollection nodes, TreeNode fromChildNode)

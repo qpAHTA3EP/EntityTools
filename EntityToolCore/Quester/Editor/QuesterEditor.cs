@@ -6,6 +6,7 @@ using AStar;
 using Astral.Classes.ItemFilter;
 using Astral.Logic.NW;
 using Astral.Quester.Classes;
+using Astral.Quester.Classes.Actions;
 using Astral.Quester.Classes.Conditions;
 using Astral.Quester.Forms;
 using DevExpress.Utils.DragDrop;
@@ -13,12 +14,14 @@ using DevExpress.XtraEditors;
 using DevExpress.XtraEditors.Controls;
 using DevExpress.XtraGrid.Views.Grid;
 using DevExpress.XtraGrid.Views.Grid.ViewInfo;
-using EntityCore.Quester.Classes;
+using EntityCore.Forms;
+using EntityCore.Quester.Editor.Classes;
+using EntityCore.Quester.Editor.EditActions;
+using EntityCore.Quester.Editor.TreeViewExtension;
 using EntityCore.Tools;
 using EntityTools.Annotations;
 using EntityTools.Enums;
 using EntityTools.Patches.Mapper;
-using EntityTools.Quester.Conditions;
 using EntityTools.Tools;
 using MyNW.Classes;
 using MyNW.Internals;
@@ -35,7 +38,7 @@ using System.Windows.Forms;
 using QuesterAction = Astral.Quester.Classes.Action;
 using QuesterCondition = Astral.Quester.Classes.Condition;
 
-namespace EntityCore.Forms
+namespace EntityCore.Quester.Editor
 {
     public partial class QuesterEditor : XtraForm
     {
@@ -43,8 +46,10 @@ namespace EntityCore.Forms
         /// Редактируемый профиль
         /// </summary>
         public QuesterProfileProxy Profile => profile;
-
         private readonly ProfileProxy profile;
+
+        private Stack<IQEdit> undoStack = new Stack<IQEdit>();
+        private Stack<IQEdit> redoStack = new Stack<IQEdit>();
 
         // Функтор, выполняемый при изменении pgProperties
         private System.Action propertyCallback;
@@ -61,10 +66,8 @@ namespace EntityCore.Forms
         // Скопированная условие
         private static QuesterCondition conditionCache;
 
-        //TODO: Исправить валидацию и настройка команд и условий, привязаных к данным профиля: PushProfileToStackAndLoad (путь к профилю), IsInCustomRegion, IsInCustomRegionSet
-
-        #region Попытка подмены PropertyDescriptor'a для установки редактора свойств типа CustomRegionCollection
-#if false
+        #region Инициализация
+#if false   //Попытка подмены PropertyDescriptor'a для установки редактора свойств типа CustomRegionCollection
         private static readonly List<TypeDescriptionProvider> descriptorProvider = new List<TypeDescriptionProvider>();
         static QuesterEditor()
         {
@@ -181,7 +184,7 @@ namespace EntityCore.Forms
         /// Отображение профиля <paramref name="profile"/> в окне редактора.
         /// </summary>
         /// <param name="profile"></param>
-        private void UI_fill(ProfileProxy profile)
+        private void UI_fill()
         {
             if (profile is null)
             {
@@ -192,7 +195,7 @@ namespace EntityCore.Forms
             // Отображение набора команд
             treeActions.Nodes.Clear();
             if (profile.Actions.Any())
-                treeActions.Nodes.AddRange(profile.Actions.ToTreeNodes(true));
+                treeActions.Nodes.AddRange(profile.ToTreeNodes(true));
 
             treeConditions.Nodes.Clear();
 
@@ -256,6 +259,11 @@ namespace EntityCore.Forms
                 typeof(IsInCustomRegionMetadataType));
             TypeDescriptor.AddProvider(provider, typeof(IsInCustomRegion));
 
+            provider = new AssociatedMetadataTypeTypeDescriptionProvider(
+                typeof(LoadProfile),
+                typeof(LoadProfileMetadataType));
+            TypeDescriptor.AddProvider(provider, typeof(LoadProfile));
+
             var tPushProfileToStackAndLoad = ACTP0Serializer.PushProfileToStackAndLoad;
             if (tPushProfileToStackAndLoad != null)
             {
@@ -265,8 +273,7 @@ namespace EntityCore.Forms
                 TypeDescriptor.AddProvider(provider, tPushProfileToStackAndLoad);
             }
 
-
-            UI_fill(profile);
+            UI_fill();
         }
 
         private void handler_Form_Closing(object sender, FormClosingEventArgs e)
@@ -774,7 +781,6 @@ namespace EntityCore.Forms
             pgProperties.SelectedObject = node.Content;
             propertyCallback = node.UpdateView;
         }
-
         #endregion
 
 
@@ -817,7 +823,7 @@ namespace EntityCore.Forms
             if (Astral.Quester.Forms.AddAction.Show(typeof(QuesterAction)) is QuesterAction newAction)
             {
                 newAction.GatherInfos();
-                var newNode = newAction.MakeTreeNode();
+                var newNode = newAction.MakeTreeNode(profile);
 
                 propertyCallback?.Invoke();
                 conditionCallback?.Invoke(treeConditions.Nodes);
@@ -851,9 +857,7 @@ namespace EntityCore.Forms
 
         private void DeleteAction(object sender, EventArgs e = null)
         {
-            var actionNode = treeActions.SelectedNode;
-
-            if (actionNode != null)
+            if (treeActions.SelectedNode is ActionBaseTreeNode actionNode)
             {
                 var parentNode = actionNode.Parent as ActionPackTreeNode;
                 if (actionNode is ActionPackTreeNode)
@@ -870,9 +874,9 @@ namespace EntityCore.Forms
 
                 treeConditions.Nodes.Clear();
                 pgProperties.SelectedObject = null;
-                
-                actionNode.Remove();
-                parentNode?.UpdateView();
+
+                var editAction = new DeleteAction(actionNode);
+                ApplyEditAction(editAction);
 
                 profile.Saved = false;
 
@@ -913,7 +917,7 @@ namespace EntityCore.Forms
 
                 // Добавляем команду
                 var newAction = CopyHelper.CreateDeepCopy(actionCache);
-                var newNode = newAction.MakeTreeNode();
+                var newNode = newAction.MakeTreeNode(profile);
                 newNode.NewID();
                 if (treeActions.SelectedNode is ActionBaseTreeNode selectedNode)
                 {
@@ -921,7 +925,7 @@ namespace EntityCore.Forms
                     {
                         // Если выделенный узел является ActionPackTreeNode
                         // добавляем новую команду в список его узлов
-                        selectedNode.Nodes.Add(newNode);
+                        selectedNode.Nodes.Insert(0, newNode);
                         selectedNode.UpdateView();
                     }
                     else
@@ -992,7 +996,7 @@ namespace EntityCore.Forms
             if (treeActions.SelectedNode is ActionBaseTreeNode actionNode
                 && XMLEdit.Show(actionNode.Content) is QuesterAction modifiedAction)
             {
-                var newActionNode = modifiedAction.MakeTreeNode();
+                var newActionNode = modifiedAction.MakeTreeNode(profile);
                 int selectedInd = actionNode.Index;
                 var parentNode = actionNode.Parent as ActionBaseTreeNode;
                 treeActions.BeginUpdate();
@@ -1107,7 +1111,7 @@ namespace EntityCore.Forms
             }
 
             profile.SetProfile(new Profile { Saved = true }, string.Empty);
-            UI_fill(profile);
+            UI_fill();
 
             txtLog.AppendText($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] Make new Profile.");
         }
@@ -1135,7 +1139,7 @@ namespace EntityCore.Forms
             {
                 profile.SetProfile(prof, path);
                 txtLog.AppendText($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] Profile '{path}' loaded.");
-                UI_fill(profile);
+                UI_fill();
             }
         }
 
@@ -1171,14 +1175,16 @@ namespace EntityCore.Forms
 
         private void handler_Profile_Upload(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
         {
-            if (SaveProfile())
+            var saved = profile.Saved;
+            if (saved || SaveProfile())
             {
                 txtLog.AppendText(string.Concat("[", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
                     "] Profile",
                     string.IsNullOrEmpty(profile.FileName)
                         ? string.Empty
                         : " '" + profile.FileName + "'",
-                    " saved and uploaded to the Quester-engine.",
+                    saved ? string.Empty : " saved and",
+                    " uploaded to the Quester-engine.",
                     Environment.NewLine));
                 UpdateWindowCaption();
                 AstralAccessors.Quester.Core.Profile = CopyHelper.CreateDeepCopy(profile.GetProfile());
@@ -1186,6 +1192,41 @@ namespace EntityCore.Forms
                 Astral.Controllers.Settings.Get.LastQuesterProfile = string.IsNullOrEmpty(fileName) 
                     ? string.Empty
                     : Path.GetFileName(profile.FileName);
+                if(AstralAccessors.Controllers.Roles.IsRunning)
+                    AstralAccessors.Controllers.Roles.ToggleRole(true);
+                AstralAccessors.Quester.Entrypoint.RefreshQuesterMainPanel();
+            }
+            else
+            {
+                XtraMessageBox.Show("Unable to upload profile into Quester-engine because of saving error.", "Upload error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+        
+        private void handler_Profile_UploadAndFocusAction(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
+        {
+            var saved = profile.Saved;
+            if (saved || SaveProfile())
+            {
+                txtLog.AppendText(string.Concat("[", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+                    "] Profile",
+                    string.IsNullOrEmpty(profile.FileName)
+                        ? string.Empty
+                        : " '" + profile.FileName + "'",
+                    saved ? string.Empty : " saved and",
+                    " uploaded to the Quester-engine.",
+                    Environment.NewLine));
+                UpdateWindowCaption();
+                var actualProfile = CopyHelper.CreateDeepCopy(profile.GetProfile());
+                AstralAccessors.Quester.Core.Profile = actualProfile;
+                var fileName = profile.FileName;
+                Astral.Controllers.Settings.Get.LastQuesterProfile = string.IsNullOrEmpty(fileName)
+                    ? string.Empty
+                    : Path.GetFileName(profile.FileName);
+                if (AstralAccessors.Controllers.Roles.IsRunning)
+                    AstralAccessors.Controllers.Roles.ToggleRole(true);
+                if (treeActions.SelectedNode is ActionBaseTreeNode selectedNode)
+                    QuesterHelper.SetStartPoint(actualProfile.MainActionPack, selectedNode.Content.ActionID);
+                AstralAccessors.Quester.Entrypoint.RefreshQuesterMainPanel();
             }
             else
             {
@@ -1694,6 +1735,9 @@ namespace EntityCore.Forms
         }
         #endregion
 
+
+
+
         #region ActionNode Highlighting
         private readonly LinkedList<TreeNode> highlightedTreeNodes = new LinkedList<TreeNode>();
         private LinkedListNode<TreeNode> selectedHighlightedNode;
@@ -1839,6 +1883,35 @@ namespace EntityCore.Forms
         private void NotifyNoActionsMatchesFilter()
         {
             XtraMessageBox.Show($"No one actions matches filter '{txtActionFilter.Text}'", "Filtering info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+        #endregion
+
+
+
+
+        #region Edit history
+        private void handler_Undo(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
+        {
+            if (undoStack.Count > 0)
+            {
+                var action = undoStack.Pop();
+                action.Undo();
+                if (undoStack.Count > 0)
+                {
+                    action = undoStack.Peek();
+                    btnUndo.Hint = action.UndoLabel; 
+                }
+                else btnUndo.Hint = string.Empty;
+            }
+        }
+
+        private void ApplyEditAction(IQEdit editAction)
+        {
+            editAction.Apply();
+            undoStack.Push(editAction);
+            btnUndo.Hint = editAction.UndoLabel;
+            redoStack.Clear();
+            btnRedo.Hint = string.Empty;
         }
         #endregion
     }

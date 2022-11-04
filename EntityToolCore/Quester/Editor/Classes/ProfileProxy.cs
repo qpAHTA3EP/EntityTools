@@ -12,7 +12,7 @@ using EntityCore.Editors;
 using MyNW.Internals;
 using QuesterAction = Astral.Quester.Classes.Action;
 
-namespace EntityCore.Quester.Classes
+namespace EntityCore.Quester.Editor.Classes
 {
     public class ProfileProxy : QuesterProfileProxy
     {
@@ -26,8 +26,9 @@ namespace EntityCore.Quester.Classes
         public ProfileProxy(Profile profile, string fileName)
         {
             _profile = profile is null 
-                     ? new Profile { Saved = true }
+                     ? new Profile()
                      : CopyHelper.CreateDeepCopy(profile);
+            _profile.Saved = true;
 
             if (!string.IsNullOrEmpty(fileName))
                 _fileName = Path.GetFullPath(fileName);

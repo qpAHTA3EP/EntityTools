@@ -72,7 +72,7 @@ namespace EntityTools.Patches
         /// </summary>
         private static bool PrefixUccEditor(MainUCC __instance, object sender, EventArgs e)
         {
-            if (EntityTools.Config.Patches.UccComplextPatch)
+            if (EntityTools.Config.Patches.UccComplexPatch)
             {
                 EntityTools.Core.UserRequest_Edit(Astral.Logic.UCC.API.CurrentProfile, false);
                 MainUccRefreshAll?.Invoke(__instance);
@@ -84,7 +84,7 @@ namespace EntityTools.Patches
 
         internal static void Apply()
         {
-            if (!EntityTools.Config.Patches.UccComplextPatch || PatchesWasApplied) return;
+            if (!EntityTools.Config.Patches.UccComplexPatch || PatchesWasApplied) return;
 
             tUccCondition = typeof(UCCCondition);
             tPatch = typeof(ComplexPatch_Ucc);

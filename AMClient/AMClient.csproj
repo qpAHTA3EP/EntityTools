@@ -110,6 +110,7 @@
     <Compile Include="Classes\Enums.cs" />
     <Compile Include="Classes\FileTools.cs" />
     <Compile Include="Classes\Quester\ActiveProfileProxy.cs" />
+    <Compile Include="Classes\Quester\QuesterHelper.cs" />
     <Compile Include="Classes\Quester\QuesterProfileProxy.cs" />
     <Compile Include="Classes\SortableBindingList.cs" />
     <Compile Include="Classes\TypeDescriptorTools\PropertyOverridingTypeDescriptor.cs" />

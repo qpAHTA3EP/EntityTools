@@ -416,7 +416,7 @@ namespace EntityTools.Patches.Quester
             {
                 try
                 {
-                    if (EntityTools.Config.Patches.UccComplextPatch)
+                    if (EntityTools.Config.Patches.UccComplexPatch)
                     {
                         // Вызов собственного ucc-редактора
                         if (EntityTools.Core.UserRequest_Edit(uccProfile, "", true))

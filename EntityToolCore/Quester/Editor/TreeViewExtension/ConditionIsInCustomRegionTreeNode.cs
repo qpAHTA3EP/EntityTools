@@ -1,14 +1,13 @@
-﻿using ACTP0Tools.Reflection;
-using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Text;
 using ACTP0Tools.Classes.Quester;
+using ACTP0Tools.Reflection;
 using Astral.Quester.Classes.Conditions;
 using EntityTools.Extensions;
 using MyNW.Internals;
 using QuesterCondition = Astral.Quester.Classes.Condition;
 
-namespace EntityCore.Quester.Classes
+namespace EntityCore.Quester.Editor.TreeViewExtension
 {
     /// <summary>
     /// Узел дерева, отображающий <see cref="QuesterCondition"/>

@@ -2,7 +2,7 @@
 using ACTP0Tools.Classes.Quester;
 using QuesterCondition = Astral.Quester.Classes.Condition;
 
-namespace EntityCore.Quester.Classes
+namespace EntityCore.Quester.Editor.TreeViewExtension
 {
     public abstract class ConditionBaseTreeNode : TreeNode, ITreeNode<QuesterCondition>
     {

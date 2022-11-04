@@ -1,18 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
 using System.Text;
-using System.Windows.Forms;
 using ACTP0Tools.Classes.Quester;
 using ACTP0Tools.Reflection;
 using EntityCore.Tools;
 using EntityTools.Enums;
 using EntityTools.Quester.Conditions;
-using QuesterAction = Astral.Quester.Classes.Action;
 using QuesterCondition = Astral.Quester.Classes.Condition;
 
 
-namespace EntityCore.Quester.Classes
+namespace EntityCore.Quester.Editor.TreeViewExtension
 {
     /// <summary>
     /// Узел дерева, отображающий <see cref="ConditionPack"/>

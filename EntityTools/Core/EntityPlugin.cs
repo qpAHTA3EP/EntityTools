@@ -56,16 +56,12 @@ namespace EntityTools
 
         public static EntityToolsSettings Config { get; set; } = new EntityToolsSettings();
 
-        /// <summary>
-        /// Управление выбранной ролью (запуск/остановка)
-        /// </summary>
-        private static readonly Action<bool> ToggleRole = typeof(Roles).GetStaticAction<bool>("ToggleRole", BindingFlags.Public);
         public static void StopBot()
         {
 #if DEBUG
             ETLogger.WriteLine(LogType.Debug, Environment.StackTrace); 
 #endif
-            ToggleRole(false);
+            AstralAccessors.Controllers.Roles.ToggleRole(false);
         }
 
         public override void OnBotStart()

@@ -1,12 +1,12 @@
-﻿using EntityTools.Editors;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Drawing.Design;
+using EntityTools.Editors;
 
-namespace EntityCore.Quester.Classes
+namespace EntityCore.Quester.Editor.Classes
 {
     public class PushProfileToStackAndLoadMetadataType
     {
-        [Description("Select profile for loading.")]
+        [Description("Specify profile name to loading")]
         [Editor(typeof(RelativeProfileFilePathEditor), typeof(UITypeEditor))]
         [TypeConverter]
         public string ProfileName { get; set; }

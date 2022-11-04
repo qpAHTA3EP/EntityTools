@@ -8,6 +8,7 @@ using System.Net.Sockets;
 using System.Reflection;
 using ACTP0Tools.Patches;
 using ACTP0Tools.Reflection;
+using HarmonyLib;
 
 // ReSharper disable once CheckNamespace
 namespace ACTP0Tools
@@ -25,9 +26,27 @@ namespace ACTP0Tools
             // Ошибка доступа времени исполнения
             public static class Roles
             {
-
                 static Roles()
                 {
+#if true
+                    tControler_Roles = AccessTools.TypeByName(typeName_Controler_Roles);//typeof(Astral.Controllers.Roles);
+                    tRole = AccessTools.TypeByName(typeName_Role);
+                    if (tControler_Roles is null)
+                        Logger.WriteLine(Logger.LogType.Debug, $"Does not found type '{typeName_Controler_Roles}'");
+                    else
+                    {
+                        toggleRoleAccessor = tControler_Roles.GetStaticAction<bool>("ToggleRole");
+
+                        if (tRole is null)
+                            Logger.WriteLine(Logger.LogType.Debug, $"Does not found type '{typeName_Role}'");
+                        else
+                        {
+                            currentRoleAccessor = tControler_Roles.GetStaticProperty("CurrentRole", tRole);
+                            isRunningAccessor =
+                                tControler_Roles.GetStaticProperty<bool>(nameof(Astral.Controllers.Roles.IsRunning));
+                        }
+                    }
+#else
                     var assembly = Assembly.GetEntryAssembly();
                     if (assembly != null)
                     {
@@ -56,13 +75,16 @@ namespace ACTP0Tools
                         {
                             Logger.WriteLine(Logger.LogType.Debug, $"Does not found type '{typeName_Role}'");
                         }
-                        else 
+                        else
                         {
                             currentRoleAccessor = tControler_Roles.GetStaticProperty("CurrentRole", tRole);
                             isRunningAccessor =
                                 tControler_Roles.GetStaticProperty<bool>(nameof(Astral.Controllers.Roles.IsRunning));
+
+                            toggleRoleAccessor = tControler_Roles.GetStaticAction<bool>("ToggleRole", BindingFlags.Public);
                         }
                     }
+#endif
                 }
 
                 /// <summary>
@@ -92,6 +114,16 @@ namespace ACTP0Tools
 
                 public static bool IsRunning => isRunningAccessor.Value;
                 private static StaticPropertyAccessor<bool> isRunningAccessor;
+
+                /// <summary>
+                /// Управление выбранной ролью (запуск/остановка)
+                /// </summary>
+                public static void ToggleRole(bool isUserQuery = false)
+                {
+                    toggleRoleAccessor?.Invoke(isUserQuery);
+                }
+                private static readonly Action<bool> toggleRoleAccessor;
+
 
                 public static class CurrentRole
                 {

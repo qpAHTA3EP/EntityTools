@@ -35,6 +35,7 @@ using System.Windows.Forms;
 using ACTP0Tools.Classes.TypeDescriptorTools;
 using ACTP0Tools.Patches;
 using Astral.Quester.Classes;
+using EntityCore.Quester.Editor;
 using EntityTools.Tools.CustomRegions;
 using QuesterAction = Astral.Quester.Classes.Action;
 using QuesterCondition = Astral.Quester.Classes.Condition;

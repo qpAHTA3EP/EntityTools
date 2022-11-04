@@ -1,5 +1,8 @@
 ﻿using ACTP0Tools.Reflection;
 using System;
+using System.Reflection;
+using ACTP0Tools.Patches;
+using HarmonyLib;
 
 // ReSharper disable InconsistentNaming
 
@@ -61,7 +64,7 @@ namespace ACTP0Tools
                 }
             }
 
-#if false
+#if true
             public static class Entrypoint
             {
 #if false
@@ -72,6 +75,7 @@ namespace ACTP0Tools
                 public static readonly Func<object, Action> Stop = typeof(Astral.Quester.Entrypoint).GetAction("Stop");
                 public static readonly Func<object, Action> TooMuchStuckReaction = typeof(Astral.Quester.Entrypoint).GetAction("TooMuchStuckReaction"); 
 #endif
+#if LoadRoleEvent
                 public delegate void LoadRoleEvent(Astral.Quester.Entrypoint entrypoint);
 
                 private static MethodInfo originalOnLoadMethod;
@@ -98,13 +102,36 @@ namespace ACTP0Tools
                 {
                     AfterLoadRole?.Invoke(__instance);
                     return true;
+                } 
+#endif
+                /// <summary>
+                /// Обновление панели Quester'a в главном окне бота 
+                /// </summary>
+                public static void RefreshQuesterMainPanel()
+                {
+                    //if (!((Astral.Forms.BasePanel)Astral.Quester.Entrypoint.lastMain).IsDisposed)
+                    //    Astral.Controllers.Forms.InvokeOnMainThread(((Astral.Quester.Forms.Main)Astral.Quester.Entrypoint.lastMain).refreshActions()); 
+                    if (!questerMainPanel.IsValid
+                        || questerMainPanelRefreshActionAccessor is null)
+                        return;
+                    var mainPanel = questerMainPanel.Value;
+                    if (mainPanel is null
+                        || mainPanel.IsDisposed)
+                        return;
+
+                    Astral.Controllers.Forms.InvokeOnMainThread(() => questerMainPanelRefreshActionAccessor(mainPanel));
                 }
+                private static readonly StaticFieldAccessor<Astral.Quester.Forms.Main> questerMainPanel;
+                private static readonly Action<object> questerMainPanelRefreshActionAccessor;
 
                 static Entrypoint()
                 {
                     var tEntrypoint = typeof(Astral.Quester.Entrypoint);
-                    var tPatch = typeof(Entrypoint);
 
+                    questerMainPanel = tEntrypoint.GetStaticField<Astral.Quester.Forms.Main>("lastMain");
+                    questerMainPanelRefreshActionAccessor = typeof(Astral.Quester.Forms.Main).GetAction("refreshActions");
+#if LoadRoleEvent
+                    var tPatch = typeof(Entrypoint);
                     originalOnLoadMethod = AccessTools.Method(tEntrypoint, "OnLoad");
                     prefixOnLoadMethod = AccessTools.Method(tEntrypoint, nameof(prefixOnLoad));
                     postfixOnLoadMethod = AccessTools.Method(tEntrypoint, nameof(postfixOnLoad));
@@ -115,6 +142,7 @@ namespace ACTP0Tools
                     {
                         ACTP0Patcher.Harmony.Patch(originalOnLoadMethod, new HarmonyMethod(prefixOnLoadMethod), new HarmonyMethod(postfixOnLoadMethod));
                     }
+#endif
                 }
             }  
 #endif

@@ -13,13 +13,13 @@ namespace ACTP0Tools.Reflection
     public static partial class ReflectionHelper
     {
         public static readonly BindingFlags DefaultFlags = BindingFlags.Instance
-                                                           | BindingFlags.Static
-                                                           | BindingFlags.Public
-                                                           | BindingFlags.NonPublic
-                                                           | BindingFlags.GetField
-                                                           | BindingFlags.SetField
-                                                           | BindingFlags.GetProperty
-                                                           | BindingFlags.SetProperty;
+                                                         | BindingFlags.Static
+                                                         | BindingFlags.Public
+                                                         | BindingFlags.NonPublic
+                                                         | BindingFlags.GetField
+                                                         | BindingFlags.SetField
+                                                         | BindingFlags.GetProperty
+                                                         | BindingFlags.SetProperty;
 
         public static readonly object[] EmptyObjectArray = new object[0];
         public static readonly Type[]   EmptyTypeArray =   new Type[0];

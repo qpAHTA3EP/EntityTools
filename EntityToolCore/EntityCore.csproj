@@ -240,10 +240,17 @@
     <Compile Include="Forms\MultipleItemSelectForm.Designer.cs">
       <DependentUpon>MultipleItemSelectForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\QuesterEditor.cs">
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Quester\Editor\EditActions\DeleteAction.cs" />
+    <Compile Include="Quester\Editor\EditActions\IQEdit.cs" />
+    <Compile Include="Quester\Editor\QuesterEditor.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\QuesterEditor.Designer.cs">
+    <Compile Include="Quester\Editor\QuesterEditor.Designer.cs">
       <DependentUpon>QuesterEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\TargetSelectForm.cs">
@@ -265,29 +272,26 @@
       <DependentUpon>UIViewer.cs</DependentUpon>
     </Compile>
     <Compile Include="IEntityInfos.cs" />
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
     <Compile Include="Editors\RelativeMeshesFilePathEditor.cs" />
     <Compile Include="Quester\Action\ExecutePowerEngine.cs" />
     <Compile Include="Quester\Action\MoveToTeammateEngine.cs" />
     <Compile Include="Quester\Action\MoveToEntityEngine.cs" />
     <Compile Include="Quester\Action\TurnInMissionEngine.cs" />
-    <Compile Include="Quester\Classes\ConditionIsInCustomRegionTreeNode.cs" />
-    <Compile Include="Quester\Classes\ActionBaseTreeNode.cs" />
-    <Compile Include="Quester\Classes\IQuesterAction.cs" />
-    <Compile Include="Quester\Classes\IQuesterCondition.cs" />
-    <Compile Include="Quester\Classes\ConditionBaseTreeNode.cs" />
-    <Compile Include="Quester\Classes\IsInCustomRegionMetadataType.cs" />
-    <Compile Include="Quester\Classes\ITreeNode.cs" />
-    <Compile Include="Quester\Classes\ActionPackTreeNode.cs" />
-    <Compile Include="Quester\Classes\ActionTreeNode.cs" />
-    <Compile Include="Quester\Classes\ConditionPackTreeNode.cs" />
-    <Compile Include="Quester\Classes\ConditionTreeNode.cs" />
-    <Compile Include="Quester\Classes\ProfileProxy.cs" />
-    <Compile Include="Quester\Classes\PushProfileToStackAndLoadMetadataType.cs" />
+    <Compile Include="Quester\Editor\TreeViewExtension\ActionPushProfileToStackAndLoadTreeNode.cs" />
+    <Compile Include="Quester\Editor\TreeViewExtension\ConditionIsInCustomRegionTreeNode.cs" />
+    <Compile Include="Quester\Editor\TreeViewExtension\ActionBaseTreeNode.cs" />
+    <Compile Include="Quester\Editor\TreeViewExtension\IQuesterAction.cs" />
+    <Compile Include="Quester\Editor\TreeViewExtension\IQuesterCondition.cs" />
+    <Compile Include="Quester\Editor\TreeViewExtension\ConditionBaseTreeNode.cs" />
+    <Compile Include="Quester\Editor\Classes\IsInCustomRegionMetadataType.cs" />
+    <Compile Include="Quester\Editor\TreeViewExtension\ITreeNode.cs" />
+    <Compile Include="Quester\Editor\TreeViewExtension\ActionPackTreeNode.cs" />
+    <Compile Include="Quester\Editor\TreeViewExtension\ActionTreeNode.cs" />
+    <Compile Include="Quester\Editor\TreeViewExtension\ConditionPackTreeNode.cs" />
+    <Compile Include="Quester\Editor\TreeViewExtension\ConditionTreeNode.cs" />
+    <Compile Include="Quester\Editor\Classes\LoadProfileMetadatType.cs" />
+    <Compile Include="Quester\Editor\Classes\ProfileProxy.cs" />
+    <Compile Include="Quester\Editor\Classes\PushProfileToStackAndLoadMetadataType.cs" />
     <Compile Include="Quester\Conditions\CheckGameGUIEngine.cs" />
     <Compile Include="Quester\Conditions\EntityDistanceEngine.cs" />
     <Compile Include="Quester\Conditions\TeamMembersCountEngine.cs" />
@@ -362,7 +366,7 @@
     <EmbeddedResource Include="Forms\MultipleItemSelectForm.resx">
       <DependentUpon>MultipleItemSelectForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\QuesterEditor.resx">
+    <EmbeddedResource Include="Quester\Editor\QuesterEditor.resx">
       <DependentUpon>QuesterEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\TargetSelectForm.resx">
@@ -484,6 +488,9 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Engine.tt.cs</LastGenOutput>
     </Content>
+    <None Include="Resources\miniRedo.png" />
+    <None Include="Resources\miniUndo.png" />
+    <None Include="Resources\miniImportTo.png" />
     <None Include="Resources\miniRoad.png" />
     <None Include="Resources\miniCube.png" />
     <None Include="Resources\miniNewFile.png" />

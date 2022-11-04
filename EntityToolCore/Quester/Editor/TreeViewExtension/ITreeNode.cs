@@ -1,6 +1,4 @@
-﻿using ACTP0Tools.Classes.Quester;
-
-namespace EntityCore.Quester.Classes
+﻿namespace EntityCore.Quester.Editor.TreeViewExtension
 {
     /// <summary>
     /// Вспомогательный интерфейс для отображения элементов quester-профиля

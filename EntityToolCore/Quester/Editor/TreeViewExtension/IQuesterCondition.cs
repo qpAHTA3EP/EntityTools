@@ -1,4 +1,4 @@
-﻿namespace EntityCore.Quester.Classes
+﻿namespace EntityCore.Quester.Editor.TreeViewExtension
 {
     public interface IQuesterCondition
     {
