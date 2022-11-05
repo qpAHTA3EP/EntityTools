@@ -28,7 +28,7 @@ namespace EntityTools.Editors
                         profileProxyAccessor = parentForm.GetProperty<QuesterProfileProxy>("Profile");
                     if (profileProxyAccessor.IsValid)
                     {
-                        var crList = profileProxyAccessor.Value.CustomRegions.Select(cr => cr.Name).ToList();
+                        var crList = profileProxyAccessor.Value.CustomRegions.Select(cr => cr.Name);
                         if (global::EntityTools.EntityTools.Core.UserRequest_SelectItem(() => crList, ref customRegion))
                         {
                             return customRegion;
