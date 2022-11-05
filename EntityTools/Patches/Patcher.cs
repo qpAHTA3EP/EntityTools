@@ -56,6 +56,7 @@ namespace EntityTools.Patches
                 ComplexPatch_Quester_UccEditing.Apply();
                 // Изменение окна добавления quester-команды/условия
                 ComplexPatch_Quester.Apply();
+                ComplexPatch_Quester_Editor.Apply();
 
                 // Подмена окна выбора Ауры
                 Patch_AuraDetector.Apply();

@@ -46,7 +46,7 @@ namespace EntityTools.Patches.Quester
         private static KeyValuePair<Profil, List<TargetPriorityEntry>> tempPriorities;
         public static void Apply()
         {
-            if (PatchesWasApplied)
+            if (EntityTools.Config.Patches.QuesterPatches.ReplaceEditorForAddUccActions || PatchesWasApplied)
                 return;
             
             tAddUCCActions = typeof(Astral.Quester.Classes.Actions.AddUCCActions);

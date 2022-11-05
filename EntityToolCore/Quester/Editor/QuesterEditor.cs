@@ -47,7 +47,7 @@ namespace EntityCore.Quester.Editor
         /// </summary>
         public QuesterProfileProxy Profile => profile;
         private readonly ProfileProxy profile;
-
+        private readonly Guid startActionId;
         private Stack<IQEdit> undoStack = new Stack<IQEdit>();
         private Stack<IQEdit> redoStack = new Stack<IQEdit>();
 
@@ -127,7 +127,7 @@ namespace EntityCore.Quester.Editor
         } 
 #endif
 
-        public QuesterEditor(Profile profile, string fileName)
+        public QuesterEditor(Profile profile, string fileName, Guid actionId)
         {
             InitializeComponent();
 
@@ -143,6 +143,8 @@ namespace EntityCore.Quester.Editor
 
             bool isChecked = panHotSpots.CustomHeaderButtons["Edit Coordinates"].IsChecked == true;
             gridViewHotSpots.OptionsBehavior.Editable = isChecked;
+
+            startActionId = actionId;
         }
 
         /// <summary>
@@ -157,6 +159,7 @@ namespace EntityCore.Quester.Editor
         {
             string profileName = string.Empty;
             bool modal = false;
+            Guid actionId = Guid.Empty;
             if (param != null)
             {
                 for (int i = 0; i < 2 && i < param.Length; i++)
@@ -169,11 +172,17 @@ namespace EntityCore.Quester.Editor
                         case bool b:
                             modal = b;
                             break;
+                        case QuesterAction action:
+                            actionId = action.ActionID;
+                            break;
+                        case Guid guid:
+                            actionId = guid;
+                            break;
                     }
                 }
             }
 
-            var editor = new QuesterEditor(profile, profileName);
+            var editor = new QuesterEditor(profile, profileName, actionId);
             if (modal)
                 return editor.ShowDialog() == DialogResult.OK;
             editor.Show();
@@ -274,6 +283,16 @@ namespace EntityCore.Quester.Editor
             }
 
             UI_fill();
+
+            if (startActionId != Guid.Empty)
+            {
+                var node = treeActions.Nodes.FindActionNode(startActionId);
+                if(node != null)
+                {
+                    treeActions.SelectedNode = node;
+                    treeActions.SelectedNode.EnsureVisible();
+                }
+            }
         }
 
         private void handler_Form_Closing(object sender, FormClosingEventArgs e)

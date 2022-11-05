@@ -19,7 +19,7 @@ namespace EntityTools.Patches
 
         internal static void Apply()
         {
-            if (!EntityTools.Config.Patches.AuraDetector || PatchesWasApplied) return;
+            if (!EntityTools.Config.Patches.QuesterPatches.AuraDetector || PatchesWasApplied) return;
 
             try
             {

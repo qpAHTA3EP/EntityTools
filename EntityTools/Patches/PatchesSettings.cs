@@ -67,7 +67,6 @@ namespace EntityTools.Settings
         }
         private bool saveQuesterProfile = true;
 
-
         /// <summary>
         /// Активация или деактивация Патча ProfessionVendorEntity
         /// </summary>
@@ -108,25 +107,6 @@ namespace EntityTools.Settings
         private bool sealTraderEntity = true;
 
         /// <summary>
-        /// Активация или деактивация Патча AuraDetector
-        /// </summary>
-        [Bindable(true)]
-        [Description("Управление патчем AuraDetector")]
-        public bool AuraDetector
-        {
-            get => auraDetector;
-            set
-            {
-                if (auraDetector != value)
-                {
-                    auraDetector = value;
-                    NotifyPropertyChanged();
-                }
-            }
-        }
-        private bool auraDetector = true;
-
-        /// <summary>
         /// Активация или деактивация Патча UccComplextPatch
         /// </summary>
         [Bindable(true)]
@@ -147,6 +127,26 @@ namespace EntityTools.Settings
         }
         private bool uccComplexPatch = true;
 
+        /// <summary>
+        /// Настройка QuesterPatchSettings
+        /// </summary>
+        [Bindable(true)]
+        [Description("Управление патчами Quester'a")]
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+        public QuesterPatchSettings QuesterPatches
+        {
+            get => questerPatches;
+            set
+            {
+                if (questerPatches != value)
+                {
+                    questerPatches = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        private QuesterPatchSettings questerPatches = new QuesterPatchSettings();
+
         public override string ToString()
         {
             int num = 0;
@@ -155,7 +155,7 @@ namespace EntityTools.Settings
             if (professionVendorEntity) num++;
             if (sealTraderEntity) num++;
             if (getNearestIndexInPositionList) num++;
-            if (auraDetector) num++;
+            if (questerPatches.Count > 0) num++;
             return string.Concat('(', num, " of 6)");
         }
     }

@@ -279,6 +279,7 @@
     <Compile Include="Core\Proxies\UCCActionProxy.cs" />
     <Compile Include="Core\Proxies\UCCConditionProxy.cs" />
     <Compile Include="Patches\ComplexPatch_Navigation.cs" />
+    <Compile Include="Patches\QuesterPatchSettings.cs" />
     <Compile Include="Patches\Quester\ComplexPatch_Quester.cs" />
     <Compile Include="Patches\Mapper\ComplexPatch_Mapper.cs" />
     <Compile Include="Patches\Mapper\Tools\CustomRegionToolBase.cs" />
@@ -303,6 +304,7 @@
     </Compile>
     <Compile Include="Patches\Patch_AuraDetector.cs" />
     <Compile Include="Patches\ComplexPatch_Ucc.cs" />
+    <Compile Include="Patches\Quester\ComplexPatch_Quester_Editor.cs" />
     <Compile Include="Patches\Quester\ComplexPatch_Quester_UccEditing.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Quester\Actions\ExecutePowerExt.cs" />

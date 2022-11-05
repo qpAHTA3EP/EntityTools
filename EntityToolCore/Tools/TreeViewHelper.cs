@@ -377,6 +377,29 @@ namespace EntityCore.Tools
             return new TCollection();
         }
 
+        public static ActionBaseTreeNode FindActionNode(this TreeNodeCollection nodes, Guid actionId)
+        {
+            foreach (ActionBaseTreeNode node in nodes)
+            {
+                if (node.Content.ActionID == actionId)
+                {
+                    node.TreeView.SelectedNode = node;
+                    node.EnsureVisible();
+                    return node;
+                }
+
+                if (node.AllowChildren
+                    && node.Nodes.Count > 0)
+                {
+                    var innerNode = FindActionNode(node.Nodes, actionId);
+                    if (innerNode != null)
+                        return innerNode;
+                }
+            }
+            return null;
+        }
+
+
         public class Callback
         {
             public delegate void SimpleCallback();
