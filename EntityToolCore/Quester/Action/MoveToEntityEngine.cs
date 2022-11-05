@@ -103,7 +103,7 @@ namespace EntityCore.Quester.Action
             _specialEntityCheck = null;
 
             @this.Bind(this);
-            powerCache.PowerIdPattern = m2e.PowerId;
+            powerCache.Reset(m2e.PowerId);
             internalCacheTimer.ChangeTime(0);
             entityAbsenceTimer = null;
 
@@ -127,7 +127,7 @@ namespace EntityCore.Quester.Action
                         _label = string.Empty;
                         break;
                     case nameof(@this.PowerId):
-                        powerCache.PowerIdPattern = @this.PowerId;
+                        powerCache.Reset(@this.PowerId);
                         break;
                     case nameof(@this.EntitySearchTime):
                         entityAbsenceTimer = null;

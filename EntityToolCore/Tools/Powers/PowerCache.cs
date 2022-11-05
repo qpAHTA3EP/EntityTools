@@ -108,12 +108,7 @@ namespace EntityCore.Tools.Powers
         /// </summary>
         public MyNW.Classes.Power Power => GetPower();
 
-        public void Reset()
-        {
-            powerIdPattern = string.Empty;
-            checker = (p) => false;
-            initialized = false;
-        }
+        public void Reset(string powerPattern = default) => PowerIdPattern = powerPattern;
 
         /// <summary>
         /// Кэшированное <see cref="MyNW.Classes.Power"/>

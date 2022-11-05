@@ -72,8 +72,8 @@ namespace EntityCore.Quester.Action
             @this?.Unbind();
 
             @this = exPow;
-            powerCache.Reset();
-            label = String.Empty;
+            powerCache.Reset(@this.PowerId);
+            label = string.Empty;
             @this.PropertyChanged += OnPropertyChanged;
 
             internalCheck = initialize_internalCheck;
@@ -93,7 +93,7 @@ namespace EntityCore.Quester.Action
         {
             if (propertyName == nameof(@this.PowerId))
             {
-                powerCache.PowerIdPattern = @this.PowerId;
+                powerCache.Reset(@this.PowerId);
                 label = string.Empty;
             }
             internalCheck = initialize_internalCheck;
@@ -103,6 +103,17 @@ namespace EntityCore.Quester.Action
         {
             get
             {
+                bool debugInfo = EntityTools.EntityTools.Config.Logger.QuesterActions.DebugExecutePowerExt;
+                string currentMethodName = debugInfo ? string.Concat(actionIDstr, '.', MethodBase.GetCurrentMethod()?.Name ?? nameof(Run)) : string.Empty;
+
+                if (!InternalConditions)
+                {
+                    // Чтобы прервать цикл обработки команды нужно, чтобы Engine перешел к обработке Run()
+                    if (debugInfo)
+                        ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: {nameof(InternalConditions)} failed.");
+                    return true;
+                }
+
                 var d = MapperHelper.SquareDistance2D(EntityManager.LocalPlayer.Location, @this.InitialPosition);
 
                 if (d > 25 
@@ -110,6 +121,8 @@ namespace EntityCore.Quester.Action
                     && CheckingIgnoreCombatCondition())
                 {
                     AstralAccessors.Quester.FSM.States.Combat.SetIgnoreCombat(true, @this.IgnoreCombatMinHP, 5_000);
+                    if (debugInfo)
+                        ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: Set ignore combat.");
                     return false;
                 }
                 AstralAccessors.Quester.FSM.States.Combat.SetIgnoreCombat(false);
@@ -246,7 +259,7 @@ namespace EntityCore.Quester.Action
 
         public void InternalReset()
         {
-            powerCache.Reset();
+            powerCache.Reset(@this.PowerId);
             internalCheck = initialize_internalCheck;
         }
 

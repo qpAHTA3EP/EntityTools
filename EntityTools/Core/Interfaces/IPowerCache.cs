@@ -5,7 +5,7 @@
         bool IsInitialized { get; }
         string PowerIdPattern { get; set; }
         MyNW.Classes.Power Power { get; }
-        void Reset();
+        void Reset(string powerPattern = default);
         MyNW.Classes.Power GetPower();
     }
 }
