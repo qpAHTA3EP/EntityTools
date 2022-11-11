@@ -42,6 +42,8 @@ namespace EntityCore.Quester.Editor
 {
     public partial class QuesterEditor : XtraForm
     {
+        //BUG Копирование команд/условие через CopyHelper приводит к копированию Engine, что может приводить к ошибкам, поэтому копирование нужно реализовать путем копирования публичных свойств, имеющий сеттеры,
+
         /// <summary>
         /// Редактируемый профиль
         /// </summary>
@@ -52,13 +54,10 @@ namespace EntityCore.Quester.Editor
         private Stack<IQEdit> redoStack = new Stack<IQEdit>();
 
         // Функтор, выполняемый при изменении pgProperties
-        private System.Action propertyCallback;
+        private System.Action propertyChangedCallback;
 
         // Функтор, выполняемый при изменении списка treeConditions
-        private Action<TreeNodeCollection> conditionCallback;
-
-        // Функтор, выполняемый при изменении списка treeConditions
-        private System.Action hotSpotCallback;
+        private Action<TreeNodeCollection> conditionListChangedCallback;
 
         // Скопированная команда
         private static QuesterAction actionCache;
@@ -217,9 +216,8 @@ namespace EntityCore.Quester.Editor
             pgSettings.SelectedObject = profile;
             pgProperties.SelectedObject = null;
 
-            propertyCallback = null;
-            conditionCallback = null;
-            hotSpotCallback = null;
+            propertyChangedCallback = null;
+            conditionListChangedCallback = null;
 
             UpdateWindowCaption();
             ResetFilter();
@@ -242,9 +240,8 @@ namespace EntityCore.Quester.Editor
             pgProperties.SelectedObject = null;
             pgSettings.SelectedObject = null;
 
-            propertyCallback = null;
-            conditionCallback = null;
-            hotSpotCallback = null;
+            propertyChangedCallback = null;
+            conditionListChangedCallback = null;
 
             UpdateWindowCaption();
             ResetFilter();
@@ -323,8 +320,8 @@ namespace EntityCore.Quester.Editor
         #region TreeViewNode Drag & Drop
         private void handler_TreeView_ItemDrag(object sender, ItemDragEventArgs e)
         {
-            propertyCallback?.Invoke();
-            conditionCallback?.Invoke(treeConditions.Nodes);
+            propertyChangedCallback?.Invoke();
+            conditionListChangedCallback?.Invoke(treeConditions.Nodes);
 
             // Move the dragged node when the left mouse button is used.
             if (e.Button == MouseButtons.Left)
@@ -603,31 +600,16 @@ namespace EntityCore.Quester.Editor
             //if (ItemSelectForm.GetAnInstance(out QuesterCondition newCondition, false))
             if (Astral.Quester.Forms.AddAction.Show(typeof(QuesterCondition)) is QuesterCondition newCondition)
             {
-                propertyCallback?.Invoke();
+                InvokeConditionCallback();
 
+                var selectedNode = treeConditions.SelectedNode as ConditionBaseTreeNode;
                 var newTreeNode = newCondition.MakeTreeNode();
-                if (treeConditions.SelectedNode is ConditionBaseTreeNode selectedNode)
-                {
-                    if (selectedNode.AllowChildren)
-                    {
-                        // Если выделенный узел является ActionPackTreeNode
-                        // добавляем новую команду в список его узлов
-                        selectedNode.Nodes.Insert(0, newTreeNode);
-                    }
-                    else
-                    {
-                        // добавляем новую команду после выделенного узла
-                        if (selectedNode.Parent is null)
-                            treeConditions.Nodes.Insert(selectedNode.Index + 1, newTreeNode);
-                        else selectedNode.Parent.Nodes.Insert(selectedNode.Index + 1, newTreeNode);
-                    }
-                }
-                // добавляем новую команду в конец списка узлов дерева
-                else treeConditions.Nodes.Add(newTreeNode);
+
+                InsertCondition(selectedNode, newTreeNode);
 
                 profile.Saved = false;
-                pgProperties.SelectedObject = newCondition;
-                propertyCallback = newTreeNode.UpdateView;
+                
+                SetSelectedConditionTo(newTreeNode);
 
                 UpdateWindowCaption();
             }
@@ -645,10 +627,16 @@ namespace EntityCore.Quester.Editor
                         return;
                 }
 
-                if (ReferenceEquals(pgProperties.SelectedObject, conditionNode.Content))
-                    propertyCallback = null;
-                pgProperties.SelectedObject = null;
+                if (pgProperties.SelectedObject is QuesterCondition)
+                {
+                    propertyChangedCallback = null;
+                    pgProperties.SelectedObject = null;
+                }
+
+                treeConditions.BeginUpdate();
                 conditionNode.Remove();
+                treeConditions.EndUpdate();
+
                 profile.Saved = false;
                 UpdateWindowCaption();
             }
@@ -658,9 +646,10 @@ namespace EntityCore.Quester.Editor
         {
             if (treeConditions.SelectedNode is ConditionBaseTreeNode conditionNode)
             {
-                propertyCallback?.Invoke();
+                InvokeConditionCallback();
+
                 if (conditionNode.AllowChildren)
-                    conditionCallback?.Invoke(treeConditions.Nodes);
+                    conditionListChangedCallback?.Invoke(treeConditions.Nodes);
                     
                 conditionCache = CopyHelper.CreateDeepCopy(conditionNode.Content);
             }
@@ -670,32 +659,17 @@ namespace EntityCore.Quester.Editor
         {
             if (conditionCache != null)
             {
-                propertyCallback?.Invoke();
+                InvokeConditionCallback();
 
                 // Добавляем команду
                 var newCondition = CopyHelper.CreateDeepCopy(conditionCache);
                 var newNode = newCondition.MakeTreeNode();
-                if (treeConditions.SelectedNode is ConditionBaseTreeNode selectedNode)
-                {
-                    if (selectedNode.AllowChildren)
-                        // Если выделенный узел является ActionPackTreeNode
-                        // добавляем новую команду в список его узлов
-                        selectedNode.Nodes.Insert(0, newNode);
-                    else
-                    {
-                        // добавляем новую команду после выделенного узла
-                        if (selectedNode.Parent is null)
-                            treeConditions.Nodes.Insert(selectedNode.Index + 1, newNode);
-                        else selectedNode.Parent.Nodes.Insert(selectedNode.Index + 1, newNode);
-                    }
-                }
-                // добавляем новую команду в конец списка узлов дерева
-                else treeConditions.Nodes.Add(newNode);
+                var selectedNode = treeConditions.SelectedNode as ConditionBaseTreeNode;
+                
+                InsertCondition(selectedNode, newNode);
 
-                pgProperties.SelectedObject = newCondition;
-                propertyCallback = newNode.UpdateView;
+                SetSelectedConditionTo(newNode);
 
-                profile.Saved = false;
                 UpdateWindowCaption();
             }
         }
@@ -728,7 +702,7 @@ namespace EntityCore.Quester.Editor
 
         private void TestCondition(object sender, EventArgs e = null)
         {
-            propertyCallback?.Invoke();
+            InvokeConditionCallback();
             if (treeConditions.SelectedNode is ConditionBaseTreeNode selectedNode)
             {
                 var result = selectedNode.IsValid(profile);
@@ -746,7 +720,7 @@ namespace EntityCore.Quester.Editor
 
         private void TestAllConditions(object sender, EventArgs e = null)
         {
-            propertyCallback?.Invoke();
+            InvokeConditionCallback();
 
             if (treeConditions.Nodes.Count > 0)
             {
@@ -776,7 +750,8 @@ namespace EntityCore.Quester.Editor
         {
             if (treeConditions.SelectedNode is ConditionBaseTreeNode node)
             {
-                BindControlTo(node);
+                InvokeConditionCallback();
+                SetSelectedConditionTo(node);
             }
         }
 
@@ -786,19 +761,59 @@ namespace EntityCore.Quester.Editor
             {
                 if (!ReferenceEquals(node.Content, pgProperties.SelectedObject))
                 {
-                    BindControlTo(node);
+                    InvokeConditionCallback();
+                    SetSelectedConditionTo(node);
                 }
             }
         }
+        
+        private void InsertCondition(ConditionBaseTreeNode selectedNode, ConditionBaseTreeNode insertingNode)
+        {
+            treeConditions.BeginUpdate();
+            if (selectedNode != null)
+            {
+                if (selectedNode.AllowChildren)
+                {
+                    // добавляем новое условие в список его узлов ConditionPackTreeNode
+                    selectedNode.Nodes.Insert(0, insertingNode);
+                }
+                else
+                {
+                    // добавляем новое условие после выделенного узла
+                    if (selectedNode.Parent is null)
+                        treeConditions.Nodes.Insert(selectedNode.Index + 1, insertingNode);
+                    else selectedNode.Parent.Nodes.Insert(selectedNode.Index + 1, insertingNode);
+                }
+            }
+            // добавляем новое условие в конец списка узлов дерева
+            else treeConditions.Nodes.Add(insertingNode);
+            treeConditions.EndUpdate();
 
-        private void BindControlTo(ConditionBaseTreeNode node)
+            profile.Saved = false;
+        }
+
+        private void InvokeConditionCallback()
+        {
+            treeConditions.BeginUpdate();
+            propertyChangedCallback?.Invoke();
+            treeConditions.EndUpdate();
+        }
+
+        private void SetSelectedConditionTo(ConditionBaseTreeNode node)
         {
             if (node is null)
-                return;
-
-            propertyCallback?.Invoke();
-            pgProperties.SelectedObject = node.Content;
-            propertyCallback = node.UpdateView;
+            {
+                if (pgProperties.SelectedObject is QuesterCondition)
+                {
+                    pgProperties.SelectedObject = null;
+                    propertyChangedCallback = null;
+                }
+            }
+            else
+            {
+                pgProperties.SelectedObject = node.Content;
+                propertyChangedCallback = node.UpdateView;
+            }
         }
         #endregion
 
@@ -841,34 +856,18 @@ namespace EntityCore.Quester.Editor
         {
             if (Astral.Quester.Forms.AddAction.Show(typeof(QuesterAction)) is QuesterAction newAction)
             {
+                InvokeActionCallback();
+
                 newAction.GatherInfos();
                 var newNode = newAction.MakeTreeNode(profile);
 
-                propertyCallback?.Invoke();
-                conditionCallback?.Invoke(treeConditions.Nodes);
-
                 var selectedNode = treeActions.SelectedNode as ActionBaseTreeNode;
-                if (selectedNode is null)
-                    treeActions.Nodes.Add(newNode);
-                else if (selectedNode.AllowChildren)
-                {
-                    selectedNode.Nodes.Insert(0, newNode);
-                    selectedNode.UpdateView();
-                }
-                else if (selectedNode.Parent is null)
-                {
-                    treeActions.Nodes.Insert(selectedNode.Index + 1, newNode);
-                }
-                else
-                {
-                    selectedNode.Parent.Nodes.Insert(selectedNode.Index + 1, newNode);
-                    if(selectedNode.Parent is ActionPackTreeNode parentActionPack)
-                        parentActionPack.UpdateView();
-                }
+
+                InsertAction(selectedNode, newNode);
 
                 profile.Saved = false;
 
-                treeActions.SelectedNode = newNode;
+                SetSelectedActionTo(newNode);
 
                 UpdateWindowCaption();
             }
@@ -878,7 +877,6 @@ namespace EntityCore.Quester.Editor
         {
             if (treeActions.SelectedNode is ActionBaseTreeNode actionNode)
             {
-                var parentNode = actionNode.Parent as ActionPackTreeNode;
                 if (actionNode is ActionPackTreeNode)
                 {
                     if (XtraMessageBox.Show("Confirm deleting of the ActionPack",
@@ -887,26 +885,17 @@ namespace EntityCore.Quester.Editor
                         return;
                 }
 
-                conditionCallback = null;
-                propertyCallback = null;
-                hotSpotCallback = null;
+                ResetSelectedAction();
 
-                treeConditions.Nodes.Clear();
-                pgProperties.SelectedObject = null;
+                var editAction = new DeleteQuesterAction(actionNode);
 
-                var editAction = new DeleteAction(actionNode);
-                ApplyEditAction(editAction);
-
-                profile.Saved = false;
-
-                UpdateWindowCaption();
+                AfterQuesterActionEdited(editAction);
             }
         }
 
         private void GatherActionInfo(object sender, EventArgs e = null)
         {
-            propertyCallback?.Invoke();
-            conditionCallback?.Invoke(treeConditions.Nodes);
+            InvokeActionCallback();
 
             if (treeActions.SelectedNode is ActionBaseTreeNode actionNode)
                 actionNode.GatherActionInfo(profile);
@@ -916,8 +905,7 @@ namespace EntityCore.Quester.Editor
         {
             if (treeActions.SelectedNode is ActionBaseTreeNode actionNode)
             {
-                propertyCallback?.Invoke();
-                conditionCallback?.Invoke(treeConditions.Nodes);
+                InvokeActionCallback();
 
                 if (actionNode.AllowChildren)
                     actionNode.ReconstructInternal();
@@ -931,41 +919,18 @@ namespace EntityCore.Quester.Editor
         {
             if (actionCache != null)
             {
-                propertyCallback?.Invoke();
-                conditionCallback?.Invoke(treeConditions.Nodes);
+                InvokeActionCallback();
 
                 // Добавляем команду
                 var newAction = CopyHelper.CreateDeepCopy(actionCache);
                 var newNode = newAction.MakeTreeNode(profile);
                 newNode.NewID();
-                if (treeActions.SelectedNode is ActionBaseTreeNode selectedNode)
-                {
-                    if (selectedNode.AllowChildren)
-                    {
-                        // Если выделенный узел является ActionPackTreeNode
-                        // добавляем новую команду в список его узлов
-                        selectedNode.Nodes.Insert(0, newNode);
-                        selectedNode.UpdateView();
-                    }
-                    else
-                    {
-                        // добавляем новую команду после выделенного узла
-                        if (selectedNode.Parent is ActionBaseTreeNode parentNode)
-                        {
-                            parentNode.Nodes.Insert(selectedNode.Index + 1, newNode);
-                            parentNode.UpdateView();
-                        }
-                        else treeActions.Nodes.Insert(selectedNode.Index + 1, newNode);
-                    }
-                }
-                else
-                {
-                    // добавляем новую команду в конец списка узлов дерева
-                    treeActions.Nodes.Add(newNode);
-                }
+
+                var selectedNode = treeActions.SelectedNode as ActionBaseTreeNode;
+                InsertAction(selectedNode, newNode);
 
                 pgProperties.SelectedObject = newAction;
-                propertyCallback = newNode.UpdateView;
+                SetSelectedActionTo(newNode);
 
                 UpdateWindowCaption();
             }
@@ -1009,8 +974,7 @@ namespace EntityCore.Quester.Editor
 
         private void EditActionXML(object sender, EventArgs e = null)
         {
-            propertyCallback?.Invoke();
-            conditionCallback?.Invoke(treeConditions.Nodes);
+            InvokeActionCallback();
 
             if (treeActions.SelectedNode is ActionBaseTreeNode actionNode
                 && XMLEdit.Show(actionNode.Content) is QuesterAction modifiedAction)
@@ -1018,6 +982,7 @@ namespace EntityCore.Quester.Editor
                 var newActionNode = modifiedAction.MakeTreeNode(profile);
                 int selectedInd = actionNode.Index;
                 var parentNode = actionNode.Parent as ActionBaseTreeNode;
+                
                 treeActions.BeginUpdate();
                 actionNode.Remove();
                 if (parentNode !=  null)
@@ -1025,10 +990,10 @@ namespace EntityCore.Quester.Editor
                     parentNode.Nodes.Insert(selectedInd, newActionNode);
                     parentNode.UpdateView();
                 }
-                else treeActions.Nodes.Insert(selectedInd, newActionNode); 
-
+                else treeActions.Nodes.Insert(selectedInd, newActionNode);
                 treeActions.EndUpdate();
-                treeActions.SelectedNode = newActionNode;
+
+                SetSelectedActionTo(newActionNode);
             }
         }
 
@@ -1036,7 +1001,8 @@ namespace EntityCore.Quester.Editor
         {
             if (e.Node is ActionBaseTreeNode node)
             {
-                BindControlTo(node);
+                InvokeActionCallback();
+                SetSelectedActionTo(node);
             }
         }
 
@@ -1047,29 +1013,86 @@ namespace EntityCore.Quester.Editor
                 var action = node.Content;
                 if (!ReferenceEquals(action, pgProperties.SelectedObject))
                 {
-                    BindControlTo(node);
+                    InvokeActionCallback();
+                    SetSelectedActionTo(node);
                 }
             }
         }
 
-        private void BindControlTo(ActionBaseTreeNode node)
+        private void SetSelectedActionTo(ActionBaseTreeNode node)
         {
             if (node is null)
-                return;
+            {
+                treeActions.SelectedNode = null;
+                treeConditions.Nodes.Clear();
 
-            propertyCallback?.Invoke();
-            conditionCallback?.Invoke(treeConditions.Nodes);
-            hotSpotCallback?.Invoke();
+                gridHotSpots.Enabled = false;
+                gridHotSpots.DataSource = null;
+
+                if (pgProperties.SelectedObject is QuesterAction)
+                {
+                    pgProperties.SelectedObject = null;
+                    propertyChangedCallback = null;
+                }
+                conditionListChangedCallback = null;
+            }
+            else
+            {
+                treeActions.SelectedNode = node;
+
+                treeConditions.Nodes.Clear();
+                treeConditions.Nodes.AddRange(node.GetConditionTreeNodes());
+
+                pgProperties.SelectedObject = node.Content;
+
+                gridHotSpots.Enabled = node.UseHotSpots;
+                gridHotSpots.DataSource = node.HotSpots;
+
+                propertyChangedCallback = node.UpdateView;
+                conditionListChangedCallback = node.CopyConditionNodesFrom;
+            }
+        }
+
+        private void InsertAction(ActionBaseTreeNode selectedNode, ActionBaseTreeNode insertingNode)
+        {
+            treeActions.BeginUpdate();
+            if (selectedNode is null)
+                treeActions.Nodes.Add(insertingNode);
+            else if (selectedNode.AllowChildren)
+            {
+                selectedNode.Nodes.Insert(0, insertingNode);
+                selectedNode.UpdateView();
+            }
+            else if (selectedNode.Parent is null)
+            {
+                treeActions.Nodes.Insert(selectedNode.Index + 1, insertingNode);
+            }
+            else
+            {
+                selectedNode.Parent.Nodes.Insert(selectedNode.Index + 1, insertingNode);
+                if (selectedNode.Parent is ActionPackTreeNode parentActionPack)
+                    parentActionPack.UpdateView();
+            }
+            treeActions.EndUpdate();
+
+            profile.Saved = false;
+        }
+
+        private void InvokeActionCallback()
+        {
+            treeActions.BeginUpdate();
+            propertyChangedCallback?.Invoke();
+            conditionListChangedCallback?.Invoke(treeConditions.Nodes);
+            treeActions.EndUpdate();
+        }
+
+        private void ResetSelectedAction()
+        {
+            conditionListChangedCallback = null;
+            propertyChangedCallback = null;
 
             treeConditions.Nodes.Clear();
-            treeConditions.Nodes.AddRange(node.GetConditionTreeNodes());
-            pgProperties.SelectedObject = node.Content;
-            gridHotSpots.Enabled = node.UseHotSpots;
-            gridHotSpots.DataSource = node.HotSpots;
-
-            propertyCallback = node.UpdateView;
-            conditionCallback = node.CopyConditionNodesFrom;
-            hotSpotCallback = node.UpdateView;
+            pgProperties.SelectedObject = null;
         }
         #endregion
 
@@ -1102,7 +1125,8 @@ namespace EntityCore.Quester.Editor
             {
 
             }
-            propertyCallback?.Invoke();
+            propertyChangedCallback?.Invoke();
+
             profile.Saved = false;
             UpdateWindowCaption();
         }
@@ -1262,8 +1286,8 @@ namespace EntityCore.Quester.Editor
         {
             try
             {
-                propertyCallback?.Invoke();
-                conditionCallback?.Invoke(treeConditions.Nodes);
+                propertyChangedCallback?.Invoke();
+                conditionListChangedCallback?.Invoke(treeConditions.Nodes);
 
                 // Восстановление команд
                 profile.Actions = ListReconstruction(treeActions.Nodes);
@@ -1318,108 +1342,6 @@ namespace EntityCore.Quester.Editor
             }
         }
 
-#if false
-        GridHitInfo downHitInfo = null;
-
-        private void handler_Grid_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left
-                && sender is GridControl grid
-                && grid.MainView is GridView view)
-            {
-                downHitInfo = null;
-
-                GridHitInfo hitInfo = view.CalcHitInfo(new Point(e.X, e.Y));
-                if (Control.ModifierKeys != Keys.None)
-                    return;
-                if (hitInfo.InRow && hitInfo.RowHandle != GridControl.NewItemRowHandle)
-                    downHitInfo = hitInfo;
-            }
-        }
-
-        private void handler_Grid_MouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
-        {
-            if (downHitInfo != null
-                && e.Button == MouseButtons.Left
-                && sender is GridControl grid)
-            {
-                //Size dragSize = SystemInformation.DragSize;
-                //Rectangle dragRect = new Rectangle(new Point(downHitInfo.HitPoint.X - dragSize.Width / 2,
-                //    downHitInfo.HitPoint.Y - dragSize.Height / 2), dragSize);
-
-                //if (!dragRect.Contains(new Point(e.X, e.Y)))
-                if (Math.Abs(downHitInfo.HitPoint.Y - e.Y) > SystemInformation.DragSize.Height / 2)
-                {
-                    grid.DoDragDrop(downHitInfo, DragDropEffects.All);
-                    downHitInfo = null;
-                }
-            }
-        }
-
-        private void handler_Grid_DragOver(object sender, DragEventArgs e)
-        {
-            if (sender is GridControl grid
-                && grid.MainView is GridView view
-                && e.Data.GetDataPresent(typeof(GridHitInfo))
-                && e.Data.GetData(typeof(GridHitInfo)) is GridHitInfo eventHitInfo)
-            {
-                GridHitInfo hitInfo = view.CalcHitInfo(grid.PointToClient(new Point(e.X, e.Y)));
-                if (hitInfo.InRow
-                    && hitInfo.RowHandle != eventHitInfo.RowHandle
-                    && hitInfo.RowHandle != GridControl.NewItemRowHandle)
-                    e.Effect = DragDropEffects.Move;
-                else
-                    e.Effect = DragDropEffects.None;
-            }
-        }
-
-        private void handler_Grid_DragDrop(object sender, System.Windows.Forms.DragEventArgs e)
-        {
-            if (sender is GridControl grid
-                && grid.MainView is GridView view
-                && e.Data.GetData(typeof(GridHitInfo)) is GridHitInfo srcHitInfo)
-            {
-                GridHitInfo hitInfo = view.CalcHitInfo(grid.PointToClient(new Point(e.X, e.Y)));
-                int sourceRowHandle = srcHitInfo.RowHandle;
-                int targetRowHandle = hitInfo.RowHandle;
-
-                if (sourceRowHandle == targetRowHandle || sourceRowHandle == targetRowHandle + 1)
-                    return;
-
-                if (grid.DataSource is List<Vector3> hotSpots)
-                {
-                    view.BeginUpdate();
-                    //DataRow targetRow = view.GetDataRow(targetRowHandle);
-                    //DataRow row2 = view.GetDataRow(targetRowHandle + 1);
-                    //DataRow dragRow = view.GetDataRow(sourceRowHandle);
-
-                    //decimal val1 = (decimal)targetRow[OrderFieldName];
-                    //if (row2 == null)
-                    //    dragRow[OrderFieldName] = val1 + 1;
-                    //else
-                    //{
-                    //    decimal val2 = (decimal)row2[OrderFieldName];
-                    //    dragRow[OrderFieldName] = (val1 + val2) / 2;
-                    //} 
-                    var spot = hotSpots[sourceRowHandle];
-                    if (sourceRowHandle > targetRowHandle)
-                    {
-                        hotSpots.RemoveAt(targetRowHandle);
-                        hotSpots.Insert(sourceRowHandle, spot);
-                    }
-                    else
-                    {
-                        hotSpots.RemoveAt(targetRowHandle);
-                        hotSpots.Insert(sourceRowHandle + 1, spot);
-
-                    }
-                    view.RefreshData();
-                    view.EndUpdate();
-                }
-            }
-        }
-
-#else
         private void handler_HotSpot_DragOver(object sender, DragOverEventArgs e)
         {
             DragOverGridEventArgs args = DragOverGridEventArgs.GetDragOverGridEventArgs(e);
@@ -1496,7 +1418,7 @@ namespace EntityCore.Quester.Editor
                 }
             }
         }
-#endif
+
         private void handler_HotSpots_ButtonClick(object sender, [NotNull] DevExpress.XtraBars.Docking2010.ButtonEventArgs e)
         {
             if (e == null) throw new ArgumentNullException(nameof(e));
@@ -1532,8 +1454,6 @@ namespace EntityCore.Quester.Editor
 
                 gridViewHotSpots.RefreshData();
                 gridViewHotSpots.EndUpdate();
-
-                hotSpotCallback?.Invoke();
             }
         }
 
@@ -1555,10 +1475,9 @@ namespace EntityCore.Quester.Editor
 
                 gridViewHotSpots.RefreshData();
                 gridViewHotSpots.EndUpdate();
-
-                hotSpotCallback?.Invoke();
             }
         }
+        
         private void ChangeHotSpotCoordinateEditMode(bool allowEdit)
         {
             gridViewHotSpots.OptionsBehavior.Editable = allowEdit;
@@ -1576,9 +1495,9 @@ namespace EntityCore.Quester.Editor
                 var obj = listBox.SelectedItem;
                 if (obj != null && !ReferenceEquals(obj, pgProperties.SelectedObject))
                 {
-                    propertyCallback?.Invoke();
+                    propertyChangedCallback?.Invoke();
                     pgProperties.SelectedObject = obj;
-                    propertyCallback = () => listBox.Refresh();
+                    propertyChangedCallback = () => listBox.Refresh();
                 }
             }
         }
@@ -1849,6 +1768,7 @@ namespace EntityCore.Quester.Editor
                 node.EnsureVisible();
             }
         }
+        
         private void SelectNextHighlightedNode()
         {
             if (highlightedTreeNodes.Count == 0)
@@ -1864,6 +1784,7 @@ namespace EntityCore.Quester.Editor
             else SelectFirstHighlightedNode();
             
         }
+        
         private void SelectPreviousHighlightedNode()
         {
             if (highlightedTreeNodes.Count == 0)
@@ -1879,6 +1800,7 @@ namespace EntityCore.Quester.Editor
             else SelectLastHighlightedNode();
             
         }
+        
         private bool IsNodeMatchFilter(TreeNode node, string filter)
         {
             if (node.Text.IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0)
@@ -1893,12 +1815,14 @@ namespace EntityCore.Quester.Editor
                 return true;
             return false;
         }
+        
         private void ResetFilter()
         {
             txtActionFilter.Text = string.Empty;
             highlightedTreeNodes.Clear();
             selectedHighlightedNode = null;
         }
+        
         private void NotifyNoActionsMatchesFilter()
         {
             XtraMessageBox.Show($"No one actions matches filter '{txtActionFilter.Text}'", "Filtering info", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -1924,11 +1848,26 @@ namespace EntityCore.Quester.Editor
             }
         }
 
-        private void ApplyEditAction(IQEdit editAction)
+        private delegate void EditActionEvent(IQEdit qEdit);
+
+        private void AfterQuesterActionEdited(IQEdit qEdit)
         {
-            editAction.Apply();
-            undoStack.Push(editAction);
-            btnUndo.Hint = editAction.UndoLabel;
+            profile.Saved = false;
+            UpdateWindowCaption();
+
+            undoStack.Push(qEdit);
+            btnUndo.Hint = qEdit.UndoLabel;
+            redoStack.Clear();
+            btnRedo.Hint = string.Empty;
+        }
+
+        private void ApplyEditCondition(IQEdit editCondition)
+        {
+            treeConditions.BeginUpdate();
+            editCondition.Apply();
+            treeConditions.EndUpdate();
+            undoStack.Push(editCondition);
+            btnUndo.Hint = editCondition.UndoLabel;
             redoStack.Clear();
             btnRedo.Hint = string.Empty;
         }
