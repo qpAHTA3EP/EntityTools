@@ -1,13 +1,16 @@
-﻿using Astral.Logic.UCC.Classes;
-using EntityTools.Editors;
-using EntityTools.Enums;
-using EntityTools.Tools;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
+
+using Astral.Logic.UCC.Classes;
+
+using EntityTools.Editors;
+using EntityTools.Enums;
+using EntityTools.Tools;
+
 using ConditionList = System.Collections.ObjectModel.ObservableCollection<Astral.Logic.UCC.Classes.UCCCondition>;
 
 namespace EntityTools.UCC.Conditions

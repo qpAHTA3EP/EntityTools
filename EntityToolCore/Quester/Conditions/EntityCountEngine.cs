@@ -1,5 +1,4 @@
 ﻿using Astral.Quester.Classes;
-using EntityCore.Entities;
 using EntityTools;
 using EntityTools.Core.Interfaces;
 using EntityTools.Enums;
@@ -10,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using EntityTools.Tools.Entities;
 using static Astral.Quester.Classes.Condition;
 
 namespace EntityCore.Quester.Conditions

@@ -1,19 +1,23 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Drawing.Design;
-using System.Threading;
+using System.Runtime.CompilerServices;
 using System.Xml.Serialization;
+
 using Astral.Classes.ItemFilter;
 using Astral.Logic.UCC.Classes;
 using Astral.Quester.Classes;
-using EntityTools.Core.Interfaces;
-using EntityTools.Core.Proxies;
+
 using EntityTools.Editors;
 using EntityTools.Enums;
+using EntityTools.Tools;
+
+using MyNW.Classes;
+// ReSharper disable InconsistentNaming
 
 namespace EntityTools.UCC.Conditions
 {
-    public class UCCGameUICheck : UCCCondition, ICustomUCCCondition
+    public class UCCGameUICheck : UCCCondition, ICustomUCCCondition, INotifyPropertyChanged
     {
         #region Опции команды
 #if DEVELOPER
@@ -30,7 +34,7 @@ namespace EntityTools.UCC.Conditions
                 if (uiGenId != value)
                 {
                     uiGenId = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(UiGenId)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -50,7 +54,7 @@ namespace EntityTools.UCC.Conditions
                 if (_uiGenProperty != value)
                 {
                     _uiGenProperty = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(UiGenProperty)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -71,7 +75,7 @@ namespace EntityTools.UCC.Conditions
                 if (_uiGenPropertyValue != value)
                 {
                     _uiGenPropertyValue = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(UiGenPropertyValue)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -95,7 +99,7 @@ namespace EntityTools.UCC.Conditions
                 if (_uiGenPropertyValueType != value)
                 {
                     _uiGenPropertyValueType = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(UiGenPropertyValue)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -113,7 +117,7 @@ namespace EntityTools.UCC.Conditions
                 if (_propertySign != value)
                 {
                     _propertySign = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PropertySign)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -130,7 +134,7 @@ namespace EntityTools.UCC.Conditions
                 if (_check != value)
                 {
                     _check = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Check)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -151,27 +155,30 @@ namespace EntityTools.UCC.Conditions
         #endregion
         #endregion
 
-        #region Взаимодействие с EntityToolsCore
-        [NonSerialized]
-        internal IUccConditionEngine Engine;
 
+
+
+        #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
-
-        public UCCGameUICheck()
+        
+        protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = default)
         {
-            Sign = Astral.Logic.UCC.Ressources.Enums.Sign.Superior;
-            Engine = new UccConditionProxy(this);
+            InternalResetOnPropertyChanged(propertyName);
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-        private IUccConditionEngine MakeProxy()
+        private void InternalResetOnPropertyChanged([CallerMemberName] string propertyName = default)
         {
-            return new UccConditionProxy(this);
+            if (propertyName == nameof(Check))
+                uiGenChecker = initialize_uiGenChecker;
+            else if (propertyName == nameof(UiGenProperty))
+                uiGenPropertyValueChecker = initialize_CheckUIGenVarName;
+            _label = string.Empty;
+            uiGen = null;
         }
         #endregion
 
-        #region ICustomUCCCondition
-        public new bool IsOK(UCCAction refAction) => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).IsOK(refAction);
 
-        public new bool Locked { get => base.Locked; set => base.Locked = value; }
+
 
         public new ICustomUCCCondition Clone()
         {
@@ -192,9 +199,160 @@ namespace EntityTools.UCC.Conditions
             };
         }
 
-        public string TestInfos(UCCAction refAction) => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).TestInfos(refAction);
+
+
+
+        #region Данные
+        private UIGen uiGen;
+        private string _label = string.Empty;
         #endregion
 
-        public override string ToString() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).Label();
+
+
+
+
+        
+
+        public new bool IsOK(UCCAction refAction)
+        {
+            var genId = UiGenId;
+            if (!Validate(uiGen) && !string.IsNullOrEmpty(genId))
+            {
+                uiGen = MyNW.Internals.UIManager.AllUIGen.Find(x => x.Name.Equals(genId, StringComparison.Ordinal));
+                if (uiGen == null || !uiGen.IsValid)
+                    return false;
+            }
+
+            return uiGenChecker(uiGen);
+        }
+
+        /// <summary>
+        /// Инициализация функтора <see cref="uiGenChecker"/>, проверяющего истинность заданного условия
+        /// </summary>
+        /// <param name="uigen"></param>
+        /// <returns></returns>
+        private bool initialize_uiGenChecker(UIGen uigen)
+        {
+            if (uiGenChecker is null)
+            {
+                Func<UIGen, bool> checker = null;
+                switch (Check)
+                {
+                    case UiGenCheckType.IsVisible:
+                        checker = uig => uig.IsVisible;
+                        break;
+                    case UiGenCheckType.IsHidden:
+                        checker = uig => !uig.IsVisible;
+                        break;
+                    case UiGenCheckType.Property:
+                        checker = uig =>
+                        {
+                            if (uig.IsVisible)
+                            {
+                                foreach (var uiVar in uig.Vars)
+                                    if (uiVar.IsValid && uiVar.Name.Equals(UiGenProperty, StringComparison.Ordinal))
+                                    {
+                                        return uiGenPropertyValueChecker(uiVar);
+                                    }
+                            }
+                            return false;
+                        };
+                        break;
+                }
+
+                uiGenChecker = checker ?? ((_) => false);
+            }
+
+            return uiGenChecker(uigen);
+        }
+        private Func<UIGen, bool> uiGenChecker;
+
+        public string Label()
+        {
+            if (string.IsNullOrEmpty(_label))
+            {
+                var genId = UiGenId;
+                if (string.IsNullOrEmpty(genId))
+                    _label = GetType().Name;
+                else
+                {
+                    var genProp = UiGenProperty;
+                    if (Check != UiGenCheckType.Property
+                        || string.IsNullOrEmpty(genProp))
+                    {
+                        _label = $"{GetType().Name} [{genId}]";
+                    }
+                    else
+                    {
+                        _label = $"{GetType().Name} [{genId}.{genProp}]";
+                    }
+                }
+            }
+
+            return _label;
+        }
+
+        public string TestInfos(UCCAction refAction)
+        {
+            var genId = UiGenId;
+            if (!Validate(uiGen))
+            {
+                uiGen = MyNW.Internals.UIManager.AllUIGen.Find(x => x.Name == genId);
+                if (uiGen == null || !uiGen.IsValid)
+                    return $"GUI '{genId}' is not found.";
+            }
+
+            switch (Check)
+            {
+                case UiGenCheckType.IsVisible:
+                    return uiGen.IsVisible 
+                         ? $"GUI '{genId}' is VISIBLE." 
+                         : $"GUI '{genId}' is HIDDEN.";
+                case UiGenCheckType.IsHidden:
+                    return uiGen.IsVisible 
+                         ? $"GUI '{genId}' is VISIBLE." 
+                         : $"GUI '{genId}' is HIDDEN.";
+                case UiGenCheckType.Property:
+                    var genPrpt = UiGenProperty;
+                    if (uiGen.IsVisible)
+                    {
+                        foreach (var uiVar in uiGen.Vars)
+                            if (uiVar.IsValid && uiVar.Name.Equals(genPrpt, StringComparison.Ordinal))
+                            {
+                                if (uiGenPropertyValueChecker(uiVar))
+                                    return $"The Property '{genId}.{genPrpt}' equals to '{uiVar.Value}'.";
+                                else return $"The Property '{genId}.{genPrpt}' equals to '{uiVar.Value}'.";
+                            }
+                        return $"The Property '{genId}.{genPrpt}' does not founded.";
+                    }
+                    else return $"GUI '{genId}' is HIDDEN. The Property '{genPrpt}' did not checked.";
+            }
+
+            return $"GUI '{genId}' is not valid.";
+        }
+
+        /// <summary>
+        /// Инициализация функтора <see cref="uiGenPropertyValueChecker"/>? проверяющего значения переменной элемента интерфейса
+        /// </summary>
+        /// <param name="uiVar"></param>
+        /// <returns></returns>
+        private bool initialize_CheckUIGenVarName(UIVar uiVar)
+        {
+            if (uiGenPropertyValueChecker is null)
+            {
+                var checker = UiGenPropertyValue.GetCompareFunc(UiGenPropertyValueType, (UIVar v) => v.Value);
+
+                uiGenPropertyValueChecker = checker ?? (_ => false);
+            }
+
+            return uiGenPropertyValueChecker(uiVar);
+        }
+        private Func<UIVar, bool> uiGenPropertyValueChecker;
+
+
+        private bool Validate(UIGen uigen)
+        {
+            return uigen != null && uigen.IsValid && uigen.Name.Equals(UiGenId, StringComparison.Ordinal);
+        }
     }
 }

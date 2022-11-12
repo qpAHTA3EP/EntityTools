@@ -1,11 +1,11 @@
-﻿using EntityTools.Forms;
-using EntityTools.Quester.Actions;
-using EntityTools.UCC.Actions;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Drawing.Design;
+using EntityTools.Forms;
+using EntityTools.Quester.Actions;
+using EntityTools.UCC.Actions;
 
-namespace EntityTools.Editors
+namespace EntityTools.Editors.TestEditors
 {
 #if DEVELOPER
     public class TargetSelectorTestEditor : UITypeEditor
@@ -13,8 +13,6 @@ namespace EntityTools.Editors
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
 #if false
-            EntityTools.Core.Monitor(new PlayerTeamMonitor());
-#else
             switch (context?.Instance)
             {
                 case ChangeTarget cht:

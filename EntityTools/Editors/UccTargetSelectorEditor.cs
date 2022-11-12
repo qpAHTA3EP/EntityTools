@@ -4,6 +4,7 @@ using EntityTools.Enums;
 using System;
 using System.ComponentModel;
 using System.Drawing.Design;
+using EntityCore.Forms;
 using EntityTools.Tools.Targeting;
 
 namespace EntityTools.Editors
@@ -14,8 +15,8 @@ namespace EntityTools.Editors
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
             Type selectorType = null; 
-            if (EntityTools.Core.UserRequest_SelectItem(() => AstralAccessors.Controllers.Plugins.UccTargetSelectors, ref selectorType, "Name") &&
-                selectorType != null)
+            if (ItemSelectForm.GetAnItem(() => AstralAccessors.Controllers.Plugins.UccTargetSelectors, ref selectorType, "Name")
+                && selectorType != null)
             {
                 if (selectorType == typeof(EntityTarget))
                 {
@@ -23,7 +24,7 @@ namespace EntityTools.Editors
                     EntityNameType nameType = EntityNameType.NameUntranslated;
                     ItemFilterStringType strFilterType = ItemFilterStringType.Simple;
 
-                    if (EntityTools.Core.UserRequest_EditEntityId(ref strPattern, ref strFilterType, ref nameType))
+                    if (EntityViewer.GUIRequest(ref strPattern, ref strFilterType, ref nameType) != null)
                     {
                         return new EntityTarget
                         {

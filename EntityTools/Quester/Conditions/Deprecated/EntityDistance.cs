@@ -1,39 +1,23 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Drawing.Design;
-using System.Threading;
+using System.Runtime.CompilerServices;
+
 using Astral.Classes.ItemFilter;
 using Astral.Quester.Classes;
-using EntityTools.Core.Interfaces;
-using EntityTools.Core.Proxies;
-using EntityTools.Editors;
 
-namespace EntityTools.Quester.Conditions
+using EntityTools.Editors;
+using EntityTools.Enums;
+using EntityTools.Tools.Entities;
+
+using MyNW.Classes;
+
+namespace EntityTools.Quester.Conditions.Deprecated
 {
     [Serializable]
     public class EntityDistance : Condition, INotifyPropertyChanged
     {
-        #region Взаимодействие с ядром EntityTools
-        public event PropertyChangedEventHandler PropertyChanged;
-        
-        [NonSerialized]
-        internal IQuesterConditionEngine Engine;
-
-        private IQuesterConditionEngine MakeProxie()
-        {
-            return new QuesterConditionProxy(this);
-        }
-        #endregion
-
-        public EntityDistance()
-        {
-            Engine = new QuesterConditionProxy(this);
-
-            Distance = 0;
-            Sign = Relation.Superior;
-            EntityIdType = ItemFilterStringType.Simple;
-            RegionCheck = false;
-        }
+        private string label = string.Empty;
 
         #region Опции команды
 #if DEVELOPER
@@ -137,12 +121,86 @@ namespace EntityTools.Quester.Conditions
         internal Relation _sign;
         #endregion
 
-        public override bool IsValid => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).IsValid;
 
-        public override void Reset() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).Reset();
 
-        public override string ToString() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).Label();
 
-        public override string TestInfos => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).TestInfos;
+        public EntityDistance()
+        {
+            Distance = 0;
+            Sign = Relation.Superior;
+            EntityIdType = ItemFilterStringType.Simple;
+            RegionCheck = false;
+        }
+
+
+
+
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = default)
+        {
+            InternalResetOnPropertyChanged(propertyName);
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private void InternalResetOnPropertyChanged([CallerMemberName] string propertyName = default)
+        {
+            if (propertyName == nameof(EntityID)
+                || propertyName == nameof(Sign)
+                || propertyName == nameof(Distance))
+                label = string.Empty;
+        }
+        #endregion
+
+
+
+
+        public override bool IsValid
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(_entityID))
+                {
+                    Entity closestEntity = SearchCached.FindClosestEntity(_entityID, _entityIdType, EntityNameType.NameUntranslated, EntitySetType.Complete, false, 0, 0, _regionCheck);
+
+                    switch (_sign)
+                    {
+                        case Relation.Equal:
+                            return closestEntity != null && closestEntity.IsValid && (Math.Abs(closestEntity.Location.Distance3DFromPlayer - _distance) < 1);
+                        case Relation.NotEqual:
+                            return closestEntity != null && closestEntity.IsValid && (Math.Abs(closestEntity.Location.Distance3DFromPlayer - _distance) >= 1);
+                        case Relation.Inferior:
+                            return closestEntity != null && closestEntity.IsValid && (closestEntity.Location.Distance3DFromPlayer < _distance);
+                        case Relation.Superior:
+                            return closestEntity == null || !closestEntity.IsValid || (closestEntity.Location.Distance3DFromPlayer > _distance);
+                    }
+                }
+
+                return false;
+            }
+        }
+
+        public override void Reset() { }
+
+        public override string TestInfos
+        {
+            get
+            {
+                Entity closestEntity = SearchCached.FindClosestEntity(_entityID, _entityIdType, EntityNameType.NameUntranslated, EntitySetType.Complete, false, 0, 0, _regionCheck);
+
+                return closestEntity.IsValid 
+                     ? $"Found closest Entity [{closestEntity.NameUntranslated}] at the {nameof(Distance)} = {closestEntity.Location.Distance3DFromPlayer}" 
+                     : $"No one Entity matched to [{_entityID}]";
+            }
+        }
+
+        public override string ToString()
+        {
+            label = string.IsNullOrEmpty(label) 
+                  ? $"[Deprecated] Entity [{_entityID}] Distance {_sign} to {_distance}" 
+                  : $"[Deprecated] {GetType().Name}";
+            return label;
+        }
     }
 }

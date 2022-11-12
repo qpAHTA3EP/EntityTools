@@ -1,7 +1,11 @@
 ﻿using System;
+
+using ACTP0Tools.Reflection;
+
 using Astral.Logic.UCC.Classes;
 using Astral.Logic.UCC.Forms;
-using ACTP0Tools.Reflection;
+
+using EntityCore.Forms;
 
 namespace EntityTools.Patches.UCC
 {
@@ -24,8 +28,9 @@ namespace EntityTools.Patches.UCC
 
         internal static object Show(Type type)
         {
-            EntityTools.Core.UserRequest_GetUccAction(out UCCAction action);
-            return action;
+            return AddUccActionForm.GUIRequest(out UCCAction action)
+                 ? action
+                 : null;
         }
     }
 #endif

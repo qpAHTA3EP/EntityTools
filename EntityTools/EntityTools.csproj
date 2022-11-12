@@ -204,6 +204,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -224,24 +225,62 @@
     <Compile Include="Editors\CheckedListBoxEditor.cs" />
     <Compile Include="Editors\CustomRegionCollectionEditor.cs" />
     <Compile Include="Editors\CustomRegionEditor.cs" />
+    <Compile Include="Editors\MissionGiverInfoExtendedEditor.cs" />
     <Compile Include="Editors\QuesterConditionEditor.cs" />
     <Compile Include="Editors\PowerIdEditor.cs" />
     <Compile Include="Editors\MissionGiverInfoEditor.cs" />
     <Compile Include="Editors\PositionEditor.cs" />
+    <Compile Include="Editors\RelativeMeshesFilePathEditor.cs" />
     <Compile Include="Editors\RelativeProfileFilePathEditor.cs" />
     <Compile Include="Editors\ZRangeEditor.cs" />
     <Compile Include="Editors\TestEditors\TargetSelectorTestEditor.cs" />
-    <Compile Include="Forms\CredentialManager2.cs">
+    <Compile Include="Forms\AddUccActionForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\CredentialManager2.Designer.cs">
-      <DependentUpon>CredentialManager2.cs</DependentUpon>
+    <Compile Include="Forms\AddUccActionForm.designer.cs">
+      <DependentUpon>AddUccActionForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\AuraViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\AuraViewer.Designer.cs">
+      <DependentUpon>AuraViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\CollectionInfoForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\CollectionInfoForm.Designer.cs">
+      <DependentUpon>CollectionInfoForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\ConditionsListForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ConditionsListForm.designer.cs">
+      <DependentUpon>ConditionsListForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\EntityViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\EntityViewer.Designer.cs">
+      <DependentUpon>EntityViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\InputBox.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\InputBox.Designer.cs">
+      <DependentUpon>InputBox.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\ItemListEditorForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\ItemListEditorForm.Designer.cs">
       <DependentUpon>ItemListEditorForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\ItemSelectForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ItemSelectForm.Designer.cs">
+      <DependentUpon>ItemSelectForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\MissionMonitorForm.cs">
       <SubType>Form</SubType>
@@ -264,20 +303,37 @@
       <DependentUpon>CustomRegionCollectionEditorForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Editors\ItemFilterEntryListEditor.cs" />
-    <Compile Include="Editors\MissionGiverInfoExtendedEditor.cs" />
     <Compile Include="Editors\FoeListEditor.cs" />
     <Compile Include="Editors\VendorInfoEditor.cs" />
     <Compile Include="Editors\UccTargetSelectorEditor.cs" />
+    <Compile Include="Forms\MultipleItemSelectForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\MultipleItemSelectForm.Designer.cs">
+      <DependentUpon>MultipleItemSelectForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\TargetSelectForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\TargetSelectForm.Designer.cs">
+      <DependentUpon>TargetSelectForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\UccEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\UccEditor.Designer.cs">
+      <DependentUpon>UccEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\UIViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\UIViewer.Designer.cs">
+      <DependentUpon>UIViewer.cs</DependentUpon>
+    </Compile>
     <Compile Include="Logger\EntityToolLogger.cs" />
     <Compile Include="Core\Interfaces\IUCCConditionEngine.cs" />
     <Compile Include="Core\Interfaces\IUCCActionEngine.cs" />
-    <Compile Include="Core\Proxies\EntityCoreProxy.cs" />
-    <Compile Include="Core\Proxies\QuesterActionProxy.cs" />
-    <Compile Include="Core\Interfaces\IEntityToolsCore.cs" />
     <Compile Include="Core\Interfaces\IQuesterActionEngine.cs" />
-    <Compile Include="Core\Proxies\QuesterConditionProxy.cs" />
-    <Compile Include="Core\Proxies\UCCActionProxy.cs" />
-    <Compile Include="Core\Proxies\UCCConditionProxy.cs" />
     <Compile Include="Patches\ComplexPatch_Navigation.cs" />
     <Compile Include="Patches\QuesterPatchSettings.cs" />
     <Compile Include="Patches\Quester\ComplexPatch_Quester.cs" />
@@ -307,6 +363,11 @@
     <Compile Include="Patches\Quester\ComplexPatch_Quester_Editor.cs" />
     <Compile Include="Patches\Quester\ComplexPatch_Quester_UccEditing.cs" />
     <Compile Include="Properties\Annotations.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Quester\Actions\ExecutePowerExt.cs" />
     <Compile Include="Quester\Actions\PromoteTeammate.cs" />
     <Compile Include="Quester\Actions\UpgradeItem.cs" />
@@ -317,6 +378,34 @@
     <Compile Include="Quester\Conditions\ConditionPack.cs" />
     <Compile Include="Quester\Conditions\EquipmentLevel.cs" />
     <Compile Include="Quester\Conditions\IsInCustomRegionSet.cs" />
+    <Compile Include="Quester\Editor\Classes\IsInCustomRegionMetadataType.cs" />
+    <Compile Include="Quester\Editor\Classes\LoadProfileMetadatType.cs" />
+    <Compile Include="Quester\Editor\Classes\ProfileProxy.cs" />
+    <Compile Include="Quester\Editor\Classes\PushProfileToStackAndLoadMetadataType.cs" />
+    <Compile Include="Quester\Editor\EditActions\DeleteQuesterAction.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Quester\Editor\EditActions\IQEdit.cs" />
+    <Compile Include="Quester\Editor\EditActions\MoveQuesterAction.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Quester\Editor\QuesterEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Quester\Editor\QuesterEditor.Designer.cs">
+      <DependentUpon>QuesterEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Quester\Editor\TreeViewExtension\ActionBaseTreeNode.cs" />
+    <Compile Include="Quester\Editor\TreeViewExtension\ActionPackTreeNode.cs" />
+    <Compile Include="Quester\Editor\TreeViewExtension\ActionPushProfileToStackAndLoadTreeNode.cs" />
+    <Compile Include="Quester\Editor\TreeViewExtension\ActionTreeNode.cs" />
+    <Compile Include="Quester\Editor\TreeViewExtension\ConditionBaseTreeNode.cs" />
+    <Compile Include="Quester\Editor\TreeViewExtension\ConditionIsInCustomRegionTreeNode.cs" />
+    <Compile Include="Quester\Editor\TreeViewExtension\ConditionPackTreeNode.cs" />
+    <Compile Include="Quester\Editor\TreeViewExtension\ConditionTreeNode.cs" />
+    <Compile Include="Quester\Editor\TreeViewExtension\IQuesterAction.cs" />
+    <Compile Include="Quester\Editor\TreeViewExtension\IQuesterCondition.cs" />
+    <Compile Include="Quester\Editor\TreeViewExtension\ITreeNode.cs" />
     <Compile Include="Servises\SlideMonitor\CharacterEx.cs" />
     <Compile Include="Servises\SlideMonitor\EntityEx.cs" />
     <Compile Include="Servises\SlideMonitor\Enums.cs" />
@@ -350,11 +439,6 @@
     <Compile Include="Patches\UCC\Patch_ActionsPlayer_CheckAlly.cs" />
     <Compile Include="Patches\UCC\Patch_Logic_UCC_Forms_AddClass_Show.cs" />
     <Compile Include="Patches\PatchesSettings.cs" />
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
     <Compile Include="Quester\Actions\BuySellItemsExt.cs" />
     <Compile Include="Quester\Actions\ChangeInstanceToLeader.cs" />
     <Compile Include="Quester\Enums.cs" />
@@ -413,12 +497,27 @@
     <Compile Include="Tools\CustomRegions\CustomRegionExtensions.cs" />
     <Compile Include="Tools\CustomRegions\CustomRegionCollection.cs" />
     <Compile Include="Tools\CustomRegions\Enums.cs" />
+    <Compile Include="Tools\Entities\EntityCache.cs" />
+    <Compile Include="Tools\Entities\EntityCacheRecord.cs" />
+    <Compile Include="Tools\Entities\EntityCacheRecordKey.cs" />
+    <Compile Include="Tools\Entities\EntityComparer.cs" />
+    <Compile Include="Tools\Entities\EntityDiagnosticTools.cs" />
+    <Compile Include="Tools\Entities\Enums.cs" />
+    <Compile Include="Tools\Entities\SearchCached.cs" />
+    <Compile Include="Tools\Entities\SearchDirect.cs" />
+    <Compile Include="Tools\Entities\SearchHelper.cs" />
+    <Compile Include="Tools\Entities\SimpleEntityWrapper.cs" />
     <Compile Include="Tools\Export\PowerInfo.cs" />
     <Compile Include="Tools\Extensions\CollectionTExtentions.cs" />
+    <Compile Include="Tools\Extensions\EntityExtensions.cs" />
+    <Compile Include="Tools\Extensions\ListBoxItemCollectionExtension.cs" />
     <Compile Include="Tools\Extensions\StringBuilderExtentions.cs" />
+    <Compile Include="Tools\GameHelper.cs" />
     <Compile Include="Tools\Inventory\InventoryHelper.cs" />
     <Compile Include="Tools\Inventory\InventorySlotBoundComparer.cs" />
     <Compile Include="Tools\Inventory\ItemFilterCoreExtension.cs" />
+    <Compile Include="Tools\Extensions\ListExtensions.cs" />
+    <Compile Include="Tools\MissionHelper.cs" />
     <Compile Include="Tools\Missions\Enums.cs" />
     <Compile Include="Tools\Missions\MissionGiverRemote.cs" />
     <Compile Include="Tools\Missions\MissionGiverNPC.cs" />
@@ -427,7 +526,7 @@
     <Compile Include="Servises\UnstuckSpell\UnstuckSpells.cs" />
     <Compile Include="Servises\UnstuckSpell\UnstuckSpellsSettings.cs" />
     <Compile Include="Logger\EntityToolLoggerSettings.cs" />
-    <Compile Include="Tools\AuraOption.cs" />
+    <Compile Include="Tools\Classes\AuraOption.cs" />
     <Compile Include="Tools\Inventory\BagsList.cs" />
     <Compile Include="Tools\Inventory\BuyItemEntry.cs" />
     <Compile Include="Tools\Inventory\Enums.cs" />
@@ -453,6 +552,9 @@
     <Compile Include="Tools\Missions\Monitor\MissionTreeNodeSettings.cs" />
     <Compile Include="Tools\Monitoring.cs" />
     <Compile Include="Tools\Navigation\NavigationHelper.cs" />
+    <Compile Include="Tools\PlayerTeamHelper.cs" />
+    <Compile Include="Tools\Powers\PowerCache.cs" />
+    <Compile Include="Tools\Powers\PowerHelper.cs" />
     <Compile Include="Tools\Relogger\ProcessMemoryHelper.cs" />
     <Compile Include="Tools\Relogger\ReloggerHelper.cs" />
     <Compile Include="Tools\StringToPattern.cs" />
@@ -462,7 +564,6 @@
     <Compile Include="Tools\Extensions\ArrayExtensions.cs" />
     <Compile Include="Tools\Extensions\HexConverter.cs" />
     <Compile Include="Tools\Extensions\FormCollectionExtentions.cs" />
-    <Compile Include="Tools\Extensions\ListTExtentions.cs" />
     <Compile Include="Tools\Extensions\StringExtentions.cs" />
     <Compile Include="Tools\FileStreamHelper.cs" />
     <Compile Include="Tools\FileTools.cs" />
@@ -472,21 +573,31 @@
     <Compile Include="Quester\Actions\MoveToEntity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Editors\EntityIdEditor.cs" />
-    <Compile Include="Editors\CustomRegionListEditor.cs" />
     <Compile Include="Editors\ShardEditor.cs" />
     <Compile Include="Tools\Export\MissionsExportInfo.cs" />
     <Compile Include="Settings\PluginSettingsBase.cs" />
-    <Compile Include="Tools\Classes.cs" />
+    <Compile Include="Tools\Classes\Classes.cs" />
     <Compile Include="Tools\SysInformer.cs" />
+    <Compile Include="Tools\Targeting\EntityTargetProcessor.cs" />
     <Compile Include="Tools\Targeting\PlayerTeamMonitor.cs" />
     <Compile Include="Tools\Targeting\TargetProcessor.cs" />
     <Compile Include="Tools\Targeting\TargetSelector.cs" />
+    <Compile Include="Tools\Targeting\TeammateSupportTargetProcessor.cs" />
+    <Compile Include="Tools\TargetSelectHelper.cs" />
+    <Compile Include="Tools\TreeViewHelper.cs" />
     <Compile Include="Tools\XmlColor.cs" />
     <Compile Include="UCC\Actions\UCCActionPack.cs" />
     <Compile Include="UCC\Actions\ChangeTarget.cs" />
     <Compile Include="Tools\Targeting\Enums.cs" />
     <Compile Include="Tools\Targeting\TeammateSupport.cs" />
     <Compile Include="UCC\Actions\PluggedSkill.cs" />
+    <Compile Include="UCC\Classes\IUccActionTreeNode.cs" />
+    <Compile Include="UCC\Classes\IUccPriorityTreeNode.cs" />
+    <Compile Include="UCC\Classes\IUccTreeNode.cs" />
+    <Compile Include="UCC\Classes\UccActionPackTreeNode.cs" />
+    <Compile Include="UCC\Classes\UccActionTreeNode.cs" />
+    <Compile Include="UCC\Classes\UccConditionPackTreeNode.cs" />
+    <Compile Include="UCC\Classes\UccConditionTreeNode.cs" />
     <Compile Include="UCC\Conditions\CheckPowerState.cs" />
     <Compile Include="UCC\IUccConditionPack.cs" />
     <Compile Include="UCC\Enums.cs" />
@@ -513,8 +624,24 @@
       <DependentUpon>MainPanel.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\CredentialManager2.resx">
-      <DependentUpon>CredentialManager2.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\AddUccActionForm.resx">
+      <DependentUpon>AddUccActionForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\AuraViewer.resx">
+      <DependentUpon>AuraViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CollectionInfoForm.resx">
+      <DependentUpon>CollectionInfoForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ConditionsListForm.resx">
+      <DependentUpon>ConditionsListForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\EntityViewer.resx">
+      <DependentUpon>EntityViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\InputBox.resx">
+      <DependentUpon>InputBox.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ItemFilterEditorForm.resx">
       <DependentUpon>ItemFilterEditorForm.cs</DependentUpon>
@@ -525,8 +652,23 @@
     <EmbeddedResource Include="Forms\ItemListEditorForm.resx">
       <DependentUpon>ItemListEditorForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ItemSelectForm.resx">
+      <DependentUpon>ItemSelectForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\MissionMonitorForm.resx">
       <DependentUpon>MissionMonitorForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\MultipleItemSelectForm.resx">
+      <DependentUpon>MultipleItemSelectForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\TargetSelectForm.resx">
+      <DependentUpon>TargetSelectForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\UccEditor.resx">
+      <DependentUpon>UccEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\UIViewer.resx">
+      <DependentUpon>UIViewer.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Patches\Mapper\MapperFormExt.resx">
       <DependentUpon>MapperFormExt.cs</DependentUpon>
@@ -546,6 +688,9 @@
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Include="Quester\Editor\QuesterEditor.resx">
+      <DependentUpon>QuesterEditor.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.editorconfig">
@@ -560,81 +705,6 @@
     <None Include="Resources\charArrow.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\miniAdd.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniBiPath.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniCancel.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniClone.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniCopy.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniDelete.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniDistance.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniEllipceCR.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniExport.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniGear.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniLink.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniLinPath.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniNodeDistance.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniRectCR.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniImport.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniStop.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniTarget.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniUniPath.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniValid.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniZdiff.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniRefresh.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Entity_7_40х48.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniExpand.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniReverse.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniPlayAll.png" />
-  </ItemGroup>
-  <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.6">
       <Visible>False</Visible>
       <ProductName>Microsoft .NET Framework 4.6 %28x86 and x64%29</ProductName>
@@ -647,113 +717,87 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\miniSave.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniExpand_2.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniSave_1.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniPen.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\node_tools.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniNodeMove_1.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniNodeMove.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniEditCR.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniEditEdge.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\previewchart_16x16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniWizard.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniZoom.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniZoomIn.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniZoomOut.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniAddCR.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniAddCR_2.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniAddCR_3.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\select_16x16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\navigationbar_16x16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\info_16x16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\rulervertical_16x16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\rulerhorizontal_16x16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\label_16x16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniRoad.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\show_16x16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\show_32x32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\zoomin_16x16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\zoomin_32x32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\zoomout_16x16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\zoomout_32x32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\previous_16x16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\next_16x16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniLoad.png" />
+    <None Include="Resources\NodeTools.png" />
   </ItemGroup>
   <ItemGroup />
-  <ItemGroup>
-    <None Include="Resources\PanelVisibility_16x16.png" />
-  </ItemGroup>
   <ItemGroup>
     <Content Include="Patches\Patcher.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Patcher.tt.cs</LastGenOutput>
     </Content>
+    <None Include="Resources\Quest.png" />
+    <None Include="Resources\Zoom.png" />
+    <None Include="Resources\UniPath.png" />
+    <None Include="Resources\Undo.png" />
+    <None Include="Resources\Target.png" />
+    <None Include="Resources\Stop.png" />
+    <None Include="Resources\Stats.png" />
+    <None Include="Resources\Skip.png" />
+    <None Include="Resources\SaveTo.png" />
+    <None Include="Resources\SaveAs.png" />
+    <None Include="Resources\SaveAll.png" />
+    <None Include="Resources\RulerVertical.png" />
+    <None Include="Resources\RulerHorizontal.png" />
+    <None Include="Resources\RowUp.png" />
+    <None Include="Resources\Road.png" />
+    <None Include="Resources\Reverse.png" />
+    <None Include="Resources\Refresh.png" />
+    <None Include="Resources\Redo.png" />
+    <None Include="Resources\RectCR.png" />
+    <None Include="Resources\PreviewChart.png" />
+    <None Include="Resources\PlayAll.png" />
+    <None Include="Resources\Play.png" />
+    <None Include="Resources\Pen.png" />
+    <None Include="Resources\Paste.png" />
+    <None Include="Resources\PanelVisibility.png" />
+    <None Include="Resources\Open.png" />
+    <None Include="Resources\NodeMove.png" />
+    <None Include="Resources\NodeDistance.png" />
+    <None Include="Resources\NewRef.png" />
+    <None Include="Resources\NewFile.png" />
+    <None Include="Resources\New.png" />
+    <None Include="Resources\Load.png" />
+    <None Include="Resources\LinPath.png" />
+    <None Include="Resources\Link.png" />
+    <None Include="Resources\ImportTo.png" />
+    <None Include="Resources\Import.png" />
+    <None Include="Resources\Grid.png" />
+    <None Include="Resources\Gear.png" />
+    <None Include="Resources\Eye.png" />
+    <None Include="Resources\Export.png" />
+    <None Include="Resources\Expand.png" />
+    <None Include="Resources\ExclamationRed.png" />
+    <None Include="Resources\Exclamation.png" />
+    <None Include="Resources\Empty.png" />
+    <None Include="Resources\EllipceCR.png" />
+    <None Include="Resources\EditEdge.png" />
+    <None Include="Resources\EditCR.png" />
+    <None Include="Resources\Edit.png" />
+    <None Include="Resources\RowDown.png" />
+    <None Include="Resources\Distance.png" />
+    <None Include="Resources\CustomizeGrid.png" />
+    <None Include="Resources\Cursor.png" />
+    <None Include="Resources\CubeRed.png" />
+    <None Include="Resources\Cube.png" />
+    <None Include="Resources\Copy.png" />
+    <None Include="Resources\Clone.png" />
+    <None Include="Resources\charArrowColor.png" />
+    <None Include="Resources\Cancel.png" />
+    <None Include="Resources\BoxRed.png" />
+    <None Include="Resources\BiPath.png" />
+    <None Include="Resources\AddCR.png" />
+    <None Include="Resources\Add.png" />
+    <None Include="Resources\Zdiff.png" />
+    <None Include="Resources\Valid.png" />
+    <None Include="Resources\Wizard.png" />
+    <None Include="Resources\zoomIn.png" />
+    <None Include="Resources\zoomOut.png" />
+    <None Include="Resources\Trashcan.png" />
+    <None Include="Resources\Save.png" />
+    <None Include="Resources\Customization.png" />
+    <None Include="Resources\Compas.png" />
+    <None Include="Resources\Entity.png" />
+    <None Include="Resources\Background.png" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />

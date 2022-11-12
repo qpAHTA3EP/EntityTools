@@ -58,7 +58,7 @@ namespace EntityTools.Forms
             // btnAdd
             // 
             this.btnAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnAdd.ImageOptions.Image = global::EntityTools.Properties.Resources.miniAdd;
+            this.btnAdd.ImageOptions.Image = global::EntityTools.Properties.Resources.Add;
             this.btnAdd.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
             this.btnAdd.Location = new System.Drawing.Point(12, 226);
             this.btnAdd.Name = "btnAdd";
@@ -72,7 +72,7 @@ namespace EntityTools.Forms
             // btnRemove
             // 
             this.btnRemove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnRemove.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCancel;
+            this.btnRemove.ImageOptions.Image = global::EntityTools.Properties.Resources.Cancel;
             this.btnRemove.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
             this.btnRemove.Location = new System.Drawing.Point(84, 226);
             this.btnRemove.Name = "btnRemove";
@@ -86,7 +86,7 @@ namespace EntityTools.Forms
             // btnDown
             // 
             this.btnDown.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnDown.ImageOptions.Image = global::EntityTools.Properties.Resources.miniNext;
+            this.btnDown.ImageOptions.Image = global::EntityTools.Properties.Resources.RowDown;
             this.btnDown.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
             this.btnDown.Location = new System.Drawing.Point(254, 226);
             this.btnDown.Name = "btnDown";
@@ -100,7 +100,7 @@ namespace EntityTools.Forms
             // btnUp
             // 
             this.btnUp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnUp.ImageOptions.Image = global::EntityTools.Properties.Resources.miniPrevious;
+            this.btnUp.ImageOptions.Image = global::EntityTools.Properties.Resources.RowUp;
             this.btnUp.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
             this.btnUp.Location = new System.Drawing.Point(182, 226);
             this.btnUp.Name = "btnUp";

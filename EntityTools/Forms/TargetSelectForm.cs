@@ -1,20 +1,12 @@
-﻿using Astral.Controllers;
+﻿using System.Windows.Forms;
+using Astral.Controllers;
 using DevExpress.XtraEditors;
-using EntityTools.Tools;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Windows.Forms;
 
-namespace EntityTools.Editors.Forms
+namespace EntityTools.Forms
 {
     public partial class TargetSelectForm : XtraForm
     {
-        static TargetSelectForm selectForm = null;
+        static TargetSelectForm @this = null;
         private SimpleButton btnOK;
         private LabelControl lblMessage;
 
@@ -23,30 +15,23 @@ namespace EntityTools.Editors.Forms
             InitializeComponent();
         }
 
-        public static DialogResult TargetGuiRequest(string caption, Form parent = null)
+        public static DialogResult GUIRequest(string caption, string message = "")
         {
-            if (selectForm == null)
-                selectForm = new TargetSelectForm();
+            if (@this == null)
+                @this = new TargetSelectForm();
 
             try
             {
-                selectForm.lblMessage.Text = caption;
+                @this.Text = caption;
+                @this.lblMessage.Text = string.IsNullOrEmpty(message) ? caption : message;
 
-                Binds.AddAction(Keys.F12, new Action(selectForm.btnOK.PerformClick));
-                return selectForm.ShowDialog();
+                Binds.AddAction(Keys.F12, @this.btnOK.PerformClick);
+                return @this.ShowDialog();
             }
             finally
             {
                 Binds.RemoveAction(Keys.F12);
-                /*if (parent != null)
-                    parent.Focus();
-                else CommonTools.FocusForm(typeof(Astral.Forms.Main));*/
             }
-        }
-
-        private void btnOK_Click(object sender, EventArgs e)
-        {
-            base.Close();
         }
     }
 }

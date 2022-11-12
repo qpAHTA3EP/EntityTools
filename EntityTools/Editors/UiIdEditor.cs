@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EntityCore.Forms;
+using System;
 using System.ComponentModel;
 using System.Drawing.Design;
 
@@ -9,8 +10,11 @@ namespace EntityTools.Editors
     {
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
-            string newValue = value as string;
-            return EntityTools.Core.UserRequest_SelectUIGenId(ref newValue) ? newValue : value;
+            string newValue = UIViewer.GUIRequest(value as string);
+
+            return string.IsNullOrEmpty(newValue) 
+                 ? value
+                 : newValue;
         }
 
         public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context)

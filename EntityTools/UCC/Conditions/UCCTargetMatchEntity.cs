@@ -1,18 +1,23 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Drawing.Design;
-using System.Threading;
+using System.Runtime.CompilerServices;
+using System.Text;
 using System.Xml.Serialization;
+
 using Astral.Classes.ItemFilter;
 using Astral.Logic.UCC.Classes;
-using EntityTools.Core.Interfaces;
-using EntityTools.Core.Proxies;
+
 using EntityTools.Editors;
 using EntityTools.Enums;
+using EntityTools.Tools.Entities;
+using EntityTools.UCC.Extensions;
+
+using MyNW.Classes;
+// ReSharper disable InconsistentNaming
 
 namespace EntityTools.UCC.Conditions
 {
-    public class UCCTargetMatchEntity : UCCCondition, ICustomUCCCondition
+    public class UCCTargetMatchEntity : UCCCondition, ICustomUCCCondition, INotifyPropertyChanged
     {
         #region Опции команды
 #if DEVELOPER
@@ -31,7 +36,7 @@ namespace EntityTools.UCC.Conditions
                 if (_entityId != value)
                 {
                     _entityId = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityID)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -53,7 +58,7 @@ namespace EntityTools.UCC.Conditions
                 if (_entityIdType != value)
                 {
                     _entityIdType = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityIdType)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -73,7 +78,7 @@ namespace EntityTools.UCC.Conditions
                 if (_entityNameType != value)
                 {
                     _entityNameType = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityNameType)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -101,7 +106,7 @@ namespace EntityTools.UCC.Conditions
                 if (_match != value)
                 {
                     _match = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Match)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -126,28 +131,21 @@ namespace EntityTools.UCC.Conditions
         #endregion
         #endregion
 
-        #region Взаимодействие с EntityToolsCore
-        [NonSerialized]
-        internal IUccConditionEngine Engine;
 
+
+
+        #region PropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public UCCTargetMatchEntity()
+        protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = default)
         {
-            Sign = Astral.Logic.UCC.Ressources.Enums.Sign.Superior;
-
-            Engine = new UccConditionProxy(this);
-        }
-        private IUccConditionEngine MakeProxy()
-        {
-            return new UccConditionProxy(this);
+            _key = null;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
         #endregion
 
-        #region ICustomUCCCondition
-        public new bool IsOK(UCCAction refAction) => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).IsOK(refAction);
 
-        public new bool Locked { get => base.Locked; set => base.Locked = value; }
+
 
         public new ICustomUCCCondition Clone()
         {
@@ -165,10 +163,56 @@ namespace EntityTools.UCC.Conditions
             };
         }
 
-        public string TestInfos(UCCAction refAction) => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).TestInfos(refAction);
+        
+
+
+        #region Вспомогательные методы
+        public new bool IsOK(UCCAction refAction)
+        {
+            Entity target = refAction?.GetTarget();
+            bool match = EntityKey.IsMatch(target);
+            if (Match == MatchType.Match)
+                return match;
+            return !match;
+        }
+
+        public string TestInfos(UCCAction refAction)
+        {
+            Entity target = refAction?.GetTarget();
+
+            StringBuilder sb = new StringBuilder("Target ");
+            if (target != null)
+            {
+                if (EntityNameType == EntityNameType.InternalName)
+                    sb.Append('[').Append(target.InternalName).Append(']');
+                else sb.Append('[').Append(target.NameUntranslated).Append(']');
+                if (EntityKey.IsMatch(target))
+                    sb.Append(" match");
+                else sb.Append(" does not match");
+                sb.Append(" EntityID [").Append(EntityID).Append(']');
+            }
+            else sb.Append("is NULL");
+
+            return sb.ToString();
+        }
+
+        public override string ToString()
+        {
+            _label = string.IsNullOrEmpty(_label)
+                   ? $"{GetType().Name} [{EntityID}]"
+                   : GetType().Name;
+
+            return _label;
+        }
+        private string _label = string.Empty;
         #endregion
 
-        public override string ToString() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).Label();
-
+        #region Вспомогательные инструменты
+        /// <summary>
+        /// Комплексный (составной) идентификатор, используемый для поиска <see cref="Entity"/> в кэше
+        /// </summary>
+        public EntityCacheRecordKey EntityKey => _key ?? (_key = new EntityCacheRecordKey(EntityID, EntityIdType, EntityNameType));
+        private EntityCacheRecordKey _key;
+        #endregion
     }
 }

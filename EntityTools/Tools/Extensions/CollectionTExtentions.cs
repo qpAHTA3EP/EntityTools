@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EntityTools.Tools.Extensions
 {
-    public static class CollectionTExtentions
+    public static class CollectionTExtensions
     {
 #if false
         /// <summary>

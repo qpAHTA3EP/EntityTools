@@ -6,8 +6,6 @@ using System.ComponentModel;
 
 namespace EntityTools.Tools.Targeting
 {
-
-
     /// <summary>
     /// Целеуказатель на врагов, атакующих члена группы, заданного <see cref="Teammate"/>
     /// </summary>

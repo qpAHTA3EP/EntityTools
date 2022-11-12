@@ -52,7 +52,6 @@ namespace EntityTools.Core
             this.ckbETLogger = new System.Windows.Forms.CheckBox();
             this.bntOpenLogFile = new System.Windows.Forms.Button();
             this.cbEnchantHelperActivator = new System.Windows.Forms.CheckBox();
-            this.btnValidate = new System.Windows.Forms.Button();
             this.btnTeamMonitor = new System.Windows.Forms.Button();
             this.btnUiViewer = new System.Windows.Forms.Button();
             this.btnQuesterEditor = new System.Windows.Forms.Button();
@@ -78,6 +77,7 @@ namespace EntityTools.Core
             this.btnSetMachineId = new DevExpress.XtraEditors.SimpleButton();
             this.tbMashineId = new System.Windows.Forms.TextBox();
             this.tabDebug = new DevExpress.XtraTab.XtraTabPage();
+            this.propertyGrid = new System.Windows.Forms.PropertyGrid();
             this.tbDebugMonitorInfo = new System.Windows.Forms.TextBox();
             this.ckbDebugMonitor = new System.Windows.Forms.CheckBox();
             this.tbText = new System.Windows.Forms.TextBox();
@@ -110,7 +110,6 @@ namespace EntityTools.Core
             this.dlgSaveFile = new System.Windows.Forms.SaveFileDialog();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.backgroundWorker = new System.ComponentModel.BackgroundWorker();
-            this.propertyGrid = new System.Windows.Forms.PropertyGrid();
             ((System.ComponentModel.ISupportInitialize)(this.tbclMain)).BeginInit();
             this.tbclMain.SuspendLayout();
             this.tabUtilities.SuspendLayout();
@@ -145,7 +144,6 @@ namespace EntityTools.Core
             // 
             this.tabUtilities.Controls.Add(this.gbxETLog);
             this.tabUtilities.Controls.Add(this.cbEnchantHelperActivator);
-            this.tabUtilities.Controls.Add(this.btnValidate);
             this.tabUtilities.Controls.Add(this.btnTeamMonitor);
             this.tabUtilities.Controls.Add(this.btnUiViewer);
             this.tabUtilities.Controls.Add(this.btnQuesterEditor);
@@ -191,7 +189,7 @@ namespace EntityTools.Core
             this.bntOpenLogFile.FlatAppearance.BorderSize = 0;
             this.bntOpenLogFile.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.bntOpenLogFile.Font = new System.Drawing.Font("Tahoma", 8.25F);
-            this.bntOpenLogFile.Image = global::EntityTools.Properties.Resources.miniLoad;
+            this.bntOpenLogFile.Image = global::EntityTools.Properties.Resources.Load;
             this.bntOpenLogFile.ImageAlign = System.Drawing.ContentAlignment.BottomLeft;
             this.bntOpenLogFile.Location = new System.Drawing.Point(246, 17);
             this.bntOpenLogFile.Name = "bntOpenLogFile";
@@ -215,21 +213,6 @@ namespace EntityTools.Core
             this.cbEnchantHelperActivator.UseVisualStyleBackColor = true;
             this.cbEnchantHelperActivator.Visible = false;
             this.cbEnchantHelperActivator.CheckedChanged += new System.EventHandler(this.handler_EnchantHelperActivation);
-            // 
-            // btnValidate
-            // 
-            this.btnValidate.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnValidate.FlatAppearance.BorderColor = System.Drawing.SystemColors.ButtonShadow;
-            this.btnValidate.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnValidate.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnValidate.Location = new System.Drawing.Point(126, 339);
-            this.btnValidate.Name = "btnValidate";
-            this.btnValidate.Size = new System.Drawing.Size(114, 40);
-            this.btnValidate.TabIndex = 0;
-            this.btnValidate.Text = "Validate";
-            this.btnValidate.UseVisualStyleBackColor = true;
-            this.btnValidate.Click += new System.EventHandler(this.handler_Validate);
             // 
             // btnTeamMonitor
             // 
@@ -279,7 +262,7 @@ namespace EntityTools.Core
             this.btnUcc.FlatAppearance.BorderColor = System.Drawing.SystemColors.ButtonShadow;
             this.btnUcc.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnUcc.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnUcc.Location = new System.Drawing.Point(9, 201);
+            this.btnUcc.Location = new System.Drawing.Point(126, 247);
             this.btnUcc.Name = "btnUcc";
             this.btnUcc.Size = new System.Drawing.Size(113, 40);
             this.btnUcc.TabIndex = 0;
@@ -293,7 +276,7 @@ namespace EntityTools.Core
             this.btnAuraViewer.FlatAppearance.BorderColor = System.Drawing.SystemColors.ButtonShadow;
             this.btnAuraViewer.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnAuraViewer.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnAuraViewer.Location = new System.Drawing.Point(126, 247);
+            this.btnAuraViewer.Location = new System.Drawing.Point(126, 339);
             this.btnAuraViewer.Name = "btnAuraViewer";
             this.btnAuraViewer.Size = new System.Drawing.Size(114, 40);
             this.btnAuraViewer.TabIndex = 0;
@@ -403,7 +386,7 @@ namespace EntityTools.Core
             this.btnExport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnExport.FlatAppearance.BorderSize = 0;
             this.btnExport.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnExport.Image = global::EntityTools.Properties.Resources.miniSave;
+            this.btnExport.Image = global::EntityTools.Properties.Resources.SaveTo;
             this.btnExport.Location = new System.Drawing.Point(318, 21);
             this.btnExport.Name = "btnExport";
             this.btnExport.Size = new System.Drawing.Size(23, 23);
@@ -434,7 +417,7 @@ namespace EntityTools.Core
             // btnSave
             // 
             this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSave.ImageOptions.Image = global::EntityTools.Properties.Resources.miniSave;
+            this.btnSave.ImageOptions.Image = global::EntityTools.Properties.Resources.Save;
             this.btnSave.Location = new System.Drawing.Point(308, 359);
             this.btnSave.Name = "btnSave";
             this.btnSave.PaintStyle = DevExpress.XtraEditors.Controls.PaintStyles.Light;
@@ -491,7 +474,7 @@ namespace EntityTools.Core
             // btnCredentialManager
             // 
             this.btnCredentialManager.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnCredentialManager.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCustomization;
+            this.btnCredentialManager.ImageOptions.Image = global::EntityTools.Properties.Resources.Customization;
             this.btnCredentialManager.Location = new System.Drawing.Point(199, 11);
             this.btnCredentialManager.Name = "btnCredentialManager";
             this.btnCredentialManager.PaintStyle = DevExpress.XtraEditors.Controls.PaintStyles.Light;
@@ -502,7 +485,7 @@ namespace EntityTools.Core
             // 
             // btnGetMachineId
             // 
-            this.btnGetMachineId.ImageOptions.Image = global::EntityTools.Properties.Resources.miniImport;
+            this.btnGetMachineId.ImageOptions.Image = global::EntityTools.Properties.Resources.Import;
             this.btnGetMachineId.Location = new System.Drawing.Point(250, 67);
             this.btnGetMachineId.Name = "btnGetMachineId";
             this.btnGetMachineId.PaintStyle = DevExpress.XtraEditors.Controls.PaintStyles.Light;
@@ -514,7 +497,7 @@ namespace EntityTools.Core
             // btnSetMachineId
             // 
             this.btnSetMachineId.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSetMachineId.ImageOptions.Image = global::EntityTools.Properties.Resources.miniExport;
+            this.btnSetMachineId.ImageOptions.Image = global::EntityTools.Properties.Resources.Export;
             this.btnSetMachineId.Location = new System.Drawing.Point(306, 67);
             this.btnSetMachineId.Name = "btnSetMachineId";
             this.btnSetMachineId.PaintStyle = DevExpress.XtraEditors.Controls.PaintStyles.Light;
@@ -553,6 +536,16 @@ namespace EntityTools.Core
             this.tabDebug.Padding = new System.Windows.Forms.Padding(6);
             this.tabDebug.Size = new System.Drawing.Size(368, 391);
             this.tabDebug.Text = "Debug";
+            // 
+            // propertyGrid
+            // 
+            this.propertyGrid.CommandsVisibleIfAvailable = false;
+            this.propertyGrid.HelpVisible = false;
+            this.propertyGrid.Location = new System.Drawing.Point(9, 167);
+            this.propertyGrid.Name = "propertyGrid";
+            this.propertyGrid.Size = new System.Drawing.Size(346, 130);
+            this.propertyGrid.TabIndex = 14;
+            this.propertyGrid.ToolbarVisible = false;
             // 
             // tbDebugMonitorInfo
             // 
@@ -742,7 +735,7 @@ namespace EntityTools.Core
             // bntSaveQuesterProfilePreprocessor
             // 
             this.bntSaveQuesterProfilePreprocessor.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.bntSaveQuesterProfilePreprocessor.ImageOptions.Image = global::EntityTools.Properties.Resources.miniSave;
+            this.bntSaveQuesterProfilePreprocessor.ImageOptions.Image = global::EntityTools.Properties.Resources.Save;
             this.bntSaveQuesterProfilePreprocessor.Location = new System.Drawing.Point(308, 359);
             this.bntSaveQuesterProfilePreprocessor.Name = "bntSaveQuesterProfilePreprocessor";
             this.bntSaveQuesterProfilePreprocessor.PaintStyle = DevExpress.XtraEditors.Controls.PaintStyles.Light;
@@ -757,7 +750,7 @@ namespace EntityTools.Core
             this.btnTestProcessingItem.FlatAppearance.BorderSize = 0;
             this.btnTestProcessingItem.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnTestProcessingItem.Font = new System.Drawing.Font("Tahoma", 8.25F);
-            this.btnTestProcessingItem.Image = global::EntityTools.Properties.Resources.miniPlayAll;
+            this.btnTestProcessingItem.Image = global::EntityTools.Properties.Resources.PlayAll;
             this.btnTestProcessingItem.ImageAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnTestProcessingItem.Location = new System.Drawing.Point(102, 359);
             this.btnTestProcessingItem.Name = "btnTestProcessingItem";
@@ -774,7 +767,7 @@ namespace EntityTools.Core
             this.btnClearProcessingItem.FlatAppearance.BorderSize = 0;
             this.btnClearProcessingItem.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnClearProcessingItem.Font = new System.Drawing.Font("Tahoma", 8.25F);
-            this.btnClearProcessingItem.Image = global::EntityTools.Properties.Resources.miniDelete;
+            this.btnClearProcessingItem.Image = global::EntityTools.Properties.Resources.Trashcan;
             this.btnClearProcessingItem.ImageAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnClearProcessingItem.Location = new System.Drawing.Point(60, 359);
             this.btnClearProcessingItem.Name = "btnClearProcessingItem";
@@ -791,7 +784,7 @@ namespace EntityTools.Core
             this.btnDeleteProcessingItem.FlatAppearance.BorderSize = 0;
             this.btnDeleteProcessingItem.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnDeleteProcessingItem.Font = new System.Drawing.Font("Tahoma", 8.25F);
-            this.btnDeleteProcessingItem.Image = global::EntityTools.Properties.Resources.miniCancel;
+            this.btnDeleteProcessingItem.Image = global::EntityTools.Properties.Resources.Cancel;
             this.btnDeleteProcessingItem.ImageAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnDeleteProcessingItem.Location = new System.Drawing.Point(34, 359);
             this.btnDeleteProcessingItem.Name = "btnDeleteProcessingItem";
@@ -808,7 +801,7 @@ namespace EntityTools.Core
             this.btnHelpQuesterProfilePreprocessor.FlatAppearance.BorderSize = 0;
             this.btnHelpQuesterProfilePreprocessor.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnHelpQuesterProfilePreprocessor.Font = new System.Drawing.Font("Tahoma", 8.25F);
-            this.btnHelpQuesterProfilePreprocessor.Image = global::EntityTools.Properties.Resources.miniInfo;
+            this.btnHelpQuesterProfilePreprocessor.Image = global::EntityTools.Properties.Resources.Eye;
             this.btnHelpQuesterProfilePreprocessor.ImageAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnHelpQuesterProfilePreprocessor.Location = new System.Drawing.Point(336, 9);
             this.btnHelpQuesterProfilePreprocessor.Name = "btnHelpQuesterProfilePreprocessor";
@@ -824,7 +817,7 @@ namespace EntityTools.Core
             this.btnAddProcessingItem.FlatAppearance.BorderSize = 0;
             this.btnAddProcessingItem.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnAddProcessingItem.Font = new System.Drawing.Font("Tahoma", 8.25F);
-            this.btnAddProcessingItem.Image = global::EntityTools.Properties.Resources.miniAdd;
+            this.btnAddProcessingItem.Image = global::EntityTools.Properties.Resources.Add;
             this.btnAddProcessingItem.ImageAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.btnAddProcessingItem.Location = new System.Drawing.Point(8, 359);
             this.btnAddProcessingItem.Name = "btnAddProcessingItem";
@@ -841,7 +834,7 @@ namespace EntityTools.Core
             this.btnExportQuesterProfilePreprocessor.FlatAppearance.BorderSize = 0;
             this.btnExportQuesterProfilePreprocessor.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnExportQuesterProfilePreprocessor.Font = new System.Drawing.Font("Tahoma", 8.25F);
-            this.btnExportQuesterProfilePreprocessor.Image = global::EntityTools.Properties.Resources.miniExport;
+            this.btnExportQuesterProfilePreprocessor.Image = global::EntityTools.Properties.Resources.Export;
             this.btnExportQuesterProfilePreprocessor.ImageAlign = System.Drawing.ContentAlignment.BottomLeft;
             this.btnExportQuesterProfilePreprocessor.Location = new System.Drawing.Point(237, 359);
             this.btnExportQuesterProfilePreprocessor.Name = "btnExportQuesterProfilePreprocessor";
@@ -858,7 +851,7 @@ namespace EntityTools.Core
             this.btnImportQuesterProfilePreprocessor.FlatAppearance.BorderSize = 0;
             this.btnImportQuesterProfilePreprocessor.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnImportQuesterProfilePreprocessor.Font = new System.Drawing.Font("Tahoma", 8.25F);
-            this.btnImportQuesterProfilePreprocessor.Image = global::EntityTools.Properties.Resources.miniImport;
+            this.btnImportQuesterProfilePreprocessor.Image = global::EntityTools.Properties.Resources.Import;
             this.btnImportQuesterProfilePreprocessor.ImageAlign = System.Drawing.ContentAlignment.BottomLeft;
             this.btnImportQuesterProfilePreprocessor.Location = new System.Drawing.Point(166, 359);
             this.btnImportQuesterProfilePreprocessor.Name = "btnImportQuesterProfilePreprocessor";
@@ -964,16 +957,6 @@ namespace EntityTools.Core
             this.backgroundWorker.WorkerSupportsCancellation = true;
             this.backgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.work_PowerSearch);
             // 
-            // propertyGrid
-            // 
-            this.propertyGrid.CommandsVisibleIfAvailable = false;
-            this.propertyGrid.HelpVisible = false;
-            this.propertyGrid.Location = new System.Drawing.Point(9, 167);
-            this.propertyGrid.Name = "propertyGrid";
-            this.propertyGrid.Size = new System.Drawing.Size(346, 130);
-            this.propertyGrid.TabIndex = 14;
-            this.propertyGrid.ToolbarVisible = false;
-            // 
             // EntityToolsMainPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1024,7 +1007,6 @@ namespace EntityTools.Core
         private GroupBox gbxExport;
         private CheckBox ckbMapperPatch;
         private ToolTip toolTip;
-        private Button btnValidate;
         private XtraTabPage tabDebug;
         private TextBox tbDebugMonitorInfo;
         private CheckBox ckbDebugMonitor;

@@ -33,12 +33,17 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using System.Xml.Serialization;
+using EntityCore.Forms;
+using EntityCore.Tools;
+using EntityTools.Quester.Editor;
+using EntityTools.Tools.Entities;
+using EntityTools.Tools.Powers;
 using API = Astral.Quester.API;
 using Task = System.Threading.Tasks.Task;
 
 namespace EntityTools.Core
 {
-    public partial class EntityToolsMainPanel : /* UserControl //*/ BasePanel
+    public partial class EntityToolsMainPanel : BasePanel
     {
         //TODO: Отображать метрики EntityCache и AStar
         public EntityToolsMainPanel() : base("Entity Tools")
@@ -518,8 +523,7 @@ namespace EntityTools.Core
         private void handler_OpenUiViewer(object sender, EventArgs e)
         {
 #if DEVELOPER
-            string uiGenId = string.Empty;
-            EntityTools.Core.UserRequest_SelectUIGenId(ref uiGenId);
+            string uiGenId = UIViewer.GUIRequest(string.Empty);
             if(!string.IsNullOrEmpty(uiGenId))
                 Clipboard.SetText(uiGenId);
 #endif
@@ -531,7 +535,7 @@ namespace EntityTools.Core
             string pattern = string.Empty;
             EntityNameType nameType = EntityNameType.InternalName;
             ItemFilterStringType strMatch = ItemFilterStringType.Simple;
-            EntityTools.Core.UserRequest_EditEntityId(ref pattern, ref strMatch, ref nameType);
+            EntityViewer.GUIRequest(ref pattern, ref strMatch, ref nameType);
             if (!string.IsNullOrEmpty(pattern))
                 Clipboard.SetText(pattern);
 #endif
@@ -553,8 +557,7 @@ namespace EntityTools.Core
         private void handler_OpenAuraViewer(object sender, EventArgs e)
         {
 #if DEVELOPER
-            string auraId = string.Empty;
-            EntityTools.Core.UserRequest_SelectAuraId(ref auraId);
+            string auraId = AuraViewer.GUIRequest();
             if (!string.IsNullOrEmpty(auraId))
                 Clipboard.SetText(auraId);
 #endif
@@ -714,23 +717,7 @@ namespace EntityTools.Core
             if(File.Exists(ETLogger.LogFilePath))
                 Process.Start(ETLogger.LogFilePath);
         }
-
-        private void handler_Validate(object sender, EventArgs e)
-        {
-            if (EntityTools.Core.CheckCore())
-            {
-
-                XtraMessageBox.Show($"EntityToolsCore is VALID!\n\rCore hash: {EntityTools.CoreHash}");
-                Logger.WriteLine($"EntityToolsCore is VALID! Core hash: {EntityTools.CoreHash}");
-            }
-            else
-            {
-                XtraMessageBox.Show("EntityToolsCore is INVALID!",//\n\rCore hash: {EntityTools.CoreHash}", 
-                                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                Logger.WriteLine($"EntityToolsCore is INVALID!\n\r");
-            }
-        }
-
+        
         private void handler_DebugMonitorActivate(object sender, EventArgs e)
         {
 #if BLAttackersListMonitor
@@ -762,45 +749,23 @@ namespace EntityTools.Core
 
         private void work_PowerSearch(object sender, System.ComponentModel.DoWorkEventArgs e)
         {
+            IPowerCache powCache = new PowerCache("M19_Instance_Fpower_Summon_Lulu");
 
-#if true
-            IPowerCache powCache = EntityTools.Core.Get<IPowerCache>("M19_Instance_Fpower_Summon_Lulu");
-
-            if (powCache != null)
-            {
-                tbDebugMonitorInfo.Text = $"[{DateTime.Now:HH:mm:ss.ffff}] Start searching the power 'M19_Instance_Fpower_Summon_Lulu'\n";
-                while (!backgroundWorker.CancellationPending)
-                {
-                    var power = powCache.GetPower();
-
-                    string info = string.Concat('[', DateTime.Now.ToString("HH:mm:ss.ffff"), "] Power ",
-                        power != null && power.IsValid
-                            ? power.PowerDef.FullDisplayName + "[Slot=" + power.GetTraySlot() + ", Id=" + power.PowerId + "]"
-                            : "not found", Environment.NewLine);
-                    tbDebugMonitorInfo.AppendText(info);
-
-                    Thread.Sleep(550);
-                } 
-            }
-            else
-            {
-                tbDebugMonitorInfo.Text = $"[{DateTime.Now:HH:mm:ss.ffff}] Unable to initialize PowerCache for 'M19_Instance_Fpower_Summon_Lulu'\n";
-            }
-#else
             tbDebugMonitorInfo.Text = $"[{DateTime.Now:HH:mm:ss.ffff}] Start searching the power 'M19_Instance_Fpower_Summon_Lulu'\n";
             while (!backgroundWorker.CancellationPending)
             {
-                var power = EntityManager.LocalPlayer.Character.Powers.FirstOrDefault(pwr => pwr.PowerDef.InternalName.Equals("M19_Instance_Fpower_Summon_Lulu", StringComparison.Ordinal));
+                var power = powCache.GetPower();
+
                 string info = string.Concat('[', DateTime.Now.ToString("HH:mm:ss.ffff"), "] Power ",
-                                            power != null && power.IsValid
-                                                ? power.PowerDef.FullDisplayName + "[Slot=" + power.GetTraySlot() + ", Id=" + power.PowerId + "]"
-                                                : "not found", Environment.NewLine);
+                    power != null && power.IsValid
+                        ? power.PowerDef.FullDisplayName + "[Slot=" + power.GetTraySlot() + ", Id=" + power.PowerId + "]"
+                        : "not found", Environment.NewLine);
                 tbDebugMonitorInfo.AppendText(info);
 
-                Thread.Sleep(500);
+                Thread.Sleep(550);
             } 
-#endif
         }
+
 #if BLAttackersListMonitor
         StaticFieldAccessor<Func<List<string>>> BLAttackersList = typeof(Astral.Logic.NW.Combats).GetStaticField<Func<List<string>>>("BLAttackersList");
         private void work_BlackList(object sender, System.ComponentModel.DoWorkEventArgs e)
@@ -925,14 +890,12 @@ namespace EntityTools.Core
 
         private void handler_OpenCredentialManager(object sender, EventArgs e)
         {
-            var form = new CredentialManager2();
-            form.Show();
+            
         }
 
         private void handler_TeamMonitor(object sender, EventArgs e)
         {
-            //new ObjectInfoForm().Show(new PlayerTeamMonitor(), 500);
-            EntityTools.Core.Monitor(new PlayerTeamMonitor());
+            ObjectInfoForm.Show(new PlayerTeamHelper.Monitor());
         }
 
         private void handler_AddProcessingItem(object sender, EventArgs e)
@@ -1203,12 +1166,12 @@ namespace EntityTools.Core
 
         private void handler_EntityCacheMonitor(object sender, EventArgs e)
         {
-            EntityTools.Core.Monitor(new EntityCacheMonitor());
+            CollectionInfoForm.Show(() => SearchCached.EntityCache);
         }
 
         private void handler_EditUcc(object sender, EventArgs e)
         {
-            EntityTools.Core.UserRequest_Edit(Astral.Logic.UCC.API.CurrentProfile, Astral.API.CurrentSettings.LastUCCProfile);
+            UccEditor.Edit(Astral.Logic.UCC.API.CurrentProfile, Astral.API.CurrentSettings.LastUCCProfile);
         }
 
         private void handler_EditQuester(object sender, EventArgs e)
@@ -1217,8 +1180,8 @@ namespace EntityTools.Core
             var profileName = Astral.API.CurrentSettings.LastQuesterProfile;
 
             if (profile.Saved && !string.IsNullOrEmpty(profileName))
-                EntityTools.Core.UserRequest_Edit(profile, profileName);
-            else EntityTools.Core.UserRequest_Edit(profile);
+                QuesterEditor.Edit(profile, profileName);
+            else QuesterEditor.Edit(profile);
         }
     }
 }

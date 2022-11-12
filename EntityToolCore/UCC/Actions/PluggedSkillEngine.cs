@@ -1,13 +1,12 @@
 ﻿using System.Linq;
 using Astral.Logic.NW;
 using Astral.Logic.UCC.Classes;
-using EntityCore.Tools.Powers;
 using EntityTools;
 using EntityTools.Core.Interfaces;
 using EntityTools.UCC.Actions;
 using EntityTools.Enums;
-using PowerHelper = EntityCore.Tools.Powers.PowerHelper;
-using PowerResult = EntityCore.Tools.Powers.PowerResult;
+using PowerHelper = EntityTools.Tools.Powers.PowerHelper;
+using PowerResult = EntityTools.Tools.Powers.PowerResult;
 using EntityTools.UCC.Conditions;
 using MyNW.Classes;
 using MyNW.Internals;
@@ -15,6 +14,7 @@ using MyNW.Patchables.Enums;
 using System;
 using System.ComponentModel;
 using System.Reflection;
+using EntityTools.Tools.Powers;
 
 namespace EntityCore.UCC.Actions
 {

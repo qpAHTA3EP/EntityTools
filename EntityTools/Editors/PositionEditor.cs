@@ -6,7 +6,7 @@ using System.Drawing.Design;
 
 namespace EntityTools.Editors
 {
-    public class PositionEditor : UITypeEditor
+    internal class PositionEditor : UITypeEditor
     {
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {

@@ -1,19 +1,30 @@
 ﻿#define DEBUG_CHANGE_TARGET
 
-using Astral.Logic.UCC.Classes;
-using EntityTools.Core.Interfaces;
-using EntityTools.Core.Proxies;
-using MyNW.Classes;
 using System;
 using System.ComponentModel;
 using System.Drawing.Design;
+using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Threading;
 using System.Xml.Serialization;
+
+using ACTP0Tools;
 using ACTP0Tools.Annotations;
+
+using Astral.Logic.UCC.Classes;
+
+using EntityCore.Enums;
+
 using EntityTools.Editors;
+using EntityTools.Editors.TestEditors;
+using EntityTools.Enums;
+using EntityTools.Tools.Entities;
+using EntityTools.Tools.Extensions;
+using EntityTools.Tools.Navigation;
 using EntityTools.Tools.Targeting;
 using EntityTools.UCC.Conditions;
+
+using MyNW.Classes;
+using MyNW.Internals;
 
 namespace EntityTools.UCC.Actions
 {
@@ -75,30 +86,7 @@ namespace EntityTools.UCC.Actions
                 }
             }
         }
-
-#if CUSTOM_UCC_CONDITION_EDITOR
-#if DEVELOPER
-        [Category("Optional")]
-        [Editor(typeof(UccConditionListEditor), typeof(UITypeEditor))]
-        [Description("Custom UCC-conditions set.")]
-        [TypeConverter(typeof(ExpandableObjectConverter))]
-#else
-        [Browsable(false)]
-#endif
-        public UCCConditionPack CustomConditions
-        {
-            get => _customConditions;
-            set
-            {
-                if (ReferenceEquals(_customConditions, value))
-                    return;
-
-                _customConditions = value;
-                OnPropertyChanged();
-            }
-        }
-        private UCCConditionPack _customConditions = new UCCConditionPack(); 
-#else
+        
         [Browsable(false)]
         public UCCConditionPack CustomConditions
         {
@@ -110,7 +98,6 @@ namespace EntityTools.UCC.Actions
             }
         }
         public bool ShouldSerializeCustomConditions() => false;
-#endif
 
 #if DEVELOPER && DEBUG_CHANGE_TARGET
         [Category("General")]
@@ -120,62 +107,8 @@ namespace EntityTools.UCC.Actions
 #endif
         #endregion
 
-        #region Взаимодействие с EntityToolsCore
 
-#if DEVELOPER && DEBUG_CHANGE_TARGET
-        [Category("DEBUG")]
-        [Browsable(false)]
-        [TypeConverter(typeof(ExpandableObjectConverter))]
-        [XmlIgnore]
-        public object Engine => _engine;
-#endif
-        [NonSerialized] 
-        private IUccActionEngine _engine;
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        public ChangeTarget()
-        {
-            _engine = new UccActionProxy(this);
-            CoolDown = 500;
-        }
-        private IUccActionEngine MakeProxy()
-        {
-            return new UccActionProxy(this);
-        }
-
-        public void Bind(IUccActionEngine engine)
-        {
-            _engine = engine;
-        }
-        public void Unbind()
-        {
-            _engine = new UccActionProxy(this);
-            PropertyChanged = null;
-        }
-        #endregion
-
-        #region Интерфейс команды
-
-        public override bool NeedToRun => LazyInitializer.EnsureInitialized(ref _engine, MakeProxy).NeedToRun;
-        public override bool Run() => LazyInitializer.EnsureInitialized(ref _engine, MakeProxy).Run();
-        [XmlIgnore]
-        [Browsable(false)]
-        public Entity UnitRef => LazyInitializer.EnsureInitialized(ref _engine, MakeProxy).UnitRef;
-        public override string ToString() => LazyInitializer.EnsureInitialized(ref _engine, MakeProxy).Label();
-        #endregion
-
-        public override UCCAction Clone()
-        {
-            var tarClone = targetSelector.Clone();
-            return BaseClone(new ChangeTarget { targetSelector = tarClone });
-        }
 
         #region Hide Inherited Properties
         [XmlIgnore]
@@ -184,6 +117,188 @@ namespace EntityTools.UCC.Actions
         [XmlIgnore]
         [Browsable(false)]
         public new Astral.Logic.UCC.Ressources.Enums.Unit Target { get; set; }
+        #endregion
+
+
+
+
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = default)
+        {
+            InternalResetOnPropertyChanged(propertyName);
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private void InternalResetOnPropertyChanged([CallerMemberName] string propertyName = default)
+        {
+            switch (propertyName)
+            {
+                case nameof(TargetSelector):
+                    _targetProcessor?.Dispose();
+                    var trgSelector = TargetSelector;
+                    switch (trgSelector)
+                    {
+                        case EntityTarget entityTarget:
+                            _targetProcessor = new EntityTargetProcessor(entityTarget, GetSpecialTeammateCheck());
+                            break;
+                        case TeammateSupport protectMember:
+                            _targetProcessor = new TeammateSupportTargetProcessor(protectMember, GetSpecialTeammateCheck());
+                            break;
+                        default:
+                            var prc = trgSelector.GetDefaultProcessor(this);
+                            if (prc != null)
+                                _targetProcessor = prc;
+                            else throw new Exception($"Can't realized the processor for the '{trgSelector.GetType()}'");
+                            break;
+                    }
+                    break;
+                case nameof(Range):
+                    _targetProcessor.SpecialCheck = GetSpecialTeammateCheck();
+                    break;
+                default:
+                    _targetProcessor.Reset();
+                    break;
+            }
+
+            _idStr = string.Concat(GetType().Name, '[', GetHashCode().ToString("X2"), ']');
+        }
+        #endregion
+
+
+        public override UCCAction Clone()
+        {
+            var tarClone = targetSelector.Clone();
+            return BaseClone(new ChangeTarget { targetSelector = tarClone });
+        }
+
+        #region Данные
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+        public object PlayerTarget => new SimpleEntityWrapper(_targetProcessor.GetTarget());
+#if DEVELOPER && DEBUG_CHANGE_TARGET
+
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+        public TargetProcessor TargetProcessor => _targetProcessor;
+#endif
+        private TargetProcessor _targetProcessor;
+
+        private string _idStr;
+        #endregion
+        
+
+
+        #region IUCCActionEngine
+        public override bool NeedToRun
+        {
+            get
+            {
+                var target = Astral.Logic.UCC.Core.CurrentTarget;
+                bool extendedDebugInfo = ExtendedDebugInfo;
+                if (extendedDebugInfo)
+                {
+                    string currentMethodName = string.Concat(_idStr, '.', MethodBase.GetCurrentMethod()?.Name ?? nameof(NeedToRun));
+
+#if CUSTOM_UCC_CONDITION_EDITOR
+                    bool customConditionOk = ((ICustomUCCCondition)CustomConditions).IsOK(@this);
+                    if (!customConditionOk)
+                    {
+                        ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": CustomConditions check failed. Skip... "), true);
+                        return false;
+                    } 
+#endif
+
+                    var targetStr = target is null || !target.IsValid
+                        ? "Target[NULL]"
+                        : target.GetDebugString(EntityNameType.InternalName, "Target", EntityDetail.Alive | EntityDetail.Pointer | EntityDetail.Distance);
+                    bool isMatch = _targetProcessor.IsMatch(target);
+                    if (isMatch)
+                    {
+                        ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": ", targetStr, " is MATCH. Skip... "), true);
+                        return false;
+                    }
+
+                    var newTarget = _targetProcessor.GetTarget();
+                    if (newTarget is null || !newTarget.IsValid)
+                    {
+                        ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": ", targetStr, " MISMATCH and no suitable target found. Skip... "), true);
+                        return false;
+                    }
+
+                    var newTargetStr = newTarget.GetDebugString(EntityNameType.InternalName, "NewTarget", EntityDetail.Alive | EntityDetail.Pointer | EntityDetail.Distance);
+                    ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": ", targetStr, " MISMATCH. Found ", newTargetStr, ". NeedToRun... "), true);
+                    return true;
+                }
+
+#if CUSTOM_UCC_CONDITION_EDITOR
+                return ((ICustomUCCCondition)CustomConditions).IsOK(@this) &&
+                               _targetProcessor.IsTargetMismatchedAndCanBeChanged(target); 
+#else
+                return _targetProcessor.IsTargetMismatchedAndCanBeChanged(target);
+#endif
+            }
+        }
+
+        public override bool Run()
+        {
+            var target = _targetProcessor.GetTarget();
+
+            bool extendedDebugInfo = ExtendedDebugInfo;
+            if (extendedDebugInfo)
+            {
+                string currentMethodName = string.Concat(_idStr, '.', MethodBase.GetCurrentMethod()?.Name ?? nameof(Run));
+                if (target != null && target.IsValid)
+                {
+                    ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": ChangeTarget to ", target.GetDebugString(EntityNameType.InternalName, "NewTarget", EntityDetail.Alive | EntityDetail.Pointer | EntityDetail.Distance)), true);
+                    AstralAccessors.Logic.UCC.Core.QueryTargetChange(target, _idStr, 1);
+                    return true;
+                }
+                ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": No suitable target found.Skip..."), true);
+            }
+            else if (target != null && target.IsValid)
+            {
+                AstralAccessors.Logic.UCC.Core.QueryTargetChange(target, _idStr, 1);
+                return true;
+            }
+
+            // Если вернуть false, то команда может быть активироваться повторно
+            return false;
+        }
+
+        public Entity UnitRef => _targetProcessor.GetTarget() ?? Astral.Logic.UCC.Core.CurrentTarget;
+
+        public override string ToString() => _targetProcessor.Label();
+
+        #endregion
+
+        #region Вспомогательные инструменты
+        /// <summary>
+        /// Флаг настроек вывода расширенной отлаточной информации
+        /// </summary>
+        private bool ExtendedDebugInfo
+        {
+            get
+            {
+                var logConf = EntityTools.Config.Logger;
+                return logConf.UccActions.DebugChangeTarget && logConf.Active;
+            }
+        }
+
+        private Predicate<Entity> GetSpecialTeammateCheck()
+        {
+            Predicate<Entity> specialCheck = null;
+
+            var range = Range;
+            if (range > 0)
+            {
+                range *= range;
+                specialCheck = (ett) =>
+                    NavigationHelper.SquareDistance3D(EntityManager.LocalPlayer.Location, ett.Location) < range;
+            }
+
+            return specialCheck;
+        }
         #endregion
     }
 }

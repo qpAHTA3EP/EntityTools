@@ -53,7 +53,7 @@ namespace EntityTools.Patches.Mapper.Tools
             // btnCRTypeSwitcher
             // 
             this.btnCRTypeSwitcher.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnCRTypeSwitcher.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCRRectang;
+            this.btnCRTypeSwitcher.ImageOptions.Image = global::EntityTools.Properties.Resources.RectCR;
             this.btnCRTypeSwitcher.ImageOptions.Location = DevExpress.XtraEditors.ImageLocation.MiddleCenter;
             this.btnCRTypeSwitcher.Location = new System.Drawing.Point(353, 2);
             this.btnCRTypeSwitcher.Name = "btnCRTypeSwitcher";
@@ -77,7 +77,7 @@ namespace EntityTools.Patches.Mapper.Tools
             // btnAccept
             // 
             this.btnAccept.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnAccept.ImageOptions.Image = global::EntityTools.Properties.Resources.miniValid;
+            this.btnAccept.ImageOptions.Image = global::EntityTools.Properties.Resources.Valid;
             this.btnAccept.ImageOptions.Location = DevExpress.XtraEditors.ImageLocation.MiddleCenter;
             this.btnAccept.Location = new System.Drawing.Point(324, 32);
             this.btnAccept.Name = "btnAccept";
@@ -89,7 +89,7 @@ namespace EntityTools.Patches.Mapper.Tools
             // btnCancel
             // 
             this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnCancel.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCancel;
+            this.btnCancel.ImageOptions.Image = global::EntityTools.Properties.Resources.Cancel;
             this.btnCancel.ImageOptions.Location = DevExpress.XtraEditors.ImageLocation.MiddleCenter;
             this.btnCancel.Location = new System.Drawing.Point(353, 32);
             this.btnCancel.Name = "btnCancel";

@@ -1,17 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Astral.Classes;
+
 using Astral.Quester.Classes;
-using EntityCore.Entities;
-using EntityTools.Enums;
-using EntityCore.Extensions;
-using EntityTools.Quester.Conditions;
-using MyNW.Classes;
-using static Astral.Quester.Classes.Condition;
-using MyNW.Internals;
+
 using EntityTools;
 using EntityTools.Core.Interfaces;
+using EntityTools.Enums;
+using EntityTools.Quester.Conditions.Deprecated;
+using EntityTools.Tools.Entities;
+
+using MyNW.Classes;
+
+using static Astral.Quester.Classes.Condition;
 
 namespace EntityCore.Quester.Conditions
 {

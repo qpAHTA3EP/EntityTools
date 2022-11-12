@@ -7,7 +7,10 @@ using MyNW.Internals;
 using System;
 using System.ComponentModel;
 using System.Drawing.Design;
+using System.Linq;
 using System.Windows.Forms;
+using EntityCore.Forms;
+using EntityTools.Tools;
 
 namespace EntityTools.Editors
 {
@@ -45,7 +48,7 @@ namespace EntityTools.Editors
             var vndType = VendorType.None;
             var localPlayer = EntityManager.LocalPlayer;
 
-            if (EntityTools.Core.UserRequest_SelectItem(() => displayedVendors, ref vndType))
+            if (ItemSelectForm.GetAnItem(() => displayedVendors, ref vndType))
             {
                 VendorInfo vendorInfo;
                 switch (vndType)
@@ -57,8 +60,8 @@ namespace EntityTools.Editors
                         return false; 
 #endif
                     case VendorType.Normal:
-                        Entity entity = null;
-                        if (EntityTools.Core.UserRequest_GetEntityToInteract(ref entity))
+                        Entity entity = TargetSelectHelper.GetEntityToInteract();
+                        if (entity != null)
                         {
                             vendorInfo = new VendorInfo
                             {
@@ -84,29 +87,29 @@ namespace EntityTools.Editors
                                 DisplayName = contactName
                             };
                             vendor = vendorInfo;
-                            if ((XtraMessageBox.Show("Call it now ?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes))
+                            if (XtraMessageBox.Show("Call it now ?", "Confirm", 
+                                    MessageBoxButtons.YesNo, 
+                                    MessageBoxIcon.Question) 
+                                == DialogResult.Yes)
                             {
-                                foreach (RemoteContact remoteContact in localPlayer.Player.InteractInfo.RemoteContacts)
+                                var contact = localPlayer.Player.InteractInfo.RemoteContacts.FirstOrDefault(cnt => cnt.ContactDef == contactName);
+                                if (contact != null)
                                 {
-                                    if (remoteContact.ContactDef == contactName)
-                                    {
-                                        vendor.DisplayName = remoteContact.DisplayName;
-                                        remoteContact.Start();
-                                        break;
-                                    }
+                                    vendor.DisplayName = contact.DisplayName;
+                                    contact.Start();
+                                    break;
                                 }
                             }
                         }
                         return !string.IsNullOrEmpty(contactName);
                     case VendorType.Node:
-                        Vector3 pos = new Vector3();
-                        if (EntityTools.Core.UserRequest_GetNodeLocation(ref pos, "Get Vendor", "Get vendor-node location"))
+                        var position = TargetSelectHelper.GetNodeLocation("Get Vendor", "Get vendor-node location");
+                        if (position.IsValid)
                         {
                             vendorInfo = new VendorInfo
                             {
                                 VendorType = vndType,
-                                Position = pos,
-                                // DisplayName = $"Node <{pos.X:N1}, {pos.Y:N1}, {pos.Z:N1}>",
+                                Position = position,
                                 MapName = localPlayer.MapState.MapName,
                                 RegionName = localPlayer.RegionInternalName
                             };

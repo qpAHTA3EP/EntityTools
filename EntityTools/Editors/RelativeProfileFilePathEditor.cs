@@ -1,21 +1,21 @@
-﻿using ACTP0Tools.Classes.Quester;
-using ACTP0Tools.Patches;
+﻿using ACTP0Tools.Patches;
 using ACTP0Tools.Reflection;
+using Astral.Quester.Classes.Actions;
+using EntityCore.Quester.Editor;
 using System;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.IO;
 using System.Windows.Forms;
-using Astral.Quester.Classes.Actions;
 using PathHelper = ACTP0Tools.Classes.FileTools;
+using QuesterEditor = EntityTools.Quester.Editor.QuesterEditor;
 
 namespace EntityTools.Editors
 {
-    class RelativeProfileFilePathEditor : UITypeEditor
+    internal class RelativeProfileFilePathEditor : UITypeEditor
     {
         private static PropertyAccessor<PropertyGrid> pgAccessor;
-        private static PropertyAccessor<QuesterProfileProxy> profileProxyAccessor;
-        //private static PropertyAccessor<string> profileNameAccessor;
+
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
             var instance = context?.Instance;
@@ -23,30 +23,16 @@ namespace EntityTools.Editors
             if (type == ACTP0Serializer.PushProfileToStackAndLoad
                 || type == typeof(LoadProfile))
             {
-                //string fullProfilePath = string.Empty;
-
-                //string profileDir = string.Empty;
-                //string astralProfilePath = Astral.Controllers.Directories.ProfilesPath;
-
                 string profileFile = string.Empty;
-
-                // if (profileNameAccessor is null)
-                //     profileNameAccessor = ACTP0Serializer.PushProfileToStackAndLoad.GetProperty<string>("ProfileName");
 
                 if (pgAccessor is null)
                     pgAccessor = context.GetProperty<PropertyGrid>("OwnerGrid");
 
                 if (pgAccessor.IsValid)
                 {
-                    var parentForm = pgAccessor.Value?.ParentForm;
-                    if (parentForm != null)
+                    if (pgAccessor.Value?.ParentForm is QuesterEditor questerEditor)
                     {
-                        if (profileProxyAccessor is null)
-                            profileProxyAccessor = parentForm.GetProperty<QuesterProfileProxy>("Profile");
-                        if (profileProxyAccessor.IsValid)
-                        {
-                            profileFile = profileProxyAccessor.Value.FileName;
-                        }
+                        profileFile = questerEditor.Profile.FileName;   
                     }
                 }
 

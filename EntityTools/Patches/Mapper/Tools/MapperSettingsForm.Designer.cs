@@ -101,8 +101,8 @@ namespace EntityTools.Patches.Mapper.Tools
             this.navGroupObjects});
             this.navBarCustomization.Location = new System.Drawing.Point(0, 0);
             this.navBarCustomization.Name = "navBarCustomization";
-            this.navBarCustomization.OptionsNavPane.ExpandedWidth = 386;
-            this.navBarCustomization.Size = new System.Drawing.Size(386, 363);
+            this.navBarCustomization.OptionsNavPane.ExpandedWidth = 393;
+            this.navBarCustomization.Size = new System.Drawing.Size(393, 363);
             this.navBarCustomization.TabIndex = 3;
             this.navBarCustomization.Text = "Customization";
             // 
@@ -110,6 +110,7 @@ namespace EntityTools.Patches.Mapper.Tools
             // 
             this.navGroupGeneral.Caption = "General";
             this.navGroupGeneral.ControlContainer = this.containerGeneral;
+            this.navGroupGeneral.Expanded = true;
             this.navGroupGeneral.GroupClientHeight = 64;
             this.navGroupGeneral.GroupStyle = DevExpress.XtraNavBar.NavBarGroupStyle.ControlContainer;
             this.navGroupGeneral.Name = "navGroupGeneral";
@@ -122,7 +123,7 @@ namespace EntityTools.Patches.Mapper.Tools
             this.containerGeneral.Controls.Add(this.editLayerDepth);
             this.containerGeneral.Controls.Add(this.ckbChacheEnable);
             this.containerGeneral.Name = "containerGeneral";
-            this.containerGeneral.Size = new System.Drawing.Size(386, 64);
+            this.containerGeneral.Size = new System.Drawing.Size(393, 64);
             this.containerGeneral.TabIndex = 2;
             // 
             // lblLayerDepth
@@ -179,7 +180,7 @@ namespace EntityTools.Patches.Mapper.Tools
             this.containerMeshes.Controls.Add(this.colorBackground);
             this.containerMeshes.Controls.Add(this.colorEditUnidirPath);
             this.containerMeshes.Name = "containerMeshes";
-            this.containerMeshes.Size = new System.Drawing.Size(386, 79);
+            this.containerMeshes.Size = new System.Drawing.Size(393, 79);
             this.containerMeshes.TabIndex = 0;
             // 
             // lblBackground
@@ -255,7 +256,7 @@ namespace EntityTools.Patches.Mapper.Tools
             this.containerObjects.Controls.Add(this.grpNodeCustomization);
             this.containerObjects.Controls.Add(this.grpEntityCustomization);
             this.containerObjects.Name = "containerObjects";
-            this.containerObjects.Size = new System.Drawing.Size(386, 176);
+            this.containerObjects.Size = new System.Drawing.Size(393, 176);
             this.containerObjects.TabIndex = 1;
             // 
             // grpNodeCustomization
@@ -270,7 +271,7 @@ namespace EntityTools.Patches.Mapper.Tools
             this.grpNodeCustomization.GroupStyle = DevExpress.Utils.GroupStyle.Card;
             this.grpNodeCustomization.Location = new System.Drawing.Point(3, 116);
             this.grpNodeCustomization.Name = "grpNodeCustomization";
-            this.grpNodeCustomization.Size = new System.Drawing.Size(380, 55);
+            this.grpNodeCustomization.Size = new System.Drawing.Size(387, 55);
             this.grpNodeCustomization.TabIndex = 2;
             this.grpNodeCustomization.Text = "Nodes";
             // 
@@ -330,7 +331,7 @@ namespace EntityTools.Patches.Mapper.Tools
             this.grpEntityCustomization.GroupStyle = DevExpress.Utils.GroupStyle.Card;
             this.grpEntityCustomization.Location = new System.Drawing.Point(3, 3);
             this.grpEntityCustomization.Name = "grpEntityCustomization";
-            this.grpEntityCustomization.Size = new System.Drawing.Size(380, 107);
+            this.grpEntityCustomization.Size = new System.Drawing.Size(387, 107);
             this.grpEntityCustomization.TabIndex = 1;
             this.grpEntityCustomization.Text = "Draw Entities";
             // 
@@ -418,6 +419,7 @@ namespace EntityTools.Patches.Mapper.Tools
             // 
             this.navGroupMeshes.Caption = "Meshes";
             this.navGroupMeshes.ControlContainer = this.containerMeshes;
+            this.navGroupMeshes.Expanded = true;
             this.navGroupMeshes.GroupClientHeight = 79;
             this.navGroupMeshes.GroupStyle = DevExpress.XtraNavBar.NavBarGroupStyle.ControlContainer;
             this.navGroupMeshes.Name = "navGroupMeshes";
@@ -426,6 +428,7 @@ namespace EntityTools.Patches.Mapper.Tools
             // 
             this.navGroupObjects.Caption = "Objects";
             this.navGroupObjects.ControlContainer = this.containerObjects;
+            this.navGroupObjects.Expanded = true;
             this.navGroupObjects.GroupClientHeight = 176;
             this.navGroupObjects.GroupStyle = DevExpress.XtraNavBar.NavBarGroupStyle.ControlContainer;
             this.navGroupObjects.Name = "navGroupObjects";
@@ -434,7 +437,7 @@ namespace EntityTools.Patches.Mapper.Tools
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(386, 363);
+            this.ClientSize = new System.Drawing.Size(393, 363);
             this.Controls.Add(this.navBarCustomization);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
             this.IconOptions.ShowIcon = false;

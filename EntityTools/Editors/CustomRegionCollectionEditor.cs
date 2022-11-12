@@ -1,19 +1,19 @@
-﻿using System;
+﻿using ACTP0Tools.Reflection;
+using EntityCore.Quester.Editor;
+using EntityTools.Forms;
+using EntityTools.Tools.CustomRegions;
+using System;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Windows.Forms;
-using ACTP0Tools.Classes.Quester;
-using ACTP0Tools.Reflection;
-using EntityTools.Forms;
-using EntityTools.Tools.CustomRegions;
+using QuesterEditor = EntityTools.Quester.Editor.QuesterEditor;
 
 namespace EntityTools.Editors
 {
 #if DEVELOPER
-    class CustomRegionCollectionEditor : UITypeEditor
+    internal class CustomRegionCollectionEditor : UITypeEditor
     {
         private PropertyAccessor<PropertyGrid> pgAccessor;
-        private PropertyAccessor<QuesterProfileProxy> profileProxyAccessor;
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
             if (value is CustomRegionCollection crCollection)
@@ -24,13 +24,9 @@ namespace EntityTools.Editors
 
                 if (pgAccessor.IsValid)
                 {
-                    var parentForm = pgAccessor.Value?.ParentForm;
-                    if (parentForm != null)
+                    if (pgAccessor.Value?.ParentForm is QuesterEditor parentForm)
                     {
-                        if (profileProxyAccessor is null)
-                            profileProxyAccessor = parentForm.GetProperty<QuesterProfileProxy>("Profile");
-                        if (profileProxyAccessor.IsValid)
-                            crCollection.DesignContext = profileProxyAccessor.Value;
+                        crCollection.DesignContext = parentForm.Profile;
                     }
                 }
 

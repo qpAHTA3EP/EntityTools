@@ -1,44 +1,48 @@
-﻿using ACTP0Tools;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Windows.Forms;
+
+using ACTP0Tools;
+
 using Astral.Classes.ItemFilter;
 using Astral.Logic.NW;
 using Astral.Logic.UCC.Classes;
+using Astral.Quester.Classes;
+
 using DevExpress.Utils;
 using DevExpress.XtraEditors;
-using EntityCore.Entities;
+
 using EntityCore.Forms;
 using EntityCore.Quester.Action;
 using EntityCore.Quester.Conditions;
 using EntityCore.Tools;
-using EntityCore.Tools.Powers;
 using EntityCore.UCC.Actions;
 using EntityCore.UCC.Conditions;
+
 using EntityTools;
 using EntityTools.Core.Interfaces;
 using EntityTools.Enums;
 using EntityTools.Forms;
 using EntityTools.Quester.Actions;
 using EntityTools.Quester.Conditions;
+using EntityTools.Quester.Conditions.Deprecated;
 using EntityTools.Tools;
+using EntityTools.Tools.Entities;
 using EntityTools.Tools.Extensions;
+using EntityTools.Tools.Powers;
 using EntityTools.Tools.Targeting;
 using EntityTools.UCC.Actions;
 using EntityTools.UCC.Conditions;
+
 using MyNW.Classes;
 using MyNW.Internals;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing.Design;
-using System.Linq;
-using System.Reflection;
-using System.Windows.Forms;
-using ACTP0Tools.Classes.TypeDescriptorTools;
-using ACTP0Tools.Patches;
-using Astral.Quester.Classes;
-using EntityCore.Quester.Editor;
-using EntityTools.Tools.CustomRegions;
+
+using InsertInsigniaEngine = EntityCore.Quester.Actions.InsertInsigniaEngine;
 using QuesterAction = Astral.Quester.Classes.Action;
 using QuesterCondition = Astral.Quester.Classes.Condition;
+using QuesterEditor = EntityTools.Quester.Editor.QuesterEditor;
 using UCCConditionList = System.Collections.ObjectModel.ObservableCollection<Astral.Logic.UCC.Classes.UCCCondition>;
 
 namespace EntityCore
@@ -382,14 +386,6 @@ namespace EntityCore
                         pos = node.Location.Clone();
                         return true;
                     }
-                    //foreach (TargetableNode targetableNode in EntityManager.LocalPlayer.Player.InteractStatus.TargetableNodes)
-                    //{
-                    //    if (targetableNode.IsValid && targetableNode.IsMouseOver)
-                    //    {
-                    //        pos = targetableNode.WorldInteractionNode.Location.Clone();
-                    //        return true;
-                    //    }
-                    //}
                 }
             }
             return false;

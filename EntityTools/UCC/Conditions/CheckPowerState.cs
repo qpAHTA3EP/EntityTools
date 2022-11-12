@@ -1,14 +1,13 @@
-﻿using Astral.Logic.UCC.Classes;
-using EntityTools.Core.Interfaces;
-using EntityTools.Core.Proxies;
-using EntityTools.Editors;
-using EntityTools.Enums;
-using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Drawing.Design;
 using System.Runtime.CompilerServices;
-using System.Threading;
 using System.Xml.Serialization;
+
+using Astral.Logic.UCC.Classes;
+
+using EntityTools.Editors;
+using EntityTools.Enums;
+using EntityTools.Tools.Powers;
 
 namespace EntityTools.UCC.Conditions
 {
@@ -70,11 +69,7 @@ namespace EntityTools.UCC.Conditions
         #endregion
 
 
-        #region ICustomUCCCondition
-        public new bool IsOK(UCCAction refAction) =>
-            LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).IsOK(refAction);
 
-        public new bool Locked { get => base.Locked; set => base.Locked = value; }
 
         public new ICustomUCCCondition Clone()
         {
@@ -89,34 +84,63 @@ namespace EntityTools.UCC.Conditions
             };
         }
 
-        public string TestInfos(UCCAction refAction) =>
-            LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).TestInfos(refAction);
-        #endregion
-
-
         #region PropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
+        protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = default)
         {
+            InternalResetOnPropertyChanged(propertyName);
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+        private void InternalResetOnPropertyChanged([CallerMemberName] string propertyName = default)
+        {
+            if (propertyName == nameof(PowerId))
+                powerCache.PowerIdPattern = PowerId;
         }
         #endregion
 
 
-        [NonSerialized]
-        internal IUccConditionEngine Engine;
 
-        public CheckPowerState()
+        #region Данные
+        private readonly PowerCache powerCache = new PowerCache(string.Empty);
+        #endregion
+
+        
+
+
+        #region Вспомогательные методы
+        public new bool IsOK(UCCAction refAction)
         {
-            Target = Astral.Logic.UCC.Ressources.Enums.Unit.Target;
-            Engine = new UccConditionProxy(this);
-        }
-        private IUccConditionEngine MakeProxy()
-        {
-            return new UccConditionProxy(this);
+            var pwr = powerCache.GetPower();
+
+            switch (CheckState)
+            {
+                case PowerState.HasPower:
+                    return pwr != null && pwr.IsValid;
+                case PowerState.HasntPower:
+                    return pwr == null || !pwr.IsValid;
+            }
+
+            return false;
         }
 
-        public override string ToString() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).Label();
+        public string TestInfos(UCCAction refAction)
+        {
+            var pwr = powerCache.GetPower();
+
+            if (pwr != null && pwr.IsValid)
+            {
+                var pwrDef = pwr.PowerDef;
+                return $"Character has Power {pwrDef.DisplayName}[{pwrDef.InternalName}].";
+            }
+
+            return $"No Power [{PowerId}] was found.";
+        }
+
+        public override string ToString()
+        {
+            return $"CheckPowerState : {CheckState} [{PowerId}]";
+        }
+        #endregion
     }
 }

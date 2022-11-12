@@ -6,6 +6,11 @@ using MyNW.Internals;
 using System;
 using System.ComponentModel;
 using System.Drawing.Design;
+using System.Windows.Forms;
+using Astral.Logic.NW;
+using EntityCore.Forms;
+using EntityTools.Tools;
+
 namespace EntityTools.Editors
 {
 #if DEVELOPER
@@ -30,18 +35,19 @@ namespace EntityTools.Editors
 
         public static readonly MissionGiverType[] DisplayedGivers = { MissionGiverType.NPC,
                                                                       MissionGiverType.Remote };
+        
 
         public static bool SetInfos(ref MissionGiverInfo missionGiver, MissionGiverType giverType = MissionGiverType.None)
         {
             if (giverType == MissionGiverType.None)
-                if (!EntityTools.Core.UserRequest_SelectItem(() => DisplayedGivers, ref giverType))
+                if(ItemSelectForm.GetAnItem(() => DisplayedGivers, ref giverType))
                     return false;
 
             switch (giverType)
             {
                 case MissionGiverType.NPC:
-                    Entity entity = null;
-                    if (EntityTools.Core.UserRequest_GetEntityToInteract(ref entity))
+                    Entity entity = TargetSelectHelper.GetEntityToInteract();
+                    if (entity != null)
                     {
                         var player = EntityManager.LocalPlayer;
                         missionGiver = new MissionGiverInfo(entity.CostumeRef.CostumeName,

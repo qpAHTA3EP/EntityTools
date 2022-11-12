@@ -1,13 +1,13 @@
 ﻿using Astral.Classes;
 using Astral.Logic.NW;
 using Astral.Logic.UCC.Classes;
-using EntityCore.Entities;
 using EntityTools;
 using EntityTools.Core.Interfaces;
 using EntityTools.Quester.Actions;
 using EntityTools.UCC.Actions;
 using MyNW.Classes;
 using System;
+using EntityTools.Tools.Entities;
 
 namespace EntityCore.UCC.Actions
 {

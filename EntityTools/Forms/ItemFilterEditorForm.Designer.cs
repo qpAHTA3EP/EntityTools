@@ -203,8 +203,6 @@ namespace EntityTools.Forms
             this.colCheckEquipmentLevel.OptionsColumn.FixedWidth = true;
             this.colCheckEquipmentLevel.ToolTip = "Check Equipment Level";
             this.colCheckEquipmentLevel.UnboundType = DevExpress.Data.UnboundColumnType.Boolean;
-            this.colCheckEquipmentLevel.Visible = true;
-            this.colCheckEquipmentLevel.VisibleIndex = 7;
             this.colCheckEquipmentLevel.Width = 40;
             // 
             // colCheckPlayerLevel
@@ -219,8 +217,6 @@ namespace EntityTools.Forms
             this.colCheckPlayerLevel.OptionsColumn.FixedWidth = true;
             this.colCheckPlayerLevel.ToolTip = "Check Player Level";
             this.colCheckPlayerLevel.UnboundType = DevExpress.Data.UnboundColumnType.Boolean;
-            this.colCheckPlayerLevel.Visible = true;
-            this.colCheckPlayerLevel.VisibleIndex = 8;
             this.colCheckPlayerLevel.Width = 40;
             // 
             // colKeepNumber
@@ -251,8 +247,6 @@ namespace EntityTools.Forms
             this.colPutOnItem.OptionsColumn.AllowSort = DevExpress.Utils.DefaultBoolean.False;
             this.colPutOnItem.ToolTip = "Equip item arter buying";
             this.colPutOnItem.UnboundType = DevExpress.Data.UnboundColumnType.Boolean;
-            this.colPutOnItem.Visible = true;
-            this.colPutOnItem.VisibleIndex = 9;
             this.colPutOnItem.Width = 40;
             // 
             // barManager
@@ -357,7 +351,7 @@ namespace EntityTools.Forms
             // btnShowItems
             // 
             this.btnShowItems.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnShowItems.ImageOptions.Image = global::EntityTools.Properties.Resources.miniPlayAll;
+            this.btnShowItems.ImageOptions.Image = global::EntityTools.Properties.Resources.PlayAll;
             this.btnShowItems.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
             this.btnShowItems.Location = new System.Drawing.Point(422, 251);
             this.btnShowItems.Name = "btnShowItems";
@@ -371,7 +365,7 @@ namespace EntityTools.Forms
             // btnClear
             // 
             this.btnClear.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnClear.ImageOptions.Image = global::EntityTools.Properties.Resources.miniDelete;
+            this.btnClear.ImageOptions.Image = global::EntityTools.Properties.Resources.Trashcan;
             this.btnClear.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
             this.btnClear.Location = new System.Drawing.Point(148, 251);
             this.btnClear.Name = "btnClear";
@@ -385,7 +379,7 @@ namespace EntityTools.Forms
             // btnExport
             // 
             this.btnExport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnExport.ImageOptions.Image = global::EntityTools.Properties.Resources.miniExport;
+            this.btnExport.ImageOptions.Image = global::EntityTools.Properties.Resources.Export;
             this.btnExport.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
             this.btnExport.Location = new System.Drawing.Point(354, 251);
             this.btnExport.Name = "btnExport";
@@ -399,7 +393,7 @@ namespace EntityTools.Forms
             // btnImport
             // 
             this.btnImport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnImport.ImageOptions.Image = global::EntityTools.Properties.Resources.miniImport;
+            this.btnImport.ImageOptions.Image = global::EntityTools.Properties.Resources.Import;
             this.btnImport.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
             this.btnImport.Location = new System.Drawing.Point(286, 251);
             this.btnImport.Name = "btnImport";
@@ -414,7 +408,7 @@ namespace EntityTools.Forms
             // 
             this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnCancel.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCancel;
+            this.btnCancel.ImageOptions.Image = global::EntityTools.Properties.Resources.Cancel;
             this.btnCancel.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
             this.btnCancel.Location = new System.Drawing.Point(570, 251);
             this.btnCancel.Name = "btnCancel";
@@ -427,7 +421,7 @@ namespace EntityTools.Forms
             // bntSave
             // 
             this.bntSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.bntSave.ImageOptions.Image = global::EntityTools.Properties.Resources.miniValid;
+            this.bntSave.ImageOptions.Image = global::EntityTools.Properties.Resources.Valid;
             this.bntSave.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
             this.bntSave.Location = new System.Drawing.Point(502, 251);
             this.bntSave.Name = "bntSave";
@@ -440,7 +434,7 @@ namespace EntityTools.Forms
             // btnReload
             // 
             this.btnReload.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnReload.ImageOptions.Image = global::EntityTools.Properties.Resources.miniRefresh;
+            this.btnReload.ImageOptions.Image = global::EntityTools.Properties.Resources.Refresh;
             this.btnReload.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
             this.btnReload.Location = new System.Drawing.Point(216, 251);
             this.btnReload.Name = "btnReload";
@@ -454,7 +448,7 @@ namespace EntityTools.Forms
             // btnDelete
             // 
             this.btnDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnDelete.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCancel;
+            this.btnDelete.ImageOptions.Image = global::EntityTools.Properties.Resources.Cancel;
             this.btnDelete.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
             this.btnDelete.Location = new System.Drawing.Point(80, 251);
             this.btnDelete.Name = "btnDelete";
@@ -468,7 +462,7 @@ namespace EntityTools.Forms
             // btnAdd
             // 
             this.btnAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnAdd.ImageOptions.Image = global::EntityTools.Properties.Resources.miniAdd;
+            this.btnAdd.ImageOptions.Image = global::EntityTools.Properties.Resources.Add;
             this.btnAdd.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
             this.btnAdd.Location = new System.Drawing.Point(12, 251);
             this.btnAdd.Name = "btnAdd";

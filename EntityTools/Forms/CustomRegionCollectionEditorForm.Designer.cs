@@ -71,7 +71,7 @@
             // btnReload
             // 
             this.btnReload.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnReload.ImageOptions.Image = global::EntityTools.Properties.Resources.miniRefresh;
+            this.btnReload.ImageOptions.Image = global::EntityTools.Properties.Resources.Refresh;
             this.btnReload.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
             this.btnReload.Location = new System.Drawing.Point(88, 374);
             this.btnReload.Name = "btnReload";

@@ -1,6 +1,5 @@
 ﻿using Astral.Classes;
 using Astral.Logic.UCC.Classes;
-using EntityCore.Entities;
 using EntityTools;
 using EntityTools.Core.Interfaces;
 using EntityTools.Enums;
@@ -10,6 +9,7 @@ using EntityTools.UCC.Extensions;
 using MyNW.Classes;
 using System;
 using System.Text;
+using EntityTools.Tools.Entities;
 
 namespace EntityCore.UCC.Conditions
 {

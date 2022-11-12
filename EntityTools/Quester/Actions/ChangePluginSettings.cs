@@ -1,10 +1,9 @@
-﻿using System;
-using System.ComponentModel;
-using Astral;
-using Astral.Logic.Classes.Map;
+﻿using Astral.Logic.Classes.Map;
 using EntityTools.Editors;
 using EntityTools.Enums;
 using MyNW.Classes;
+using System;
+using System.ComponentModel;
 using Action = Astral.Quester.Classes.Action;
 
 namespace EntityTools.Quester.Actions

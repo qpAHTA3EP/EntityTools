@@ -5,11 +5,12 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
+using EntityCore.Forms;
 
 namespace EntityTools.Editors
 {
 #if DEVELOPER
-    public class FoeListEditor : UITypeEditor
+    internal class FoeListEditor : UITypeEditor
     {
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
@@ -20,12 +21,15 @@ namespace EntityTools.Editors
                 string id = string.Empty;
                 ItemFilterStringType strType = ItemFilterStringType.Simple;
                 var nameType = EntityNameType.InternalName;
-                Func<string> getNewItem = () => {
-                    if (EntityTools.Core.UserRequest_EditEntityId(ref id, ref strType, ref nameType))
-                        return id;
-                    return null;
-                };
-                if (ItemListEditorForm<string>.GUIRequest(ref items, getNewItem, "Foe list"))
+
+                string GetEntityId()
+                {
+                    return EntityViewer.GUIRequest(ref id, ref strType, ref nameType) != null 
+                        ? id 
+                        : null;
+                }
+
+                if (ItemListEditorForm<string>.GUIRequest(ref items, GetEntityId, "Foe list"))
                     return new List<string>(items);
             }
             return value;

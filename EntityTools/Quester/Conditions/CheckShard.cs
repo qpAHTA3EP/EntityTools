@@ -13,9 +13,10 @@ namespace EntityTools.Quester.Conditions
     {
         public CheckShard()
         {
-            if (Game.CharacterSelectionData.CharacterChoices.IsValid && Game.CharacterSelectionData.CharacterChoices.LastPlayedCharacter.IsValid)
+            var characterChoices = Game.CharacterSelectionData.CharacterChoices;
+            if (characterChoices.IsValid && characterChoices.LastPlayedCharacter.IsValid)
             {
-                Name = Game.CharacterSelectionData.CharacterChoices.LastPlayedCharacter.ShardName;
+                Name = characterChoices.LastPlayedCharacter.ShardName;
             }
         }
 
@@ -23,29 +24,31 @@ namespace EntityTools.Quester.Conditions
         [Editor(typeof(CurrentShardEditor), typeof(UITypeEditor))]
         public string Name { get; set; }
 
+
+
+
         public override bool IsValid
         {
             get
             {
-                if(Game.CharacterSelectionData.CharacterChoices.IsValid && Game.CharacterSelectionData.CharacterChoices.LastPlayedCharacter.IsValid)
-                    return (Name == Game.CharacterSelectionData.CharacterChoices.LastPlayedCharacter.ShardName);
+                var characterChoices = Game.CharacterSelectionData.CharacterChoices;
+                if (characterChoices.IsValid && characterChoices.LastPlayedCharacter.IsValid)
+                    return Name == characterChoices.LastPlayedCharacter.ShardName;
                 return false;
             }
         }
 
         public override void Reset(){ }
 
-        public override string ToString()
-        {
-            return $"{GetType().Name} [{Name}]";
-        }
+        public override string ToString() => $"{GetType().Name} [{Name}]";
 
         public override string TestInfos
         {
             get
             {
-                if (Game.CharacterSelectionData.CharacterChoices.IsValid && Game.CharacterSelectionData.CharacterChoices.LastPlayedCharacter.IsValid)
-                    return $"Current Shard is [{Game.CharacterSelectionData.CharacterChoices.LastPlayedCharacter.ShardName}]";
+                var characterChoices = Game.CharacterSelectionData.CharacterChoices;
+                if (characterChoices.IsValid && characterChoices.LastPlayedCharacter.IsValid)
+                    return $"Current Shard is [{characterChoices.LastPlayedCharacter.ShardName}]";
                 return "No valid information";
             }
         }

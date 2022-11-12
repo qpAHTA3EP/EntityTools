@@ -1,11 +1,15 @@
-﻿using AStar;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 using System.Windows.Forms;
+
+using AStar;
+
 using DevExpress.Utils;
 using DevExpress.XtraEditors;
+
+using EntityCore.Forms;
+
 using MyNW.Classes;
 using MyNW.Internals;
 
@@ -230,11 +234,12 @@ namespace EntityTools.Patches.Mapper.Tools
 
                     // Ориентиров для определения Z не найдено, поэтому предлагаем ввести вручную
                     string zStr = z.ToString();
-                    if (!EntityTools.Core.UserRequest_EditValue(ref zStr,
-                            "Enter Z-coordinate for the new Node.\n" +
-                            $"Hint: No Waypoint, InteractNode or Entity found to determine Z-coordinate.\n" +
-                            $"The Player's Z-coordinate is used as default value.",
-                            "Z-coordinate", new FormatInfo {FormatString = "N5", FormatType = FormatType.Numeric})
+                    if (!InputBox.EditValue(ref zStr,
+                                            "Enter Z-coordinate for the new Node.\n" +
+                                            $"Hint: No Waypoint, InteractNode or Entity found to determine Z-coordinate.\n" +
+                                            $"The Player's Z-coordinate is used as default value.",
+                                            "Z-coordinate", 
+                                            new FormatInfo {FormatString = "N5", FormatType = FormatType.Numeric})
                         || !double.TryParse(zStr, out z))
                     {
                         XtraMessageBox.Show("You should enter the value of Z-coordinate for the new Node.",

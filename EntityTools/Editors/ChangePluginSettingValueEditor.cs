@@ -5,24 +5,13 @@ using System.ComponentModel;
 
 namespace EntityTools.Editors
 {
-    class ChangePluginSettingValueEditor : StringConverter
+    internal class ChangePluginSettingValueEditor : StringConverter
     {
         /// <summary>
         /// Будем предоставлять выбор из списка
         /// </summary>
         public override bool GetStandardValuesSupported(ITypeDescriptorContext context)
         {
-            //if (context.Instance is ChangePluginSetting changePluginSetting)
-            //{
-            //    switch (changePluginSetting.Command)
-            //    {
-            //        case PluginSettingsCommand.DisableSlideMonitor:
-            //        case PluginSettingsCommand.DisableUnstuckSpell:
-            //            return true;
-            //        default:
-            //            return false;
-            //    }
-            //}
             return true;
         }
 
@@ -67,7 +56,6 @@ namespace EntityTools.Editors
                 }
             }
             return false;
-            //return base.IsValid(context, value);
         }
 
         /// <summary>
@@ -84,11 +72,11 @@ namespace EntityTools.Editors
                     case PluginSettingsCommand.DisableSlideMonitor:
                         return new StandardValuesCollection(Enum.GetValues(typeof(SlideMonitorState)));
                     case PluginSettingsCommand.DisableUnstuckSpell:
-                        return new StandardValuesCollection(new object[] {true, false});
+                        return new StandardValuesCollection(new [] { true, false });
                 }
             }
 
-            return new StandardValuesCollection(new object[] { });
+            return new StandardValuesCollection(Array.Empty<object>());
         }
     }
 }

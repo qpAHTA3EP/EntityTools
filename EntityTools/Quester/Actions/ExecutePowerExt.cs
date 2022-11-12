@@ -1,22 +1,29 @@
 ﻿#define DEBUG_INSERTINSIGNIA
 
+using ACTP0Tools;
 using Astral.Logic.Classes.Map;
-using EntityTools.Core.Interfaces;
-using EntityTools.Core.Proxies;
-using EntityTools.Editors;
-using MyNW.Classes;
-using System;
-using System.ComponentModel;
-using System.Drawing.Design;
-using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Xml.Serialization;
-using Astral.Quester.Forms;
 using Astral.Quester.UIEditors;
+using EntityTools.Editors;
+using EntityTools.Forms;
+using EntityTools.Patches.Mapper;
 using EntityTools.Tools.Classes;
 using EntityTools.Tools.CustomRegions;
+using EntityTools.Tools.Navigation;
+using EntityTools.Tools.Powers;
+using MyNW.Classes;
+using MyNW.Internals;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Drawing.Design;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Windows.Forms;
+using System.Xml.Serialization;
 using Action = Astral.Quester.Classes.Action;
 using PositionEditor = EntityTools.Editors.PositionEditor;
+// ReSharper disable InconsistentNaming
 
 namespace EntityTools.Quester.Actions
 {
@@ -39,11 +46,13 @@ namespace EntityTools.Quester.Actions
                 {
                     powerId = value;
                     _lastPowerId = value;
+                    InternalReset();
                     NotifyPropertyChanged();
                 }
             }
         }
         private string powerId = string.Empty;
+        private readonly PowerCache powerCache = new PowerCache(string.Empty);
 
 #if DEVELOPER
         [Description("Time to cast the power. Minimum is 500 ms")]
@@ -325,6 +334,7 @@ namespace EntityTools.Quester.Actions
                 }
             }
         }
+        private Astral.Quester.Classes.Condition _ignoreCombatCondition;
         #endregion
 
 
@@ -385,52 +395,554 @@ namespace EntityTools.Quester.Actions
         #endregion
 
 
-        #region Взаимодействие с EntityToolsCore
+
+
+        public ExecutePowerExt()
+        {
+            if (string.IsNullOrEmpty(powerId))
+                powerId = _lastPowerId;
+            if (_targetRad > 0)
+                TargetRadius = _targetRad;
+            InternalReset();
+        }
+
+
+
+        #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+        #endregion
+        
 
-        [NonSerialized]
-        internal IQuesterActionEngine Engine;
 
-        public ExecutePowerExt()
+
+
+        #region Интерфейс Action
+        public override bool NeedToRun
         {
-            Engine = new QuesterActionProxy(this);
-            if (string.IsNullOrEmpty(powerId))
-                powerId = _lastPowerId;
-            if (_targetRad > 0)
-                TargetRadius = _targetRad;
+            get
+            {
+                bool debugInfo = EntityTools.Config.Logger.QuesterActions.DebugExecutePowerExt;
+                string currentMethodName = debugInfo ? string.Concat(actionIDstr, '.', MethodBase.GetCurrentMethod()?.Name ?? nameof(Run)) : string.Empty;
+
+                if (!IntenalConditions)
+                {
+                    // Чтобы прервать цикл обработки команды нужно, чтобы Engine перешел к обработке Run()
+                    if (debugInfo)
+                        ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: {nameof(IntenalConditions)} failed.");
+                    return true;
+                }
+
+                var d = MapperHelper.SquareDistance2D(EntityManager.LocalPlayer.Location, InitialPosition);
+
+                if (d > 25
+                    && IgnoreCombat
+                    && CheckingIgnoreCombatCondition())
+                {
+                    AstralAccessors.Quester.FSM.States.Combat.SetIgnoreCombat(true, IgnoreCombatMinHP, 5_000);
+                    if (debugInfo)
+                        ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: Set ignore combat.");
+                    return false;
+                }
+                AstralAccessors.Quester.FSM.States.Combat.SetIgnoreCombat(false);
+
+                return d <= 25 && powerCache.GetPower() != null;
+            }
         }
-        public void Bind(IQuesterActionEngine engine)
+        
+        public override ActionResult Run()
         {
-            Engine = engine;
+            bool debugInfo = EntityTools.Config.Logger.QuesterActions.DebugExecutePowerExt;
+            string currentMethodName = debugInfo ? string.Concat(actionIDstr, '.', MethodBase.GetCurrentMethod()?.Name ?? nameof(Run)) : string.Empty;
+
+
+            if (!IntenalConditions)
+            {
+                if (debugInfo)
+                    ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: {nameof(IntenalConditions)} failed. ActionResult={ActionResult.Fail}.");
+                return ActionResult.Fail;
+            }
+
+
+            if (debugInfo)
+                ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: starts");
+            NavigationHelper.StopNavigationCompletely();
+
+            var currentPower = powerCache.GetPower();
+
+            if (currentPower is null)
+            {
+                if (debugInfo)
+                    ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: Fail to get Power '{PowerId}' by '" + nameof(PowerId) + "'");
+                return ActionResult.Fail;
+            }
+
+            if (debugInfo)
+                ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: Activating Power '{PowerId}'");
+
+            var powResult = currentPower.ExecutePower(TargetPosition, CastingTime, Pause, 0, false, debugInfo);
+
+            switch (powResult)
+            {
+                case PowerResult.Fail:
+                    if (debugInfo)
+                        ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: ActionResult => {ActionResult.Fail}");
+                    return ActionResult.Fail;
+                case PowerResult.Skip:
+                    if (debugInfo)
+                        ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: ActionResult => {ActionResult.Skip}");
+                    return ActionResult.Skip;
+            }
+
+            // Проверяем необходимость и возможность повторения команды
+            var rad = TargetRadius;
+            if (rad > 0)
+            {
+                rad = Math.Max(rad, 5);
+                rad *= rad;
+                var pos = EntityManager.LocalPlayer.Location.Clone();
+                var dist2 = MapperHelper.SquareDistance3D(pos, TargetPosition);
+                if (dist2 > rad)
+                {
+                    bool intCheck = internalCheck();
+                    var actRes = intCheck
+                        ? ActionResult.Running
+                        : ActionResult.Fail;
+                    if (debugInfo)
+                        ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: Current player position: <{pos.X:N2}, {pos.Y:N2}, {pos.Z:N2}>. Distance to {nameof(TargetPosition)} is {Math.Sqrt(dist2)}.\n" +
+                                                          $"InternalConditions '{intCheck}' => {actRes}");
+                    // Расстояние от персонажа до TargetPosition больше TargetRadius,
+                    // поэтому выполнение команды нужно повторить
+                    return actRes;
+                }
+                if (debugInfo)
+                    ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: Current player position: <{pos.X:N2}, {pos.Y:N2}, {pos.Z:N2}>. Distance to {nameof(TargetPosition)} is {Math.Sqrt(dist2)} => {ActionResult.Completed}");
+            }
+            else if (debugInfo)
+                ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: ActionResult => {ActionResult.Completed}");
+
+            return ActionResult.Completed;
         }
-        public void Unbind()
+
+        public override string ActionLabel
         {
-            Engine = new QuesterActionProxy(this);
-            PropertyChanged = null;
+            get
+            {
+                if (string.IsNullOrEmpty(label))
+                {
+                    var id = PowerId;
+                    if (string.IsNullOrEmpty(id))
+                        label = GetType().Name;
+                    else label = $@"{GetType().Name}: [{id}]";
+                }
+                return label;
+            }
         }
-        private IQuesterActionEngine MakeProxy()
+        private string label;
+        private string actionIDstr;
+
+        public override string InternalDisplayName => string.Empty;
+
+        public override bool UseHotSpots => false;
+        protected override bool IntenalConditions => internalCheck();
+        protected override Vector3 InternalDestination
         {
-            return new QuesterActionProxy(this);
+            get
+            {
+                if (!internalCheck())
+                    return Vector3.Empty;
+
+                var d = MapperHelper.SquareDistance2D(EntityManager.LocalPlayer.Location, InitialPosition);
+                if (d > 25)
+                    return InitialPosition;
+
+                return Vector3.Empty;
+            }
+        }
+
+        protected override ActionValidity InternalValidity
+        {
+            get
+            {
+                var iniPos = InitialPosition;
+                if (!iniPos.IsValid)
+                    return new ActionValidity($"{nameof(InitialPosition)} is invalid");
+                if (!TargetPosition.IsValid)
+                    return new ActionValidity($"{nameof(TargetPosition)} is invalid");
+                if (string.IsNullOrEmpty(PowerId))
+                    return new ActionValidity($"{nameof(PowerId)} is invalid");
+                if (zRange.IsValid && zRange.Outside(iniPos.Z))
+                    return new ActionValidity($"{nameof(InitialPosition)} is out of {nameof(ZRange)}");
+                return new ActionValidity();
+            }
+        }
+        
+        public override void GatherInfos()
+        {
+            var player = EntityManager.LocalPlayer;
+            if (player.IsValid && !player.IsLoading
+                && TargetSelectForm.GUIRequest("Set InitialPosition",
+                                               "Move the Character to the position where the Power could be activated and press F12")
+                   == DialogResult.OK)
+            {
+                var iniPos = player.Location;
+                if (iniPos.IsValid)
+                {
+                    var node = AstralAccessors.Quester.Core.Meshes.ClosestNode(iniPos.X, iniPos.Y, iniPos.Z, out double dist, false);
+
+                    if (node is null
+                        || dist > 10)
+                    {
+                        InitialPosition = iniPos;
+                    }
+                    else iniPos = InitialPosition = node.Position;
+
+                    if (TargetSelectForm.GUIRequest("Set TargetPosition",
+                            "Move the Character to the position on which the Power should be target before activated and press F12") ==
+                        DialogResult.OK)
+                    {
+                        var tarPos = EntityManager.LocalPlayer.Location;
+                        if (tarPos.IsValid)
+                        {
+                            node = AstralAccessors.Quester.Core.Meshes.ClosestNode(tarPos.X, tarPos.Y, tarPos.Z,
+                               out dist, false);
+
+                            if (node is null
+                                || dist > 10)
+                            {
+                                TargetPosition = tarPos;
+                            }
+                            else TargetPosition = node.Position;
+
+                            CurrentMap = player.MapState.MapName;
+                            CurrentRegion = player.RegionInternalName;
+
+                            var zi = iniPos.Z;
+                            var zDev = ZDeviation;
+                            if (zDev > 0)
+                            {
+                                zRange.Min = (float)Math.Floor(zi - zDev);
+                                zRange.Max = (float)Math.Round(zi + zDev);
+                            }
+                            var pwId = PowerIdEditor.GetPowerId(PowerId);
+                            if (string.IsNullOrEmpty(pwId))
+                            {
+                                PowerId = PowerIdEditor.GetPowerId(PowerId);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        public override void InternalReset()
+        {
+            powerCache.Reset(PowerId);
+            label = string.Empty;
+
+            internalCheck = initialize_internalCheck;
+            actionIDstr = string.Concat(GetType().Name, '[', ActionID, ']');
+        }
+
+        public override void OnMapDraw(GraphicsNW graphics)
+        {
+            var iniPos = InitialPosition;
+            var tarPos = TargetPosition;
+            if (graphics is MapperGraphics mapGraphics)
+            {
+                if (iniPos.IsValid)
+                {
+                    if (tarPos.IsValid)
+                    {
+                        mapGraphics.FillRhombCentered(Brushes.Orange, tarPos, 16, 16);
+                        mapGraphics.DrawLine(Pens.Orange, iniPos.X, iniPos.Y, tarPos.X, tarPos.Y);
+                    }
+                    mapGraphics.FillCircleCentered(Brushes.Yellow, iniPos, 12);
+                }
+                else if (tarPos.IsValid)
+                {
+                    mapGraphics.FillRhombCentered(Brushes.Orange, tarPos, 16, 16);
+                }
+
+            }
+            else
+            {
+                if (iniPos.IsValid)
+                {
+                    if (tarPos.IsValid)
+                    {
+                        float x = tarPos.X,
+                            y = tarPos.Y;
+                        List<Vector3> coords = new List<Vector3>()
+                        {
+                            new Vector3(x, y - 5, 0),
+                            new Vector3(x - 4.33f, y + 2.5f, 0),
+                            new Vector3(x + 4.33f, y + 2.5f, 0)
+                        };
+                        graphics.drawLine(iniPos, tarPos, Pens.Orange);
+                        graphics.drawFillPolygon(coords, Brushes.Orange);
+                    }
+
+                    graphics.drawEllipse(iniPos, MapperHelper.Size_12x12, Pens.Yellow);
+                }
+                else if (tarPos.IsValid)
+                {
+                    float x = tarPos.X,
+                        y = tarPos.Y;
+                    List<Vector3> coords = new List<Vector3>()
+                    {
+                        new Vector3(x, y - 5, 0),
+                        new Vector3(x - 4.33f, y + 2.5f, 0),
+                        new Vector3(x + 4.33f, y + 2.5f, 0)
+                    };
+                    graphics.drawFillPolygon(coords, Brushes.Orange);
+                }
+            }
+
         }
         #endregion
 
 
-        private Astral.Quester.Classes.Condition _ignoreCombatCondition;
-        public override bool NeedToRun => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).NeedToRun;
-        public override ActionResult Run() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).Run();
-        public override string ActionLabel => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).ActionLabel;
-        public override string InternalDisplayName => string.Empty;
-        public override bool UseHotSpots => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).UseHotSpots;
-        protected override bool IntenalConditions => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).InternalConditions;
-        protected override Vector3 InternalDestination => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).InternalDestination;
-        protected override ActionValidity InternalValidity => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).InternalValidity;
-        public override void GatherInfos() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).GatherInfos();
-        public override void InternalReset() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).InternalReset();
-        public override void OnMapDraw(GraphicsNW graph) => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).OnMapDraw(graph);
+
+
+        /// <summary>
+        /// Проверка условия отключения боя <see cref="ExecutePowerExt.IgnoreCombatCondition"/>
+        /// </summary>
+        /// <returns>Результат проверки <see cref="ExecutePowerExt.IgnoreCombatCondition"/> либо True, если оно не задано.</returns>
+        private bool CheckingIgnoreCombatCondition()
+        {
+            var check = IgnoreCombatCondition;
+            if (check != null)
+                return check.IsValid;
+            return true;
+        }
+
+
+
+
+        #region internalCheck
+        /// <summary>
+        /// Функтор проверки <see cref="IntenalConditions"/>
+        /// </summary>
+        private Func<bool> internalCheck;
+
+        /// <summary>
+        /// Функтор, инициализирующий предикат проверки <see cref="IntenalConditions"/>
+        /// </summary>
+        /// <returns></returns>
+        private bool initialize_internalCheck()
+        {
+            Func<bool> check;
+
+            var iniPos = InitialPosition;
+            var tarPos = TargetPosition;
+            var powId = PowerId;
+            if (!iniPos.IsValid || !tarPos.IsValid || string.IsNullOrEmpty(powId)
+                || zRange.IsValid && zRange.Outside(EntityManager.LocalPlayer.Location.Z))
+            {
+                internalCheck = () => false;
+                return false;
+            }
+
+            var crSet = CustomRegionNames;
+            if (crSet.Count > 0)
+            {
+                if (zRange.IsValid)
+                {
+                    var map = CurrentMap;
+                    if (string.IsNullOrEmpty(map))
+                    {
+                        check = internalCheck_RegionSet_zRange;
+                    }
+                    else
+                    {
+                        var reg = CurrentRegion;
+                        if (string.IsNullOrEmpty(reg))
+                        {
+                            check = internalCheck_Map_RegionSet_zRange;
+                        }
+                        else
+                        {
+                            check = internalCheck_MapRegion_RegionSet_zRange;
+                        }
+                    }
+                }
+                else
+                {
+                    var map = CurrentMap;
+                    if (string.IsNullOrEmpty(map))
+                    {
+                        check = internalCheck_RegionSet;
+                    }
+                    else
+                    {
+                        var reg = CurrentRegion;
+                        if (string.IsNullOrEmpty(reg))
+                        {
+                            check = internalCheck_Map_RegionSet;
+                        }
+                        else
+                        {
+                            check = internalCheck_MapRegion_RegionSet;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (zRange.IsValid)
+                {
+                    var map = CurrentMap;
+                    if (string.IsNullOrEmpty(map))
+                    {
+                        check = internalCheck_zRange;
+                    }
+                    else
+                    {
+                        var reg = CurrentRegion;
+                        if (string.IsNullOrEmpty(reg))
+                        {
+                            check = internalCheck_Map_zRange;
+                        }
+                        else
+                        {
+                            check = internalCheck_MapRegion_zRange;
+                        }
+                    }
+                }
+                else
+                {
+                    var map = CurrentMap;
+                    if (string.IsNullOrEmpty(map))
+                    {
+                        check = internalCheck_true;
+                    }
+                    else
+                    {
+                        var reg = CurrentRegion;
+                        if (string.IsNullOrEmpty(reg))
+                        {
+                            check = internalCheck_Map;
+                        }
+                        else
+                        {
+                            check = internalCheck_MapRegion;
+                        }
+                    }
+                }
+            }
+
+            internalCheck = check;
+            return internalCheck();
+        }
+
+        private bool internalCheck_true()
+        {
+            return true;
+        }
+        private bool internalCheck_RegionSet()
+        {
+            var crSet = CustomRegionNames;
+            var player = EntityManager.LocalPlayer;
+            var location = player.Location;
+            return crSet.Within(location);
+        }
+        private bool internalCheck_RegionSet_zRange()
+        {
+            var crSet = CustomRegionNames;
+            var player = EntityManager.LocalPlayer;
+            var location = player.Location;
+            return crSet.Within(location)
+                   && zRange.Within(location.Z);
+        }
+        private bool internalCheck_MapRegion_RegionSet_zRange()
+        {
+            var map = CurrentMap;
+            var reg = CurrentRegion;
+            var crSet = CustomRegionNames;
+            var player = EntityManager.LocalPlayer;
+            var location = player.Location;
+            return player.CurrentZoneMapInfo.MapName.Equals(map, StringComparison.Ordinal)
+                   && player.RegionInternalName.Equals(reg, StringComparison.Ordinal)
+                   && crSet.Within(location)
+                   && zRange.Within(location.Z);
+        }
+        private bool internalCheck_Map_RegionSet_zRange()
+        {
+            var map = CurrentMap;
+            var crSet = CustomRegionNames;
+            var player = EntityManager.LocalPlayer;
+            var location = player.Location;
+            return player.CurrentZoneMapInfo.MapName.Equals(map, StringComparison.Ordinal)
+                   && string.IsNullOrEmpty(player.RegionInternalName)
+                   && crSet.Within(location)
+                   && zRange.Within(location.Z);
+        }
+        private bool internalCheck_MapRegion_RegionSet()
+        {
+            var map = CurrentMap;
+            var reg = CurrentRegion;
+            var crSet = CustomRegionNames;
+            var player = EntityManager.LocalPlayer;
+            var location = player.Location;
+            return player.CurrentZoneMapInfo.MapName.Equals(map, StringComparison.Ordinal)
+                   && player.RegionInternalName.Equals(reg, StringComparison.Ordinal)
+                   && crSet.Within(location);
+        }
+        private bool internalCheck_Map_RegionSet()
+        {
+            var map = CurrentMap;
+            var crSet = CustomRegionNames;
+            var player = EntityManager.LocalPlayer;
+            var location = player.Location;
+            return player.CurrentZoneMapInfo.MapName.Equals(map, StringComparison.Ordinal)
+                   && string.IsNullOrEmpty(player.RegionInternalName)
+                   && crSet.Within(location);
+        }
+        private bool internalCheck_Map_zRange()
+        {
+            var map = CurrentMap;
+            var player = EntityManager.LocalPlayer;
+            var location = player.Location;
+            return player.CurrentZoneMapInfo.MapName.Equals(map, StringComparison.Ordinal)
+                   && string.IsNullOrEmpty(player.RegionInternalName)
+                   && zRange.Within(location.Z);
+        }
+        private bool internalCheck_MapRegion_zRange()
+        {
+            var map = CurrentMap;
+            var reg = CurrentRegion;
+            var player = EntityManager.LocalPlayer;
+            var location = player.Location;
+            return player.CurrentZoneMapInfo.MapName.Equals(map, StringComparison.Ordinal)
+                   && player.RegionInternalName.Equals(reg, StringComparison.Ordinal)
+                   && zRange.Within(location.Z);
+        }
+        private bool internalCheck_MapRegion()
+        {
+            var map = CurrentMap;
+            var reg = CurrentRegion;
+            var player = EntityManager.LocalPlayer;
+            return player.CurrentZoneMapInfo.MapName.Equals(map, StringComparison.Ordinal)
+                   && player.RegionInternalName.Equals(reg, StringComparison.Ordinal);
+        }
+        private bool internalCheck_Map()
+        {
+            var map = CurrentMap;
+            var player = EntityManager.LocalPlayer;
+            return player.CurrentZoneMapInfo.MapName.Equals(map, StringComparison.Ordinal)
+                   && string.IsNullOrEmpty(player.RegionInternalName);
+        }
+        private bool internalCheck_zRange()
+        {
+            var player = EntityManager.LocalPlayer;
+            var location = player.Location;
+            return zRange.Within(location.Z);
+        }
+        #endregion
     }
 }

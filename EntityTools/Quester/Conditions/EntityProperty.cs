@@ -1,15 +1,21 @@
-﻿using Astral.Classes.ItemFilter;
+﻿using System;
+using System.ComponentModel;
+using System.Drawing.Design;
+using System.Runtime.CompilerServices;
+using System.Xml.Serialization;
+
+using Astral.Classes.ItemFilter;
 using Astral.Quester.Classes;
+
 using EntityTools.Core.Interfaces;
-using EntityTools.Core.Proxies;
 using EntityTools.Editors;
 using EntityTools.Enums;
 using EntityTools.Tools.CustomRegions;
-using System;
-using System.ComponentModel;
-using System.Drawing.Design;
-using System.Threading;
-using System.Xml.Serialization;
+using EntityTools.Tools.Entities;
+
+using MyNW.Classes;
+
+using Timeout = Astral.Classes.Timeout;
 
 namespace EntityTools.Quester.Conditions
 {
@@ -32,7 +38,7 @@ namespace EntityTools.Quester.Conditions
                 if (_entityId != value)
                 {
                     _entityId = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityID)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -52,7 +58,7 @@ namespace EntityTools.Quester.Conditions
                 if (_entityNameType != value)
                 {
                     _entityNameType = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityNameType)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -74,7 +80,7 @@ namespace EntityTools.Quester.Conditions
                 if (_entityIdType != value)
                 {
                     _entityIdType = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityIdType)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -103,7 +109,7 @@ namespace EntityTools.Quester.Conditions
                 if (_regionCheck != value)
                 {
                     _regionCheck = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RegionCheck)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -121,10 +127,10 @@ namespace EntityTools.Quester.Conditions
         {
             get => _healthCheck; set
             {
-                if (_healthCheck = value)
+                if (_healthCheck == value)
                 {
                     _healthCheck = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HealthCheck)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -147,7 +153,7 @@ namespace EntityTools.Quester.Conditions
                 if (_entitySetType != value)
                 {
                     _entitySetType = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntitySetType)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -165,10 +171,10 @@ namespace EntityTools.Quester.Conditions
             get => _reactionRange;
             set
             {
-                if (_reactionRange != value)
+                if (Math.Abs(_reactionRange - value) > 0.1)
                 {
                     _reactionRange = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ReactionRange)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -186,10 +192,10 @@ namespace EntityTools.Quester.Conditions
             get => _reactionZRange;
             set
             {
-                if (_reactionZRange != value)
+                if (Math.Abs(_reactionZRange - value) > 0.1)
                 {
                     _reactionZRange = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ReactionZRange)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -210,7 +216,7 @@ namespace EntityTools.Quester.Conditions
                 if (_customRegionNames != value)
                 {
                     _customRegionNames = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CustomRegionNames)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -228,7 +234,7 @@ namespace EntityTools.Quester.Conditions
                 if (_propertyType != value)
                 {
                     _propertyType = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PropertyType)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -244,10 +250,10 @@ namespace EntityTools.Quester.Conditions
             get => _value;
             set
             {
-                if (_value != value)
+                if (Math.Abs(_value - value) > 0.1)
                 {
                     _value = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Value)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -267,7 +273,7 @@ namespace EntityTools.Quester.Conditions
                 if (_sign != value)
                 {
                     _sign = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Sign)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -275,36 +281,207 @@ namespace EntityTools.Quester.Conditions
         #endregion
 
 
-        #region Взаимодействие с ядром EntityTools
-        [NonSerialized]
-        private IQuesterConditionEngine engine;
 
+
+        #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public EntityProperty()
+        protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = default)
         {
-            engine = MakeProxy();
+            InternalResetOnPropertyChanged(propertyName);
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public void Bind(IQuesterConditionEngine engine)
+        private void InternalResetOnPropertyChanged([CallerMemberName] string propertyName = default)
         {
-            this.engine = engine;
-        }
-        public void Unbind()
-        {
-            engine = MakeProxy();
-            PropertyChanged = null;
-        }
+            _key = null;
+            _label = string.Empty;
+            _specialCheck = null;
+            
+            propertyValueChecker = Initialize_PropertyValueChecker;
 
-        private IQuesterConditionEngine MakeProxy()
-        {
-            return new QuesterConditionProxy(this);
+            entity = null;
+            timeout.ChangeTime(0);
         }
         #endregion
 
-        public override bool IsValid => LazyInitializer.EnsureInitialized(ref engine, MakeProxy).IsValid;
-        public override void Reset() => LazyInitializer.EnsureInitialized(ref engine, MakeProxy).Reset();
-        public override string TestInfos => LazyInitializer.EnsureInitialized(ref engine, MakeProxy).TestInfos;
-        public override string ToString() => LazyInitializer.EnsureInitialized(ref engine, MakeProxy).Label();
+
+
+
+        #region Данные ядра
+        private Entity entity;
+        private Timeout timeout = new Timeout(0);
+
+        private string _label = string.Empty;
+        #endregion
+        
+
+
+
+        public override bool IsValid
+        {
+            get
+            {
+                var entityKey = EntityKey;
+                bool isValid = entityKey.Validate(entity);
+                if (timeout.IsTimedOut || !isValid)
+                {
+                    entity = SearchCached.FindClosestEntity(EntityKey, SpecialCheck);
+                    isValid = entity != null;
+                    timeout.ChangeTime(EntityTools.Config.EntityCache.LocalCacheTime);
+                }
+
+                if (isValid)
+                {
+                    return propertyValueChecker(entity);
+                }
+
+                return PropertyType == EntityPropertyType.Distance && Sign == Relation.Superior;
+            }
+        }
+
+        public override void Reset() { }
+
+        public override string TestInfos
+        {
+            get
+            {
+                entity = SearchCached.FindClosestEntity(EntityKey, SpecialCheck);
+
+                if (EntityKey.Validate(entity))
+                {
+                    return string.Concat("Found closest Entity [",
+                        EntityNameType == EntityNameType.NameUntranslated ? entity.NameUntranslated : entity.InternalName,
+                        "] which ", PropertyType, " = ",
+                        PropertyType == EntityPropertyType.Distance ? entity.Location.Distance3DFromPlayer.ToString("N2") :
+                        PropertyType == EntityPropertyType.ZAxis ? entity.Location.Z.ToString("N2") : entity.Character.AttribsBasic.HealthPercent.ToString("N2"));
+                }
+                
+                return string.Concat("No one Entity matched to [", EntityID, ']', Environment.NewLine,
+                    PropertyType == EntityPropertyType.Distance ? "The distance to the missing Entity is considered equal to infinity." : string.Empty);
+            }
+        }
+
+        public override string ToString()
+        {
+            if (string.IsNullOrEmpty(_label))
+                _label = $"Entity [{EntityID}] {PropertyType} {Sign} to {Value}";
+            return _label;
+        }
+
+        #region Вспомогательные инструменты
+        /// <summary>
+        /// Комплексный (составной) идентификатор, используемый для поиска <see cref="Entity"/> в кэше
+        /// </summary>
+        public EntityCacheRecordKey EntityKey =>
+            _key ?? (_key = new EntityCacheRecordKey(EntityID, EntityIdType, EntityNameType, EntitySetType.Complete));
+
+        private EntityCacheRecordKey _key;
+
+        /// <summary>
+        /// Функтор дополнительной проверки <seealso cref="Entity"/> 
+        /// на предмет нахождения в пределах области, заданной <see cref="CustomRegionNames"/>
+        /// </summary>        
+        private Predicate<Entity> SpecialCheck
+        {
+            get
+            {
+                if (_specialCheck is null)
+                    _specialCheck = SearchHelper.Construct_EntityAttributePredicate(HealthCheck,
+                                                            ReactionRange, ReactionZRange,
+                                                            RegionCheck,
+                                                            CustomRegionNames);
+                return _specialCheck;
+            }
+        }
+        private Predicate<Entity> _specialCheck;
+        #endregion
+
+        #region EntityPropertyChecker
+        /// <summary>
+        /// Предикат, проверяющий истинность соотношения <seealso cref="EntityProperty.Sign"/> 
+        /// между величиной атрибута, заданного <seealso cref="EntityProperty.PropertyType"/>, 
+        /// и референтным значением <seealso cref="EntityProperty.Value"/>
+        /// </summary>
+        Predicate<Entity> propertyValueChecker;
+        private bool Initialize_PropertyValueChecker(Entity e)
+        {
+            if (e is null)
+                return false;
+
+            switch (PropertyType)
+            {
+                case EntityPropertyType.Distance:
+                    switch (Sign)
+                    {
+                        case Relation.Equal:
+                            propertyValueChecker = Distance_Equal;
+                            break;
+                        case Relation.NotEqual:
+                            propertyValueChecker = Distance_NotEqual;
+                            break;
+                        case Relation.Inferior:
+                            propertyValueChecker = Distance_Inferior;
+                            break;
+                        case Relation.Superior:
+                            propertyValueChecker = Distance_Superior;
+                            break;
+                    }
+                    break;
+                case EntityPropertyType.HealthPercent:
+                    switch (Sign)
+                    {
+                        case Relation.Equal:
+                            propertyValueChecker = HealthPercent_Equal;
+                            break;
+                        case Relation.NotEqual:
+                            propertyValueChecker = HealthPercent_NotEqual;
+                            break;
+                        case Relation.Inferior:
+                            propertyValueChecker = HealthPercent_Inferior;
+                            break;
+                        case Relation.Superior:
+                            propertyValueChecker = HealthPercent_Superior;
+                            break;
+                    }
+                    break;
+                case EntityPropertyType.ZAxis:
+                    switch (Sign)
+                    {
+                        case Relation.Equal:
+                            propertyValueChecker = ZAxis_Equal;
+                            break;
+                        case Relation.NotEqual:
+                            propertyValueChecker = ZAxis_NotEqual;
+                            break;
+                        case Relation.Inferior:
+                            propertyValueChecker = ZAxis_Inferior;
+                            break;
+                        case Relation.Superior:
+                            propertyValueChecker = ZAxis_Superior;
+                            break;
+                    }
+                    break;
+            }
+
+            return propertyValueChecker(e);
+        }
+
+        private bool Distance_Inferior(Entity e) => entity.Location.Distance3DFromPlayer < Value;
+        private bool Distance_Superior(Entity e) => entity.Location.Distance3DFromPlayer > Value;
+        private bool Distance_Equal(Entity e) => Math.Abs(entity.Location.Distance3DFromPlayer - Value) <= 1;
+        private bool Distance_NotEqual(Entity e) => Math.Abs(entity.Location.Distance3DFromPlayer - Value) > 1;
+
+        private bool HealthPercent_Inferior(Entity e) => entity.Character.AttribsBasic.HealthPercent < Value;
+        private bool HealthPercent_Superior(Entity e) => entity.Character.AttribsBasic.HealthPercent > Value;
+        private bool HealthPercent_Equal(Entity e) => Math.Abs(entity.Character.AttribsBasic.HealthPercent - Value) <= 1;
+        private bool HealthPercent_NotEqual(Entity e) => Math.Abs(entity.Character.AttribsBasic.HealthPercent - Value) > 1;
+
+        private bool ZAxis_Inferior(Entity e) => entity.Z < Value;
+        private bool ZAxis_Superior(Entity e) => entity.Z > Value;
+        private bool ZAxis_Equal(Entity e) => Math.Abs(entity.Z - Value) <= 1;
+        private bool ZAxis_NotEqual(Entity e) => Math.Abs(entity.Z - Value) > 1;
+
+        #endregion
     }
 }

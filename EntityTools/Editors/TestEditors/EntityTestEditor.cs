@@ -2,6 +2,8 @@
 using System;
 using System.ComponentModel;
 using System.Drawing.Design;
+using EntityTools.Core.Interfaces;
+using EntityTools.Tools.Entities;
 
 namespace EntityTools.Editors
 {
@@ -10,9 +12,23 @@ namespace EntityTools.Editors
     {
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
-            string msg = EntityTools.Core.EntityDiagnosticInfos(context?.Instance);
-            if (!string.IsNullOrEmpty(msg))
-                XtraMessageBox.Show(msg, $"Test of '{value}'"); 
+
+            string message;
+            switch (context?.Instance)
+            {
+                case IEntityDescriptor entityDescriptor:
+                    message = EntityDiagnosticTools.Construct(entityDescriptor);
+                    break;
+                case IEntityIdentifier entityIdentifier:
+                    message = EntityDiagnosticTools.Construct(entityIdentifier);
+                    break;
+                default:
+                    message = "Unable recognize test context!";
+                    break;
+            }
+            if (!string.IsNullOrEmpty(message))
+                XtraMessageBox.Show(message, $"Test of '{value}'");
+
             return value;
         }
 

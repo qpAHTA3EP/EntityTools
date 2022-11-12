@@ -1,7 +1,5 @@
 ﻿using ACTP0Tools.Reflection;
 using Astral.Logic.Classes.Map;
-using EntityTools.Core.Interfaces;
-using EntityTools.Core.Proxies;
 using EntityTools.Editors;
 using EntityTools.Tools.Combats.IgnoredFoes;
 using MyNW.Classes;
@@ -18,27 +16,6 @@ namespace EntityTools.Quester.Actions
     [Serializable]
     public class AddIgnoredFoes : Action, INotifyPropertyChanged
     {
-        #region Взаимодействие с ядром EntityToolsCore
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-#if false
-        [XmlIgnore]
-        [NonSerialized]
-        internal IQuesterActionEngine Engine;
-
-#endif
-
-        private IQuesterActionEngine MakeProxy()
-        {
-            return new QuesterActionProxy(this);
-        }
-        #endregion
-
         #region Опции команды
         [Description("IDs of the Enemies ignoring in the combat")]
         [Editor(typeof(FoeListEditor), typeof(UITypeEditor))]
@@ -78,20 +55,22 @@ namespace EntityTools.Quester.Actions
         public string TestInfo => "Нажми на кнопку '...' =>";
         #endregion
 
-        
-#if false // Интерфес Quester.Action, реализованный через ActionEngine
-        public override bool NeedToRun => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).NeedToRun;
-        public override ActionResult Run() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).Run();
-        public override string ActionLabel => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).ActionLabel;
-        public override string InternalDisplayName => string.Empty;
-        public override bool UseHotSpots => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).UseHotSpots;
-        protected override bool IntenalConditions => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).InternalConditions;
-        protected override Vector3 InternalDestination => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).InternalDestination;
-        protected override ActionValidity InternalValidity => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).InternalValidity;
-        public override void GatherInfos() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).GatherInfos();
-        public override void InternalReset() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).InternalReset();
-        public override void OnMapDraw(GraphicsNW graph) => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).OnMapDraw(graph); 
-#else
+
+
+
+        #region INotifyPropertyChanged
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+        #endregion
+
+
+
+
+        #region Интерфейс Action
         public override bool NeedToRun => true;
         public override ActionResult Run()
         {
@@ -114,7 +93,7 @@ namespace EntityTools.Quester.Actions
         }
         public override void GatherInfos() { }
         public override void InternalReset() { }
-        public override void OnMapDraw(GraphicsNW graph) { }
-#endif
+        public override void OnMapDraw(GraphicsNW graph) { } 
+        #endregion
     }
 }

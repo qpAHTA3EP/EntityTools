@@ -1,51 +1,18 @@
-﻿using System;
-
-namespace EntityCore.Enums
+﻿namespace EntityTools.Enums
 {
-    /// <summary>
-    /// Перечисление полей Entity, по которым производится поиск
-    /// </summary>
-    [Serializable]
-    public enum EntityNameType
-    {
-        NameUntranslated,
-        InternalName,
-        Empty
-    }
-
-    /// <summary>
-    /// Тип сопоставления
-    /// </summary>
-    [Serializable]
-    public enum MatchType
-    {
-        Match,
-        Mismatch
-    }
-
-    /// <summary>
-    /// Перечисление 
-    /// </summary>
-    [Serializable]
-    public enum EntityPropertyType
-    {
-        Distance,
-        ZAxis,
-        HealthPercent
-    }
-
-    /// <summary>
-    /// Переключатель множетв Entity в которых производится поиск
-    /// </summary>
-    public enum EntitySetType
+    public enum EntityPreprocessingResult
     {
         /// <summary>
-        /// Все Entity из EntityManager.GetEntities()
+        /// Некорректная сущность, обработка провалена
         /// </summary>
-        Complete,
+        Failed,
         /// <summary>
-        /// Entity из подмножеств NearbyContacts и NearbyInteractCritterEnts
+        /// Сущность в пределах заданной дистации и "обработана" в соответствии с настройками
         /// </summary>
-        Contacts
+        Succeeded,
+        /// <summary>
+        /// Суoнщсть не достигнута (находится за пределами заданой дистанции)
+        /// </summary>
+        Faraway
     }
 }

@@ -1,17 +1,18 @@
-﻿using ACTP0Tools.Reflection;
-using Astral.Logic.UCC.Classes;
-using DevExpress.XtraEditors;
-using HarmonyLib;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 
-// ReSharper disable RedundantNameQualifier
-// ReSharper disable InconsistentNaming
-// ReSharper disable RedundantAssignment
-// ReSharper disable UnusedParameter.Local
+using ACTP0Tools.Reflection;
+
+using Astral.Logic.UCC.Classes;
+
+using DevExpress.XtraEditors;
+
+using EntityCore.Forms;
+
+using HarmonyLib;
 
 namespace EntityTools.Patches.Quester
 {
@@ -419,9 +420,9 @@ namespace EntityTools.Patches.Quester
                     if (EntityTools.Config.Patches.UccComplexPatch)
                     {
                         // Вызов собственного ucc-редактора
-                        if (EntityTools.Core.UserRequest_Edit(uccProfile, "", true))
-                            __result = uccProfile;
-                        else __result = __2;
+                        __result = UccEditor.Edit(uccProfile, "", true) 
+                                 ? uccProfile 
+                                 : __2;
                         return false;
                     }
 

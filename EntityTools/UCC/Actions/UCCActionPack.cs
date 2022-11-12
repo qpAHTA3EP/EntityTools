@@ -1,15 +1,14 @@
-﻿using Astral.Logic.UCC.Classes;
-using EntityTools.Core.Interfaces;
-using EntityTools.Core.Proxies;
-using EntityTools.Editors;
-using EntityTools.UCC.Conditions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing.Design;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Xml.Serialization;
+
+using Astral.Logic.UCC.Classes;
+
+using EntityTools.Core.Interfaces;
+// ReSharper disable InconsistentNaming
 
 namespace EntityTools.UCC.Actions
 {
@@ -42,30 +41,6 @@ namespace EntityTools.UCC.Actions
         [Category("Optional")]
         [Description("Execute all ucc-action one after another without interruption after first succeeded one.")]
         public bool ExecuteSequentially { get; set; } = true;
-#if CUSTOM_UCC_CONDITION_EDITOR
-#if DEVELOPER
-        [Category("Optional")]
-        [Editor(typeof(UccConditionListEditor), typeof(UITypeEditor))]
-        //[TypeConverter(typeof(ExpandableObjectConverter))]
-#else
-        [Browsable(false)]
-#endif
-        public UCCConditionPack CustomConditions
-        {
-            get => _customConditions;
-            set
-            {
-                if (ReferenceEquals(_customConditions, value))
-                    return;
-                if (value is null)
-                    _customConditions.Conditions.Clear();
-                else _customConditions = value;
-
-                NotifyPropertyChanged();
-            }
-        }
-        private UCCConditionPack _customConditions = new UCCConditionPack(); 
-#endif
 
         #region Hide Inherited Properties
         [XmlIgnore]
@@ -88,11 +63,7 @@ namespace EntityTools.UCC.Actions
 
         #region Интерфейс команды
 
-#if CUSTOM_UCC_CONDITION_EDITOR
-        public override bool NeedToRun => _actions.Count > 0 && _customConditions.IsOK(this); 
-#else
         public override bool NeedToRun => _actions.Count > 0;
-#endif
 
         public override bool Run()
         {
@@ -105,22 +76,19 @@ namespace EntityTools.UCC.Actions
             return BaseClone(new UCCActionPack
             {
                 _actions = _actions.Select(a => a.Clone()).ToList(),
-#if CUSTOM_UCC_CONDITION_EDITOR
-                _customConditions = _customConditions.Clone() as UCCConditionPack 
-#endif
             });
         }
 
         public override string ToString()
         {
             var name = ActionName;
-            if (string.IsNullOrEmpty(name) || name == "New Action")
-                return "ActionPack";
-            else return "ActionPack: " + name;
+            return string.IsNullOrEmpty(name) || name == "New Action" 
+                 ? "ActionPack" 
+                 : "ActionPack: " + name;
         }
         #endregion
 
-        #region Взаимодействие с EntityToolsCore
+        #region INotifyPropertyChanged
         [NonSerialized]
         internal IUccActionEngine Engine;
         
@@ -128,17 +96,7 @@ namespace EntityTools.UCC.Actions
 
         protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
-            //Engine.OnPropertyChanged(this, propertyName);
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        public UCCActionPack()
-        {
-            Engine = new UccActionProxy(this);
-        }
-        private IUccActionEngine MakeProxy()
-        {
-            return new UccActionProxy(this);
         }
         #endregion
     }

@@ -3,11 +3,10 @@ using EntityTools.Enums;
 using MyNW.Classes;
 using System;
 
-namespace EntityTools.Tools.Entities
+namespace EntityCore.Entities
 {
     public class EntityKey
     {
-        public EntityKey(){}
         public EntityKey(string p, ItemFilterStringType mp = ItemFilterStringType.Simple, EntityNameType nt = EntityNameType.InternalName, EntitySetType est = EntitySetType.Complete)
         {
             Pattern = p;

@@ -1,6 +1,5 @@
 ﻿using Astral.Logic.NW;
 using Astral.Logic.UCC.Classes;
-using EntityCore.Tools.Powers;
 using EntityTools;
 using EntityTools.Core.Interfaces;
 using EntityTools.UCC.Actions;
@@ -12,6 +11,7 @@ using System.ComponentModel;
 using System.Reflection;
 using System.Text;
 using EntityTools.Enums;
+using EntityTools.Tools.Powers;
 using Unit = Astral.Logic.UCC.Ressources.Enums.Unit;
 
 namespace EntityCore.UCC.Actions

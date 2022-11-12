@@ -2,10 +2,8 @@
 
 using ACTP0Tools;
 using Astral.Logic.UCC.Classes;
-using EntityCore.Entities;
 using EntityCore.Enums;
 using EntityCore.Extensions;
-using EntityCore.Tools.Targeting;
 using EntityTools;
 using EntityTools.Core.Interfaces;
 using EntityTools.Enums;
@@ -18,6 +16,8 @@ using MyNW.Internals;
 using System;
 using System.ComponentModel;
 using System.Reflection;
+using EntityTools.Tools.Entities;
+using EntityTools.Tools.Extensions;
 
 namespace EntityCore.UCC.Actions
 {

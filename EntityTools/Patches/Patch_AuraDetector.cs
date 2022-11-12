@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using System;
 using System.Reflection;
+using EntityCore.Forms;
 
 namespace EntityTools.Patches
 {
@@ -31,7 +32,6 @@ namespace EntityTools.Patches
                     return;
                 }
 
-                //original_AuraDetector_GetAura = AccessTools.Method(tAuraDetector, "\u0001", new Type[] { });
                 foreach (var methodInfo in tAuraDetector.GetMethods())
                 {
                     if (methodInfo.Name == "\u0001"
@@ -50,7 +50,7 @@ namespace EntityTools.Patches
 
                 var tPatch = typeof(Patch_AuraDetector);
                 prefix_AuraDetector_GetAura = AccessTools.Method(tPatch, nameof(GetAura));
-                if (original_AuraDetector_GetAura is null)
+                if (prefix_AuraDetector_GetAura is null)
                 {
                     ETLogger.WriteLine($@"Patch '{nameof(Patch_AuraDetector)}' failed. Method '{nameof(GetAura)}' not found", true);
                     return;
@@ -69,10 +69,7 @@ namespace EntityTools.Patches
 
         public static bool GetAura(ref string __result)
         {
-            if (!EntityTools.Core.UserRequest_SelectAuraId(ref __result))
-            {
-                __result = string.Empty;
-            }
+            __result = AuraViewer.GUIRequest();
             return false;
         }
     }

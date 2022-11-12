@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Linq;
+using EntityCore.Forms;
 
 namespace EntityTools.Editors
 {
@@ -41,7 +42,7 @@ namespace EntityTools.Editors
                     return Tuple.Create(powDef.InternalName,
                         string.IsNullOrEmpty(powDef.DisplayName)
                             ? id
-                            : string.Concat(powDef.DisplayName, " [", id, "]"));
+                            : $"{powDef.DisplayName} [{id}]");
                 }).ToList();
             }
             else
@@ -55,13 +56,13 @@ namespace EntityTools.Editors
                     var tuple = Tuple.Create(powDef.InternalName,
                         string.IsNullOrEmpty(powDef.DisplayName)
                             ? id
-                            : string.Concat(powDef.DisplayName, " [", id, "]"));
+                            : $"{powDef.DisplayName} [{id}]");
                     powerCache.Add(tuple);
                     if (predicate(pwr.PowerDef.InternalName))
                         defaultValue = tuple;
                 }
             }
-            if (EntityTools.Core.UserRequest_SelectItem(GetPowers, ref defaultValue, nameof(Tuple<string, string>.Item2)))
+            if (ItemSelectForm.GetAnItem(GetPowers, ref defaultValue, nameof(defaultValue.Item2)))
             {
                 return defaultValue?.Item1;
             }

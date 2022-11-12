@@ -1,14 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using ACTP0Tools;
 using Astral.Classes.ItemFilter;
-using ACTP0Tools.Reflection;
 using EntityTools.Tools.Inventory;
 using MyNW.Classes;
 using MyNW.Internals;
 using MyNW.Patchables.Enums;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Inventory = Astral.Logic.NW.Inventory;
-using ACTP0Tools;
 
 namespace EntityTools.Extensions
 {
@@ -20,9 +19,6 @@ namespace EntityTools.Extensions
         /// <summary>
         /// Подсчет числа предметов, соответствующих item2buy
         /// </summary>
-        /// <param name="bags"></param>
-        /// <param name="item2buy"></param>
-        /// <returns></returns>
         public static uint CountItems(this IndexedBags bags, ItemFilterEntryExt item2buy)
         {
             var slots = bags[item2buy];
@@ -35,9 +31,6 @@ namespace EntityTools.Extensions
         /// <summary>
         /// Подсчет числа предметов, соответствующих item2buy
         /// </summary>
-        /// <param name="bags"></param>
-        /// <param name="item2buy"></param>
-        /// <returns></returns>
         public static uint CountItems(this BagsList bags, ItemFilterEntryExt item2buy)
         {
             uint num = 0;
@@ -242,7 +235,7 @@ namespace EntityTools.Extensions
                         foreach (var slot in slotCache.Slots)
                             if (filterEntry.IsMatch(slot)
                                 && slot.Item.ItemDef.Level >= storeItem.Item.ItemDef.Level)
-                                    hasNum += slot.Item.Count;
+                                hasNum += slot.Item.Count;
                     }
                     if (hasNum < toBuyNum)
                         toBuyNum -= hasNum;
@@ -288,21 +281,12 @@ namespace EntityTools.Extensions
             var restrictBags = storeItem.Item.ItemDef.RestrictBagIDs;
             if (restrictBags.Count > 0)
             {
-                bool isEquitable = false;
+                bool isEquitable;
                 //BagsList restrictBagsList = new BagsList(BagsList.Equipments);
                 // Проверяем возможность экипировать предмет
                 // Предмет может быть экипирован, если RestrictBagIDs содержит хотя бы 1 элемент из BagsList.FullInventory
-#if false
-                foreach (var bagId in storeItem.Item.ItemDef.RestrictBagIDs)
-                    if (BagsList.FullInventory.Contains(bagId))
-                    {
-                        isEquitable = true;
-                        //restrictBagsList[bagId] = true;
-                    } 
-#else
-                var equipBags = storeItem.Item.ItemDef.RestrictBagIDs.FindAll(bagId => BagsList.IsEquipmentsBag(bagId));
+                var equipBags = storeItem.Item.ItemDef.RestrictBagIDs.FindAll(BagsList.IsEquipmentsBag);
                 isEquitable = equipBags.Count > 0;
-#endif
 
                 uint maxItemLevel = 0;
                 if (isEquitable)
@@ -315,8 +299,7 @@ namespace EntityTools.Extensions
                         {
                             uint bagItemLvl = bagSlot.Item.ItemDef.Level;
                             if (bagItemLvl > maxItemLevel
-                                // && bagSlot.Item.ItemDef.RestrictBagIDs.Count > 0
-                                && bagSlot.Item.ItemDef.RestrictBagIDs.ContainsAny(equipBags))//Any((bagId) => equipBags.Contains(bagId)))
+                                && bagSlot.Item.ItemDef.RestrictBagIDs./*ContainsAny(equipBags))*/Any(bagId => equipBags.Contains(bagId)))
                                 maxItemLevel = bagItemLvl;
                         }
                     }
@@ -385,9 +368,6 @@ namespace EntityTools.Extensions
         /// <summary>
         /// Поиск предмета в сумке
         /// </summary>
-        /// <param name="bags"></param>
-        /// <param name="storeItem"></param>
-        /// <returns></returns>
         public static InventorySlot Find(this BagsList bags, ItemDef itemDef)
         {
             string itemInternalName = itemDef.InternalName;
@@ -408,12 +388,6 @@ namespace EntityTools.Extensions
             return null;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="filter"></param>
-        /// <param name="list"></param>
-        /// <returns></returns>
         public static bool GetBagsItems(this ItemFilterCore filter, out List<InventorySlot> list, bool checkSellable = false)
         {
             list = new List<InventorySlot>();

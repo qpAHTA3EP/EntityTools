@@ -1,13 +1,12 @@
-﻿using Astral.Quester.Classes;
+﻿using ACTP0Tools;
+using ACTP0Tools.Classes.Quester;
+using Astral.Quester.Classes;
 using DevExpress.XtraEditors;
 using EntityTools.Properties;
 using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using ACTP0Tools;
-using ACTP0Tools.Classes.Quester;
-using AStar;
 
 // ReSharper disable InconsistentNaming
 
@@ -165,8 +164,8 @@ namespace EntityTools.Patches.Mapper.Tools
                 if (isElliptical != value)
                 {
                     btnCRTypeSwitcher.ImageOptions.Image = value
-                        ? Resources.miniCREllipce
-                        : Resources.miniCRRectang;
+                        ? Resources.EllipceCR
+                        : Resources.RectCR;
                     isElliptical = value;
                 }
             }

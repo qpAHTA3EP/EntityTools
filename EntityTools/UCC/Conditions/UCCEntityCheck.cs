@@ -1,19 +1,28 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Drawing.Design;
-using System.Threading;
+using System.Runtime.CompilerServices;
+using System.Text;
 using System.Xml.Serialization;
+
 using Astral.Classes.ItemFilter;
 using Astral.Logic.UCC.Classes;
+
 using EntityTools.Core.Interfaces;
-using EntityTools.Core.Proxies;
 using EntityTools.Editors;
 using EntityTools.Enums;
+using EntityTools.Quester.Actions;
 using EntityTools.Tools;
+using EntityTools.Tools.Entities;
+using EntityTools.UCC.Extensions;
+
+using MyNW.Classes;
+
+using Timeout = Astral.Classes.Timeout;
 
 namespace EntityTools.UCC.Conditions
 {
-    public class UCCEntityCheck : UCCCondition, ICustomUCCCondition, IEntityDescriptor
+    public class UCCEntityCheck : UCCCondition, ICustomUCCCondition, IEntityDescriptor, INotifyPropertyChanged
     {
         #region Опции команды
 #if DEVELOPER
@@ -31,7 +40,7 @@ namespace EntityTools.UCC.Conditions
                 if (_entityId != value)
                 {
                     _entityId = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityID)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -53,7 +62,7 @@ namespace EntityTools.UCC.Conditions
                 if (_entityIdType != value)
                 {
                     _entityIdType = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityIdType)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -73,7 +82,7 @@ namespace EntityTools.UCC.Conditions
                 if (_entityNameType != value)
                 {
                     _entityNameType = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityNameType)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -103,7 +112,7 @@ namespace EntityTools.UCC.Conditions
                 if (_regionCheck != value)
                 {
                     _regionCheck = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RegionCheck)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -125,7 +134,7 @@ namespace EntityTools.UCC.Conditions
                 if (_healthCheck != value)
                 {
                     _healthCheck = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HealthCheck)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -146,7 +155,7 @@ namespace EntityTools.UCC.Conditions
                 if (Math.Abs(_reactionRange - value) > 0.1)
                 {
                     _reactionRange = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ReactionRange)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -167,7 +176,7 @@ namespace EntityTools.UCC.Conditions
                 if (Math.Abs(_reactionZRange - value) > 0.1)
                 {
                     _reactionZRange = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ReactionZRange)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -187,7 +196,7 @@ namespace EntityTools.UCC.Conditions
                 if (_aura != value)
                 {
                     _aura = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Aura)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -204,7 +213,7 @@ namespace EntityTools.UCC.Conditions
                 if (_propertyType != value)
                 {
                     _propertyType = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PropertyType)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -220,7 +229,7 @@ namespace EntityTools.UCC.Conditions
                 if (Math.Abs(_propertyValue - value) > 0.1)
                 {
                     _propertyValue = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PropertyValue)));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -243,29 +252,22 @@ namespace EntityTools.UCC.Conditions
         #endregion
 
 
-        #region Взаимодействие с EntityToolsCore
-        [NonSerialized]
-        internal IUccConditionEngine Engine;
-
+        #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public UCCEntityCheck()
+        protected virtual void NotifyPropertyChanged([CallerMemberName] string memberName = default)
         {
-            Sign = Astral.Logic.UCC.Ressources.Enums.Sign.Superior;
+            _key = null;
+            _specialCheck = null;
+            _label = string.Empty;
+            entity = null;
 
-            Engine = new UccConditionProxy(this);
-        }
-        private IUccConditionEngine MakeProxy()
-        {
-            return new UccConditionProxy(this);
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(memberName)));
         }
         #endregion
 
 
-        #region ICustomUCCCondition
-        public new bool IsOK(UCCAction refAction) => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).IsOK(refAction);
 
-        public new bool Locked { get => base.Locked; set => base.Locked = value; }
 
         public new ICustomUCCCondition Clone()
         {
@@ -297,15 +299,163 @@ namespace EntityTools.UCC.Conditions
             return copy;
         }
 
-        public string TestInfos(UCCAction refAction) => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).TestInfos(refAction);
+        
+
+
+        #region Данные
+        private Entity entity;
+        private readonly Timeout timeout = new Timeout(0);
+        private string _label = string.Empty;
         #endregion
 
+        
 
-        public override string ToString() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).Label();
+        
 
-        protected virtual void OnPropertyChanged(PropertyChangedEventArgs e)
+        public new bool IsOK(UCCAction refAction)
         {
-            PropertyChanged?.Invoke(this, e);
+            Entity targetEntity = refAction?.GetTarget();
+
+            var entityKey = EntityKey;
+
+            if (entityKey.Validate(targetEntity))
+                entity = targetEntity;
+            else if (timeout.IsTimedOut)
+            {
+                entity = SearchCached.FindClosestEntity(entityKey, SpecialCheck);
+                timeout.ChangeTime(EntityTools.Config.EntityCache.CombatCacheTime / 2);
+            }
+
+
+            if (entityKey.Validate(entity))
+            {
+                switch (PropertyType)
+                {
+                    case EntityPropertyType.Distance:
+                        switch (Sign)
+                        {
+                            case Astral.Logic.UCC.Ressources.Enums.Sign.Equal:
+                                return Math.Abs(entity.Location.Distance3DFromPlayer - PropertyValue) <= 1;
+                            case Astral.Logic.UCC.Ressources.Enums.Sign.NotEqual:
+                                return Math.Abs(entity.Location.Distance3DFromPlayer - PropertyValue) > 1;
+                            case Astral.Logic.UCC.Ressources.Enums.Sign.Inferior:
+                                return entity.Location.Distance3DFromPlayer < PropertyValue;
+                            case Astral.Logic.UCC.Ressources.Enums.Sign.Superior:
+                                return entity.Location.Distance3DFromPlayer > PropertyValue;
+                        }
+                        break;
+                    case EntityPropertyType.HealthPercent:
+                        switch (Sign)
+                        {
+                            case Astral.Logic.UCC.Ressources.Enums.Sign.Equal:
+                                return Math.Abs(entity.Character.AttribsBasic.HealthPercent - PropertyValue) <= 1;
+                            case Astral.Logic.UCC.Ressources.Enums.Sign.NotEqual:
+                                return Math.Abs(entity.Character.AttribsBasic.HealthPercent - PropertyValue) > 1;
+                            case Astral.Logic.UCC.Ressources.Enums.Sign.Inferior:
+                                return entity.Character.AttribsBasic.HealthPercent < PropertyValue;
+                            case Astral.Logic.UCC.Ressources.Enums.Sign.Superior:
+                                return entity.Character.AttribsBasic.HealthPercent > PropertyValue;
+                        }
+                        break;
+                    case EntityPropertyType.ZAxis:
+                        switch (Sign)
+                        {
+                            case Astral.Logic.UCC.Ressources.Enums.Sign.Equal:
+                                return Math.Abs(entity.Location.Z - PropertyValue) <= 1;
+                            case Astral.Logic.UCC.Ressources.Enums.Sign.NotEqual:
+                                return Math.Abs(entity.Location.Z - PropertyValue) > 1;
+                            case Astral.Logic.UCC.Ressources.Enums.Sign.Inferior:
+                                return entity.Location.Z < PropertyValue;
+                            case Astral.Logic.UCC.Ressources.Enums.Sign.Superior:
+                                return entity.Location.Z > PropertyValue;
+                        }
+                        break;
+                }
+                return false;
+            }
+            // Если Entity не найдено, условие будет истино в единственном случае:
+            return PropertyType == EntityPropertyType.Distance
+                   && Sign == Astral.Logic.UCC.Ressources.Enums.Sign.Superior;
         }
+
+        public string TestInfos(UCCAction refAction)
+        {
+            Entity closestEntity = refAction?.GetTarget();
+
+            var entityKey = EntityKey;
+
+            if (!entityKey.Validate(closestEntity))
+                closestEntity = SearchCached.FindClosestEntity(entityKey, SpecialCheck);
+
+            if (entityKey.Validate(closestEntity))
+            {
+                StringBuilder sb = new StringBuilder("Found closest Entity");
+                var propType = PropertyType;
+                sb.Append(" [").Append(closestEntity.NameUntranslated).Append(']').Append(" which ").Append(propType).Append(" = ");
+                switch (propType)
+                {
+                    case EntityPropertyType.Distance:
+                        sb.Append(closestEntity.Location.Distance3DFromPlayer);
+                        break;
+                    case EntityPropertyType.ZAxis:
+                        sb.Append(closestEntity.Location.Z);
+                        break;
+                    case EntityPropertyType.HealthPercent:
+                        sb.Append(closestEntity.Character?.AttribsBasic?.HealthPercent);
+                        break;
+                }
+                return sb.ToString();
+            }
+            else
+            {
+                StringBuilder sb = new StringBuilder("No one Entity matched to");
+                sb.Append(" [").Append(EntityID).Append(']').AppendLine();
+                if (PropertyType == EntityPropertyType.Distance)
+                    sb.AppendLine("The distance to the missing Entity is considered equal to infinity.");
+                return sb.ToString();
+            }
+        }
+
+        public string Label()
+        {
+            _label = string.IsNullOrEmpty(_label) 
+                   ? $"{GetType().Name} [{EntityID}]" 
+                   : GetType().Name;
+
+            return _label;
+        }
+
+        #region Вспомогательные инструменты
+        /// <summary>
+        /// Комплексный (составной) идентификатор, используемый для поиска <see cref="Entity"/> в кэше
+        /// </summary>
+        public EntityCacheRecordKey EntityKey =>
+            _key ??
+            (_key = new EntityCacheRecordKey(EntityID, EntityIdType, EntityNameType));
+
+        private EntityCacheRecordKey _key;
+
+        /// <summary>
+        /// Функтор дополнительной проверки <seealso cref="Entity"/> 
+        /// на предмет нахождения в пределах области, заданной <see cref="InteractEntities.CustomRegionNames"/>
+        /// Использовать самомодифицирующийся предиката, т.к. предикат передается в <seealso cref="SearchCached.FindClosestEntity(EntityCacheRecordKey, Predicate{Entity})"/>
+        /// </summary>        
+        private Predicate<Entity> SpecialCheck
+        {
+            get
+            {
+                if (_specialCheck is null)
+                    _specialCheck = SearchHelper.Construct_EntityAttributePredicate(HealthCheck,
+                                                            ReactionRange,
+                                                            ReactionZRange > 0
+                                                                ? ReactionZRange
+                                                                : Astral.Controllers.Settings.Get.MaxElevationDifference,
+                                                            RegionCheck,
+                                                            Aura.IsMatch);
+                return _specialCheck;
+            }
+        }
+        private Predicate<Entity> _specialCheck;
+        #endregion
     }
 }

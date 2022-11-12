@@ -7,21 +7,19 @@ using System.Windows.Forms;
 
 namespace EntityTools.Editors
 {
-    public class CurrentShardEditor : UITypeEditor
+    internal class CurrentShardEditor : UITypeEditor
     {
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
-            if (Game.CharacterSelectionData.CharacterChoices.IsValid && Game.CharacterSelectionData.CharacterChoices.LastPlayedCharacter.IsValid)
+            var characterChoices = Game.CharacterSelectionData.CharacterChoices;
+            if (characterChoices.IsValid 
+                && characterChoices.LastPlayedCharacter.IsValid)
             {
-                DialogResult result =
-#if false
-                    MessageBox.Show("Set to current Shard ?"); 
-#else
-                    XtraMessageBox.Show("Set to current Shard ?");
-#endif
+                DialogResult result = XtraMessageBox.Show("Set to current Shard ?");
+
                 if (result == DialogResult.OK)
                 {
-                    return Game.CharacterSelectionData.CharacterChoices.LastPlayedCharacter.ShardName;
+                    return characterChoices.LastPlayedCharacter.ShardName;
                 }
             }
             return value;

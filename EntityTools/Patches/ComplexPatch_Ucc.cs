@@ -1,11 +1,17 @@
-﻿using Astral.Logic.UCC.Classes;
-using EntityTools.UCC.Conditions;
-using HarmonyLib;
-using System;
+﻿using System;
 using System.Reflection;
-using System.Windows.Forms;
+
 using ACTP0Tools.Reflection;
+
+using Astral.Logic.UCC.Classes;
 using Astral.Logic.UCC.Panels;
+
+using EntityCore.Forms;
+
+using EntityTools.UCC.Conditions;
+
+using HarmonyLib;
+// ReSharper disable InconsistentNaming
 
 namespace EntityTools.Patches
 {
@@ -32,9 +38,6 @@ namespace EntityTools.Patches
         /// Данный патч нужен поскольку метод <see cref="UCCCondition.IsOK"/> не является виртуальным.
         /// </summary>
         /// <param name="__instance">Экземпляр ucc-условия</param>
-        /// <param name="__result"></param>
-        /// <param name="refAction"></param>
-        /// <returns></returns>
         private static bool PrefixIsOK(UCCCondition __instance, ref bool __result, UCCAction refAction)
         {
             if (__instance is UCCGenericCondition genericCondition)
@@ -54,8 +57,6 @@ namespace EntityTools.Patches
         /// Данный патч нужен поскольку метод <see cref="UCCCondition.Clone"/> не является виртуальнным.
         /// </summary>
         /// <param name="__instance">Экземпляр ucc-условия</param>
-        /// <param name="__result"></param>
-        /// <returns></returns>
         private static bool PrefixClone(UCCCondition __instance, ref UCCCondition __result)
         {
             if (__instance is ICustomUCCCondition customUccCondition)
@@ -74,7 +75,7 @@ namespace EntityTools.Patches
         {
             if (EntityTools.Config.Patches.UccComplexPatch)
             {
-                EntityTools.Core.UserRequest_Edit(Astral.Logic.UCC.API.CurrentProfile, false);
+                UccEditor.Edit(Astral.Logic.UCC.API.CurrentProfile, false);
                 MainUccRefreshAll?.Invoke(__instance);
                 return false;
             }

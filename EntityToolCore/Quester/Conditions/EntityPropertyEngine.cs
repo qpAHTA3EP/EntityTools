@@ -1,12 +1,12 @@
 ﻿using Astral.Classes;
 using Astral.Quester.Classes;
-using EntityCore.Entities;
 using EntityTools;
 using EntityTools.Core.Interfaces;
 using EntityTools.Enums;
 using EntityTools.Quester.Conditions;
 using MyNW.Classes;
 using System;
+using EntityTools.Tools.Entities;
 using static Astral.Quester.Classes.Condition;
 
 namespace EntityCore.Quester.Conditions

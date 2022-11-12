@@ -1,18 +1,20 @@
-﻿using System;
+﻿using ACTP0Tools.Reflection;
+using Astral.Quester.Forms;
+using EntityCore.Forms;
+using EntityCore.Quester.Editor;
+using System;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Linq;
 using System.Windows.Forms;
-using ACTP0Tools.Classes.Quester;
-using ACTP0Tools.Reflection;
-using Astral.Quester.Forms;
+using QuesterEditor = EntityTools.Quester.Editor.QuesterEditor;
 
 namespace EntityTools.Editors
 {
-    class CustomRegionEditor : UITypeEditor
+    internal class CustomRegionEditor : UITypeEditor
     {
         private PropertyAccessor<PropertyGrid> pgAccessor;
-        private PropertyAccessor<QuesterProfileProxy> profileProxyAccessor;
+
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
             string customRegion = value?.ToString();
@@ -21,18 +23,12 @@ namespace EntityTools.Editors
 
             if (pgAccessor.IsValid)
             {
-                var parentForm = pgAccessor.Value?.ParentForm;
-                if (parentForm != null)
+                if (pgAccessor.Value?.ParentForm is QuesterEditor questerEditor)
                 {
-                    if (profileProxyAccessor is null)
-                        profileProxyAccessor = parentForm.GetProperty<QuesterProfileProxy>("Profile");
-                    if (profileProxyAccessor.IsValid)
+                    var crList = questerEditor.Profile.CustomRegions.Select(cr => cr.Name);
+                    if (ItemSelectForm.GetAnItem(() => crList, ref customRegion))
                     {
-                        var crList = profileProxyAccessor.Value.CustomRegions.Select(cr => cr.Name);
-                        if (global::EntityTools.EntityTools.Core.UserRequest_SelectItem(() => crList, ref customRegion))
-                        {
-                            return customRegion;
-                        }
+                        return customRegion;
                     }
                 }
             }
@@ -49,5 +45,5 @@ namespace EntityTools.Editors
         {
             return UITypeEditorEditStyle.Modal;
         }
-	}
+    }
 }

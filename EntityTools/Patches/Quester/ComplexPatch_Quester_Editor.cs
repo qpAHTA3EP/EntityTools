@@ -1,18 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 using ACTP0Tools.Patches;
 using ACTP0Tools.Reflection;
+
 using DevExpress.XtraEditors;
+
+using EntityTools.Quester.Editor;
+
 using HarmonyLib;
 
 namespace EntityTools.Patches.Quester
 {
     public static class ComplexPatch_Quester_Editor
     {
-        private static PropertyAccessor<Astral.Quester.Classes.Action> selectedActionAccessor;
+        private static readonly PropertyAccessor<Astral.Quester.Classes.Action> selectedActionAccessor;
 
         public static bool PatchesWasApplied { get; private set; }
 
@@ -24,8 +25,8 @@ namespace EntityTools.Patches.Quester
                 var profileName = Astral.API.CurrentSettings.LastQuesterProfile;
 
                 if (profile.Saved && !string.IsNullOrEmpty(profileName))
-                    EntityTools.Core.UserRequest_Edit(profile, profileName);
-                else EntityTools.Core.UserRequest_Edit(profile);
+                    QuesterEditor.Edit(profile, profileName);
+                else QuesterEditor.Edit(profile);
                 return false;
             }
             return true;
@@ -62,8 +63,8 @@ namespace EntityTools.Patches.Quester
                 var profileName = Astral.API.CurrentSettings.LastQuesterProfile;
 
                 if (profile.Saved && !string.IsNullOrEmpty(profileName))
-                    EntityTools.Core.UserRequest_Edit(profile, profileName, selectedAction.ActionID);
-                else EntityTools.Core.UserRequest_Edit(profile, selectedAction.ActionID);
+                    QuesterEditor.Edit(profile, profileName, selectedAction.ActionID);
+                else QuesterEditor.Edit(profile, selectedAction.ActionID);
                 return false;
             }
             return true;
@@ -83,7 +84,7 @@ namespace EntityTools.Patches.Quester
             var miEditorClick = AccessTools.Method(tMain, "b_editor_Click");
             if (miEditorClick is null)
             {
-                ETLogger.WriteLine(LogType.Error, $@"Patch '{nameof(ComplexPatch_Quester_Editor)}' failed. Method '{miEditorClick}' not found", true);
+                ETLogger.WriteLine(LogType.Error, $@"Patch '{nameof(ComplexPatch_Quester_Editor)}' failed. Method 'b_editor_Click' not found", true);
                 return;
             }
             var prepatchEditProfile = AccessTools.Method(tPatch, nameof(PrepatchEditProfile));
@@ -91,7 +92,7 @@ namespace EntityTools.Patches.Quester
             var miEditActionClick = AccessTools.Method(tMain, "editToolStripMenuItem_Click");
             if (miEditActionClick is null)
             {
-                ETLogger.WriteLine(LogType.Error, $@"Patch '{nameof(ComplexPatch_Quester_Editor)}' failed. Method '{miEditActionClick}' not found", true);
+                ETLogger.WriteLine(LogType.Error, $@"Patch '{nameof(ComplexPatch_Quester_Editor)}' failed. Method 'editToolStripMenuItem_Click' not found", true);
                 return;
             }
             var prepatchEditAction = AccessTools.Method(tPatch, nameof(PrepatchEditSelectedAction));

@@ -1,16 +1,23 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Drawing.Design;
-using System.Threading;
+using System.Runtime.CompilerServices;
 using System.Xml.Serialization;
+
 using Astral.Classes.ItemFilter;
+using Astral.Logic.NW;
 using Astral.Logic.UCC.Classes;
+using EntityTools.Annotations;
 using EntityTools.Core.Interfaces;
-using EntityTools.Core.Proxies;
 using EntityTools.Editors;
 using EntityTools.Enums;
+using EntityTools.Quester.Actions;
 using EntityTools.Tools;
+using EntityTools.Tools.Entities;
+
 using MyNW.Classes;
+
+using Timeout = Astral.Classes.Timeout;
 
 namespace EntityTools.UCC.Actions
 {
@@ -34,7 +41,7 @@ namespace EntityTools.UCC.Actions
                 if (_entityId != value)
                 {
                     _entityId = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityID)));
+                    OnPropertyChanged();
                 }
             }
         }
@@ -56,7 +63,7 @@ namespace EntityTools.UCC.Actions
                 if (_entityIdType != value)
                 {
                     _entityIdType = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityIdType)));
+                    OnPropertyChanged();
                 }
             }
         }
@@ -76,7 +83,7 @@ namespace EntityTools.UCC.Actions
                 if (_entityNameType != value)
                 {
                     _entityNameType = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityNameType)));
+                    OnPropertyChanged();
                 }
             }
         }
@@ -91,10 +98,10 @@ namespace EntityTools.UCC.Actions
         {
             get => _entityRadius; set
             {
-                if (_entityRadius != value)
+                if (Math.Abs(_entityRadius - value) > 0.1)
                 {
                     _entityRadius = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityRadius)));
+                    OnPropertyChanged();
                 }
             }
         }
@@ -125,7 +132,7 @@ namespace EntityTools.UCC.Actions
                 if (_regionCheck != value)
                 {
                     _regionCheck = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RegionCheck)));
+                    OnPropertyChanged();
                 }
             }
         }
@@ -146,7 +153,7 @@ namespace EntityTools.UCC.Actions
                 if (_healthCheck != value)
                 {
                     _healthCheck = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HealthCheck)));
+                    OnPropertyChanged();
                 }
             }
         }
@@ -167,11 +174,12 @@ namespace EntityTools.UCC.Actions
                 if (_aura != value)
                 {
                     _aura = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Aura)));
+                    OnPropertyChanged();
                 }
             }
         }
         private AuraOption _aura = new AuraOption();
+        public bool ShouldSerializeAura() => !string.IsNullOrEmpty(_aura?.AuraName);
 
 #if DEVELOPER
         [Description("The maximum distance from the character within which the Entity is searched\n" +
@@ -184,10 +192,10 @@ namespace EntityTools.UCC.Actions
         {
             get => _reactionRange; set
             {
-                if (_reactionRange != value)
+                if (Math.Abs(_reactionRange - value) > 0.1)
                 {
                     _reactionRange = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ReactionRange)));
+                    OnPropertyChanged();
                 }
             }
         }
@@ -205,10 +213,10 @@ namespace EntityTools.UCC.Actions
             get => _reactionZRange;
             set
             {
-                if (_reactionZRange != value)
+                if (Math.Abs(_reactionZRange - value) > 0.1)
                 {
                     _reactionZRange = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ReactionZRange)));
+                    OnPropertyChanged();
                 }
             }
         }
@@ -228,32 +236,30 @@ namespace EntityTools.UCC.Actions
         [Browsable(false)]
         public new string ActionName { get; set; } = string.Empty;
         #endregion
-
         #endregion
+        
 
-        #region Взаимодействие с EntityToolsCore
-        [NonSerialized]
-        internal IUccActionEngine Engine;
 
+
+        #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public ApproachEntity()
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = default)
         {
-            Engine = new UccActionProxy(this);
+            InternalResetOnPropertyChanged(propertyName);
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-        private IUccActionEngine MakeProxy()
-        {
-            return new UccActionProxy(this);
-        }
-        #endregion
 
-        #region Интерфейс команды
-        public override bool NeedToRun => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).NeedToRun;
-        public override bool Run() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).Run();
-        [XmlIgnore]
-        [Browsable(false)]
-        public Entity UnitRef => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).UnitRef;
-        public override string ToString() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).Label();
+        protected virtual void InternalResetOnPropertyChanged([CallerMemberName] string propertyName = default)
+        {
+            _key = null;
+            _specialCheck = null;
+            _label = string.Empty;
+            
+            entityCache = null;
+            timeout.ChangeTime(0);
+        }
         #endregion
 
         public override UCCAction Clone()
@@ -277,5 +283,105 @@ namespace EntityTools.UCC.Actions
                 }
             });
         }
+
+        #region Данные
+        private Entity entityCache;
+        private Timeout timeout = new Timeout(0);
+        private string _label = string.Empty;
+        #endregion
+        
+
+        
+        #region IUCCActionEngine
+        public override bool NeedToRun
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(EntityID))
+                {
+                    var entityKey = EntityKey;
+                    if (timeout.IsTimedOut)
+                    {
+                        entityCache = SearchCached.FindClosestEntity(entityKey, SpecialCheck);
+
+                        timeout.ChangeTime(EntityTools.Config.EntityCache.CombatCacheTime);
+
+                        return entityCache != null && entityCache.CombatDistance > EntityRadius;
+                    }
+
+                    return entityKey.Validate(entityCache) && !(HealthCheck && entityCache.IsDead) && entityCache.CombatDistance > EntityRadius;
+                }
+                return false;
+            }
+        }
+
+        public override bool Run()
+        {
+            if (entityCache.Location.Distance3DFromPlayer >= EntityRadius)
+                return Approach.EntityByDistance(entityCache, EntityRadius);
+            return true;
+        }
+
+        public Entity UnitRef
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(EntityID))
+                {
+                    var entityKey = EntityKey;
+                    if (entityKey.Validate(entityCache))
+                        return entityCache;
+                    if (timeout.IsTimedOut)
+                    {
+                        entityCache = SearchCached.FindClosestEntity(entityKey, SpecialCheck);
+                        timeout.ChangeTime(EntityTools.Config.EntityCache.CombatCacheTime);
+                        return entityCache;
+                    }
+                }
+                return null;
+            }
+        }
+
+        public override string ToString()
+        {
+            if (string.IsNullOrEmpty(_label))
+            {
+                var entId = EntityID;
+                _label = string.IsNullOrEmpty(entId) 
+                       ? GetType().Name 
+                       : $"{GetType().Name} [{entId}]";
+            }
+            return _label;
+        }
+        #endregion
+
+
+        #region Вспомогательные инструменты
+        /// <summary>
+        /// Комплексный (составной) идентификатор, используемый для поиска <see cref="Entity"/> в кэше
+        /// </summary>
+        public EntityCacheRecordKey EntityKey => _key ?? (_key = new EntityCacheRecordKey(EntityID, EntityIdType, EntityNameType));
+        private EntityCacheRecordKey _key;
+
+        /// <summary>
+        /// Функтор дополнительной проверки <seealso cref="Entity"/> 
+        /// на предмет нахождения в пределах области, заданной <see cref="InteractEntities.CustomRegionNames"/>
+        /// Использовать самомодифицирующийся предикат нельзя, т.к. предикат передается в <seealso cref="SearchCached.FindClosestEntity(EntityCacheRecordKey, Predicate{Entity})"/>
+        /// </summary>        
+        private Predicate<Entity> SpecialCheck
+        {
+            get
+            {
+                if (_specialCheck is null)
+                    _specialCheck = SearchHelper.Construct_EntityAttributePredicate(HealthCheck,
+                                                            ReactionZRange,
+                                                            ReactionZRange > 0 ? ReactionZRange : Astral.Controllers.Settings.Get.MaxElevationDifference,
+                                                            RegionCheck,
+                                                            Aura.IsMatch);
+                return _specialCheck;
+            }
+        }
+        private Predicate<Entity> _specialCheck;
+        #endregion
     }
 }

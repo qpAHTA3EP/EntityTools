@@ -27,25 +27,6 @@ namespace EntityTools.Enums
         Any
     }
 
-#if false
-    [Flags]
-    public enum WardType
-    {
-        None,
-
-        /// <summary>
-        /// Страхующий катализатор, идентификатор которого начинается с 'Fuse_Ward_Preservation'
-        /// </summary>
-        Preservation,
-#if false
-        /// <summary>
-        /// Полный катализатор, идентификатор которого начинается с 'Fuse_Ward_Coalescent'
-        /// </summary>
-        Coalescent 
-#endif
-    } 
-#endif
-
     /// <summary>
     /// Частицы, повышающие шанс улучшения предметов
     /// </summary>
@@ -109,20 +90,6 @@ namespace EntityTools.Enums
         /// Предмет не найден
         /// </summary>
         Absent = 0,
-#if false
-        /// <summary>
-        /// Найден незаполненный предмет
-        /// </summary>
-        Unfilled,
-        /// <summary>
-        /// Найден частично заполненный предмет
-        /// </summary>
-        PartialFilled,
-        /// <summary>
-        /// Найден полностью заполненный предмет, готовый к обработке
-        /// </summary>
-        FullFilled, 
-#endif
         /// <summary>
         /// Непривязанный предмет
         /// </summary>
@@ -255,21 +222,35 @@ namespace EntityTools.Enums
         /// Правое кольцо (нижнее, слот 1)
         /// </summary>
         RingRight = InvBagIDs.Ring + 1,
-        /// <summary>
-        /// Основной (активный) артефакт
-        /// </summary>
-        //ArtifactPrimary = InvBagIDs.ArtifactPrimary,
-        /// <summary>
-        /// Дополнительный артефакт (правый, слот 0)
-        /// </summary>
-        //ArtifactSecondary1 = InvBagIDs.ArtifactSecondary,
-        /// <summary>
-        /// Дополнительный артефакт (средний, слот 1)
-        /// </summary>
-        //ArtifactSecondary2 = InvBagIDs.ArtifactSecondary + 1,
-        /// <summary>
-        /// Дополнительный артефакт (левый, слот 2)
-        /// </summary>
-        //ArtifactSecondary3 = InvBagIDs.ArtifactSecondary + 2
+        ///// <summary>
+        ///// Основной (активный) артефакт
+        ///// </summary>
+        ////ArtifactPrimary = InvBagIDs.ArtifactPrimary,
+        ///// <summary>
+        ///// Дополнительный артефакт (правый, слот 0)
+        ///// </summary>
+        ////ArtifactSecondary1 = InvBagIDs.ArtifactSecondary,
+        ///// <summary>
+        ///// Дополнительный артефакт (средний, слот 1)
+        ///// </summary>
+        ////ArtifactSecondary2 = InvBagIDs.ArtifactSecondary + 1,
+        ///// <summary>
+        ///// Дополнительный артефакт (левый, слот 2)
+        ///// </summary>
+        ////ArtifactSecondary3 = InvBagIDs.ArtifactSecondary + 2
+    }
+
+    /// <summary>
+    /// Типы инсигний (знаков скакунов)
+    /// </summary>
+    public enum InsigniaType
+    {
+        Empty = 0,
+        Crescent = 262144,
+        Regal = 524288,
+        Barbed = 1048576,
+        Illuminated = 2097152,
+        Enlightened = 4194304,
+        Universal = 8126464
     }
 }

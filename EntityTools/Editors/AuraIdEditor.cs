@@ -1,18 +1,18 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Drawing.Design;
+using EntityCore.Forms;
 
 namespace EntityTools.Editors
 {
 #if DEVELOPER
-    public class AuraIdEditor : UITypeEditor
+    internal class AuraIdEditor : UITypeEditor
     {
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
-            string auraId = value?.ToString();
-            if (EntityTools.Core.UserRequest_SelectAuraId(ref auraId) &&
-                !string.IsNullOrEmpty(auraId))
-                return auraId;
+            string newId = AuraViewer.GUIRequest();
+            if (!string.IsNullOrEmpty(newId))
+                return newId;
 
             return value;
         }

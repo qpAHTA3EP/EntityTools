@@ -1,12 +1,12 @@
 ﻿using Astral.Classes;
 using Astral.Logic.UCC.Actions;
 using Astral.Logic.UCC.Classes;
-using EntityCore.Entities;
 using EntityTools;
 using EntityTools.Core.Interfaces;
 using EntityTools.UCC.Actions;
 using MyNW.Classes;
 using System;
+using EntityTools.Tools.Entities;
 
 namespace EntityCore.UCC.Actions
 {

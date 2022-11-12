@@ -397,7 +397,7 @@ namespace EntityTools.Patches.Mapper
             // 
             this.btnAddNodes.Caption = "Add Nodes";
             this.btnAddNodes.Id = 145;
-            this.btnAddNodes.ImageOptions.Image = global::EntityTools.Properties.Resources.miniAdd;
+            this.btnAddNodes.ImageOptions.Image = global::EntityTools.Properties.Resources.Add;
             this.btnAddNodes.Name = "btnAddNodes";
             this.btnAddNodes.CheckedChanged += new DevExpress.XtraBars.ItemClickEventHandler(this.handler_AddNode_ModeChanged);
             // 

@@ -1,19 +1,24 @@
 ﻿using System.ComponentModel;
 using System.Drawing.Design;
-using System.Threading;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
+
 using Astral.Classes.ItemFilter;
 using Astral.Quester.Classes;
-using EntityTools.Core.Interfaces;
-using EntityTools.Core.Proxies;
+
 using EntityTools.Editors;
 using EntityTools.Enums;
-using EntityTools.Patches;
+using EntityTools.Extensions;
+
+using MyNW.Classes;
+// ReSharper disable InconsistentNaming
 
 namespace EntityTools.Quester.Conditions
 {
     public class CheckGameGUI : Condition
     {
-         #region Опции команды
+        #region Опции команды
 #if DEVELOPER
         [Description("The Identifier of the Ingame user interface element")]
         [Editor(typeof(UiIdEditor), typeof(UITypeEditor))]
@@ -28,11 +33,11 @@ namespace EntityTools.Quester.Conditions
                 if (_uiGenID != value)
                 {
                     _uiGenID = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(UiGenID)));
+                    NotifyPropertyChanged();
                 }
             }
         }
-        internal string _uiGenID;
+        private string _uiGenID;
 
 #if !DEVELOPER
         [Browsable(false)]
@@ -42,10 +47,10 @@ namespace EntityTools.Quester.Conditions
             get => _tested; set
             {
                 _tested = value;
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Tested)));
+                NotifyPropertyChanged();
             }
         }
-        internal UiGenCheckType _tested = UiGenCheckType.IsVisible;
+        private UiGenCheckType _tested = UiGenCheckType.IsVisible;
 
 #if DEVELOPER
         [Description("The Name of the GUI element's property which is checked\n" +
@@ -62,11 +67,11 @@ namespace EntityTools.Quester.Conditions
                 if (_uiGenProperty != value)
                 {
                     _uiGenProperty = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(UiGenProperty)));
+                    NotifyPropertyChanged();
                 }
             }
         }
-        internal string _uiGenProperty;
+        private string _uiGenProperty;
 
 #if DEVELOPER
         [Description("The Value of the GUI element's property which is checked\n" +
@@ -83,11 +88,11 @@ namespace EntityTools.Quester.Conditions
                 if (_uiGenPropertyValue != value)
                 {
                     _uiGenPropertyValue = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(UiGenProperty)));
+                    NotifyPropertyChanged();
                 }
             }
         }
-        internal string _uiGenPropertyValue = string.Empty;
+        private string _uiGenPropertyValue = string.Empty;
 
 #if DEVELOPER
         [Description("Type of and UiGenPropertyValue:\n" +
@@ -106,11 +111,11 @@ namespace EntityTools.Quester.Conditions
                 if (_uiGenPropertyValueType != value)
                 {
                     _uiGenPropertyValueType = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(UiGenPropertyValueType)));
+                    NotifyPropertyChanged();
                 }
             }
         }
-        internal ItemFilterStringType _uiGenPropertyValueType = ItemFilterStringType.Simple;
+        private ItemFilterStringType _uiGenPropertyValueType = ItemFilterStringType.Simple;
 
 #if DEVELOPER
         [Category("GuiProperty")]
@@ -125,31 +130,136 @@ namespace EntityTools.Quester.Conditions
                 if (_propertySign != value)
                 {
                     _propertySign = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PropertySign)));
+                    NotifyPropertyChanged();
                 }
             }
         }
-        internal Presence _propertySign = Presence.Equal;
+        private Presence _propertySign = Presence.Equal;
         #endregion
 
         #region Взаимодействие с ядром EntityTools
-        internal IQuesterConditionEngine Engine;
         public event PropertyChangedEventHandler PropertyChanged;
-
-        public CheckGameGUI()
+        
+        protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = default)
         {
-            Engine = new QuesterConditionProxy(this);
+            InternalResetOnPropertyChanged(propertyName);
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        private IQuesterConditionEngine MakeProxy()
+        internal void InternalResetOnPropertyChanged([CallerMemberName] string propertyName = default)
         {
-            return new QuesterConditionProxy(this);
+            if (propertyName == nameof(UiGenID))
+                label = string.Empty;
+            uiGen = null;
         }
         #endregion
 
-        public override bool IsValid => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).IsValid;
-        public override void Reset() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).Reset();
-        public override string TestInfos => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).TestInfos;
-        public override string ToString() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxy).Label();
+        private UIGen uiGen;
+        private string label = string.Empty;
+
+
+
+        public override bool IsValid
+        {
+            get
+            {
+                if (uiGen == null && !string.IsNullOrEmpty(_uiGenID))
+                    uiGen = MyNW.Internals.UIManager.AllUIGen.Find(x => x.Name == _uiGenID);
+                if (uiGen != null && uiGen.IsValid)
+                {
+                    switch (_tested)
+                    {
+                        case UiGenCheckType.IsVisible:
+                            return uiGen.IsVisible;
+                        case UiGenCheckType.IsHidden:
+                            return !uiGen.IsVisible;
+                        case UiGenCheckType.Property:
+                            if (uiGen.IsVisible)
+                            {
+                                bool result = false;
+                                var uiVar = uiGen.Vars.FirstOrDefault(v => v.Name == _uiGenProperty);
+                                if (uiVar != null)
+                                    result = CheckUiGenPropertyValue(uiVar);
+                                return result;
+                            }
+                            break;
+                    }
+                }
+                return false;
+            }
+        }
+
+        public override string TestInfos
+        {
+            get
+            {
+                if (uiGen == null && !string.IsNullOrEmpty(_uiGenID))
+                    uiGen = MyNW.Internals.UIManager.AllUIGen.Find(x => x.Name == _uiGenID);
+                if (uiGen != null && uiGen.IsValid)
+                {
+                    switch (_tested)
+                    {
+                        case UiGenCheckType.IsVisible:
+                            return uiGen.IsVisible 
+                                 ? $"GUI '{_uiGenID}' is VISIBLE." 
+                                 : $"GUI '{_uiGenID}' is HIDDEN.";
+                        case UiGenCheckType.IsHidden:
+                            return uiGen.IsVisible 
+                                 ? $"GUI '{_uiGenID}' is VISIBLE." 
+                                 : $"GUI '{_uiGenID}' is HIDDEN.";
+                        case UiGenCheckType.Property:
+                            if (!uiGen.IsVisible)
+                                return $"GUI '{_uiGenID}' is HIDDEN. The Property '{_uiGenProperty}' did not checked.";
+                            var uiVar = uiGen.Vars.FirstOrDefault(v => v.IsValid && v.Name == _uiGenProperty);
+                            if (uiVar == null) 
+                                return $"The Property '{_uiGenID}.{_uiGenProperty}' does not founded.";
+                            
+                            return CheckUiGenPropertyValue(uiVar) 
+                                 ? $"The Property '{_uiGenID}.{_uiGenProperty}' {_propertySign} to '{uiVar.Value}'." 
+                                 : $"The Property '{_uiGenID}.{_uiGenProperty}' not {_propertySign} to '{uiVar.Value}'.";
+                    }
+                }
+
+                return $"GUI '{_uiGenID}' is not valid.";
+            }
+        }
+
+        public override string ToString()
+        {
+            label = !string.IsNullOrEmpty(label) 
+                  ? $"{GetType().Name} [{_uiGenID}]" 
+                  : GetType().Name;
+
+            return label;
+        }
+
+        public override void Reset()
+        {
+            uiGen = null;
+        }
+
+        private bool CheckUiGenPropertyValue(UIVar uiVar)
+        {
+            if (uiVar == null || !uiVar.IsValid)
+                return false;
+
+            bool result = false;
+            if (string.IsNullOrEmpty(uiVar.Value) && string.IsNullOrEmpty(_uiGenPropertyValue))
+                result = true;
+            else switch (_uiGenPropertyValueType)
+            {
+                case ItemFilterStringType.Simple:
+                    result = uiVar.Value.CompareToSimplePattern(_uiGenPropertyValue);
+                    break;
+                case ItemFilterStringType.Regex:
+                    //TODO Использовать предкомпилированный Regex
+                    result = Regex.IsMatch(uiVar.Value, _uiGenPropertyValue);
+                    break;
+            }
+
+            if (_propertySign == Presence.Equal)
+                return result;
+            return !result;
+        }
     }
 }

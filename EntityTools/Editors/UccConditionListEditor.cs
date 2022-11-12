@@ -1,15 +1,18 @@
-﻿using EntityTools.UCC.Actions;
-using EntityTools.UCC.Conditions;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Drawing.Design;
-using ConditionList = System.Collections.ObjectModel.ObservableCollection<Astral.Logic.UCC.Classes.UCCCondition>;
 
+using EntityCore.Forms;
+
+using EntityTools.UCC.Actions;
+using EntityTools.UCC.Conditions;
+
+using ConditionList = System.Collections.ObjectModel.ObservableCollection<Astral.Logic.UCC.Classes.UCCCondition>;
 
 namespace EntityTools.Editors
 {
 #if DEVELOPER
-    class UccConditionListEditor : UITypeEditor
+    internal class UccConditionListEditor : UITypeEditor
     {
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
@@ -24,7 +27,7 @@ namespace EntityTools.Editors
                         var conditions = conditionPack.Conditions;
                         var logic = conditionPack.TestRule;
                         var negation = conditionPack.Not;
-                        if (EntityTools.Core.UserRequest_EditUccConditions(ref conditions, ref logic, ref negation))
+                        if (ConditionListForm.UserRequest(ref conditions, ref logic, ref negation))
                         {
                             conditionPack.TestRule = logic;
                             conditionPack.Not = negation;
@@ -38,7 +41,7 @@ namespace EntityTools.Editors
                         var conditions = spUccAction.CustomConditions;
                         var logic = spUccAction.CustomConditionCheck;
                         var negation = spUccAction.Not;
-                        if (EntityTools.Core.UserRequest_EditUccConditions(ref conditions, ref logic, ref negation))
+                        if (ConditionListForm.UserRequest(ref conditions, ref logic, ref negation))
                         {
                             spUccAction.CustomConditionCheck = logic;
                             spUccAction.Not = negation;
@@ -51,14 +54,14 @@ namespace EntityTools.Editors
             }
             switch (value)
             {
-                case ConditionList conditionList when EntityTools.Core.UserRequest_EditUccConditions(ref conditionList):
-                    return conditionList;
+                case ConditionList conditionList:
+                        return ConditionListForm.UserRequest(conditionList) ?? value;
                 case UCCConditionPack conditionPack:
                 {
                     var conditions = conditionPack.Conditions;
                     var logic = conditionPack.TestRule;
                     var negation = conditionPack.Not;
-                    if (EntityTools.Core.UserRequest_EditUccConditions(ref conditions, ref logic, ref negation))
+                    if (ConditionListForm.UserRequest(ref conditions, ref logic, ref negation))
                     {
                         var newConditionPack = new UCCConditionPack
                         {

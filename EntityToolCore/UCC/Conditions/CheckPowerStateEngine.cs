@@ -1,10 +1,10 @@
 ﻿using Astral.Logic.UCC.Classes;
-using EntityCore.Tools.Powers;
 using EntityTools;
 using EntityTools.Core.Interfaces;
 using EntityTools.Enums;
 using EntityTools.UCC.Conditions;
 using System;
+using EntityTools.Tools.Powers;
 
 namespace EntityCore.UCC.Conditions
 {
