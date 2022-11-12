@@ -318,10 +318,10 @@
     <Compile Include="Forms\TargetSelectForm.Designer.cs">
       <DependentUpon>TargetSelectForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\UccEditor.cs">
+    <Compile Include="UCC\Editor\UccEditor.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\UccEditor.Designer.cs">
+    <Compile Include="UCC\Editor\UccEditor.Designer.cs">
       <DependentUpon>UccEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\UIViewer.cs">
@@ -395,17 +395,17 @@
     <Compile Include="Quester\Editor\QuesterEditor.Designer.cs">
       <DependentUpon>QuesterEditor.cs</DependentUpon>
     </Compile>
-    <Compile Include="Quester\Editor\TreeViewExtension\ActionBaseTreeNode.cs" />
-    <Compile Include="Quester\Editor\TreeViewExtension\ActionPackTreeNode.cs" />
-    <Compile Include="Quester\Editor\TreeViewExtension\ActionPushProfileToStackAndLoadTreeNode.cs" />
-    <Compile Include="Quester\Editor\TreeViewExtension\ActionTreeNode.cs" />
-    <Compile Include="Quester\Editor\TreeViewExtension\ConditionBaseTreeNode.cs" />
-    <Compile Include="Quester\Editor\TreeViewExtension\ConditionIsInCustomRegionTreeNode.cs" />
-    <Compile Include="Quester\Editor\TreeViewExtension\ConditionPackTreeNode.cs" />
-    <Compile Include="Quester\Editor\TreeViewExtension\ConditionTreeNode.cs" />
-    <Compile Include="Quester\Editor\TreeViewExtension\IQuesterAction.cs" />
-    <Compile Include="Quester\Editor\TreeViewExtension\IQuesterCondition.cs" />
-    <Compile Include="Quester\Editor\TreeViewExtension\ITreeNode.cs" />
+    <Compile Include="Quester\Editor\TreeViewCustomization\ActionBaseTreeNode.cs" />
+    <Compile Include="Quester\Editor\TreeViewCustomization\ActionPackTreeNode.cs" />
+    <Compile Include="Quester\Editor\TreeViewCustomization\ActionPushProfileToStackAndLoadTreeNode.cs" />
+    <Compile Include="Quester\Editor\TreeViewCustomization\ActionTreeNode.cs" />
+    <Compile Include="Quester\Editor\TreeViewCustomization\ConditionBaseTreeNode.cs" />
+    <Compile Include="Quester\Editor\TreeViewCustomization\ConditionIsInCustomRegionTreeNode.cs" />
+    <Compile Include="Quester\Editor\TreeViewCustomization\ConditionPackTreeNode.cs" />
+    <Compile Include="Quester\Editor\TreeViewCustomization\ConditionTreeNode.cs" />
+    <Compile Include="Quester\Editor\TreeViewCustomization\IQuesterAction.cs" />
+    <Compile Include="Quester\Editor\TreeViewCustomization\IQuesterCondition.cs" />
+    <Compile Include="Quester\Editor\TreeViewCustomization\ITreeNode.cs" />
     <Compile Include="Servises\SlideMonitor\CharacterEx.cs" />
     <Compile Include="Servises\SlideMonitor\EntityEx.cs" />
     <Compile Include="Servises\SlideMonitor\Enums.cs" />
@@ -591,13 +591,13 @@
     <Compile Include="Tools\Targeting\Enums.cs" />
     <Compile Include="Tools\Targeting\TeammateSupport.cs" />
     <Compile Include="UCC\Actions\PluggedSkill.cs" />
-    <Compile Include="UCC\Classes\IUccActionTreeNode.cs" />
-    <Compile Include="UCC\Classes\IUccPriorityTreeNode.cs" />
-    <Compile Include="UCC\Classes\IUccTreeNode.cs" />
-    <Compile Include="UCC\Classes\UccActionPackTreeNode.cs" />
-    <Compile Include="UCC\Classes\UccActionTreeNode.cs" />
-    <Compile Include="UCC\Classes\UccConditionPackTreeNode.cs" />
-    <Compile Include="UCC\Classes\UccConditionTreeNode.cs" />
+    <Compile Include="UCC\Editor\TreeViewCustomization\IUccActionTreeNode.cs" />
+    <Compile Include="UCC\Editor\TreeViewCustomization\IUccPriorityTreeNode.cs" />
+    <Compile Include="UCC\Editor\TreeViewCustomization\IUccTreeNode.cs" />
+    <Compile Include="UCC\Editor\TreeViewCustomization\UccActionPackTreeNode.cs" />
+    <Compile Include="UCC\Editor\TreeViewCustomization\UccActionTreeNode.cs" />
+    <Compile Include="UCC\Editor\TreeViewCustomization\UccConditionPackTreeNode.cs" />
+    <Compile Include="UCC\Editor\TreeViewCustomization\UccConditionTreeNode.cs" />
     <Compile Include="UCC\Conditions\CheckPowerState.cs" />
     <Compile Include="UCC\IUccConditionPack.cs" />
     <Compile Include="UCC\Enums.cs" />
@@ -664,7 +664,7 @@
     <EmbeddedResource Include="Forms\TargetSelectForm.resx">
       <DependentUpon>TargetSelectForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\UccEditor.resx">
+    <EmbeddedResource Include="UCC\Editor\UccEditor.resx">
       <DependentUpon>UccEditor.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\UIViewer.resx">

@@ -1,4 +1,4 @@
-﻿namespace EntityTools.UCC.Classes
+﻿namespace EntityTools.UCC.Editor.TreeViewCustomization
 {
     /// <summary>
     /// Вспомогательный интерфейс для отображения элементов UCC-профиля

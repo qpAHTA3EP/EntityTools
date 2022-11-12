@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 using ACTP0Tools.Classes.Quester;
-using EntityCore.Quester.Editor.TreeViewExtension;
 using MyNW.Classes;
 using QuesterAction = Astral.Quester.Classes.Action;
 
-namespace EntityTools.Quester.Editor.TreeViewExtension
+namespace EntityTools.Quester.Editor.TreeViewCustomization
 {
     public abstract class ActionBaseTreeNode : TreeNode, ITreeNode<QuesterAction>
     {
@@ -32,6 +32,7 @@ namespace EntityTools.Quester.Editor.TreeViewExtension
                 nodes.CopyTo(condNodes, 0);
                 conditionTreeNodes = condNodes;
             }
+            else conditionTreeNodes = Array.Empty<TreeNode>();
         }
         protected TreeNode[] conditionTreeNodes;
 

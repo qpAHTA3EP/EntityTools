@@ -1,17 +1,18 @@
-﻿using ACTP0Tools.Reflection;
+﻿using System;
+using System.Text;
+using System.Windows.Forms;
+using ACTP0Tools.Reflection;
 using Astral.Logic.UCC.Classes;
 using DevExpress.XtraEditors;
+using EntityCore.Forms;
 using EntityTools.Enums;
 using EntityTools.Tools.Extensions;
 using EntityTools.UCC.Actions;
 using EntityTools.UCC.Conditions;
-using System;
-using System.Text;
-using System.Windows.Forms;
 using ConditionList = System.Collections.ObjectModel.ObservableCollection<Astral.Logic.UCC.Classes.UCCCondition>;
 using UCCEditor = Astral.Logic.UCC.Forms.Editor;
 
-namespace EntityCore.Forms
+namespace EntityTools.Forms
 {
     public partial class ConditionListForm : XtraForm
     {

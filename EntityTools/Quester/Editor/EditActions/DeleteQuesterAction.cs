@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
-using EntityCore.Quester.Editor.TreeViewExtension;
-using EntityTools.Quester.Editor.TreeViewExtension;
+using EntityTools.Quester.Editor.TreeViewCustomization;
 
 namespace EntityTools.Quester.Editor
 {

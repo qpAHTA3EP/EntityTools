@@ -3,15 +3,10 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
-
 using ACTP0Tools.Reflection;
-
 using Astral.Logic.UCC.Classes;
-
 using DevExpress.XtraEditors;
-
-using EntityCore.Forms;
-
+using EntityTools.UCC.Editor;
 using HarmonyLib;
 
 namespace EntityTools.Patches.Quester

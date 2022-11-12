@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Reflection;
-
 using ACTP0Tools.Reflection;
-
 using Astral.Logic.UCC.Classes;
 using Astral.Logic.UCC.Panels;
-
-using EntityCore.Forms;
-
 using EntityTools.UCC.Conditions;
-
+using EntityTools.UCC.Editor;
 using HarmonyLib;
 // ReSharper disable InconsistentNaming
 

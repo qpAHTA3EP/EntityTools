@@ -5,9 +5,8 @@ using ACTP0Tools.Reflection;
 
 using DevExpress.XtraEditors;
 
-using EntityTools.Quester.Editor;
-
 using HarmonyLib;
+using QuesterEditor = EntityTools.Quester.Editor.QuesterEditor;
 
 namespace EntityTools.Patches.Quester
 {

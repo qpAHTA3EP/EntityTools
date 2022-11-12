@@ -1,4 +1,13 @@
-﻿using ACTP0Tools;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Windows.Forms;
+using ACTP0Tools;
 using ACTP0Tools.Classes.Quester;
 using ACTP0Tools.Patches;
 using ACTP0Tools.Reflection;
@@ -15,27 +24,18 @@ using DevExpress.XtraEditors.Controls;
 using DevExpress.XtraGrid.Views.Grid;
 using DevExpress.XtraGrid.Views.Grid.ViewInfo;
 using EntityCore.Forms;
-using EntityCore.Quester.Editor.TreeViewExtension;
 using EntityCore.Tools;
 using EntityTools.Annotations;
 using EntityTools.Enums;
 using EntityTools.Forms;
 using EntityTools.Patches.Mapper;
 using EntityTools.Quester.Editor.Classes;
-using EntityTools.Quester.Editor.TreeViewExtension;
+using EntityTools.Quester.Editor.TreeViewCustomization;
 using EntityTools.Tools;
 using MyNW.Classes;
 using MyNW.Internals;
 using MyNW.Patchables.Enums;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Windows.Forms;
+
 using QuesterAction = Astral.Quester.Classes.Action;
 using QuesterCondition = Astral.Quester.Classes.Condition;
 
@@ -190,9 +190,8 @@ namespace EntityTools.Quester.Editor
         }
 
         /// <summary>
-        /// Отображение профиля <paramref name="profile"/> в окне редактора.
+        /// Отображение профиля <see cref="Profile"/> в окне редактора.
         /// </summary>
-        /// <param name="profile"></param>
         private void UI_fill()
         {
             if (profile is null)
@@ -315,6 +314,7 @@ namespace EntityTools.Quester.Editor
             mapperForm?.Close();
         }
         #endregion
+
 
 
 
@@ -561,6 +561,7 @@ namespace EntityTools.Quester.Editor
 
 
 
+
         #region Conditions  manipulation
         private void handler_Condition_ButtonClick(object sender, DevExpress.XtraBars.Docking2010.ButtonEventArgs e)
         {
@@ -747,11 +748,18 @@ namespace EntityTools.Quester.Editor
             txtLog.AppendText("\nThe condition list is empty.");
         }
 
-        private void handler_Condition_Selected(object sender, TreeViewEventArgs e)
+        private void handler_Condition_Selecting(object sender, TreeViewCancelEventArgs e)
         {
             if (treeConditions.SelectedNode is ConditionBaseTreeNode node)
             {
                 InvokeConditionCallback();
+            }
+        }
+
+        private void handler_Condition_Selected(object sender, TreeViewEventArgs e)
+        {
+            if (treeConditions.SelectedNode is ConditionBaseTreeNode node)
+            {
                 SetSelectedConditionTo(node);
             }
         }
@@ -848,7 +856,7 @@ namespace EntityTools.Quester.Editor
                     TestAllActions(sender);
                     break;
                 case "Edit XML":
-                    EditActionXML(sender);
+                    EditActionXml(sender);
                     break;
             }
         }
@@ -973,7 +981,7 @@ namespace EntityTools.Quester.Editor
                 "Not implemented yet.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        private void EditActionXML(object sender, EventArgs e = null)
+        private void EditActionXml(object sender, EventArgs e = null)
         {
             InvokeActionCallback();
 
@@ -998,11 +1006,15 @@ namespace EntityTools.Quester.Editor
             }
         }
 
+        private void handler_Action_Selecting(object sender, TreeViewCancelEventArgs e)
+        {
+            InvokeActionCallback();
+        }
+
         private void handler_Action_Selected(object sender, TreeViewEventArgs e)
         {
             if (e.Node is ActionBaseTreeNode node)
             {
-                InvokeActionCallback();
                 SetSelectedActionTo(node);
             }
         }
@@ -1802,7 +1814,7 @@ namespace EntityTools.Quester.Editor
             
         }
         
-        private bool IsNodeMatchFilter(TreeNode node, string filter)
+        private static bool IsNodeMatchFilter(TreeNode node, string filter)
         {
             if (node.Text.IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0)
                 return true;

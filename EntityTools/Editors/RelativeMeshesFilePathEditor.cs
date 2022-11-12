@@ -4,7 +4,6 @@ using System.Drawing.Design;
 using System.IO;
 using System.Windows.Forms;
 using ACTP0Tools.Reflection;
-using EntityCore.Quester.Editor;
 using FileTools = ACTP0Tools.Classes.FileTools;
 using QuesterEditor = EntityTools.Quester.Editor.QuesterEditor;
 

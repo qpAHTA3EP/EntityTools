@@ -6,7 +6,7 @@ using Astral.Classes;
 using Astral.Quester.Classes;
 using Astral.Quester.UIEditors;
 
-namespace EntityTools.Quester.Editor.TreeViewExtension
+namespace EntityTools.Quester.Editor.TreeViewCustomization
 {
     public interface IQuesterAction
     {

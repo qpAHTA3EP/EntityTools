@@ -1,21 +1,22 @@
-﻿using ACTP0Tools;
-using ACTP0Tools.Reflection;
-using Astral.Logic.UCC.Classes;
-using Astral.Logic.UCC.Forms;
-using DevExpress.XtraEditors;
-using EntityCore.Tools;
-using EntityTools.Tools;
-using EntityTools.UCC.Conditions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using EntityTools.UCC.Classes;
+using ACTP0Tools;
+using ACTP0Tools.Reflection;
+using Astral.Logic.UCC.Classes;
+using Astral.Logic.UCC.Forms;
+using DevExpress.XtraEditors;
+using EntityCore.Forms;
+using EntityCore.Tools;
+using EntityTools.Tools;
+using EntityTools.UCC.Conditions;
+using EntityTools.UCC.Editor.TreeViewCustomization;
 
-namespace EntityCore.Forms
+namespace EntityTools.UCC.Editor
 {
     public partial class UccEditor : XtraForm
     {

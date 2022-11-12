@@ -1,9 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Drawing.Design;
-
-using EntityCore.Forms;
-
+using EntityTools.Forms;
 using EntityTools.UCC.Actions;
 using EntityTools.UCC.Conditions;
 

@@ -56,8 +56,7 @@ namespace ACTP0Tools.Reflection
             return result;
         }
 
-        private static object CreateDeepCopyInternal(Dictionary<object, object> state,
-            object o)
+        private static object CreateDeepCopyInternal(Dictionary<object, object> state, object o)
         {
             if (state.TryGetValue(o, out object exist_object))
                 return exist_object;

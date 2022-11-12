@@ -7,8 +7,7 @@ using EntityTools.Enums;
 using EntityTools.Quester.Conditions;
 using QuesterCondition = Astral.Quester.Classes.Condition;
 
-
-namespace EntityTools.Quester.Editor.TreeViewExtension
+namespace EntityTools.Quester.Editor.TreeViewCustomization
 {
     /// <summary>
     /// Узел дерева, отображающий <see cref="ConditionPack"/>

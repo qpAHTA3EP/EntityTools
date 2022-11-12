@@ -1,9 +1,8 @@
 ﻿using System.Windows.Forms;
 using ACTP0Tools.Classes.Quester;
-using EntityCore.Quester.Editor.TreeViewExtension;
 using QuesterCondition = Astral.Quester.Classes.Condition;
 
-namespace EntityTools.Quester.Editor.TreeViewExtension
+namespace EntityTools.Quester.Editor.TreeViewCustomization
 {
     public abstract class ConditionBaseTreeNode : TreeNode, ITreeNode<QuesterCondition>
     {

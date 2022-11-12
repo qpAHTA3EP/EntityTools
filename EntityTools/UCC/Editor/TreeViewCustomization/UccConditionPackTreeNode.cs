@@ -6,7 +6,7 @@ using Astral.Logic.UCC.Classes;
 using EntityCore.Tools;
 using EntityTools.UCC.Conditions;
 
-namespace EntityTools.UCC.Classes
+namespace EntityTools.UCC.Editor.TreeViewCustomization
 {
     /// <summary>
     /// Узел дерева, отображающий <see cref="UCCConditionPack"/>

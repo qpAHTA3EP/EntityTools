@@ -1,4 +1,4 @@
-﻿namespace EntityTools.Quester.Editor.TreeViewExtension
+﻿namespace EntityTools.Quester.Editor.TreeViewCustomization
 {
     /// <summary>
     /// Вспомогательный интерфейс для отображения элементов quester-профиля

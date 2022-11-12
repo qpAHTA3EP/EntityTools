@@ -1,10 +1,10 @@
-﻿using DevExpress.XtraBars;
+﻿using System.Windows.Forms;
+using DevExpress.XtraBars;
 using DevExpress.XtraBars.Docking;
 using DevExpress.XtraBars.Docking2010;
 using DevExpress.XtraBars.Docking2010.Views.Tabbed;
-using System.Windows.Forms;
 
-namespace EntityCore.Forms
+namespace EntityTools.UCC.Editor
 {
     partial class UccEditor
     {

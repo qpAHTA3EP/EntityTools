@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
-using EntityCore.Quester.Editor.TreeViewExtension;
-using EntityTools.Quester.Editor.TreeViewExtension;
+using EntityTools.Quester.Editor.TreeViewCustomization;
 
 namespace EntityTools.Quester.Editor
 {
@@ -17,9 +16,9 @@ namespace EntityTools.Quester.Editor
             private ActionBaseTreeNode parentNodeBeforeMoving;
             private int nodeIndexBeforeMoving;
 
-            private readonly EditActionEvent onApply;
-            private readonly EditActionEvent onRedo;
-            public MoveQuesterAction(ActionBaseTreeNode movingNode, ActionBaseTreeNode targetNode, bool suppressMovingIn, EditActionEvent onApply = null, EditActionEvent onRedo = null)
+            private readonly Editor.QuesterEditor.EditActionEvent onApply;
+            private readonly Editor.QuesterEditor.EditActionEvent onRedo;
+            public MoveQuesterAction(ActionBaseTreeNode movingNode, ActionBaseTreeNode targetNode, bool suppressMovingIn, Editor.QuesterEditor.EditActionEvent onApply = null, Editor.QuesterEditor.EditActionEvent onRedo = null)
             {
                 this.movingNode = movingNode ?? throw new ArgumentException(nameof(movingNode));
                 this.targetNode = targetNode ?? throw new ArgumentException(nameof(targetNode));

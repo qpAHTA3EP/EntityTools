@@ -5,14 +5,13 @@ using System.Windows.Forms;
 using ACTP0Tools.Classes.Quester;
 using ACTP0Tools.Patches;
 using ACTP0Tools.Reflection;
-using EntityCore.Quester.Editor.TreeViewExtension;
 using EntityCore.Tools;
 using MyNW.Classes;
 using QuesterAction = Astral.Quester.Classes.Action;
 using QuesterCondition = Astral.Quester.Classes.Condition;
 
 
-namespace EntityTools.Quester.Editor.TreeViewExtension
+namespace EntityTools.Quester.Editor.TreeViewCustomization
 {
 
     /// <summary>

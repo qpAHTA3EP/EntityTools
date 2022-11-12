@@ -6,13 +6,12 @@ using ACTP0Tools.Classes.Quester;
 using ACTP0Tools.Reflection;
 using Astral.Quester.Classes;
 using EntityCore.Tools;
-using EntityTools.Quester.Editor.TreeViewExtension;
 using MyNW.Classes;
 using QuesterAction = Astral.Quester.Classes.Action;
 using QuesterCondition = Astral.Quester.Classes.Condition;
 
 
-namespace EntityCore.Quester.Editor.TreeViewExtension
+namespace EntityTools.Quester.Editor.TreeViewCustomization
 {
     /// <summary>
     /// Узел дерева, отображающий <see cref="ActionPack"/>

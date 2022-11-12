@@ -3,12 +3,11 @@ using System.Text;
 using ACTP0Tools.Classes.Quester;
 using ACTP0Tools.Reflection;
 using Astral.Quester.Classes.Conditions;
-using EntityCore.Quester.Editor.TreeViewExtension;
 using EntityTools.Extensions;
 using MyNW.Internals;
 using QuesterCondition = Astral.Quester.Classes.Condition;
 
-namespace EntityTools.Quester.Editor.TreeViewExtension
+namespace EntityTools.Quester.Editor.TreeViewCustomization
 {
     /// <summary>
     /// Узел дерева, отображающий <see cref="QuesterCondition"/>

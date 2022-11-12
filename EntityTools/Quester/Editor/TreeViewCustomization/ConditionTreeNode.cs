@@ -2,7 +2,7 @@
 using ACTP0Tools.Reflection;
 using QuesterCondition = Astral.Quester.Classes.Condition;
 
-namespace EntityTools.Quester.Editor.TreeViewExtension
+namespace EntityTools.Quester.Editor.TreeViewCustomization
 {
     /// <summary>
     /// Узел дерева, отображающий <see cref="QuesterCondition"/>
