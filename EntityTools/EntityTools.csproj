@@ -44,8 +44,8 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\References\x64\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;DEVELOPER, NOT_ENCRYPTED_CORE, PATCH_ASTRAL, ENTITYTOOLS, NO_PATCH_LOG</DefineConstants>
+    <OutputPath>..\..\References\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;DEVELOPER, PATCH_ASTRAL, ENTITYTOOLS, NO_PATCH_LOG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x64</PlatformTarget>
@@ -57,7 +57,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\References\x64\</OutputPath>
+    <OutputPath>..\..\References\</OutputPath>
     <DefineConstants>TRACE;DEVELOPER, NOT_ENCRYPTED_CORE, PATCH_ASTRAL, ENTITYTOOLS, NO_PATCH_LOG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -106,7 +106,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Encrypted_Debug|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>..\References\x64\</OutputPath>
+    <OutputPath>..\..\References\</OutputPath>
     <DefineConstants>TRACE;DEBUG;DEVELOPER, ENCRYPTED_CORE, PATCH_ASTRAL, HARMONY, ENTITYTOOLS, NO_PATCH_LOG</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DebugType>full</DebugType>
@@ -130,7 +130,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Encrypted_Release|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>..\References\x64\</OutputPath>
+    <OutputPath>..\..\References\</OutputPath>
     <DefineConstants>DEVELOPER, ENCRYPTED_CORE, PATCH_ASTRAL, HARMONY, ENTITYTOOLS, NO_PATCH_LOG</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DebugType>full</DebugType>
@@ -161,8 +161,7 @@
     </Reference>
     <Reference Include="Astral_patched, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\References\x64\Astral_patched.exe</HintPath>
-      <Private>False</Private>
+      <HintPath>..\References\Astral_patched.exe</HintPath>
     </Reference>
     <Reference Include="DevExpress.Data.v21.2, Version=21.2.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -199,9 +198,9 @@
       <HintPath>..\..\..\References\x64\MyMemory-x64.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="MyNW">
-      <HintPath>..\..\..\References\x64\MyNW.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="MyNW, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\MyNW.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -719,7 +718,12 @@
   <ItemGroup>
     <None Include="Resources\NodeTools.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\AMClient\AMClient.csproj">
+      <Project>{fd0c9e2a-5d26-43aa-a227-bddaf9c30705}</Project>
+      <Name>AMClient</Name>
+    </ProjectReference>
+  </ItemGroup>
   <ItemGroup>
     <Content Include="Patches\Patcher.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
@@ -801,13 +805,6 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\AMClient\AMClient.csproj">
-      <Project>{fd0c9e2a-5d26-43aa-a227-bddaf9c30705}</Project>
-      <Name>AMClient</Name>
-      <Private>False</Private>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

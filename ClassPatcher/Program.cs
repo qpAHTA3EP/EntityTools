@@ -135,7 +135,9 @@ namespace ClassPatcher
                         break;
                 }
             }
-            else patch_astral("Astral.exe");            
+            else patch_astral("Astral.exe");
+
+            Console.ReadKey();
         }
 
         private static bool patch_astral(string fileName)

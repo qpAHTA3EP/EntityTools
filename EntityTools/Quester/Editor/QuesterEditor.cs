@@ -653,7 +653,7 @@ namespace EntityTools.Quester.Editor
                 if (conditionNode.AllowChildren)
                     conditionListChangedCallback?.Invoke(treeConditions.Nodes);
                     
-                conditionCache = CopyHelper.CreateDeepCopy(conditionNode.Content);
+                conditionCache = conditionNode.Content.CreateDeepCopy();
             }
         }
 
@@ -664,7 +664,7 @@ namespace EntityTools.Quester.Editor
                 InvokeConditionCallback();
 
                 // Добавляем команду
-                var newCondition = CopyHelper.CreateDeepCopy(conditionCache);
+                var newCondition = conditionCache.CreateDeepCopy();
                 var newNode = newCondition.MakeTreeNode();
                 var selectedNode = treeConditions.SelectedNode as ConditionBaseTreeNode;
                 
@@ -896,9 +896,10 @@ namespace EntityTools.Quester.Editor
 
                 ResetSelectedAction();
 
-                var editAction = new DeleteQuesterAction(actionNode);
+                var deleteAction = new DeleteQuesterAction(actionNode);
+                deleteAction.Apply();
 
-                AfterQuesterActionEdited(editAction);
+                AfterQuesterActionEdited(deleteAction);
             }
         }
 
@@ -916,11 +917,9 @@ namespace EntityTools.Quester.Editor
             {
                 InvokeActionCallback();
 
-                if (actionNode.AllowChildren)
-                    actionNode.ReconstructInternal();
+                var action = actionNode.ReconstructInternal();
 
-                var action = actionNode.Content;
-                actionCache = CopyHelper.CreateDeepCopy(action);
+                actionCache = action.CreateDeepCopy();
             }
         }
 
@@ -931,7 +930,7 @@ namespace EntityTools.Quester.Editor
                 InvokeActionCallback();
 
                 // Добавляем команду
-                var newAction = CopyHelper.CreateDeepCopy(actionCache);
+                var newAction = actionCache.CreateDeepCopy();
                 var newNode = newAction.MakeTreeNode(profile);
                 newNode.NewID();
 
@@ -1234,7 +1233,22 @@ namespace EntityTools.Quester.Editor
             var saved = profile.Saved;
             if (saved || SaveProfile())
             {
-                txtLog.AppendText(string.Concat("[", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+#if true
+                var actualProfile = profile.GetProfile().CreateDeepCopy();
+                AstralAccessors.Quester.Core.SetProfile(actualProfile, profile.FileName);
+#else
+                AstralAccessors.Quester.Core.Profile = CopyHelper.CreateDeepCopy(profile.GetProfile());
+                var fileName = profile.FileName;
+                Astral.API.CurrentSettings.LastQuesterProfile = fileName;
+                Astral.Controllers.Settings.Get.LastQuesterProfile = string.IsNullOrEmpty(fileName)
+                    ? string.Empty
+                    : Path.GetFileName(profile.FileName);
+                if (AstralAccessors.Controllers.Roles.IsRunning)
+                    AstralAccessors.Controllers.Roles.ToggleRole(true);
+                AstralAccessors.Quester.Entrypoint.RefreshQuesterMainPanel(); 
+#endif
+                txtLog.AppendText(
+                    string.Concat("[", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
                     "] Profile",
                     string.IsNullOrEmpty(profile.FileName)
                         ? string.Empty
@@ -1242,15 +1256,8 @@ namespace EntityTools.Quester.Editor
                     saved ? string.Empty : " saved and",
                     " uploaded to the Quester-engine.",
                     Environment.NewLine));
+
                 UpdateWindowCaption();
-                AstralAccessors.Quester.Core.Profile = CopyHelper.CreateDeepCopy(profile.GetProfile());
-                var fileName = profile.FileName;
-                Astral.Controllers.Settings.Get.LastQuesterProfile = string.IsNullOrEmpty(fileName) 
-                    ? string.Empty
-                    : Path.GetFileName(profile.FileName);
-                if(AstralAccessors.Controllers.Roles.IsRunning)
-                    AstralAccessors.Controllers.Roles.ToggleRole(true);
-                AstralAccessors.Quester.Entrypoint.RefreshQuesterMainPanel();
             }
             else
             {
@@ -1263,15 +1270,14 @@ namespace EntityTools.Quester.Editor
             var saved = profile.Saved;
             if (saved || SaveProfile())
             {
-                txtLog.AppendText(string.Concat("[", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
-                    "] Profile",
-                    string.IsNullOrEmpty(profile.FileName)
-                        ? string.Empty
-                        : " '" + profile.FileName + "'",
-                    saved ? string.Empty : " saved and",
-                    " uploaded to the Quester-engine.",
-                    Environment.NewLine));
-                UpdateWindowCaption();
+#if true
+                var actualProfile = profile.GetProfile().CreateDeepCopy();
+                var actionId = treeActions.SelectedNode is ActionBaseTreeNode selectedNode
+                                 ? selectedNode.Content.ActionID
+                                 : Guid.Empty;
+
+                AstralAccessors.Quester.Core.SetProfile(actualProfile, profile.FileName, actionId);
+#else
                 var actualProfile = CopyHelper.CreateDeepCopy(profile.GetProfile());
                 AstralAccessors.Quester.Core.Profile = actualProfile;
                 var fileName = profile.FileName;
@@ -1282,7 +1288,18 @@ namespace EntityTools.Quester.Editor
                     AstralAccessors.Controllers.Roles.ToggleRole(true);
                 if (treeActions.SelectedNode is ActionBaseTreeNode selectedNode)
                     QuesterHelper.SetStartPoint(actualProfile.MainActionPack, selectedNode.Content.ActionID);
-                AstralAccessors.Quester.Entrypoint.RefreshQuesterMainPanel();
+                AstralAccessors.Quester.Entrypoint.RefreshQuesterMainPanel(); 
+#endif
+                txtLog.AppendText(string.Concat("[", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+                    "] Profile",
+                    string.IsNullOrEmpty(profile.FileName)
+                        ? string.Empty
+                        : " '" + profile.FileName + "'",
+                    saved ? string.Empty : " saved and",
+                    " uploaded to the Quester-engine.",
+                    Environment.NewLine));
+
+                UpdateWindowCaption();
             }
             else
             {
@@ -1485,7 +1502,7 @@ namespace EntityTools.Quester.Editor
 
                 profile.Saved = false;
                 UpdateWindowCaption();
-
+                //TODO Обновление ActionTreeNode при пустом списке HotSpot's
                 gridViewHotSpots.RefreshData();
                 gridViewHotSpots.EndUpdate();
             }

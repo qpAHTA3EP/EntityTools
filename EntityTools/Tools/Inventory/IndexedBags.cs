@@ -23,7 +23,7 @@ namespace EntityTools.Tools.Inventory
         public IndexedBags(IEnumerable<ItemFilterEntryExt> filters, BagsList bags)
         {
             AnalizeFilters(filters);
-            _bags = CopyHelper.CreateDeepCopy(bags);
+            _bags = bags.Clone();
         }
         public IndexedBags(IEnumerable<ItemFilterEntryExt> filters, InvBagIDs[] bagsIds)
         {

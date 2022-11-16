@@ -20,7 +20,7 @@ namespace EntityTools.UCC.Editor.TreeViewCustomization
 
         public UccActionTreeNode(UCCAction action, bool clone = false)
         {
-            var act = clone ? CopyHelper.CreateDeepCopy(action) : action;
+            var act = clone ? action.CreateDeepCopy() : action;
             Tag = act;
             SelectIcon(act);
             var txt = act.Label;
@@ -129,7 +129,7 @@ namespace EntityTools.UCC.Editor.TreeViewCustomization
         public override object Clone()
         {
             //TODO: Добави реконструкцию списка условий
-            return new UccActionTreeNode(CopyHelper.CreateDeepCopy(ReconstructInternal()));
+            return new UccActionTreeNode(ReconstructInternal().CreateDeepCopy());
         }
 
         /// <summary>

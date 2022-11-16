@@ -311,7 +311,7 @@ namespace EntityTools.Tools.Inventory
         public BagsList Clone()
         {
             BagsList newBags = new BagsList();
-            newBags._bags = CopyHelper.CreateDeepCopy(_bags);
+            newBags._bags = (BitArray)_bags.Clone();
             return newBags;
         }
 

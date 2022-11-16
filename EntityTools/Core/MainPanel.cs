@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using System.Xml.Serialization;
 using ACTP0Tools;
 using ACTP0Tools.Patches;
+using ACTP0Tools.Reflection;
 using Astral;
 using Astral.Classes.ItemFilter;
 using Astral.Controllers;
@@ -228,13 +229,19 @@ namespace EntityTools.Core
             }
 
             XtraMessageBox.Show(sb.ToString()); 
-#else
+#elif false
             var id = tbText.Text;
             var slot = EntityManager.LocalPlayer.AllItems.FirstOrDefault(s =>
                 s.Filled && s.Item.ItemDef.InternalName == id);
             if (slot!= null)
                 XtraMessageBox.Show($@"ItemLevel: {slot.Item.ItemProgression_GetItemLevel()}");
             else XtraMessageBox.Show($@"No item '{id}' found");
+#elif true
+            var path = @"d:\ASTRAL\Astral_RU_1\Profiles\Campaigns\M18_M19_Avernus\M19_Fallen.amp.zip";
+            var profile = AstralAccessors.Quester.Core.Load(ref path);
+
+            var profile1 = profile.CreateDeepCopy();
+            var profile2 = profile.CreateXmlCopy();
 #endif
         }
 

@@ -20,14 +20,14 @@ namespace EntityTools.UCC.Editor.TreeViewCustomization
 
         public UccActionPackTreeNode(UCCActionPack actionPack, bool clone = false)
         {
-            UCCActionPack actPack = clone ? CopyHelper.CreateDeepCopy(actionPack) : actionPack;
+            UCCActionPack actPack = clone ? actionPack.CreateDeepCopy() : actionPack;
             Tag = actPack;
             Text = actPack.ToString();
             //BackColor = SystemColors.ControlDark;
             ImageKey = "Box";
             SelectedImageKey = "Box";
             Checked = actPack.Enabled;
-            Nodes.AddRange(actPack.Actions.ToTreeNodes());
+            Nodes.AddRange(actPack.Actions.ToUccTreeNodes());
 
             //_conditionTreeNodes = ReconstructInternal().Conditions.ToTreeNodes().ToArray();
         }

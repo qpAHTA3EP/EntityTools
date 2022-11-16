@@ -41,7 +41,7 @@ namespace EntityTools.Tools.Targeting
             _label = string.Empty;
         }
 
-        public override void Dispose()
+        protected override void InternalDispose()
         {
             if (_entitySelector != null)
             {

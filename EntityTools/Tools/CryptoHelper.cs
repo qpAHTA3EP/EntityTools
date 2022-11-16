@@ -2,6 +2,7 @@
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+
 #if ENCRYPTOR
 using Extensions;
 using Encrypter;

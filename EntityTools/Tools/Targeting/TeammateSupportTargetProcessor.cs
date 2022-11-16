@@ -36,7 +36,7 @@ namespace EntityTools.Tools.Targeting
             Reset();
         }
 
-        public override void Dispose()
+        protected override void InternalDispose()
         {
             if (_targetHelper != null)
             {

@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using ACTP0Tools;
 using ACTP0Tools.Classes.Quester;
-using ACTP0Tools.Reflection;
 using AStar;
 using Astral.Quester.Classes;
 using EntityTools.Editors;
@@ -25,9 +24,7 @@ namespace EntityTools.Quester.Editor.Classes
 
         public ProfileProxy(Profile profile, string fileName)
         {
-            _profile = profile is null 
-                     ? new Profile()
-                     : CopyHelper.CreateDeepCopy(profile);
+            _profile = profile ?? new Profile();
             _profile.Saved = true;
 
             if (!string.IsNullOrEmpty(fileName))

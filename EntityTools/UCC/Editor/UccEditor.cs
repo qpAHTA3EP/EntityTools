@@ -600,7 +600,7 @@ namespace EntityTools.UCC.Editor
             if (profileUnsaved)
                 SaveProfile("");
 
-            Astral.Logic.UCC.Core.Get.mProfil = CopyHelper.CreateDeepCopy(uccProfile);
+            Astral.Logic.UCC.Core.Get.mProfil = uccProfile.CreateDeepCopy();
         }
 
         /// <summary>
@@ -618,13 +618,13 @@ namespace EntityTools.UCC.Editor
             if (profile.ActionsCombat?.Count > 0)
             {
                 treeCombatActions.Nodes.Clear();
-                treeCombatActions.Nodes.AddRange(profile.ActionsCombat.ToTreeNodes(true));
+                treeCombatActions.Nodes.AddRange(profile.ActionsCombat.ToUccTreeNodes(true));
             }
             // Отображение дерева умений, 
             if (profile.ActionsPatrol?.Count > 0)
             {
                 treePatrolActions.Nodes.Clear();
-                treePatrolActions.Nodes.AddRange(profile.ActionsPatrol.ToTreeNodes(true));
+                treePatrolActions.Nodes.AddRange(profile.ActionsPatrol.ToUccTreeNodes(true));
             }
             // Отображение тактики
             {
@@ -806,7 +806,7 @@ namespace EntityTools.UCC.Editor
             if (treeConditions.SelectedNode?.Tag is UCCCondition uccCondition)
             {
                 propertyCallback?.Invoke();
-                uccConditionCache = CopyHelper.CreateDeepCopy(uccCondition);
+                uccConditionCache = uccCondition.CreateDeepCopy();
             }
         }
 
@@ -817,7 +817,7 @@ namespace EntityTools.UCC.Editor
                 propertyCallback?.Invoke();
 
                 // Добавляем UCC-команду
-                var newCondition = CopyHelper.CreateDeepCopy(uccConditionCache);
+                var newCondition = uccConditionCache.CreateDeepCopy();
                 var newNode = newCondition.MakeTreeNode();
                 var selectedNode = treeConditions.SelectedNode;
                 if (selectedNode != null)
@@ -1126,7 +1126,7 @@ namespace EntityTools.UCC.Editor
                 propertyCallback?.Invoke();
 
                 // Копируем ucc-команду
-                uccActionCache = uccAction.Clone(); //CopyHelper.CreateDeepCopy(uccAction);
+                uccActionCache = uccAction.Clone(); //uccAction.CreateBinaryCopy();
             }
         }
 
@@ -1145,7 +1145,7 @@ namespace EntityTools.UCC.Editor
                 propertyCallback?.Invoke();
 
                 // Добавляем UCC-команду
-                var newAction = uccActionCache.Clone();//CopyHelper.CreateDeepCopy(uccActionCache);
+                var newAction = uccActionCache.Clone();//uccActionCache.CreateBinaryCopy();
                 var newNode = newAction.MakeTreeNode();
                 var selectedNode = selectedTreeView.SelectedNode;
                 if (selectedNode != null)
@@ -1374,13 +1374,13 @@ namespace EntityTools.UCC.Editor
                     if (e.KeyCode == Keys.C || e.KeyData == Keys.C)
                     {
                         if (listPriorities.SelectedItem is TargetPriorityEntry priorityEntry)
-                            targetPriorityCache = CopyHelper.CreateDeepCopy(priorityEntry);
+                            targetPriorityCache = priorityEntry.CreateDeepCopy();
                     }
                     else if (e.KeyCode == Keys.V || e.KeyData == Keys.V)
                     {
                         if (targetPriorityCache != null)
                         {
-                            var targetPriorityEntry = CopyHelper.CreateDeepCopy(targetPriorityCache);
+                            var targetPriorityEntry = targetPriorityCache.CreateDeepCopy();
                             var selectedPriorityInd = listPriorities.SelectedIndex;
                             if (selectedPriorityInd >= 0)
                                 listPriorities.Items.Insert(selectedPriorityInd + 1, targetPriorityEntry);

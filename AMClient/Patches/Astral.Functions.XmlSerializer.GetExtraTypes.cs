@@ -12,6 +12,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Xml.Serialization;
 using Action = Astral.Quester.Classes.Action;
 using Memory = MyNW.Memory;
 
@@ -167,13 +168,13 @@ namespace ACTP0Tools.Patches
                 _uccTargetSelectorTypes.Clear();
 
                 // Проверяем типы, объявленные в Астрале
-                FillTypeLists(Assembly.GetEntryAssembly()?.GetTypes());
+                CategorizeTypeLists(Assembly.GetEntryAssembly()?.GetTypes());
 
                 // Проверяем типы, объявленные в плагинах
                 var types = AstralAccessors.Controllers.Plugins.GetTypes();
                 //if (types != null && types.Count > 0)
                 if (types != null)
-                    FillTypeLists(types);
+                    CategorizeTypeLists(types);
             }
             catch (TypeLoadException ex)
             {
@@ -241,20 +242,33 @@ namespace ACTP0Tools.Patches
         /// </summary>
         private static bool _pluginsAssembliesLoaded;
 
-        static readonly Type tQuesterAction = typeof(Action);
-        static readonly Type tQuesterCondition = typeof(Condition);
-        
-        static readonly Type tSkillTrainAction = typeof(SkillTrainAction);
-        static readonly Type tMTAction = typeof(MTAction);
-        
-        static readonly Type tUccAction = typeof(UCCAction);
-        static readonly Type tUccCondition = typeof(UCCCondition);
-        //static readonly Type tUccTargetSelector = typeof(TargetSelector);
-        //static readonly Type tUccTargetProcessor = typeof(TargetProcessor);
-        static readonly Type tTargetPriorityEntry = typeof(TargetPriorityEntry);
+        private static readonly Type tQuesterProfile = typeof(Profile);
+        private static readonly Type tQuesterAction = typeof(Action);
+        private static readonly Type tQuesterCondition = typeof(Condition);
 
+        private static readonly Type tSkillTrainAction = typeof(SkillTrainAction);
+        private static readonly Type tMTAction = typeof(MTAction);
 
-        internal static void FillTypeLists(IEnumerable<Type> types)
+        private static readonly Type tUccProfile = typeof(Profil);
+        private static readonly Type tUccAction = typeof(UCCAction);
+        private static readonly Type tUccCondition = typeof(UCCCondition);
+        private static readonly Type tTargetPriorityEntry = typeof(TargetPriorityEntry);
+
+        public static XmlSerializer QuesterProfileSerializer => _questerProfileSerializer ?? (_questerProfileSerializer = new XmlSerializer(tQuesterProfile, QuesterTypes.ToArray()));
+        private static XmlSerializer _questerProfileSerializer;
+        public static XmlSerializer QuesterActionSerializer => _questerActionSerializer ?? (_questerActionSerializer = new XmlSerializer(tQuesterAction, QuesterTypes.ToArray()));
+        private static XmlSerializer _questerActionSerializer;
+        public static XmlSerializer QuesterConditionSerializer => _questerConditionSerializer ?? (_questerConditionSerializer = new XmlSerializer(tQuesterCondition, QuesterTypes.ToArray()));
+        private static XmlSerializer _questerConditionSerializer;
+
+        public static XmlSerializer UccProfileSerializer => _uccProfileSerializer ?? (_uccProfileSerializer = new XmlSerializer(tUccProfile, UccTypes.ToArray()));
+        private static XmlSerializer _uccProfileSerializer;
+        public static XmlSerializer UccActionSerializer => _uccActionSerializer ?? (_uccActionSerializer = new XmlSerializer(tUccAction, UccTypes.ToArray()));
+        private static XmlSerializer _uccActionSerializer;
+        public static XmlSerializer UccConditionSerializer => _uccConditionSerializer ?? (_uccConditionSerializer = new XmlSerializer(tUccCondition, UccTypes.ToArray()));
+        private static XmlSerializer _uccConditionSerializer;
+
+        internal static void CategorizeTypeLists(IEnumerable<Type> types)
         {
             if(types is null)
                 return;
@@ -289,13 +303,6 @@ namespace ACTP0Tools.Patches
                     _questerTypes.Add(type);
                     _questerConditions.Add(type);
                 }
-                //else if(tUccTargetSelector.IsAssignableFrom(type))
-                //{
-                //    UccTypes.Add(type);
-                //    QuesterTypes.Add(type);
-                //    UccTargetSelectorTypes.Add(type);
-                //}
-                //else 
                 else if (tQuesterAction.IsAssignableFrom(type))
                 {
                     _questerTypes.Add(type);

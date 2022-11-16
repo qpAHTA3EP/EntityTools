@@ -213,7 +213,7 @@ namespace EntityTools.Patches.Quester
 
             if (tempUccProfile.TargetPriorities?.Count > 0)
             {
-                var priorities = tempUccProfile.TargetPriorities.Select(CopyHelper.CreateDeepCopy).ToList();
+                var priorities = tempUccProfile.TargetPriorities.CreateDeepCopy();
                 if (tempPriorities.Key != currentUccProfile)
                     tempPriorities = new KeyValuePair<Profil, List<TargetPriorityEntry>>(currentUccProfile, priorities);
                 else tempPriorities.Value.AddRange(priorities);

@@ -137,29 +137,14 @@ namespace EntityTools.UCC.Actions
             switch (propertyName)
             {
                 case nameof(TargetSelector):
-                    _targetProcessor?.Dispose();
-                    var trgSelector = TargetSelector;
-                    switch (trgSelector)
-                    {
-                        case EntityTarget entityTarget:
-                            _targetProcessor = new EntityTargetProcessor(entityTarget, GetSpecialTeammateCheck());
-                            break;
-                        case TeammateSupport protectMember:
-                            _targetProcessor = new TeammateSupportTargetProcessor(protectMember, GetSpecialTeammateCheck());
-                            break;
-                        default:
-                            var prc = trgSelector.GetDefaultProcessor(this);
-                            if (prc != null)
-                                _targetProcessor = prc;
-                            else throw new Exception($"Can't realized the processor for the '{trgSelector.GetType()}'");
-                            break;
-                    }
+                    TargetProcessor?.Dispose();
+                    _targetProcessor = null;
                     break;
                 case nameof(Range):
-                    _targetProcessor.SpecialCheck = GetSpecialTeammateCheck();
+                    TargetProcessor.SpecialCheck = GetSpecialTeammateCheck();
                     break;
                 default:
-                    _targetProcessor.Reset();
+                    TargetProcessor.Reset();
                     break;
             }
 
@@ -175,13 +160,40 @@ namespace EntityTools.UCC.Actions
         }
 
         #region Данные
+        [XmlIgnore]
         [TypeConverter(typeof(ExpandableObjectConverter))]
-        public object PlayerTarget => new SimpleEntityWrapper(_targetProcessor.GetTarget());
+        public object PlayerTarget => new SimpleEntityWrapper(TargetProcessor.GetTarget());
 #if DEVELOPER && DEBUG_CHANGE_TARGET
 
         [TypeConverter(typeof(ExpandableObjectConverter))]
-        public TargetProcessor TargetProcessor => _targetProcessor;
+        public TargetProcessor TargetProcessor
+        {
+            get
+            {
+                if (_targetProcessor is null || _targetProcessor.IsDisposed)
+                {
+                    switch (TargetSelector)
+                    {
+                        case EntityTarget entityTarget:
+                            _targetProcessor = new EntityTargetProcessor(entityTarget, GetSpecialTeammateCheck());
+                            break;
+                        case TeammateSupport protectMember:
+                            _targetProcessor = new TeammateSupportTargetProcessor(protectMember, GetSpecialTeammateCheck());
+                            break;
+                        default:
+                            var prc = TargetSelector.GetDefaultProcessor(this);
+                            if (prc != null)
+                                _targetProcessor = prc;
+                            else throw new Exception($"Can't realized the processor for the '{TargetSelector.GetType()}'");
+                            break;
+                    }
+                }
+                return _targetProcessor;
+            }
+        }
 #endif
+        [XmlIgnore]
+        [NonSerialized]
         private TargetProcessor _targetProcessor;
 
         private string _idStr;
@@ -212,14 +224,14 @@ namespace EntityTools.UCC.Actions
                     var targetStr = target is null || !target.IsValid
                         ? "Target[NULL]"
                         : target.GetDebugString(EntityNameType.InternalName, "Target", EntityDetail.Alive | EntityDetail.Pointer | EntityDetail.Distance);
-                    bool isMatch = _targetProcessor.IsMatch(target);
+                    bool isMatch = TargetProcessor.IsMatch(target);
                     if (isMatch)
                     {
                         ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": ", targetStr, " is MATCH. Skip... "), true);
                         return false;
                     }
 
-                    var newTarget = _targetProcessor.GetTarget();
+                    var newTarget = TargetProcessor.GetTarget();
                     if (newTarget is null || !newTarget.IsValid)
                     {
                         ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": ", targetStr, " MISMATCH and no suitable target found. Skip... "), true);
@@ -233,16 +245,16 @@ namespace EntityTools.UCC.Actions
 
 #if CUSTOM_UCC_CONDITION_EDITOR
                 return ((ICustomUCCCondition)CustomConditions).IsOK(@this) &&
-                               _targetProcessor.IsTargetMismatchedAndCanBeChanged(target); 
+                               TargetProcessor.IsTargetMismatchedAndCanBeChanged(target); 
 #else
-                return _targetProcessor.IsTargetMismatchedAndCanBeChanged(target);
+                return TargetProcessor.IsTargetMismatchedAndCanBeChanged(target);
 #endif
             }
         }
 
         public override bool Run()
         {
-            var target = _targetProcessor.GetTarget();
+            var target = TargetProcessor.GetTarget();
 
             bool extendedDebugInfo = ExtendedDebugInfo;
             if (extendedDebugInfo)
@@ -266,9 +278,10 @@ namespace EntityTools.UCC.Actions
             return false;
         }
 
-        public Entity UnitRef => _targetProcessor.GetTarget() ?? Astral.Logic.UCC.Core.CurrentTarget;
+        [XmlIgnore]
+        public Entity UnitRef => TargetProcessor.GetTarget() ?? Astral.Logic.UCC.Core.CurrentTarget;
 
-        public override string ToString() => _targetProcessor.Label();
+        public override string ToString() => TargetProcessor.Label();
 
         #endregion
 

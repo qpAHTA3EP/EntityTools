@@ -52,6 +52,7 @@ namespace EntityTools.Core
             this.ckbETLogger = new System.Windows.Forms.CheckBox();
             this.bntOpenLogFile = new System.Windows.Forms.Button();
             this.cbEnchantHelperActivator = new System.Windows.Forms.CheckBox();
+            this.btnTest = new System.Windows.Forms.Button();
             this.btnTeamMonitor = new System.Windows.Forms.Button();
             this.btnUiViewer = new System.Windows.Forms.Button();
             this.btnQuesterEditor = new System.Windows.Forms.Button();
@@ -144,6 +145,7 @@ namespace EntityTools.Core
             // 
             this.tabUtilities.Controls.Add(this.gbxETLog);
             this.tabUtilities.Controls.Add(this.cbEnchantHelperActivator);
+            this.tabUtilities.Controls.Add(this.btnTest);
             this.tabUtilities.Controls.Add(this.btnTeamMonitor);
             this.tabUtilities.Controls.Add(this.btnUiViewer);
             this.tabUtilities.Controls.Add(this.btnQuesterEditor);
@@ -213,6 +215,21 @@ namespace EntityTools.Core
             this.cbEnchantHelperActivator.UseVisualStyleBackColor = true;
             this.cbEnchantHelperActivator.Visible = false;
             this.cbEnchantHelperActivator.CheckedChanged += new System.EventHandler(this.handler_EnchantHelperActivation);
+            // 
+            // btnTest
+            // 
+            this.btnTest.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnTest.FlatAppearance.BorderColor = System.Drawing.SystemColors.ButtonShadow;
+            this.btnTest.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnTest.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.btnTest.Location = new System.Drawing.Point(246, 201);
+            this.btnTest.Name = "btnTest";
+            this.btnTest.Size = new System.Drawing.Size(113, 40);
+            this.btnTest.TabIndex = 0;
+            this.btnTest.Text = "TEST";
+            this.btnTest.UseVisualStyleBackColor = true;
+            this.btnTest.Visible = false;
+            this.btnTest.Click += new System.EventHandler(this.handler_Test_1);
             // 
             // btnTeamMonitor
             // 
@@ -1051,5 +1068,6 @@ namespace EntityTools.Core
         private Button btnUcc;
         private Button btnQuesterEditor;
         private PropertyGrid propertyGrid;
+        private Button btnTest;
     }
 }

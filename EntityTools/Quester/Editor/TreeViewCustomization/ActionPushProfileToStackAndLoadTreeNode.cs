@@ -27,7 +27,7 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
         {
             if (!action.IsPushProfileToStackAndLoad())
                 throw new ArgumentException($"Action has type '{action.GetType().Name}' instead of the expected type 'PushProfileToStackAndLoad'");
-            var act = clone ? CopyHelper.CreateDeepCopy(action) : action;
+            var act = clone ? action.CreateDeepCopy() : action;
             Tag = act;
             this.action = act;
             UpdateView();
@@ -142,36 +142,24 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
         public override QuesterAction ReconstructInternal()
         {
             action.Disabled = !Checked;
+            action.InternalReset();
             if (conditionTreeNodes != null)
-                action.Conditions = conditionTreeNodes.ToListOf<QuesterCondition>();
+                action.Conditions = conditionTreeNodes.ToQuesterConditionList();
             return action;
         }
 
         public override object Clone()
         {
-            var newAction = CopyHelper.CreateDeepCopy(ReconstructInternal());
+            var newAction = ReconstructInternal().CreateDeepCopy();
             newAction.ActionID = Guid.NewGuid();
             return new ActionTreeNode(owner, newAction);
         }
 
-#if false
-        /// <summary>
-        /// Список узлов дерева, соответствующих условиям <see cref="QuesterAction"/>
-        /// </summary>
-        public TreeNode[] ConditionTreeNodes
-        {
-            get => _conditionTreeNodes ?? (_conditionTreeNodes = ReconstructInternal().Conditions
-                                                                                      .ToTreeNodes()
-                                                                                      .ToArray());
-            set => _conditionTreeNodes = value;
-        }
-#else
         public override TreeNode[] GetConditionTreeNodes()
         {
             return conditionTreeNodes ?? (conditionTreeNodes = ReconstructInternal().Conditions
                                                                                     .ToTreeNodes()
                                                                                     .ToArray());
         }
-#endif
     }
 }

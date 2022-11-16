@@ -16,6 +16,7 @@ using System.Threading;
 using System.Windows.Forms;
 using System.Xml.Serialization;
 using ACTP0Tools.Classes;
+using MyNW.Classes;
 
 // ReSharper disable InconsistentNaming
 // ReSharper disable RedundantAssignment
@@ -224,20 +225,7 @@ namespace ACTP0Tools
                 #region Profile
                 private static readonly MethodInfo originalSetProfile;
 
-                //private static readonly SaveFileDialog saveFileDialog = new SaveFileDialog
-                //{
-                //    InitialDirectory = Astral.Controllers.Directories.ProfilesPath,
-                //    DefaultExt = "amp.zip",
-                //    Filter = @"Astral mission profile (*.amp.zip)|*.amp.zip",
-                //};
-                //private static readonly OpenFileDialog openFileDialog = new OpenFileDialog
-                //{
-                //    InitialDirectory = Directories.ProfilesPath,
-                //    DefaultExt = "amp.zip",
-                //    Filter = @"Astral mission profile (*.amp.zip)|*.amp.zip"
-                //};
-
-                private static XmlSerializer profileXmlSerializer
+                private static XmlSerializer ProfileXmlSerializer
                 {
                     get
                     {
@@ -307,10 +295,10 @@ namespace ACTP0Tools
 
                     if (profile != null)
                     {
-                        Profile?.ResetCompleted();
+                        //Profile?.ResetCompleted();
                         Profile = profile;
 
-                        API.CurrentSettings.LastQuesterProfile = path;
+                        Astral.API.CurrentSettings.LastQuesterProfile = path;
                         // TODO Проверить не приводит ли следующая строка к некорректной работе AddIgnoredFoes
                         Logic.NW.Combats.BLAttackersList = null;
 
@@ -365,19 +353,17 @@ namespace ACTP0Tools
 
                                 using (var stream = zipProfileEntry.Open())
                                 {
-                                    //ACTP0Serializer.GetExtraTypes(out List<Type> types, 2);
-                                    //XmlSerializer serializer = new XmlSerializer(typeof(Profile), types.ToArray());
                                     if (Preprocessor.Active)
                                     {
                                         using (var profileStream = Preprocessor.Replace(stream, out mods))
                                         {
-                                            profile = profileXmlSerializer.Deserialize(profileStream) as Profile;
+                                            profile = ProfileXmlSerializer.Deserialize(profileStream) as Profile;
                                             if (mods > 0)
                                                 Logger.Notify(
                                                     $"There are {mods} modifications in the profile '{Path.GetFileName(profilePath)}'");
                                         }
                                     }
-                                    else profile = profileXmlSerializer.Deserialize(stream) as Profile;
+                                    else profile = ProfileXmlSerializer.Deserialize(stream) as Profile;
 
                                     if (profile is null)
                                     {
@@ -427,7 +413,8 @@ namespace ACTP0Tools
                 {
                     string currentProfileName = Astral.API.CurrentSettings.LastQuesterProfile;
                     string profileName = saveas ? string.Empty : currentProfileName;
-                    Save(Profile, _mapsMeshes, currentProfileName, ref profileName);
+                    if(Save(Profile, _mapsMeshes, currentProfileName, ref profileName))
+                        Astral.API.CurrentSettings.LastQuesterProfile = profileName;
                 }
 
                 /// <summary>
@@ -683,7 +670,7 @@ namespace ACTP0Tools
                         try
                         {
                             profile.Saved = true;
-                            profileXmlSerializer.Serialize(memStream, profile);
+                            ProfileXmlSerializer.Serialize(memStream, profile);
 
                             ZipArchiveEntry zipProfileEntry = null;
 
@@ -711,6 +698,39 @@ namespace ACTP0Tools
                         }
                     }
                     return false;
+                }
+
+                /// <summary>
+                /// Установка профиля в качестве активного профиля Quester'a
+                /// </summary>
+                public static void SetProfile(Profile profile, string profilePath, Guid actionId = default)
+                {
+                    if (profile is null)
+                        return;
+                  
+                    if (AstralAccessors.Controllers.Roles.IsRunning)
+                        AstralAccessors.Controllers.Roles.ToggleRole(true);
+
+                    AstralAccessors.Quester.Core.Profile = profile.CreateDeepCopy();
+                    
+                    Astral.API.CurrentSettings.LastQuesterProfile = profilePath;
+
+                    var allProfileMeshes = _mapsMeshes;
+                    lock (allProfileMeshes)
+                    {
+                        allProfileMeshes.Clear();
+                    }
+
+                    if (actionId != Guid.Empty)
+                        QuesterHelper.SetStartPoint(profile.MainActionPack, actionId);
+
+                    if (Controllers.BotComs.BotServer.Server.IsRunning)
+                    {
+                        Controllers.BotComs.BotServer.SendQuesterProfileInfos();
+                    }
+
+                    AstralAccessors.Quester.Entrypoint.RefreshQuesterMainPanel(); 
+                    
                 }
                 #endregion
 

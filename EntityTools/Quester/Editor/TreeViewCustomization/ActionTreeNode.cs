@@ -20,7 +20,7 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
         private readonly QuesterAction action;
         public ActionTreeNode(QuesterProfileProxy profile, QuesterAction action, bool clone = false) : base(profile)
         {
-            var act = clone ? CopyHelper.CreateDeepCopy(action) : action;
+            var act = clone ? action.CreateDeepCopy() : action;
             Tag = act;
             this.action = act;
             UpdateView();
@@ -134,13 +134,13 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
         {
             action.Disabled = !Checked;
             if (conditionTreeNodes != null)
-                action.Conditions = conditionTreeNodes.ToListOf<QuesterCondition>();
+                action.Conditions = conditionTreeNodes.ToQuesterConditionList();
             return action;
         }
 
         public override object Clone()
         {
-            var newAction = CopyHelper.CreateDeepCopy(ReconstructInternal());
+            var newAction = ReconstructInternal().CreateDeepCopy();
             newAction.ActionID = Guid.NewGuid();
             return new ActionTreeNode(owner, newAction);
         }

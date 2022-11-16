@@ -67,9 +67,10 @@ namespace EntityTools.Forms
                 @this.fillListAction = () =>
                 {
                     @this.filter.Clear();
-                    if (originalList != null)
-                        foreach (var f in originalList)
-                            @this.filter.Add(CopyHelper.CreateDeepCopy(f));
+                    if (originalList?.Count > 0)
+                    {
+                        @this.filter = new ObservableCollection<ItemFilterEntryExt>(originalList.CreateDeepCopy());
+                    }
                 };
             else @this.fillListAction = null;
 

@@ -37,7 +37,6 @@ namespace EntityTools.Tools.Targeting
                 }
             }
         }
-
         private string _entityId = string.Empty;
 
 #if DEVELOPER
@@ -61,7 +60,6 @@ namespace EntityTools.Tools.Targeting
                 }
             }
         }
-
         private ItemFilterStringType _entityIdType = ItemFilterStringType.Simple;
 
 #if DEVELOPER
@@ -83,7 +81,6 @@ namespace EntityTools.Tools.Targeting
                 }
             }
         }
-
         private EntityNameType _entityNameType = EntityNameType.InternalName; 
         #endregion
 
@@ -101,14 +98,13 @@ namespace EntityTools.Tools.Targeting
         {
             if (string.IsNullOrEmpty(_label))
             {
-                if (string.IsNullOrEmpty(_entityId))
-                    _label = "Target Entity";
-                else _label = $"Target Entity [{_entityId}]";
+                _label = string.IsNullOrEmpty(_entityId) 
+                       ? "Target Entity" 
+                       : $"Target Entity [{_entityId}]";
             }
 
             return _label;
         }
-
         private string _label;
     }
 }

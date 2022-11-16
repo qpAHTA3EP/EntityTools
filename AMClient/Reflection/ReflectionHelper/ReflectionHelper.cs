@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -60,18 +61,26 @@ namespace ACTP0Tools.Reflection
         /// <summary>
         /// Получение списка полей объекта <param name="obj"/>
         /// </summary>
-        public static FieldInfo[] GetListOfFields(object obj, BindingFlags flags = BindingFlags.Default, bool baseType = false)
+        public static IEnumerable<FieldInfo> EnumerateFields(this Type type, BindingFlags flags = BindingFlags.Default, bool baseType = true)
         {
-            if (obj == null)
-                return null;
-            Type type = obj.GetType();
+            if (type is null)
+                yield break;
 
             if (flags == BindingFlags.Default)
                 flags = DefaultFlags;
 
-            if (baseType)
+            foreach (var field in type.GetFields(flags))
+                yield return field;
+            if (!baseType)
+                yield break;
+            
+            type = type.BaseType;
+            while (type != null)
+            {
+                foreach (var field in type.GetFields(flags))
+                    yield return field;
                 type = type.BaseType;
-            return type?.GetFields(flags);
+            }
         }
 
         /// <summary>

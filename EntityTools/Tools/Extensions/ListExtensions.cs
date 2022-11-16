@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ACTP0Tools.Reflection;
 
-namespace EntityCore.Tools
+namespace EntityTools.Tools.Extensions
 {
     public static class ListExtensions
     {
@@ -40,19 +36,16 @@ namespace EntityCore.Tools
         //
         //     return 0;
         // }
-        public static List<T> Clone<T>(this List<T> @this)
-        {
-            if (@this != null)
-            {
-                List<T> listCopy = new List<T>(@this.Count);
-                foreach (T t in @this)
-                {
-                    listCopy.Add(CopyHelper.CreateDeepCopy(t));
-                }
-
-                return listCopy;
-            }
-            return null;
-        }
+        
+        
+        //public static List<T> Clone<T>(this List<T> @this)
+        //{
+        //    if (@this != null)
+        //    {
+        //        List<T> listCopy = new List<T>(@this.Select(item => item.CreateDeepCopy()));
+        //        return listCopy;
+        //    }
+        //    return null;
+        //}
     }
 }

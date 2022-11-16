@@ -7,7 +7,6 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading;
@@ -26,7 +25,6 @@ using GoldenPath = Astral.Logic.NW.GoldenPath;
 using MinimapWaypoint = MyNW.Classes.MinimapWaypoint;
 using Timeout = Astral.Classes.Timeout;
 using ACTP0Tools;
-using EntityTools.Extensions;
 #if PATCH_ASTRAL
 using ACTP0Tools.Classes;
 using ACTP0Tools.Classes.Quester;
@@ -1282,7 +1280,7 @@ namespace EntityTools.Patches.Mapper
             if (leftBorder <= x && x <= rightBorder && downBorder <= y && y <= topBorder)
             {
                 double angle = EntityManager.LocalPlayer.Yaw * 180 / Math.PI;
-                Bitmap image = MapperHelper.RotateImage(Resources.charArrow, (float) angle);
+                Bitmap image = MapperHelper.RotateImage(Resources.charArrowColor, (float) angle);
                 _graphics.drawImage(location, image);
             }
         }

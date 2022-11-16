@@ -43,6 +43,14 @@ namespace EntityTools.Tools.Targeting
         /// </summary>
         public abstract string Label();
 
-        public abstract void Dispose();
+        public bool IsDisposed { get; private set; }
+
+        public void Dispose()
+        {
+            InternalDispose();
+            IsDisposed = true;
+        }
+
+        protected abstract void InternalDispose();
     }
 }
