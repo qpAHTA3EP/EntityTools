@@ -76,24 +76,16 @@ namespace EntityTools.Patches.Mapper
                 {
                     if (CacheRegenerationNeeded)
                         RegenerateCache();
-#if nodesLocker
                     using (_nodesLocker.ReadLock())
                         foreach (Node node in _nodes)
                             yield return node; 
-#else
-                    return nodes;
-#endif
                 }
                 else
                 {
                     var graph = getGraph();
-#if nodesLocker
                     using (graph.ReadLock())
                         foreach (Node node in graph.NodesCollection)
                             yield return node; 
-#else 
-                    return graph.NodesCollection;
-#endif
                 }
             }
         }
@@ -120,19 +112,20 @@ namespace EntityTools.Patches.Mapper
                 {
                     if (CacheRegenerationNeeded)
                         RegenerateCache();
-#if nodesLocker
                     using (_nodesLocker.ReadLock()) 
-#endif
-                    foreach (Node node in _nodes)
+                    {
+                        foreach (Node node in _nodes)
                             foreach (Arc arc in node.OutgoingArcs)
                                 yield return arc;
+                    }
                 }
                 else
                 {
                     var graph = getGraph();
                     using (graph.ReadLock())
-                        foreach (Arc arc in graph.ArcsCollection)
+                    {   foreach (Arc arc in graph.ArcsCollection)
                             yield return arc;
+                    }
                 }
             }
         }
@@ -218,9 +211,7 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         public void Clear()
         {
-#if nodesLocker
             using (_nodesLocker.WriteLock()) 
-#endif
                 _nodes.Clear();
         }
 
@@ -239,9 +230,7 @@ namespace EntityTools.Patches.Mapper
                     result = graph.AddNode(newNode);
                 if (result)
                 {
-#if nodesLocker
                     using (_nodesLocker.WriteLock()) 
-#endif
                     _nodes.AddLast(newNode);
 #if LastAddedNode
                     lastAddedNode = newNode; 
@@ -252,12 +241,12 @@ namespace EntityTools.Patches.Mapper
             {
                 using (graph.WriteLock())
                     result = graph.AddNode(newNode);
+#if LastAddedNode
                 if (result)
                 {
-#if LastAddedNode
                     lastAddedNode = newNode; 
-#endif
                 }
+#endif
             }
             return result;
         }
@@ -280,11 +269,7 @@ namespace EntityTools.Patches.Mapper
                 return node;
             }
             using(graph.WriteLock())
-#if LastAddedNode
-                return lastAddedNode = graph.AddNode(x, y, z); 
-#else
                 return graph.AddNode(x, y, z);
-#endif
         }
 
         /// <summary>
@@ -326,10 +311,8 @@ namespace EntityTools.Patches.Mapper
                     removed = graph.RemoveNode(nodeToRemove);
                 if(removed)
                 {
-#if nodesLocker
                     using (_nodesLocker.WriteLock()) 
-#endif
-                    removed = _nodes.Remove(nodeToRemove);
+                        removed = _nodes.Remove(nodeToRemove);
                 }
             }
             catch
@@ -426,24 +409,13 @@ namespace EntityTools.Patches.Mapper
                 graph.Add2Arcs(node1, node2, weight);
         }
 
-#if false
-        public int RemoveArcs(ArrayList arcsToRemome)
-        {
-            var graph = getGraph();
-            using (graph.WriteLock())
-                return graph.RemoveArcs(arcsToRemome);
-        } 
-#endif
-
         /// <summary>
         /// Кэшированные узлы
         /// </summary>
         private readonly LinkedList<Node> _nodes = new LinkedList<Node>();
         //private List<Node> nodes = new List<Node>(300);
 
-#if nodesLocker
         private readonly RWLocker _nodesLocker = new RWLocker(); 
-#endif
         #endregion
 
         /// <summary>
@@ -536,9 +508,7 @@ namespace EntityTools.Patches.Mapper
         /// <returns></returns>
         private void ScanNodes()
         {
-#if nodesLocker
             using (_nodesLocker.WriteLock()) 
-#endif
             {
                 _nodes.Clear();
                 var graph = getGraph();//FullGraph;

@@ -1008,7 +1008,7 @@ namespace EntityTools.Patches.Mapper
         }
         private void DrawMapMeshes()
         {
-            ComplexPatch_Mapper.DrawMeshes(_graphics, _profile.CurrentMesh);
+            ComplexPatch_Mapper.DrawMeshes(_graphics, _graphCache);
         }
         
         private void DrawMapperTools(double topBorder, double downBorder, double leftBorder, double rightBorder)

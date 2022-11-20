@@ -428,7 +428,7 @@ public static void Astral.Logic.Classes.Map.Functions.Picture.DrawMeshes(Graphic
         /// <summary>
         /// Отрисовка графа путей <paramref name="meshes"/> на <paramref name="graph"/>
         /// </summary>
-        public static bool DrawMeshes(GraphicsNW graph, Graph meshes)
+        public static bool DrawMeshes(GraphicsNW graph, IGraph meshes)
         {
             if (graph is null || meshes is null)
                 return false;
@@ -474,7 +474,7 @@ public static void Astral.Logic.Classes.Map.Functions.Picture.DrawMeshes(Graphic
                 {
                     double num = graph.getWorldPos(new Point(graph.ImageWidth, graph.ImageHeight)).Distance2D(graph.CenterPosition);
                     var nodeSize = new Size(5, 5);
-                    foreach (Node node in meshes.Nodes)
+                    foreach (Node node in meshes.NodesCollection)
                     {
                         if (node.Passable)
                         {
