@@ -14,22 +14,9 @@ namespace EntityTools.Servises.SlideMonitor
         public static string GetMountCostumeInternalName(this CostumeRef costumeRef)
         {
             var pMountCostume = costumeRef.pMountCostume;
-            if (pMountCostume > 0)
-                return Memory.MMemory.ReadString(Memory.MMemory.Read<IntPtr>(new IntPtr(pMountCostume)));
-            return string.Empty;
+            return pMountCostume > 0 
+                 ? Memory.MMemory.ReadString(Memory.MMemory.Read<IntPtr>(new IntPtr(pMountCostume))) 
+                 : string.Empty;
         }
-
-#if false
-        public static MountType GetMountType(this CostumeRef costumeRef)
-        {
-            var pMountCostume = costumeRef.pMountCostume;
-            if (pMountCostume > 0)
-            {
-                string internalName = Memory.MMemory.ReadString(Memory.MMemory.Read<IntPtr>(new IntPtr(pMountCostume)));
-
-            }
-            return MountType.None;
-        } 
-#endif
     }
 }

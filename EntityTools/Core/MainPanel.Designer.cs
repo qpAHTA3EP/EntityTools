@@ -111,6 +111,7 @@ namespace EntityTools.Core
             this.dlgSaveFile = new System.Windows.Forms.SaveFileDialog();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.backgroundWorker = new System.ComponentModel.BackgroundWorker();
+            this.lblVersion = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.tbclMain)).BeginInit();
             this.tbclMain.SuspendLayout();
             this.tabUtilities.SuspendLayout();
@@ -222,13 +223,12 @@ namespace EntityTools.Core
             this.btnTest.FlatAppearance.BorderColor = System.Drawing.SystemColors.ButtonShadow;
             this.btnTest.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnTest.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnTest.Location = new System.Drawing.Point(246, 201);
+            this.btnTest.Location = new System.Drawing.Point(246, 204);
             this.btnTest.Name = "btnTest";
             this.btnTest.Size = new System.Drawing.Size(113, 40);
             this.btnTest.TabIndex = 0;
             this.btnTest.Text = "TEST";
             this.btnTest.UseVisualStyleBackColor = true;
-            this.btnTest.Visible = false;
             this.btnTest.Click += new System.EventHandler(this.handler_Test_1);
             // 
             // btnTeamMonitor
@@ -237,7 +237,7 @@ namespace EntityTools.Core
             this.btnTeamMonitor.FlatAppearance.BorderColor = System.Drawing.SystemColors.ButtonShadow;
             this.btnTeamMonitor.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnTeamMonitor.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnTeamMonitor.Location = new System.Drawing.Point(245, 247);
+            this.btnTeamMonitor.Location = new System.Drawing.Point(245, 250);
             this.btnTeamMonitor.Name = "btnTeamMonitor";
             this.btnTeamMonitor.Size = new System.Drawing.Size(113, 40);
             this.btnTeamMonitor.TabIndex = 0;
@@ -251,7 +251,7 @@ namespace EntityTools.Core
             this.btnUiViewer.FlatAppearance.BorderColor = System.Drawing.SystemColors.ButtonShadow;
             this.btnUiViewer.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnUiViewer.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnUiViewer.Location = new System.Drawing.Point(9, 339);
+            this.btnUiViewer.Location = new System.Drawing.Point(9, 342);
             this.btnUiViewer.Name = "btnUiViewer";
             this.btnUiViewer.Size = new System.Drawing.Size(113, 40);
             this.btnUiViewer.TabIndex = 0;
@@ -265,7 +265,7 @@ namespace EntityTools.Core
             this.btnQuesterEditor.FlatAppearance.BorderColor = System.Drawing.SystemColors.ButtonShadow;
             this.btnQuesterEditor.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnQuesterEditor.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnQuesterEditor.Location = new System.Drawing.Point(9, 247);
+            this.btnQuesterEditor.Location = new System.Drawing.Point(9, 250);
             this.btnQuesterEditor.Name = "btnQuesterEditor";
             this.btnQuesterEditor.Size = new System.Drawing.Size(113, 40);
             this.btnQuesterEditor.TabIndex = 0;
@@ -279,7 +279,7 @@ namespace EntityTools.Core
             this.btnUcc.FlatAppearance.BorderColor = System.Drawing.SystemColors.ButtonShadow;
             this.btnUcc.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnUcc.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnUcc.Location = new System.Drawing.Point(126, 247);
+            this.btnUcc.Location = new System.Drawing.Point(126, 250);
             this.btnUcc.Name = "btnUcc";
             this.btnUcc.Size = new System.Drawing.Size(113, 40);
             this.btnUcc.TabIndex = 0;
@@ -293,7 +293,7 @@ namespace EntityTools.Core
             this.btnAuraViewer.FlatAppearance.BorderColor = System.Drawing.SystemColors.ButtonShadow;
             this.btnAuraViewer.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnAuraViewer.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnAuraViewer.Location = new System.Drawing.Point(126, 339);
+            this.btnAuraViewer.Location = new System.Drawing.Point(126, 342);
             this.btnAuraViewer.Name = "btnAuraViewer";
             this.btnAuraViewer.Size = new System.Drawing.Size(114, 40);
             this.btnAuraViewer.TabIndex = 0;
@@ -307,7 +307,7 @@ namespace EntityTools.Core
             this.btnMissionMonitor.FlatAppearance.BorderColor = System.Drawing.SystemColors.ButtonShadow;
             this.btnMissionMonitor.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnMissionMonitor.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnMissionMonitor.Location = new System.Drawing.Point(245, 339);
+            this.btnMissionMonitor.Location = new System.Drawing.Point(245, 342);
             this.btnMissionMonitor.Name = "btnMissionMonitor";
             this.btnMissionMonitor.Size = new System.Drawing.Size(113, 40);
             this.btnMissionMonitor.TabIndex = 0;
@@ -321,7 +321,7 @@ namespace EntityTools.Core
             this.btnEntityCacheMonitor.FlatAppearance.BorderColor = System.Drawing.SystemColors.ButtonShadow;
             this.btnEntityCacheMonitor.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnEntityCacheMonitor.Font = new System.Drawing.Font("Tahoma", 14F, System.Drawing.FontStyle.Bold);
-            this.btnEntityCacheMonitor.Location = new System.Drawing.Point(126, 293);
+            this.btnEntityCacheMonitor.Location = new System.Drawing.Point(126, 296);
             this.btnEntityCacheMonitor.Name = "btnEntityCacheMonitor";
             this.btnEntityCacheMonitor.Size = new System.Drawing.Size(232, 40);
             this.btnEntityCacheMonitor.TabIndex = 0;
@@ -335,7 +335,7 @@ namespace EntityTools.Core
             this.btnEntities.FlatAppearance.BorderColor = System.Drawing.SystemColors.ButtonShadow;
             this.btnEntities.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnEntities.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.btnEntities.Location = new System.Drawing.Point(9, 293);
+            this.btnEntities.Location = new System.Drawing.Point(9, 296);
             this.btnEntities.Name = "btnEntities";
             this.btnEntities.Size = new System.Drawing.Size(113, 40);
             this.btnEntities.TabIndex = 0;
@@ -424,6 +424,7 @@ namespace EntityTools.Core
             // 
             // tabSettings
             // 
+            this.tabSettings.Controls.Add(this.lblVersion);
             this.tabSettings.Controls.Add(this.btnSave);
             this.tabSettings.Controls.Add(this.pgConfigs);
             this.tabSettings.Name = "tabSettings";
@@ -974,6 +975,14 @@ namespace EntityTools.Core
             this.backgroundWorker.WorkerSupportsCancellation = true;
             this.backgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.work_PowerSearch);
             // 
+            // lblVersion
+            // 
+            this.lblVersion.Location = new System.Drawing.Point(9, 359);
+            this.lblVersion.Name = "lblVersion";
+            this.lblVersion.Size = new System.Drawing.Size(293, 23);
+            this.lblVersion.TabIndex = 15;
+            this.lblVersion.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
             // EntityToolsMainPanel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1069,5 +1078,6 @@ namespace EntityTools.Core
         private Button btnQuesterEditor;
         private PropertyGrid propertyGrid;
         private Button btnTest;
+        private Label lblVersion;
     }
 }

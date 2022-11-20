@@ -97,12 +97,18 @@ namespace EntityCore.Tools
         {
             if (uccActionList?.Count > 0)
             {
-                return uccActionList.Select(item =>
+                TreeNode Selector(UCCAction action)
                 {
-                    if (item is UCCActionPack actPack)
-                        return (TreeNode)new UccActionPackTreeNode(clone ? actPack.CreateDeepCopy() : actPack);
-                    return (TreeNode)new UccActionTreeNode(clone ? item.CreateDeepCopy() : item);
-                }).ToArray();
+                    if (clone)
+                        action = action.CreateXmlCopy();
+
+                    if (action is UCCActionPack actPack)
+                        return (TreeNode)new UccActionPackTreeNode(actPack);
+                    return (TreeNode)new UccActionTreeNode(action);
+
+                }
+
+                return uccActionList.Select(Selector).ToArray();
             }
 
             return Array.Empty<TreeNode>();
@@ -120,9 +126,12 @@ namespace EntityCore.Tools
             {
                 TreeNode Selector(QuesterAction action)
                 {
+                    if (clone)
+                        action = action.CreateXmlCopy();
+
                     if (action is ActionPack actPack)
-                        return new ActionPackTreeNode(profile, clone ? actPack.CreateDeepCopy() : actPack);
-                    return new ActionTreeNode(profile, clone ? action.CreateDeepCopy() : action);
+                        return new ActionPackTreeNode(profile, actPack);
+                    return new ActionTreeNode(profile, action);
                 }
 
                 return actions.Select(Selector).ToArray();
@@ -136,11 +145,14 @@ namespace EntityCore.Tools
             {
                 TreeNode Selector(QuesterAction action)
                 {
+                    if (clone)
+                        action = action.CreateXmlCopy();
+
                     if (action is ActionPack actPack)
-                        return new ActionPackTreeNode(profile, clone ? actPack.CreateDeepCopy() : actPack);
+                        return new ActionPackTreeNode(profile, actPack);
                     if (action.IsPushProfileToStackAndLoad())
-                        return new ActionPushProfileToStackAndLoadTreeNode(profile, clone ? action.CreateDeepCopy() : action);
-                    return new ActionTreeNode(profile, clone ? action.CreateDeepCopy() : action);
+                        return new ActionPushProfileToStackAndLoadTreeNode(profile, action);
+                    return new ActionTreeNode(profile, action);
                 }
 
                 return questerActionList.Select(Selector).ToArray();
@@ -157,9 +169,12 @@ namespace EntityCore.Tools
         /// <returns></returns>
         public static TreeNode MakeTreeNode(this UCCAction action, bool clone = false)
         {
+            if (clone)
+                action = action.CreateXmlCopy();
+
             if (action is UCCActionPack actPack)
-                return new UccActionPackTreeNode(clone ? actPack.CreateDeepCopy() : actPack);
-            return new UccActionTreeNode(clone ? action.CreateDeepCopy() : action);
+                return new UccActionPackTreeNode(actPack);
+            return new UccActionTreeNode(action);
         }
         /// <summary>
         /// Конструирование узла дерева для отображения quester-команды <paramref name="action"/>
@@ -169,11 +184,14 @@ namespace EntityCore.Tools
         /// <returns></returns>
         public static ActionBaseTreeNode MakeTreeNode(this QuesterAction action, QuesterProfileProxy profile, bool clone = false)
         {
+            if (clone)
+                action = action.CreateXmlCopy();
+
             if (action is ActionPack actionPack)
-                return new ActionPackTreeNode(profile, clone ? actionPack.CreateDeepCopy() : actionPack);
+                return new ActionPackTreeNode(profile, actionPack);
             if(action.IsPushProfileToStackAndLoad())
-                return new ActionPushProfileToStackAndLoadTreeNode(profile, clone ? action.CreateDeepCopy() : action);
-            return new ActionTreeNode(profile, clone ? action.CreateDeepCopy() : action);
+                return new ActionPushProfileToStackAndLoadTreeNode(profile, action);
+            return new ActionTreeNode(profile, action);
         }
 
         /// <summary>
@@ -186,12 +204,17 @@ namespace EntityCore.Tools
         {
             if (uccConditionList?.Any() == true)
             {
-                return uccConditionList.Select(act =>
+                TreeNode Selector(UCCCondition condition)
                 {
-                    if (act is UCCConditionPack conditionPack)
-                        return (TreeNode)new UccConditionPackTreeNode(clone ? conditionPack.CreateDeepCopy() : conditionPack);
-                    return (TreeNode)new UccConditionTreeNode(clone ? act.CreateDeepCopy() : act);
-                }).ToArray();
+                    if (clone)
+                        condition = condition.CreateXmlCopy();
+
+                    if (condition is UCCConditionPack conditionPack)
+                        return (TreeNode)new UccConditionPackTreeNode(conditionPack);
+                    return (TreeNode)new UccConditionTreeNode(condition);
+                }
+
+                return uccConditionList.Select(Selector).ToArray();
             }
 
             return Array.Empty<TreeNode>();
@@ -205,7 +228,7 @@ namespace EntityCore.Tools
         /// <returns></returns>
         public static TreeNode[] ToTreeNodes(this IEnumerable<QuesterCondition> questerConditionList, bool clone = false)
         {
-            return questerConditionList.Select(item => MakeTreeNode(item, clone)).ToArray();
+            return questerConditionList.Select(item => MakeTreeNode(item, clone)).Cast<TreeNode>().ToArray();
         }
 
         /// <summary>
@@ -216,9 +239,12 @@ namespace EntityCore.Tools
         /// <returns></returns>
         public static TreeNode MakeTreeNode(this UCCCondition condition, bool clone = false)
         {
+            if (clone)
+                condition = condition.CreateXmlCopy();
+
             if (condition is UCCConditionPack conditionPack)
-                return new UccConditionPackTreeNode(clone ? conditionPack.CreateDeepCopy() : conditionPack);
-            return new UccConditionTreeNode(clone ? condition.CreateDeepCopy() : condition);
+                return new UccConditionPackTreeNode(conditionPack);
+            return new UccConditionTreeNode(condition);
         }
 
         /// <summary>
@@ -229,7 +255,9 @@ namespace EntityCore.Tools
         /// <returns></returns>
         public static ConditionBaseTreeNode MakeTreeNode(this QuesterCondition condition, bool clone = false)
         {
-            var instance = clone ? condition.CreateDeepCopy() : condition;
+            if (clone)
+                condition = condition.CreateXmlCopy();
+
             switch (condition)
             {
                 case ConditionPack conditionPack:
@@ -237,7 +265,7 @@ namespace EntityCore.Tools
                 case IsInCustomRegion isInCustomRegion:
                     return new ConditionIsInCustomRegionTreeNode(isInCustomRegion);
                 default:
-                    return new ConditionTreeNode(instance);
+                    return new ConditionTreeNode(condition);
             }
         }
 
@@ -251,18 +279,21 @@ namespace EntityCore.Tools
         {
             if (nodes?.Length > 0)
             {
-                var cndList = new List<UCCCondition>(nodes.Length);
-                foreach (var cndNode in nodes)
+                UCCCondition Selector(TreeNode node)
                 {
-                    if (cndNode is IUccTreeNode<UCCCondition> uccCndNode)
+                    if (node is IUccTreeNode<UCCCondition> uccConditionNode)
                     {
-                        var cnd = uccCndNode.ReconstructInternal();
-                        if (cnd != null)
-                            cndList.Add(clone ? cnd.CreateDeepCopy() : cnd);
+                        var condition = uccConditionNode.ReconstructInternal();
+                        if (condition != null)
+                            return clone 
+                                 ? condition.CreateXmlCopy() 
+                                 : condition;
                     }
+
+                    return null;
                 }
 
-                return cndList;
+                return nodes.Select(Selector).Where(item => item != null).ToList();
             }
 
             return new List<UCCCondition>();
@@ -278,24 +309,21 @@ namespace EntityCore.Tools
         {
             if (nodes?.Length > 0)
             {
-#if false
-                var cndList = new List<QuesterCondition>(nodes.Length);
-                foreach (var node in nodes)
+                QuesterCondition Selector(TreeNode node)
                 {
-                    if (node is ConditionBaseTreeNode cndNode)
+                    if (node is ConditionBaseTreeNode conditionNode)
                     {
-                        var cnd = cndNode.ReconstructInternal();
-                        if (cnd != null)
-                            cndList.Add(clone ? cnd.CreateDeepCopy() : cnd);
+                        var condition = conditionNode.ReconstructInternal();
+                        if (condition != null)
+                            return clone
+                                 ? condition.CreateXmlCopy()
+                                 : condition;
                     }
-                }
-#else
-                var conditionList = nodes.Cast<ConditionBaseTreeNode>().Select(nd => nd.ReconstructInternal()).ToList();
 
-                return clone
-                    ? conditionList.CreateDeepCopy()
-                    : conditionList; 
-#endif
+                    return null;
+                }
+
+                return nodes.Select(Selector).Where(item => item != null).ToList();
             }
 
             return new List<QuesterCondition>();
@@ -311,6 +339,23 @@ namespace EntityCore.Tools
         {
             if (nodes?.Count > 0)
             {
+#if false
+                UCCCondition Selector(TreeNode node)
+                {
+                    if (node is IUccTreeNode<UCCCondition> conditionNode)
+                    {
+                        var condition = conditionNode.ReconstructInternal();
+                        if (condition != null)
+                            return clone
+                                ? condition.CreateXmlCopy()
+                                : condition;
+                    }
+
+                    return null;
+                }
+
+                return nodes.Select(Selector).Where(item => item != null).ToList();
+#else
                 var cndList = new List<UCCCondition>(nodes.Count);
                 foreach (var cndNode in nodes)
                 {
@@ -318,11 +363,12 @@ namespace EntityCore.Tools
                     {
                         var cnd = uccCndNode.ReconstructInternal();
                         if (cnd != null)
-                            cndList.Add(clone ? cnd.CreateDeepCopy(): cnd);
+                            cndList.Add(clone ? cnd.CreateXmlCopy() : cnd);
                     }
                 }
 
-                return cndList;
+                return cndList; 
+#endif
             }
 
             return new List<UCCCondition>();
@@ -345,7 +391,7 @@ namespace EntityCore.Tools
                     {
                         var cnd = uccCndNode.ReconstructInternal();
                         if (cnd != null)
-                            cndList.Add(clone ? cnd.CreateDeepCopy() : cnd);
+                            cndList.Add(clone ? cnd.CreateXmlCopy() : cnd);
                     }
                 }
 
@@ -372,7 +418,7 @@ namespace EntityCore.Tools
                     {
                         var cnd = cndNode.ReconstructInternal();
                         if (cnd != null)
-                            cndList.Add(clone ? cnd.CreateDeepCopy() : cnd);
+                            cndList.Add(clone ? cnd.CreateXmlCopy() : cnd);
                     }
                 }
 

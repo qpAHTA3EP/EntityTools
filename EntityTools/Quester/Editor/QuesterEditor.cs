@@ -11,8 +11,8 @@ using ACTP0Tools;
 using ACTP0Tools.Classes.Quester;
 using ACTP0Tools.Patches;
 using ACTP0Tools.Reflection;
-using AStar;
 using Astral.Classes.ItemFilter;
+using Astral.Controllers;
 using Astral.Logic.NW;
 using Astral.Quester.Classes;
 using Astral.Quester.Classes.Actions;
@@ -258,6 +258,23 @@ namespace EntityTools.Quester.Editor
 
         private void handler_Form_Load(object sender, EventArgs e)
         {
+            SetTypeAssociations();
+
+            UI_fill();
+
+            if (startActionId != Guid.Empty)
+            {
+                var node = treeActions.Nodes.FindActionNode(startActionId);
+                if (node != null)
+                {
+                    treeActions.SelectedNode = node;
+                    treeActions.SelectedNode.EnsureVisible();
+                }
+            }
+        }
+
+        private static void SetTypeAssociations()
+        {
             // Подмена метаданных для IsInCustomRegion
             // https://stackoverflow.com/questions/46099675/can-you-how-to-specify-editor-at-runtime-for-propertygrid-for-pcl
             var provider = new AssociatedMetadataTypeTypeDescriptionProvider(
@@ -278,18 +295,12 @@ namespace EntityTools.Quester.Editor
                     typeof(PushProfileToStackAndLoadMetadataType));
                 TypeDescriptor.AddProvider(provider, tPushProfileToStackAndLoad);
             }
+        }
 
-            UI_fill();
-
-            if (startActionId != Guid.Empty)
-            {
-                var node = treeActions.Nodes.FindActionNode(startActionId);
-                if(node != null)
-                {
-                    treeActions.SelectedNode = node;
-                    treeActions.SelectedNode.EnsureVisible();
-                }
-            }
+        private void handler_Form_Activated(object sender, EventArgs e)
+        {
+            Binds.RemoveAction(Keys.F5);
+            Binds.AddAction(Keys.F5, AddHotSpot);
         }
 
         private void handler_Form_Closing(object sender, FormClosingEventArgs e)
@@ -311,6 +322,7 @@ namespace EntityTools.Quester.Editor
             }
 
             dockManager.SaveLayoutToXml(FileTools.QuesterEditorSettingsFile);
+            Binds.RemoveAction(Keys.F5);
             mapperForm?.Close();
         }
         #endregion
@@ -653,7 +665,7 @@ namespace EntityTools.Quester.Editor
                 if (conditionNode.AllowChildren)
                     conditionListChangedCallback?.Invoke(treeConditions.Nodes);
                     
-                conditionCache = conditionNode.Content.CreateDeepCopy();
+                conditionCache = conditionNode.Content.CreateXmlCopy();
             }
         }
 
@@ -664,7 +676,7 @@ namespace EntityTools.Quester.Editor
                 InvokeConditionCallback();
 
                 // Добавляем команду
-                var newCondition = conditionCache.CreateDeepCopy();
+                var newCondition = conditionCache.CreateXmlCopy();
                 var newNode = newCondition.MakeTreeNode();
                 var selectedNode = treeConditions.SelectedNode as ConditionBaseTreeNode;
                 
@@ -919,7 +931,7 @@ namespace EntityTools.Quester.Editor
 
                 var action = actionNode.ReconstructInternal();
 
-                actionCache = action.CreateDeepCopy();
+                actionCache = action.CreateXmlCopy();
             }
         }
 
@@ -930,9 +942,9 @@ namespace EntityTools.Quester.Editor
                 InvokeActionCallback();
 
                 // Добавляем команду
-                var newAction = actionCache.CreateDeepCopy();
+                var newAction = actionCache.CreateXmlCopy();
                 var newNode = newAction.MakeTreeNode(profile);
-                newNode.NewID();
+                newNode.RegenActionID();
 
                 var selectedNode = treeActions.SelectedNode as ActionBaseTreeNode;
                 InsertAction(selectedNode, newNode);
@@ -1000,6 +1012,8 @@ namespace EntityTools.Quester.Editor
                 }
                 else treeActions.Nodes.Insert(selectedInd, newActionNode);
                 treeActions.EndUpdate();
+                
+                profile.Saved = false;
 
                 SetSelectedActionTo(newActionNode);
             }
@@ -1233,20 +1247,9 @@ namespace EntityTools.Quester.Editor
             var saved = profile.Saved;
             if (saved || SaveProfile())
             {
-#if true
-                var actualProfile = profile.GetProfile().CreateDeepCopy();
+                var actualProfile = profile.GetProfile();//.CreateDeepCopy();
                 AstralAccessors.Quester.Core.SetProfile(actualProfile, profile.FileName);
-#else
-                AstralAccessors.Quester.Core.Profile = CopyHelper.CreateDeepCopy(profile.GetProfile());
-                var fileName = profile.FileName;
-                Astral.API.CurrentSettings.LastQuesterProfile = fileName;
-                Astral.Controllers.Settings.Get.LastQuesterProfile = string.IsNullOrEmpty(fileName)
-                    ? string.Empty
-                    : Path.GetFileName(profile.FileName);
-                if (AstralAccessors.Controllers.Roles.IsRunning)
-                    AstralAccessors.Controllers.Roles.ToggleRole(true);
-                AstralAccessors.Quester.Entrypoint.RefreshQuesterMainPanel(); 
-#endif
+
                 txtLog.AppendText(
                     string.Concat("[", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
                     "] Profile",
@@ -1270,26 +1273,13 @@ namespace EntityTools.Quester.Editor
             var saved = profile.Saved;
             if (saved || SaveProfile())
             {
-#if true
-                var actualProfile = profile.GetProfile().CreateDeepCopy();
+                var actualProfile = profile.GetProfile();//.CreateDeepCopy();
                 var actionId = treeActions.SelectedNode is ActionBaseTreeNode selectedNode
                                  ? selectedNode.Content.ActionID
                                  : Guid.Empty;
 
                 AstralAccessors.Quester.Core.SetProfile(actualProfile, profile.FileName, actionId);
-#else
-                var actualProfile = CopyHelper.CreateDeepCopy(profile.GetProfile());
-                AstralAccessors.Quester.Core.Profile = actualProfile;
-                var fileName = profile.FileName;
-                Astral.Controllers.Settings.Get.LastQuesterProfile = string.IsNullOrEmpty(fileName)
-                    ? string.Empty
-                    : Path.GetFileName(profile.FileName);
-                if (AstralAccessors.Controllers.Roles.IsRunning)
-                    AstralAccessors.Controllers.Roles.ToggleRole(true);
-                if (treeActions.SelectedNode is ActionBaseTreeNode selectedNode)
-                    QuesterHelper.SetStartPoint(actualProfile.MainActionPack, selectedNode.Content.ActionID);
-                AstralAccessors.Quester.Entrypoint.RefreshQuesterMainPanel(); 
-#endif
+
                 txtLog.AppendText(string.Concat("[", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
                     "] Profile",
                     string.IsNullOrEmpty(profile.FileName)
@@ -1321,11 +1311,6 @@ namespace EntityTools.Quester.Editor
 
                 // Восстановление команд
                 profile.Actions = ListReconstruction(treeActions.Nodes);
-
-                // Восстановление не требуется, т.к. списки реализованы через BindingList<T>
-                //profile.Vendors = ListReconstruction<NPCInfos>(listVendor.Items);
-                //profile.CustomRegions = ListReconstruction<CustomRegion>(listCustomRegions.Items);
-                //profile.BlackList = ListReconstruction<string>(listBlackList.Items);
 
                 if (saveAs)
                     profile.SaveAs();
@@ -1472,7 +1457,20 @@ namespace EntityTools.Quester.Editor
             if (gridHotSpots.DataSource is List<Vector3> hotSpots)
             {
                 var pos = EntityManager.LocalPlayer.Location.Clone();
-                Node node = profile.CurrentMesh.ClosestNode(pos.X, pos.Y, pos.Z, out double distance, false);
+                if (hotSpots.FirstOrDefault(hs => hs.Distance3D(pos) < 15) != null)
+                {
+                    XtraMessageBox.Show(
+                        "It is not possible to add a HotSpot \n" +
+                        "because there is another HotSpot\n " +
+                        "less than 15 feet away!", "HotSpot warring", 
+                        MessageBoxButtons.OK, 
+                        MessageBoxIcon.Exclamation);
+                    return;
+                }
+                
+                var node = profile.CurrentMesh.ClosestNode(pos.X, pos.Y, pos.Z, out double distance, false);
+
+
                 gridViewHotSpots.BeginUpdate();
                 if (node != null
                     && distance < 10)
@@ -1712,8 +1710,11 @@ namespace EntityTools.Quester.Editor
 
         private void handler_Filter_KeyDown(object sender, KeyEventArgs e)
         {
-            if(e.KeyCode == Keys.Enter)
+            if (e.KeyCode == Keys.Enter)
+            {
                 FilterActionNodes(txtActionFilter.Text);
+                SelectFirstHighlightedNode();
+            }
         }
 
         private void handler_Filter_ButtonPressed(object sender, ButtonPressedEventArgs e)

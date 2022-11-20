@@ -20,7 +20,7 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
         private readonly QuesterAction action;
         public ActionTreeNode(QuesterProfileProxy profile, QuesterAction action, bool clone = false) : base(profile)
         {
-            var act = clone ? action.CreateDeepCopy() : action;
+            var act = clone ? action.CreateXmlCopy() : action;
             Tag = act;
             this.action = act;
             UpdateView();
@@ -36,7 +36,7 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
 
         public override bool AllowChildren => false;
 
-        public override void NewID() => action.ActionID = Guid.NewGuid();
+        public override void RegenActionID() => action.RegenActionID(); 
 
         public override void UpdateView()
         {
@@ -140,8 +140,8 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
 
         public override object Clone()
         {
-            var newAction = ReconstructInternal().CreateDeepCopy();
-            newAction.ActionID = Guid.NewGuid();
+            var newAction = ReconstructInternal().CreateXmlCopy();
+            newAction.RegenActionID();
             return new ActionTreeNode(owner, newAction);
         }
 

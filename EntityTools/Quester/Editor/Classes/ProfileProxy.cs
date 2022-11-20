@@ -243,11 +243,18 @@ namespace EntityTools.Quester.Editor.Classes
             get => _profile.MainActionPack.Actions;
             set
             {
-                OnPropertyChanged();
-                var actions = _profile.MainActionPack.Actions;
+                if (ReferenceEquals(_profile, AstralAccessors.Quester.Core.Profile)
+                    && AstralAccessors.Controllers.Roles.IsRunning)
+                    AstralAccessors.Controllers.Roles.ToggleRole(true);
+
+                var mainActionPack = _profile.MainActionPack;
+                mainActionPack.Reset();
+                QuesterHelper.ResetActionPlayer(mainActionPack);
+                var actions = mainActionPack.Actions;
                 actions.Clear();
                 if (value?.Any() == true)
                     actions.AddRange(value);
+                OnPropertyChanged();
             }
         }
 

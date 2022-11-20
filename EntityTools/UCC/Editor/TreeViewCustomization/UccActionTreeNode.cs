@@ -20,18 +20,20 @@ namespace EntityTools.UCC.Editor.TreeViewCustomization
 
         public UccActionTreeNode(UCCAction action, bool clone = false)
         {
-            var act = clone ? action.CreateDeepCopy() : action;
-            Tag = act;
-            SelectIcon(act);
-            var txt = act.Label;
+            if (clone)
+                action = action.CreateXmlCopy();
+
+            Tag = action;
+            SelectIcon(action);
+            var txt = action.Label;
             if (txt == "(Unknown Spell)")
             {
-                txt = act.GetType().Name;
+                txt = action.GetType().Name;
             }
             Text = txt;
-            Checked = act.Enabled;
+            Checked = action.Enabled;
 
-            _conditionTreeNodes = act.Conditions.ToTreeNodes().ToArray();
+            _conditionTreeNodes = action.Conditions.ToTreeNodes().ToArray();
         }
 
         private void SelectIcon(UCCAction action)
@@ -128,8 +130,7 @@ namespace EntityTools.UCC.Editor.TreeViewCustomization
 
         public override object Clone()
         {
-            //TODO: Добави реконструкцию списка условий
-            return new UccActionTreeNode(ReconstructInternal().CreateDeepCopy());
+            return new UccActionTreeNode(ReconstructInternal().CreateXmlCopy());
         }
 
         /// <summary>

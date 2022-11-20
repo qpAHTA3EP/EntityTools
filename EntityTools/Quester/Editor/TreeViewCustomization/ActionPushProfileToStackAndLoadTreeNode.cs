@@ -27,9 +27,10 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
         {
             if (!action.IsPushProfileToStackAndLoad())
                 throw new ArgumentException($"Action has type '{action.GetType().Name}' instead of the expected type 'PushProfileToStackAndLoad'");
-            var act = clone ? action.CreateDeepCopy() : action;
-            Tag = act;
-            this.action = act;
+            if (clone)
+                action = action.CreateXmlCopy();
+            Tag = action;
+            this.action = action;
             UpdateView();
         }
 
@@ -43,7 +44,7 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
 
         public override bool AllowChildren => false;
 
-        public override void NewID() => action.ActionID = Guid.NewGuid();
+        public override void RegenActionID() => action.RegenActionID(); 
 
         public override void UpdateView()
         {
@@ -150,16 +151,17 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
 
         public override object Clone()
         {
-            var newAction = ReconstructInternal().CreateDeepCopy();
-            newAction.ActionID = Guid.NewGuid();
+            var newAction = ReconstructInternal().CreateXmlCopy();
+            newAction.RegenActionID();
             return new ActionTreeNode(owner, newAction);
         }
 
         public override TreeNode[] GetConditionTreeNodes()
         {
-            return conditionTreeNodes ?? (conditionTreeNodes = ReconstructInternal().Conditions
-                                                                                    .ToTreeNodes()
-                                                                                    .ToArray());
+            return conditionTreeNodes 
+                ?? (conditionTreeNodes = ReconstructInternal().Conditions
+                                                              .ToTreeNodes()
+                                                              .ToArray());
         }
     }
 }

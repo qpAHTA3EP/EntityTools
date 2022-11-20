@@ -711,7 +711,7 @@ namespace ACTP0Tools
                     if (AstralAccessors.Controllers.Roles.IsRunning)
                         AstralAccessors.Controllers.Roles.ToggleRole(true);
 
-                    AstralAccessors.Quester.Core.Profile = profile.CreateDeepCopy();
+                    AstralAccessors.Quester.Core.Profile = profile;//.CreateDeepCopy();
                     
                     Astral.API.CurrentSettings.LastQuesterProfile = profilePath;
 
@@ -723,6 +723,11 @@ namespace ACTP0Tools
 
                     if (actionId != Guid.Empty)
                         QuesterHelper.SetStartPoint(profile.MainActionPack, actionId);
+                    else
+                    {
+                        profile.MainActionPack.Reset();
+                        QuesterHelper.ResetActionPlayer(profile.MainActionPack);
+                    }
 
                     if (Controllers.BotComs.BotServer.Server.IsRunning)
                     {

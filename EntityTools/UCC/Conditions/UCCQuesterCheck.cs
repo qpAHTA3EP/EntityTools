@@ -38,7 +38,7 @@ namespace EntityTools.UCC.Conditions
                 Value = Value,
             };
             if (Condition != null)
-                copy.Condition = Condition.CreateDeepCopy();
+                copy.Condition = Condition.CreateXmlCopy();
 
             return copy;
         }

@@ -150,8 +150,6 @@ namespace EntityTools.Quester.Conditions
 
 
         #region INotifyPropertyChanged
-        [NonSerialized]
-        internal IQuesterConditionEngine Engine;
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
         {

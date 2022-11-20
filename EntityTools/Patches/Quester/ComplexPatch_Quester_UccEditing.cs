@@ -166,12 +166,12 @@ namespace EntityTools.Patches.Quester
                 };
 
                 ACTP0Tools.Patches.ACTP0Patcher.Harmony.Patch(original_UccProfile_ToString, new HarmonyMethod(prefix_UccProfile_ToString));
-                //unpatch += () =>
-                //{
-                //    ETLogger.WriteLine(LogType.Error, $@"Unpatch method '{original_UccProfile_ToString}'", true);
-                //    AcTp0Tools.Patches.ACTP0Patcher.Harmony.Unpatch(original_UccProfile_ToString,
-                //            prefix_UccProfile_ToString);
-                //};
+                unpatch += () =>
+                {
+                    ETLogger.WriteLine(LogType.Error, $@"Unpatch method '{original_UccProfile_ToString}'", true);
+                    ACTP0Tools.Patches.ACTP0Patcher.Harmony.Unpatch(original_UccProfile_ToString,
+                            prefix_UccProfile_ToString);
+                };
 
                 ACTP0Tools.Patches.ACTP0Patcher.Harmony.Patch(original_UCCProfileEditor_EditValue, new HarmonyMethod(prefix_UCCProfileEditor_EditValue));
                     
@@ -213,26 +213,12 @@ namespace EntityTools.Patches.Quester
 
             if (tempUccProfile.TargetPriorities?.Count > 0)
             {
-                var priorities = tempUccProfile.TargetPriorities.CreateDeepCopy();
+                var priorities = tempUccProfile.TargetPriorities.Select(tp => tp.CreateXmlCopy()).ToList();
                 if (tempPriorities.Key != currentUccProfile)
                     tempPriorities = new KeyValuePair<Profil, List<TargetPriorityEntry>>(currentUccProfile, priorities);
                 else tempPriorities.Value.AddRange(priorities);
                 currentUccProfile.TargetPriorities.InsertRange(0, priorities);
             }
-#if false
-            var enableTargetPriorities = uccProfile.EnableTargetPriorities;
-            var potionHealth = uccProfile.PotionHealth;
-            var smartPotionUse = uccProfile.SmartPotionUse;
-            var targetChangeCD = uccProfile.TargetChangeCD;
-            var targetPriorityRange = uccProfile.TargetPriorityRange;
-            var _ =
-            Action action2 = () =>
-            {
-
-            }
-            uccProfile.
-            __result = Astral.Quester.Classes.Action.ActionResult.Completed; 
-#endif
 
             return false;
         }
@@ -314,49 +300,10 @@ namespace EntityTools.Patches.Quester
         /// </summary>
         private static void UccProfile_Save(Profil __instance)
         {
-#if false
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.InitialDirectory = Directories.SettingsPath + "\\CC";
-            saveFileDialog.DefaultExt = "XML";
-            saveFileDialog.Filter = @"UCC Profiles (*.xml)|*.xml";
-            if (saveFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                int i = 0;
-                while (i < __instance.ActionsCombat.Count)
-                {
-                    var uccAction = __instance.ActionsCombat[i];
-                    if (uccAction.TempAction)
-                        __instance.ActionsCombat.RemoveAt(i);
-                    else i++;
-                }
-                i = 0;
-                while (i < __instance.ActionsPatrol.Count)
-                {
-                    var uccAction = __instance.ActionsPatrol[i];
-                    if (uccAction.TempAction)
-                        __instance.ActionsPatrol.RemoveAt(i);
-                    else i++;
-                }
-
-                Astral.Functions.XmlSerializer.Serialize(saveFileDialog.FileName, __instance, 1);
-                Astral.API.CurrentSettings.LastUCCProfile = saveFileDialog.FileName;
-            }
-
-            return false; 
-#else
             if (__instance != null)
             {
                 int i = 0;
-#if false
-                while (i < __instance.ActionsCombat.Count)
-                {
-                    var uccAction = __instance.ActionsCombat[i];
-                    if (uccAction.TempAction)
-                        __instance.ActionsCombat.RemoveAt(i);
-                    else i++;
-                }
-                i = 0; 
-#endif
+
                 var actions = __instance.ActionsPatrol;
                 if (actions != null)
                 {
@@ -384,7 +331,6 @@ namespace EntityTools.Patches.Quester
                     }
                 }
             }
-#endif
         }
 
         /// <summary>
@@ -408,11 +354,12 @@ namespace EntityTools.Patches.Quester
         /// </summary>
         private static bool UCCProfileEditor_EditValue(ref object __result, ITypeDescriptorContext /*__context*/ __0, IServiceProvider /*__provider*/__1, object /*__value*/__2)
         {
+            //TODO заменить на вызов нового редактора
             if (__2 is Profil uccProfile)
             {
                 try
                 {
-                    if (EntityTools.Config.Patches.UccComplexPatch)
+                    if (EntityTools.Config.Patches.QuesterPatches.ReplaceEditorForAddUccActions)
                     {
                         // Вызов собственного ucc-редактора
                         __result = UccEditor.Edit(uccProfile, "", true) 

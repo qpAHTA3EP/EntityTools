@@ -600,7 +600,7 @@ namespace EntityTools.UCC.Editor
             if (profileUnsaved)
                 SaveProfile("");
 
-            Astral.Logic.UCC.Core.Get.mProfil = uccProfile.CreateDeepCopy();
+            Astral.Logic.UCC.Core.Get.mProfil = uccProfile.CreateXmlCopy();
         }
 
         /// <summary>
@@ -806,7 +806,7 @@ namespace EntityTools.UCC.Editor
             if (treeConditions.SelectedNode?.Tag is UCCCondition uccCondition)
             {
                 propertyCallback?.Invoke();
-                uccConditionCache = uccCondition.CreateDeepCopy();
+                uccConditionCache = uccCondition.CreateXmlCopy();
             }
         }
 
@@ -817,7 +817,7 @@ namespace EntityTools.UCC.Editor
                 propertyCallback?.Invoke();
 
                 // Добавляем UCC-команду
-                var newCondition = uccConditionCache.CreateDeepCopy();
+                var newCondition = uccConditionCache.CreateXmlCopy();
                 var newNode = newCondition.MakeTreeNode();
                 var selectedNode = treeConditions.SelectedNode;
                 if (selectedNode != null)
@@ -1374,13 +1374,13 @@ namespace EntityTools.UCC.Editor
                     if (e.KeyCode == Keys.C || e.KeyData == Keys.C)
                     {
                         if (listPriorities.SelectedItem is TargetPriorityEntry priorityEntry)
-                            targetPriorityCache = priorityEntry.CreateDeepCopy();
+                            targetPriorityCache = priorityEntry.CreateXmlCopy();
                     }
                     else if (e.KeyCode == Keys.V || e.KeyData == Keys.V)
                     {
                         if (targetPriorityCache != null)
                         {
-                            var targetPriorityEntry = targetPriorityCache.CreateDeepCopy();
+                            var targetPriorityEntry = targetPriorityCache.CreateXmlCopy();
                             var selectedPriorityInd = listPriorities.SelectedIndex;
                             if (selectedPriorityInd >= 0)
                                 listPriorities.Items.Insert(selectedPriorityInd + 1, targetPriorityEntry);

@@ -4,14 +4,13 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using System.Xml.Serialization;
 using ACTP0Tools;
 using ACTP0Tools.Patches;
-using ACTP0Tools.Reflection;
 using Astral;
 using Astral.Classes.ItemFilter;
 using Astral.Controllers;
@@ -26,6 +25,7 @@ using EntityTools.Core.Interfaces;
 using EntityTools.Enums;
 using EntityTools.Forms;
 using EntityTools.Services;
+using EntityTools.Servises.SlideMonitor;
 using EntityTools.Tools;
 using EntityTools.Tools.Entities;
 using EntityTools.Tools.Export;
@@ -45,6 +45,9 @@ namespace EntityTools.Core
         public EntityToolsMainPanel() : base("Entity Tools")
         {
             InitializeComponent();
+
+            var assemblyInfo = Assembly.GetExecutingAssembly().GetName();
+            lblVersion.Text = $"{assemblyInfo.Name} v.{assemblyInfo.Version}";
 
             cbxExportSelector.Properties.Items.AddRange(Enum.GetValues(typeof(ExportTypes)));
             cbxExportSelector.SelectedIndex = 0;
@@ -236,12 +239,18 @@ namespace EntityTools.Core
             if (slot!= null)
                 XtraMessageBox.Show($@"ItemLevel: {slot.Item.ItemProgression_GetItemLevel()}");
             else XtraMessageBox.Show($@"No item '{id}' found");
-#elif true
+#elif false
             var path = @"d:\ASTRAL\Astral_RU_1\Profiles\Campaigns\M18_M19_Avernus\M19_Fallen.amp.zip";
             var profile = AstralAccessors.Quester.Core.Load(ref path);
 
             var profile1 = profile.CreateDeepCopy();
             var profile2 = profile.CreateXmlCopy();
+#elif true
+            var mountDef = EntityManager.LocalPlayer.GetMountCostume();
+
+            if (mountDef != null)
+                XtraMessageBox.Show($@"{mountDef.InternalName} {mountDef.Category} {mountDef.Type}");
+
 #endif
         }
 

@@ -47,7 +47,7 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
 
         public override object Clone()
         {
-            return new ConditionTreeNode(condition.CreateDeepCopy());
+            return new ConditionTreeNode(condition.CreateXmlCopy());
         }
     }
 }

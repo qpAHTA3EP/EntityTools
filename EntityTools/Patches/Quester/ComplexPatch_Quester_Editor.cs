@@ -35,22 +35,6 @@ namespace EntityTools.Patches.Quester
         {
             if (EntityTools.Config.Patches.QuesterPatches.ReplaceQuesterEditor)
             {
-                /*
-                if (this.SelectedAction == null)
-	            {
-		            XtraMessageBox.Show("No selected action !");
-		            return;
-	            }
-	            if (Main.editorForm != null && !Main.editorForm.IsDisposed)
-	            {
-		            Main.editorForm.SelectedAction = this.SelectedAction;
-		            Main.editorForm.Focus();
-		            return;
-	            }
-	            Main.editorForm = new Editor();
-	            Main.editorForm.HaveToSelect = this.SelectedAction;
-	            Main.editorForm.Show();
-                */
                 var selectedAction = selectedActionAccessor[__instance];
                 if (selectedAction is null)
                 {

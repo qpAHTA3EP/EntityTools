@@ -14,13 +14,16 @@ namespace EntityTools.UCC.Editor.TreeViewCustomization
     /// </summary>
     public class UccActionPackTreeNode : TreeNode, IUccActionTreeNode
     {
-        //public UCCAction Data => (UCCAction)Tag;
-
         public bool AllowChildren => true;
 
         public UccActionPackTreeNode(UCCActionPack actionPack, bool clone = false)
         {
-            UCCActionPack actPack = clone ? actionPack.CreateDeepCopy() : actionPack;
+            if (clone)
+                // Специальная перегрузка для UCCActionPack отсутствует, 
+                // поэтому требуется преобразование к UCCAction для вызова нужной версии CreateXmlCopy()
+                actionPack = (UCCActionPack)((UCCAction)actionPack).CreateXmlCopy();
+
+            UCCActionPack actPack = actionPack;
             Tag = actPack;
             Text = actPack.ToString();
             //BackColor = SystemColors.ControlDark;
@@ -28,14 +31,11 @@ namespace EntityTools.UCC.Editor.TreeViewCustomization
             SelectedImageKey = "Box";
             Checked = actPack.Enabled;
             Nodes.AddRange(actPack.Actions.ToUccTreeNodes());
-
-            //_conditionTreeNodes = ReconstructInternal().Conditions.ToTreeNodes().ToArray();
         }
 
         public override object Clone()
         {
-            //TODO: Добавить реконструкцию списка условий
-            return new UccActionPackTreeNode((UCCActionPack)ReconstructInternal());
+            return new UccActionPackTreeNode((UCCActionPack)ReconstructInternal().CreateXmlCopy());
         }
 
         public UCCAction ReconstructInternal()

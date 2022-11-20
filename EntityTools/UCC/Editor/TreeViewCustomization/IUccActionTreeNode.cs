@@ -3,9 +3,6 @@ using Astral.Logic.UCC.Classes;
 
 namespace EntityTools.UCC.Editor.TreeViewCustomization
 {
-    /// <summary>
-    /// 
-    /// </summary>
     interface IUccActionTreeNode : IUccTreeNode<UCCAction>
     {
         /// <summary>

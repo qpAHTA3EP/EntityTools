@@ -53,7 +53,7 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
             UpdateView();
         }
 
-        public abstract void NewID();
+        public abstract void RegenActionID(); 
 
         public abstract void UpdateView();
 

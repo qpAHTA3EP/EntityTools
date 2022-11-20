@@ -145,11 +145,17 @@ namespace ACTP0Tools.Classes.Quester
             get => AstralAccessors.Quester.Core.Profile.MainActionPack.Actions;
             set
             {
-                OnPropertyChanged();
-                var actions = AstralAccessors.Quester.Core.Profile.MainActionPack.Actions;
+                if (AstralAccessors.Controllers.Roles.IsRunning)
+                    AstralAccessors.Controllers.Roles.ToggleRole(true);
+
+                var mainActionPack = AstralAccessors.Quester.Core.Profile.MainActionPack;
+                mainActionPack.Reset();
+                QuesterHelper.ResetActionPlayer(mainActionPack);
+                var actions = mainActionPack.Actions;
                 actions.Clear();
                 if (value?.Any() == true)
                     actions.AddRange(value);
+                OnPropertyChanged();
             }
         }
 

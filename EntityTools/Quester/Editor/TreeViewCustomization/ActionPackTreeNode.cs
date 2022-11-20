@@ -22,7 +22,7 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
 
         public ActionPackTreeNode(QuesterProfileProxy profile, ActionPack actionPack, bool clone = false) : base(profile)
         {
-            ActionPack actPack = clone ? actionPack.CreateDeepCopy() : actionPack;
+            ActionPack actPack = clone ? actionPack.CreateXmlCopy() : actionPack;
             Tag = actPack;
             this.actionPack = actPack;
             Nodes.AddRange(TreeViewHelper.ToTreeNodes(owner, actPack.Actions, clone));
@@ -41,14 +41,15 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
 
         public override object Clone()
         {
-            var copy = (ActionPack) ReconstructInternal().CreateDeepCopy();
-            UpdateId(copy);
+            var copy = (ActionPack) ReconstructInternal().CreateXmlCopy();
+            copy.RegenActionID(true);
 
             return new ActionPackTreeNode(owner, copy);
         }
 
-        public override void NewID() => UpdateId(actionPack);
-     
+        public override void RegenActionID() => actionPack.RegenActionID(true);
+
+#if false
         private static void UpdateId(ActionPack actionPack)
         {
             actionPack.ActionID = Guid.NewGuid();
@@ -58,7 +59,8 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
                     UpdateId(internalPack);
                 else action.ActionID = Guid.NewGuid();
             }
-        }
+        } 
+#endif
 
         public override QuesterAction ReconstructInternal()
         {

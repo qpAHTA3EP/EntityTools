@@ -89,9 +89,6 @@ namespace EntityTools.UCC.Actions
         #endregion
 
         #region INotifyPropertyChanged
-        [NonSerialized]
-        internal IUccActionEngine Engine;
-        
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")

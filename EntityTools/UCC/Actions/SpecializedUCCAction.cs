@@ -411,7 +411,7 @@ namespace EntityTools.UCC.Actions
         {
             return BaseClone(new SpecializedUCCAction
             {
-                ManagedAction = ManagedAction.CreateDeepCopy(),
+                ManagedAction = ManagedAction.CreateXmlCopy(),
                 CustomConditionCheck = CustomConditionCheck,
                 CustomConditions = new ObservableCollection<UCCCondition>(CustomConditions.Select(cnd => cnd is ICustomUCCCondition cstCnd
                                                                                                                        ? (UCCCondition)cstCnd.Clone()

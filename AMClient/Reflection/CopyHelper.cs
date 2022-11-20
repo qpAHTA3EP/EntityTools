@@ -2,7 +2,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Runtime.Serialization;
@@ -11,6 +10,7 @@ using System.Text;
 using System.Xml.Serialization;
 using ACTP0Tools.Patches;
 using Astral;
+using Astral.Logic.UCC.Classes;
 using QuesterAction = Astral.Quester.Classes.Action;
 using QuesterActionPack = Astral.Quester.Classes.ActionPack;
 using QuesterCondition = Astral.Quester.Classes.Condition;
@@ -67,9 +67,17 @@ namespace ACTP0Tools.Reflection
             catch (Exception e)
             {
                 var builder = new StringBuilder();
+                builder.Append(MethodBase.GetCurrentMethod().Name)
+                    .Append(" catch an exception coping '")
+                    .Append(sourceObject.GetType().FullName)
+                    .AppendLine("':");
                 builder.IntroduceException(e);
                 var text = builder.ToString();
-                File.WriteAllText(Path.Combine(Astral.Controllers.Directories.LogsPath, DateTime.Now.ToString("yyyy-MM-dd hh-mm-ss ") + nameof(CreateDeepCopy) + ".log"), text);
+                File.WriteAllText(
+                    Path.Combine(Astral.Controllers.Directories.LogsPath,
+                        $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss}_{MethodBase.GetCurrentMethod().Name}.log"),
+                    text);
+                
                 Logger.WriteLine(Logger.LogType.Debug, text);
                 throw;
             }
@@ -84,6 +92,9 @@ namespace ACTP0Tools.Reflection
 
         private static object CreateDeepCopyInternal(Dictionary<object, object> innerObjects, ref object obj)
         {
+            if (obj is null)
+                return null;
+
             if (innerObjects.TryGetValue(obj, out object existsObject))
                 return existsObject;
 
@@ -101,7 +112,6 @@ namespace ACTP0Tools.Reflection
             var objCopy = memberwise_clone.Invoke(obj, null);
             innerObjects[obj] = objCopy;
 
-            // BUG добавить копирование авто-свойств
             foreach (var field in type.EnumerateFields())
             {
                 if (field.IsInitOnly
@@ -118,6 +128,9 @@ namespace ACTP0Tools.Reflection
 
         private static Array CreateArrayDeepCopy(Dictionary<object, object> innerObjects, Array array)
         {
+            if (array is null)
+                return null;
+
             Array arrayCopy = (Array)array.Clone();
             innerObjects[array] = arrayCopy;
 
@@ -130,6 +143,9 @@ namespace ACTP0Tools.Reflection
 
         private static void MakeArrayRowDeepCopy(Dictionary<object, object> innerObjects, Array array, int[] indices, int rank)
         {
+            if (array is null)
+                return;
+
             int nextRank = rank + 1;
             int upperBound = array.GetUpperBound(rank);
 
@@ -146,9 +162,10 @@ namespace ACTP0Tools.Reflection
             }
             indices[rank] = array.GetLowerBound(rank);
         }
-        #endregion  
+        #endregion
 #endif
 
+#if false
         /// <summary>
         /// Perform a deep Copy of the object.
         /// </summary>
@@ -185,11 +202,16 @@ namespace ACTP0Tools.Reflection
             catch (Exception e)
             {
                 var builder = new StringBuilder();
+                builder.Append(MethodBase.GetCurrentMethod().Name)
+                       .Append(" catch an exception coping '")
+                       .Append(source.GetType().FullName)
+                       .AppendLine("':");
                 builder.IntroduceException(e);
                 var text = builder.ToString();
                 File.WriteAllText(
                     Path.Combine(Astral.Controllers.Directories.LogsPath,
-                        DateTime.Now.ToString("yyyy-MM-dd hh-mm-ss ") + nameof(CreateDeepCopy) + ".log"), text);
+                                 $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss}_{MethodBase.GetCurrentMethod().Name}.log"),
+                    text);
                 Logger.WriteLine(Logger.LogType.Debug, text);
                 throw;
             }
@@ -200,7 +222,8 @@ namespace ACTP0Tools.Reflection
                 Logger.WriteLine(Logger.LogType.Debug, $"CreateXmlCopy() worktime is {stopwatch.ElapsedMilliseconds} ms");
             }
 #endif
-        }
+        } 
+#endif
 
 #if true
         public static UccProfile CreateXmlCopy(this UccProfile profile)
@@ -229,7 +252,8 @@ namespace ACTP0Tools.Reflection
                 var text = builder.ToString();
                 File.WriteAllText(
                     Path.Combine(Astral.Controllers.Directories.LogsPath,
-                        DateTime.Now.ToString("yyyy-MM-dd hh-mm-ss ") + nameof(CreateDeepCopy) + ".log"), text);
+                                 $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss}_{MethodBase.GetCurrentMethod().Name}.log"), 
+                    text);
                 Logger.WriteLine(Logger.LogType.Debug, text);
                 throw;
             }
@@ -268,7 +292,8 @@ namespace ACTP0Tools.Reflection
                 var text = builder.ToString();
                 File.WriteAllText(
                     Path.Combine(Astral.Controllers.Directories.LogsPath,
-                        DateTime.Now.ToString("yyyy-MM-dd hh-mm-ss ") + nameof(CreateDeepCopy) + ".log"), text);
+                                 $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss}_{MethodBase.GetCurrentMethod().Name}.log"),
+                    text);
                 Logger.WriteLine(Logger.LogType.Debug, text);
                 throw;
             }
@@ -307,7 +332,48 @@ namespace ACTP0Tools.Reflection
                 var text = builder.ToString();
                 File.WriteAllText(
                     Path.Combine(Astral.Controllers.Directories.LogsPath,
-                        DateTime.Now.ToString("yyyy-MM-dd hh-mm-ss ") + nameof(CreateDeepCopy) + ".log"), text);
+                                 $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss}_{MethodBase.GetCurrentMethod().Name}.log"), 
+                    text);
+                Logger.WriteLine(Logger.LogType.Debug, text);
+                throw;
+            }
+#if PROFILING
+            finally
+            {
+                stopwatch.Stop();
+                Logger.WriteLine(Logger.LogType.Debug, $"CreateXmlCopy() worktime is {stopwatch.ElapsedMilliseconds} ms");
+            }
+#endif
+        }
+
+        public static TargetPriorityEntry CreateXmlCopy(this TargetPriorityEntry targetPriority)
+        {
+#if PROFILING
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+#endif
+            try
+            {
+                if (targetPriority is null)
+                    return null;
+
+                using (var stream = new MemoryStream())
+                {
+                    var serializer = ACTP0Serializer.UccTargetPrioritySerializer;
+                    serializer.Serialize(stream, targetPriority);
+                    stream.Seek(0, SeekOrigin.Begin);
+                    return serializer.Deserialize(stream) as TargetPriorityEntry;
+                }
+            }
+            catch (Exception e)
+            {
+                var builder = new StringBuilder();
+                builder.IntroduceException(e);
+                var text = builder.ToString();
+                File.WriteAllText(
+                    Path.Combine(Astral.Controllers.Directories.LogsPath,
+                        $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss}_{MethodBase.GetCurrentMethod().Name}.log"),
+                    text);
                 Logger.WriteLine(Logger.LogType.Debug, text);
                 throw;
             }
@@ -346,7 +412,8 @@ namespace ACTP0Tools.Reflection
                 var text = builder.ToString();
                 File.WriteAllText(
                     Path.Combine(Astral.Controllers.Directories.LogsPath,
-                        DateTime.Now.ToString("yyyy-MM-dd hh-mm-ss ") + nameof(CreateDeepCopy) + ".log"), text);
+                        $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss}_{MethodBase.GetCurrentMethod().Name}.log"),
+                    text);
                 Logger.WriteLine(Logger.LogType.Debug, text);
                 throw;
             }
@@ -385,7 +452,8 @@ namespace ACTP0Tools.Reflection
                 var text = builder.ToString();
                 File.WriteAllText(
                     Path.Combine(Astral.Controllers.Directories.LogsPath,
-                        DateTime.Now.ToString("yyyy-MM-dd hh-mm-ss ") + nameof(CreateDeepCopy) + ".log"), text);
+                        $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss}_{MethodBase.GetCurrentMethod().Name}.log"),
+                    text);
                 Logger.WriteLine(Logger.LogType.Debug, text);
                 throw;
             }
@@ -424,7 +492,8 @@ namespace ACTP0Tools.Reflection
                 var text = builder.ToString();
                 File.WriteAllText(
                     Path.Combine(Astral.Controllers.Directories.LogsPath,
-                        DateTime.Now.ToString("yyyy-MM-dd hh-mm-ss ") + nameof(CreateDeepCopy) + ".log"), text);
+                        $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss}_{MethodBase.GetCurrentMethod().Name}.log"),
+                    text);
                 Logger.WriteLine(Logger.LogType.Debug, text);
                 throw;
             }
@@ -463,7 +532,8 @@ namespace ACTP0Tools.Reflection
                 var text = builder.ToString();
                 File.WriteAllText(
                     Path.Combine(Astral.Controllers.Directories.LogsPath,
-                        DateTime.Now.ToString("yyyy-MM-dd hh-mm-ss ") + nameof(CreateDeepCopy) + ".log"), text);
+                        $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss}_{MethodBase.GetCurrentMethod().Name}.log"),
+                    text);
                 Logger.WriteLine(Logger.LogType.Debug, text);
                 throw;
             }
@@ -518,7 +588,8 @@ namespace ACTP0Tools.Reflection
                 var text = builder.ToString();
                 File.WriteAllText(
                     Path.Combine(Astral.Controllers.Directories.LogsPath,
-                        DateTime.Now.ToString("yyyy-MM-dd hh-mm-ss ") + nameof(CreateDeepCopy) + ".log"), text);
+                        $"{DateTime.Now:yyyy-MM-dd_HH-mm-ss}_{MethodBase.GetCurrentMethod().Name}.log"),
+                    text);
                 Logger.WriteLine(Logger.LogType.Debug, text);
                 throw;
             }

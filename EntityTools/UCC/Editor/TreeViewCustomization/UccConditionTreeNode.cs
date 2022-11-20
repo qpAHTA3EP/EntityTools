@@ -60,7 +60,8 @@ namespace EntityTools.UCC.Editor.TreeViewCustomization
 
         public override object Clone()
         {
-            return new UccConditionTreeNode((UCCCondition)Tag.CreateDeepCopy());
+            var copy = ((UCCCondition)Tag).CreateXmlCopy();
+            return new UccConditionTreeNode(copy);
         }
     }
 }

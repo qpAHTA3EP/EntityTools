@@ -125,7 +125,8 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
 
         public override object Clone()
         {
-            return new ConditionTreeNode(condition.CreateDeepCopy());
+            var copy = ((QuesterCondition)condition).CreateXmlCopy();
+            return new ConditionIsInCustomRegionTreeNode((IsInCustomRegion)copy);
         }
     }
 }

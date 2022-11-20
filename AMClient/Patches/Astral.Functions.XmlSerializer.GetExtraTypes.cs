@@ -267,6 +267,8 @@ namespace ACTP0Tools.Patches
         private static XmlSerializer _uccActionSerializer;
         public static XmlSerializer UccConditionSerializer => _uccConditionSerializer ?? (_uccConditionSerializer = new XmlSerializer(tUccCondition, UccTypes.ToArray()));
         private static XmlSerializer _uccConditionSerializer;
+        public static XmlSerializer UccTargetPrioritySerializer => _uccTargetPrioritySerializer ?? (_uccTargetPrioritySerializer = new XmlSerializer(tTargetPriorityEntry, UccTypes.ToArray()));
+        private static XmlSerializer _uccTargetPrioritySerializer;
 
         internal static void CategorizeTypeLists(IEnumerable<Type> types)
         {

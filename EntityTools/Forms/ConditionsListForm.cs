@@ -179,7 +179,7 @@ namespace EntityTools.Forms
             _conditionCopy = null;
             if (lsbxConditions.SelectedItem is UCCCondition cond)
             {
-                _conditionCopy = cond.CreateDeepCopy(); 
+                _conditionCopy = cond.CreateXmlCopy(); 
                 XtraMessageBox.Show($"Condition '{_conditionCopy}' copied");
             }
         }
@@ -188,7 +188,7 @@ namespace EntityTools.Forms
         {
             if (_conditionCopy != null)
             {
-                UCCCondition cond = _conditionCopy.CreateDeepCopy();
+                UCCCondition cond = _conditionCopy.CreateXmlCopy();
                 allowConditionsItemCheckedChangeInd = lsbxConditions.Items.Add(cond, cond.Locked);
                 lsbxConditions.SetItemChecked(allowConditionsItemCheckedChangeInd, cond.Locked);
                 lsbxConditions.SelectedItem = cond;
