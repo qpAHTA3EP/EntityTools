@@ -9,14 +9,14 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
 {
     public abstract class ActionBaseTreeNode : TreeNode, ITreeNode<QuesterAction>
     {
-        protected readonly QuesterProfileProxy owner;
+        protected readonly QuesterProfileProxy Owner;
         public abstract QuesterAction Content { get; }
         public abstract bool UseHotSpots { get; }
         public abstract List<Vector3> HotSpots { get; }
 
         protected ActionBaseTreeNode(QuesterProfileProxy profile)
         {
-            owner = profile;
+            Owner = profile;
         }
 
         public abstract QuesterAction.ActionValidity IsValid { get; }

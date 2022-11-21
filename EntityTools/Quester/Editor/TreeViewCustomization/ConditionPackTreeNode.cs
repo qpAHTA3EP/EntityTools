@@ -16,19 +16,19 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
     {
         private readonly ConditionPack conditionPack;
 
-        public ConditionPackTreeNode(ConditionPack conditionPack)
+        public ConditionPackTreeNode(QuesterProfileProxy profile, ConditionPack conditionPack) : base(profile)
         {
             Tag = conditionPack;
             this.conditionPack = conditionPack;
             var conditions = conditionPack.Conditions;
             if (conditions?.Count > 0)
-                Nodes.AddRange(conditions.ToTreeNodes());
+                Nodes.AddRange(conditions.ToTreeNodes(Owner));
             UpdateView();
         }
 
         public override QuesterCondition Content => conditionPack;
 
-        public override bool IsValid(QuesterProfileProxy profile)
+        public override bool IsValid()
         {
             if (Nodes.Count == 0)
                 return false;
@@ -38,7 +38,7 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
             if (conditionPack.Tested == LogicRule.Conjunction)
             {
                 foreach (ConditionBaseTreeNode node in Nodes)
-                    if (!node.IsValid(profile))
+                    if (!node.IsValid())
                     {
                         result = false;
                         break;
@@ -52,7 +52,7 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
 
                 foreach (ConditionBaseTreeNode node in Nodes)
                 {
-                    if (node.IsValid(profile))
+                    if (node.IsValid())
                     {
                         if (node.Checked)
                             trueNumLock++;
@@ -69,7 +69,7 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
             return conditionPack.Not ^ result;
         }
 
-        public override string TestInfo(QuesterProfileProxy profile)
+        public override string TestInfo()
         {
             if (Nodes.Count > 0)
             {
@@ -79,7 +79,7 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
                 foreach (ConditionBaseTreeNode node in Nodes)
                 {
                     sb.Append(node.Checked ? "\t[L] " : "\t[U] ");
-                    sb.Append(node).Append(" | Result: ").Append(node.IsValid(profile)).AppendLine();
+                    sb.Append(node).Append(" | Result: ").Append(node.IsValid()).AppendLine();
                 }
                 sb.Append("Negation flag (Not): ").Append(conditionPack.Not).AppendLine();
                 return sb.ToString();
@@ -92,7 +92,7 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
         public override object Clone()
         {
             var copy = ((QuesterCondition)conditionPack).CreateXmlCopy();
-            return new ConditionPackTreeNode((ConditionPack)copy);
+            return new ConditionPackTreeNode(Owner, (ConditionPack)copy);
         }
 
         public override QuesterCondition ReconstructInternal()

@@ -320,6 +320,7 @@
     <Compile Include="Forms\TargetSelectForm.Designer.cs">
       <DependentUpon>TargetSelectForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Quester\Editor\TreeViewCustomization\ConditionIsInCustomRegionSetTreeNode.cs" />
     <Compile Include="UCC\Editor\UccEditor.cs">
       <SubType>Form</SubType>
     </Compile>

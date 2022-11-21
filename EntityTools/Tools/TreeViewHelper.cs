@@ -224,11 +224,15 @@ namespace EntityCore.Tools
         /// Конструирование коллекции узлов дерева для отображения списка quester-условий <paramref name="questerConditionList"/>
         /// </summary>
         /// <param name="questerConditionList"></param>
+        /// <param name="profile"></param>
         /// <param name="clone">Флаг принудительного создания копии quester-условия для соответствующего узла дерева</param>
         /// <returns></returns>
-        public static TreeNode[] ToTreeNodes(this IEnumerable<QuesterCondition> questerConditionList, bool clone = false)
+        public static TreeNode[] ToTreeNodes(
+            this IEnumerable<Condition> questerConditionList,
+            QuesterProfileProxy profile, 
+            bool clone = false)
         {
-            return questerConditionList.Select(item => MakeTreeNode(item, clone)).Cast<TreeNode>().ToArray();
+            return questerConditionList.Select(item => MakeTreeNode(item, profile, clone)).Cast<TreeNode>().ToArray();
         }
 
         /// <summary>
@@ -251,9 +255,13 @@ namespace EntityCore.Tools
         /// Конструирование узла дерева для отображения quester-условия <paramref name="condition"/>
         /// </summary>
         /// <param name="condition"></param>
+        /// <param name="profile"></param>
         /// <param name="clone">Флаг принудительного создания копии quester-условия для узла дерева</param>
         /// <returns></returns>
-        public static ConditionBaseTreeNode MakeTreeNode(this QuesterCondition condition, bool clone = false)
+        public static ConditionBaseTreeNode MakeTreeNode(
+            this Condition condition, 
+            QuesterProfileProxy profile,
+            bool clone = false)
         {
             if (clone)
                 condition = condition.CreateXmlCopy();
@@ -261,11 +269,13 @@ namespace EntityCore.Tools
             switch (condition)
             {
                 case ConditionPack conditionPack:
-                    return new ConditionPackTreeNode(conditionPack);
+                    return new ConditionPackTreeNode(profile, conditionPack);
                 case IsInCustomRegion isInCustomRegion:
-                    return new ConditionIsInCustomRegionTreeNode(isInCustomRegion);
+                    return new ConditionIsInCustomRegionTreeNode(profile, isInCustomRegion);
+                case IsInCustomRegionSet isInCustomRegionSet:
+                    return new ConditionIsInCustomRegionSetTreeNode(profile, isInCustomRegionSet);
                 default:
-                    return new ConditionTreeNode(condition);
+                    return new ConditionTreeNode(profile, condition);
             }
         }
 

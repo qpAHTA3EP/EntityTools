@@ -1,9 +1,4 @@
-﻿using Astral.Quester.Classes;
-using EntityTools.Enums;
-using EntityTools.Extensions;
-using EntityTools.Tools.Extensions;
-using MyNW.Classes;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -13,6 +8,11 @@ using System.Xml.Schema;
 using System.Xml.Serialization;
 using ACTP0Tools;
 using ACTP0Tools.Classes.Quester;
+using Astral.Quester.Classes;
+using EntityTools.Enums;
+using EntityTools.Extensions;
+using EntityTools.Tools.Extensions;
+using MyNW.Classes;
 
 namespace EntityTools.Tools.CustomRegions
 {
@@ -29,17 +29,13 @@ namespace EntityTools.Tools.CustomRegions
         public CustomRegionCollection(IEnumerable<CustomRegionEntry> collection, bool clone = true)
         {
             var predicate = construct_withing_predicate(collection, true, clone);
-            if (predicate != null)
-                within = predicate;
-            else within = initialize_withing;
+            within = predicate ?? initialize_withing;
         }
         public CustomRegionCollection(IEnumerable<CustomRegion> collection, InclusionType inclusion = InclusionType.Union)
         {
             var internInclusion = inclusion;
             var predicate = construct_withing_predicate(collection.Select(cr => new CustomRegionEntry(cr, internInclusion)), true);
-            if (predicate != null)
-                within = predicate;
-            else within = initialize_withing;
+            within = predicate ?? initialize_withing;
         }
         private long version;
 
@@ -51,17 +47,7 @@ namespace EntityTools.Tools.CustomRegions
         protected override void ClearItems()
         {
             version++;
-#if false   // Вызов Unbind() внутри перечисления недопустим
-            using (var enumerator = GetEnumerator())
-            {
-                while (enumerator.MoveNext())
-                {
-                    var crEntry = enumerator.Current;
-                    if (crEntry.Collection != null)
-                        enumerator.Current.Unbind();
-                }
-            } 
-#else
+
             if (Count > 0)
             {
                 CustomRegionEntry[] crEntryArray = new CustomRegionEntry[Count];
@@ -69,15 +55,14 @@ namespace EntityTools.Tools.CustomRegions
                 crEntryArray.ForEach(crEntry => crEntry.Unbind());
                 base.ClearItems();
             }
-#endif
             label = string.Empty;
             within = initialize_withing;
         }
         protected override void InsertItem(int index, CustomRegionEntry customRegionEntry)
         {
-            if(customRegionEntry is null)
+            if (customRegionEntry is null)
                 return;
-            
+
             version++;
             if (!Contains(customRegionEntry))
             {
@@ -119,7 +104,7 @@ namespace EntityTools.Tools.CustomRegions
         [Browsable(false), XmlIgnore]
         public QuesterProfileProxy DesignContext
         {
-            get => _context ?? (_context = AstralAccessors.Quester.Core.ActiveProfileProxy);
+            get => _context ?? AstralAccessors.Quester.Core.ActiveProfileProxy;
             set => _context = value;
         }
         private QuesterProfileProxy _context;
@@ -178,7 +163,7 @@ namespace EntityTools.Tools.CustomRegions
                     return within(position);
                 }
             }
-            return false; 
+            return false;
         }
 
         /// <summary>
@@ -203,6 +188,12 @@ namespace EntityTools.Tools.CustomRegions
                 _exclusion.Clear();
                 _intersection.Clear();
 
+                var customRegions = DesignContext.CustomRegions;
+
+                CustomRegion FindCustomRegion(CustomRegionEntry customRegionEntry)
+                {
+                    return customRegions.FirstOrDefault(cr => cr.Name == customRegionEntry.Name);
+                }
                 foreach (var crEntry in collection)
                 {
                     if (reinitialize && !TryAddValue(clone ? crEntry.Clone() : crEntry))
@@ -214,21 +205,21 @@ namespace EntityTools.Tools.CustomRegions
                         case InclusionType.Union:
                             // Отсутствие cr, соответствующего crEntry,
                             // не является препятствием для обработки InclusionType.Union
-                            cr = FindCustomRegionFor(crEntry);
+                            cr = FindCustomRegion(crEntry);
                             if (cr != null)
                                 _union.Add(cr);
                             break;
                         case InclusionType.Exclusion:
                             // Отсутствие cr, соответствующего crEntry,
                             // не является препятствием для обработки InclusionType.Exclusion
-                            cr = FindCustomRegionFor(crEntry);
+                            cr = FindCustomRegion(crEntry);
                             if (cr != null)
                                 _exclusion.Add(cr);
                             break;
                         case InclusionType.Intersection:
                             // Отсутствие cr, соответствующего crEntry,
                             // означает, что пересечение является вырожденным множеством и ни одна точка в него не входит
-                            cr = FindCustomRegionFor(crEntry);
+                            cr = FindCustomRegion(crEntry);
                             if (cr != null)
                                 _intersection.Add(cr);
                             break;
@@ -312,7 +303,7 @@ namespace EntityTools.Tools.CustomRegions
             return !_exclusion.Any(position.Within);
         }
         protected bool check_false(Vector3 position) => false;
-        protected bool check_true(Vector3 position) => true; 
+        protected bool check_true(Vector3 position) => true;
         #endregion
 
         public override string ToString()
@@ -320,9 +311,6 @@ namespace EntityTools.Tools.CustomRegions
             if (string.IsNullOrEmpty(label))
             {
                 if (Count > 0)
-#if false
-                    label = string.Concat(GetType().Name, '[', Count, ']'); 
-#else
                 {
                     int unionCount = _union.Count,
                         intersectionCount = _intersection.Count,
@@ -334,7 +322,6 @@ namespace EntityTools.Tools.CustomRegions
                                           exclusionCount > 0 ? $" \\ ({exclusionCount})" : string.Empty,
                                           ']');
                 }
-#endif
                 else label = "Empty";
             }
             return label;
@@ -407,25 +394,29 @@ namespace EntityTools.Tools.CustomRegions
             }
         }
 
+        public void ResetCache()
+        {
+            version++;
+            versionUnion = -1;
+            versionIntersection = -1;
+            versionExclusion = -1;
+            versionWithin = -1;
+            within = initialize_withing;
+            _context = null;
+        }
+
         readonly List<CustomRegion> _intersection = new List<CustomRegion>();
         private long versionIntersection = -1;
 
         Predicate<Vector3> within;
         private long versionWithin = -1;
-
-        private CustomRegion FindCustomRegionFor(CustomRegionEntry crEntry)
-        {
-            return DesignContext.CustomRegions.FirstOrDefault(cr =>
-                cr.Name.Equals(crEntry.Name, StringComparison.Ordinal));
-        }
-
+        
         #region IXmlSerializable
         public XmlSchema GetSchema()
         {
             return null;
         }
 
-#if true
         public void ReadXml(XmlReader reader)
         {
             if (reader.ReadState == ReadState.Initial)
@@ -492,7 +483,6 @@ namespace EntityTools.Tools.CustomRegions
                 reader.Read();
             string startElemName = reader.Name;
 
-            string crName;
             while (reader.ReadState == ReadState.Interactive)
             {
                 string elemName = reader.Name;
@@ -502,19 +492,19 @@ namespace EntityTools.Tools.CustomRegions
                         reader.ReadStartElement(elemName);
 
                     else if (elemName == nameof(CustomRegion.Name)
-                        || elemName == "string")
+                             || elemName == "string")
                     {
-                        crName = reader.ReadElementContentAsString(elemName, "");
+                        string crName = reader.ReadElementContentAsString(elemName, "");
                         if (!Contains(crName))
                         {
-                            if(TryAddValue(new CustomRegionEntry(crName, inclusion)))
+                            if (TryAddValue(new CustomRegionEntry(crName, inclusion)))
                                 version++;
                         }
                     }
                     else reader.Read();
                 }
                 else if (reader.NodeType == XmlNodeType.EndElement
-                    && elemName == startElemName)
+                         && elemName == startElemName)
                 {
                     reader.ReadEndElement();
                     break;
@@ -522,54 +512,23 @@ namespace EntityTools.Tools.CustomRegions
                 else reader.Read();
             }
         }
-#else
-        public void ReadXml(XmlReader reader)
-        {
-            if (reader.ReadState == ReadState.Initial)
-                reader.Read();
-            string startElemName = reader.Name;
 
-            while (reader.ReadState == ReadState.Interactive)
-            {
-                string elemName = reader.Name;
-                if (reader.IsStartElement())
-                {
-                    if (reader.IsEmptyElement)
-                    {
-                        reader.ReadStartElement(elemName);
-                    }
-#if ReadInnerXml
-                    else
-                    {
-                        reader.ReadStartElement(elemName);
-                        ReadInnerXml(reader, elemName)
-                        reader.ReadEndElement(); 
-                    }
-#endif
-                    else if (elemName == nameof(CustomRegion)
-                        || elemName == nameof(CustomRegionEntry)
-                        || elemName == "string")
-                    {
-                        var crEntry = reader.ReadContentAsCustomRegionEntry();
-                        if (crEntry != null && !Contains(crEntry.Name))
-                            Add(crEntry);
-                        continue;
-                    }
-                }
-                else if (reader.NodeType == XmlNodeType.EndElement
-                && elemName == startElemName)
-                {
-                    reader.ReadEndElement();
-                    break;
-                }
-                reader.Read();
-            }
-        } 
-#endif
-
-#if true // Запись в Xml списков CustomRegion.Name, сгруппированных по InclusionType
         public void WriteXml(XmlWriter writer)
         {
+#if true
+            if (Count > 0)
+            {
+                var groups = this.GroupBy(cr => cr.Inclusion);
+
+                foreach (var group in groups)
+                {
+                    writer.WriteStartElement(group.Key.ToString(), "");
+                    foreach (var item in group)
+                        writer.WriteElementString(nameof(CustomRegion.Name), item.Name);
+                    writer.WriteEndElement();
+                } 
+            }
+#else
             // Проверяем актуальность списков union, intersection, exclusion
             if (versionUnion != version
                 || versionIntersection != version
@@ -598,25 +557,8 @@ namespace EntityTools.Tools.CustomRegions
                     writer.WriteElementString(nameof(CustomRegion.Name), cr.Name);
                 writer.WriteEndElement();
             }
-        }
-#else   // Запись в Xml каждого CustomRegionEntry отдельно
-        public void WriteXml(XmlWriter writer)
-        {
-            using (var itemEnumerator = base.GetEnumerator())
-            {
-                while (itemEnumerator.MoveNext())
-                {
-                    var item = itemEnumerator.Current;
-                    if (item.Inclusion != InclusionType.Ignore)
-                    {
-                        writer.WriteStartElement(nameof(CustomRegion), "");
-                        item.WriteXml(writer);
-                        writer.WriteEndElement();
-                    }
-                }
-            }
-        }
 #endif
+        }
         #endregion
     }
 }

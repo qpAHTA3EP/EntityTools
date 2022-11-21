@@ -1,5 +1,6 @@
 ﻿using ACTP0Tools.Classes.Quester;
 using ACTP0Tools.Reflection;
+using EntityTools.Quester.Conditions;
 using QuesterCondition = Astral.Quester.Classes.Condition;
 
 namespace EntityTools.Quester.Editor.TreeViewCustomization
@@ -7,9 +8,9 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
     /// <summary>
     /// Узел дерева, отображающий <see cref="QuesterCondition"/>
     /// </summary>
-    internal sealed class ConditionTreeNode : ConditionBaseTreeNode
+    internal sealed class ConditionIsInCustomRegionSetTreeNode : ConditionBaseTreeNode
     {
-        public ConditionTreeNode(QuesterProfileProxy profile, QuesterCondition condition) : base(profile)
+        public ConditionIsInCustomRegionSetTreeNode(QuesterProfileProxy profile, IsInCustomRegionSet condition) : base (profile)
         {
             Tag = condition;
             this.condition = condition;
@@ -17,12 +18,20 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
         }
 
         public override QuesterCondition Content => condition;
-        private readonly QuesterCondition condition;
+        private readonly IsInCustomRegionSet condition;
 
-        public override bool IsValid() => condition.IsValid;
+        public override bool IsValid()
+        {
+            condition.CustomRegions.DesignContext = Owner;
+            return condition.IsValid;
+        }
 
-        public override string TestInfo() => condition.TestInfos;
-        
+        public override string TestInfo()
+        {
+            condition.CustomRegions.DesignContext = Owner;
+            return condition.TestInfos;
+        }
+
         public override bool AllowChildren => false;
 
         public override void UpdateView()
@@ -33,7 +42,7 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
                 || txt == type.FullName)
                 txt = type.Name;
             Text = txt;
-            if(Checked != condition.Locked)
+            if (Checked != condition.Locked)
                 Checked = condition.Locked;
             ImageKey = "Condition";
             SelectedImageKey = "Condition";
@@ -47,7 +56,8 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
 
         public override object Clone()
         {
-            return new ConditionTreeNode(Owner, condition.CreateXmlCopy());
+            var copy = condition.CreateXmlCopy();
+            return new ConditionIsInCustomRegionSetTreeNode(Owner, (IsInCustomRegionSet)copy);
         }
     }
 }

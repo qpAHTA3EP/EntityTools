@@ -48,7 +48,7 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
 
         public override void UpdateView()
         {
-            designProfilePathAccessor[action] = owner.FileName;
+            designProfilePathAccessor[action] = Owner.FileName;
 
             if (Parent is ActionBaseTreeNode parentPackNode)
                 parentPackNode.UpdateView();
@@ -153,14 +153,14 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
         {
             var newAction = ReconstructInternal().CreateXmlCopy();
             newAction.RegenActionID();
-            return new ActionTreeNode(owner, newAction);
+            return new ActionTreeNode(Owner, newAction);
         }
 
         public override TreeNode[] GetConditionTreeNodes()
         {
             return conditionTreeNodes 
                 ?? (conditionTreeNodes = ReconstructInternal().Conditions
-                                                              .ToTreeNodes()
+                                                              .ToTreeNodes(Owner)
                                                               .ToArray());
         }
     }

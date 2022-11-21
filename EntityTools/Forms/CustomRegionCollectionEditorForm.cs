@@ -1,13 +1,11 @@
-﻿using DevExpress.XtraBars.Navigation;
-using DevExpress.XtraEditors;
-using EntityTools.Enums;
-using EntityTools.Tools.CustomRegions;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
-using Astral.Quester.Classes;
+using DevExpress.XtraBars.Navigation;
+using DevExpress.XtraEditors;
+using EntityTools.Enums;
+using EntityTools.Tools.CustomRegions;
 using Action = System.Action;
 
 namespace EntityTools.Forms
@@ -18,13 +16,6 @@ namespace EntityTools.Forms
 
         private static CustomRegionCollectionEditorForm @this = null;
 
-#if DataSource
-        /// <summary>
-        /// Список регионов
-        /// </summary>
-        BindingList<CustomRegionEntry> customRegions = new BindingList<CustomRegionEntry>();
-
-#endif
         Action fillList;
 
         public CustomRegionCollectionEditorForm()
@@ -32,7 +23,7 @@ namespace EntityTools.Forms
             InitializeComponent();
 
             var culture = System.Globalization.CultureInfo.CurrentCulture;
-            if(culture.TwoLetterISOLanguageName != "ru")
+            if (culture.TwoLetterISOLanguageName != "ru")
             {
                 textUnion.Text = "Select several regions, which will form MERGE  of the regions. The character should be within any marked region, as well as within the INTERSECTION area (if preset). At this time, it is forbidden to be withing the EXCLUSION area.";
                 textIntersection.Text = "Select several regions, which will form INTERSECTION of the regions. The character should be within every marked region, as well as within the UNION region (if preset).At this time, it is forbidden to be withing the EXCLUSION area";

@@ -1455,92 +1455,9 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         private void handler_SaveChanges2QuesterProfile(object sender, ItemClickEventArgs e)
         {
-#if true
             _profile.Save();
             if (!_profile.Saved)
                 Logger.Notify($"Fail to save profile '{Path.GetFileName(_profile.FileName)}'", true);
-            //else
-            //{
-            //    string meshName = EntityManager.LocalPlayer.MapState.MapName + ".bin";
-            //    Logger.Notify(string.Concat("The profile '", Path.GetFileName(_profile.FileName), "' saved."));
-            //}
-#else
-            // Штатное сохранение профиля реализовано в
-            // Astral.Quester.Core.Save(false)
-
-            //TODO переделать с использованием Core.CurrentProfileZipMeshFile и внешних мешей
-
-            string meshName = EntityManager.LocalPlayer.MapState.MapName + ".bin";
-            string profileName = _profile.FileName;
-            if (File.Exists(profileName))
-            {
-                var currentProfile = Astral.Quester.API.CurrentProfile;
-                bool useExternalMeshFile = currentProfile.UseExternalMeshFile && currentProfile.ExternalMeshFileName.Length >= 10;
-                string externalMeshFileName = useExternalMeshFile ? Path.Combine(Path.GetDirectoryName(profileName) ?? string.Empty, currentProfile.ExternalMeshFileName) : string.Empty;
-                Graph mesh = _profile.CurrentMesh;
-
-                ZipArchive zipFile = null;
-                try
-                {
-                    bool profileUpdated = false;
-                    if (СurrentProfileNeedSave)
-                    {
-                        // Открываем архивный файл профиля
-                        zipFile = ZipFile.Open(profileName, File.Exists(profileName) ? ZipArchiveMode.Update : ZipArchiveMode.Create);
-
-                        // Сохраняем в архив файл профиля "profile.xml"
-                        lock (currentProfile)
-                        {
-                            AstralAccessors.Quester.Core.SaveProfile(currentProfile, zipFile);
-                            currentProfile.Saved = true;
-                        }
-
-                        СurrentProfileNeedSave = false;
-                        profileUpdated = true;
-                    }
-
-                    // Сохраняем файлы мешей
-                    if (useExternalMeshFile)
-                    {
-                        // закрываем архив профиля
-                        zipFile?.Dispose();
-
-                        // открываем архив с внешними мешами
-                        zipFile = ZipFile.Open(externalMeshFileName,
-                            File.Exists(externalMeshFileName) ? ZipArchiveMode.Update : ZipArchiveMode.Create);
-                    }
-                    else if (zipFile is null)
-                        zipFile = ZipFile.Open(profileName, File.Exists(profileName) ? ZipArchiveMode.Update : ZipArchiveMode.Create);
-
-                    bool succeeded = false;
-                    if (mesh?.NodesCount > 0)
-                    {
-                        lock (mesh)
-                        {
-                            // удаляем мусор (скрытые вершины и ребра)
-                            mesh.RemoveUnpassable();
-                            // сохраняем меш в архивный файл
-                            succeeded = AstralAccessors.Quester.Core.SaveMesh(zipFile, meshName, mesh);
-                        }
-                    }
-
-                    if (succeeded)
-                        Logger.Notify(string.Concat("The profile '", Path.GetFileName(profileName), "' updated:\n\r\t",
-                                                        useExternalMeshFile ? externalMeshFileName + '\\' : string.Empty, meshName,
-                                                        profileUpdated ? "\n\r\tprofile.xml" : string.Empty));
-                    else Logger.Notify(string.Concat("Fail to save changes to the profile '", Path.GetFileName(profileName), '\''), true);
-                }
-                catch (Exception exc)
-                {
-                    Logger.WriteLine(exc.ToString());
-                    Logger.Notify(exc.ToString(), true);
-                }
-                finally
-                {
-                    zipFile?.Dispose();
-                }
-            } 
-#endif
         }
 
         /// <summary>

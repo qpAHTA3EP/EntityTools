@@ -1182,17 +1182,25 @@ namespace EntityTools.Core
 
         private void handler_EditUcc(object sender, EventArgs e)
         {
+#if true
+            UccEditor.Edit();
+#else
             UccEditor.Edit(Astral.Logic.UCC.API.CurrentProfile, Astral.API.CurrentSettings.LastUCCProfile);
+#endif
         }
 
         private void handler_EditQuester(object sender, EventArgs e)
         {
+#if true
+            QuesterEditor.Edit();
+#else
             var profile = Astral.Quester.API.CurrentProfile;
             var profileName = Astral.API.CurrentSettings.LastQuesterProfile;
 
             if (profile.Saved && !string.IsNullOrEmpty(profileName))
                 QuesterEditor.Edit(profile, profileName);
-            else QuesterEditor.Edit(profile);
+            else QuesterEditor.Edit(profile); 
+#endif
         }
     }
 }

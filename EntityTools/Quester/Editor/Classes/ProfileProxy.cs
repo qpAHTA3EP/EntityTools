@@ -64,7 +64,6 @@ namespace EntityTools.Quester.Editor.Classes
                         _blackList.Add(bl);
                     _blackList.ListChanged += BlackList_Changed;
                     OnPropertyChanged(nameof(BlackList));
-
                 }
 
                 if (_vendors != null)
@@ -73,8 +72,8 @@ namespace EntityTools.Quester.Editor.Classes
                     _vendors.Clear();
                     foreach (var vendor in profile.Vendors)
                         _vendors.AddUnique(vendor);
-                    OnPropertyChanged(nameof(Vendors));
                     _vendors.ListChanged += Vendors_Changed;
+                    OnPropertyChanged(nameof(Vendors));
                 }
             }
             else
@@ -83,27 +82,21 @@ namespace EntityTools.Quester.Editor.Classes
                 _fileName = string.Empty;
                 if (_customRegions != null)
                 {
-                    _customRegions.ListChanged -= CustomRegions_Changed;
                     _customRegions.Clear();
-                    _customRegions.ListChanged += CustomRegions_Changed;
                     OnPropertyChanged(nameof(CustomRegions));
                 }
 
                 if (_blackList != null)
                 {
-                    _blackList.ListChanged -= BlackList_Changed;
                     _blackList.Clear();
-                    _blackList.ListChanged += BlackList_Changed;
                     OnPropertyChanged(nameof(BlackList));
 
                 }
 
                 if (_vendors != null)
                 {
-                    _vendors.ListChanged -= Vendors_Changed;
                     _vendors.Clear();
                     OnPropertyChanged(nameof(Vendors));
-                    _vendors.ListChanged += Vendors_Changed;
                 }
             }
             _customRegionsChangeNum = 0;
@@ -112,6 +105,7 @@ namespace EntityTools.Quester.Editor.Classes
 
             lock (_mapsMeshes)
                 _mapsMeshes.Clear();
+            _currentProfileZipMeshFile = null;
             OnPropertyChanged(nameof(MapsMeshes));
 
             OnPropertyChanged(nameof(Actions));
@@ -119,14 +113,12 @@ namespace EntityTools.Quester.Editor.Classes
             OnPropertyChanged(nameof(CurrentProfileZipMeshFile));
             OnPropertyChanged(nameof(CurrentMesh));
             OnPropertyChanged(nameof(KillRadius));
-            _currentProfileZipMeshFile = null;
             OnPropertyChanged(nameof(UseExternalMeshFile));
             OnPropertyChanged(nameof(ExternalMeshFileName));
             OnPropertyChanged(nameof(DisablePet));
             OnPropertyChanged(nameof(FollowerDistance));
             OnPropertyChanged(nameof(DisableFollow));
             OnPropertyChanged(nameof(AssociateMissionsDefault));
-
         }
 
 

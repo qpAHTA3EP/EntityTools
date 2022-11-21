@@ -14,7 +14,6 @@ namespace EntityTools.Quester.Conditions
     {
         [Description("A set of CustomRegion, the combination of which defines an area on the map")]
         [Editor(typeof(CustomRegionCollectionEditor), typeof(UITypeEditor))]
-        //[TypeConverter(typeof(ExpandableObjectConverter))]
         public CustomRegionCollection CustomRegions
         {
             get => _customRegions;
@@ -28,10 +27,7 @@ namespace EntityTools.Quester.Conditions
 
         public string Description
         {
-            get
-            {
-                return _description;
-            }
+            get => _description;
             set
             {
                 _description = value;
@@ -57,13 +53,17 @@ namespace EntityTools.Quester.Conditions
             get
             {
                 bool within = _customRegions.Within(EntityManager.LocalPlayer.Location);
-                if (_outside)
-                    return !within;
-                else return within;
+                return _outside 
+                     ? !within 
+                     : within;
             }
         }
 
-        public override void Reset() => _label = string.Empty;
+        public override void Reset()
+        {
+            _label = string.Empty;
+            _customRegions.ResetCache();
+        }
 
         public override string ToString()
         {
@@ -71,24 +71,6 @@ namespace EntityTools.Quester.Conditions
             {
                 if(_customRegions.Count > 0)
                 {
-#if false
-                    var sb = new StringBuilder("Check Player ");
-                    if (_outside)
-                        sb.Append("outside ");
-                    else sb.Append("within ");
-
-                    if (!string.IsNullOrEmpty(_description))
-                        sb.Append('\'').Append(_description).Append("' =>");
-                    if (_customRegions.Union.Count > 0)
-                        sb.Append(" \x22c3 (").Append(_customRegions.Union.Count).Append(')');
-                    if (_customRegions.Intersection.Count > 0)
-                        sb.Append(" \x22c2 (").Append(_customRegions.Intersection.Count).Append(')');
-                    if (_customRegions.Exclusion.Count > 0)
-                        //sb.Append(" \x00ac(").Append(_customRegions.Exclusion.Count).Append(')');
-                        sb.Append(" \\ (").Append(_customRegions.Exclusion.Count).Append(')');
-
-                    _label = sb.ToString(); 
-#else
                     int unionCount = _customRegions.Union.Count,
                         intersectionCount = _customRegions.Intersection.Count,
                         exclusionCount = _customRegions.Exclusion.Count;
@@ -98,7 +80,6 @@ namespace EntityTools.Quester.Conditions
                                            unionCount > 0 ? $" \x22c3 ({unionCount})" : string.Empty,
                                            intersectionCount > 0 ? $" \x22c2 ({intersectionCount})" : string.Empty,
                                            exclusionCount > 0 ? $" \x00ac ({exclusionCount})" : string.Empty);
-#endif
                 }
                 else _label = GetType().Name;
             }

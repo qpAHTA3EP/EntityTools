@@ -142,7 +142,7 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
         {
             var newAction = ReconstructInternal().CreateXmlCopy();
             newAction.RegenActionID();
-            return new ActionTreeNode(owner, newAction);
+            return new ActionTreeNode(Owner, newAction);
         }
 
 #if false
@@ -160,7 +160,7 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
         public override TreeNode[] GetConditionTreeNodes()
         {
             return conditionTreeNodes ?? (conditionTreeNodes = ReconstructInternal().Conditions
-                                                                                    .ToTreeNodes()
+                                                                                    .ToTreeNodes(Owner)
                                                                                     .ToArray());
         }
 #endif

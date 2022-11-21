@@ -43,8 +43,6 @@ namespace EntityTools.Quester.Editor
 {
     public partial class QuesterEditor : XtraForm
     {
-        //BUG Копирование команд/условие через CopyHelper приводит к копированию Engine, что может приводить к ошибкам, поэтому копирование нужно реализовать путем копирования публичных свойств, имеющий сеттеры,
-
         /// <summary>
         /// Редактируемый профиль
         /// </summary>
@@ -617,7 +615,7 @@ namespace EntityTools.Quester.Editor
                 InvokeConditionCallback();
 
                 var selectedNode = treeConditions.SelectedNode as ConditionBaseTreeNode;
-                var newTreeNode = newCondition.MakeTreeNode();
+                var newTreeNode = newCondition.MakeTreeNode(profile);
 
                 InsertCondition(selectedNode, newTreeNode);
 
@@ -675,9 +673,8 @@ namespace EntityTools.Quester.Editor
             {
                 InvokeConditionCallback();
 
-                // Добавляем команду
                 var newCondition = conditionCache.CreateXmlCopy();
-                var newNode = newCondition.MakeTreeNode();
+                var newNode = newCondition.MakeTreeNode(profile);
                 var selectedNode = treeConditions.SelectedNode as ConditionBaseTreeNode;
                 
                 InsertCondition(selectedNode, newNode);
@@ -719,8 +716,8 @@ namespace EntityTools.Quester.Editor
             InvokeConditionCallback();
             if (treeConditions.SelectedNode is ConditionBaseTreeNode selectedNode)
             {
-                var result = selectedNode.IsValid(profile);
-                var testInfo = selectedNode.TestInfo(profile);
+                var result = selectedNode.IsValid();
+                var testInfo = selectedNode.TestInfo();
                 var msg = $"{selectedNode.Text}\n{testInfo}\nResult: {result}";
                 XtraMessageBox.Show(msg, "Condition Test", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 txtLog.AppendText(msg);
@@ -742,7 +739,7 @@ namespace EntityTools.Quester.Editor
                 foreach (ConditionBaseTreeNode node in treeConditions.Nodes)
                 {
                     // Тестирование выбранного условия
-                    bool result = node.IsValid(profile);
+                    bool result = node.IsValid();
                     stringBuilder.Append('\t')
                                  .Append(node.Text)
                                  .Append(" | Result: ")
@@ -941,7 +938,6 @@ namespace EntityTools.Quester.Editor
             {
                 InvokeActionCallback();
 
-                // Добавляем команду
                 var newAction = actionCache.CreateXmlCopy();
                 var newNode = newAction.MakeTreeNode(profile);
                 newNode.RegenActionID();

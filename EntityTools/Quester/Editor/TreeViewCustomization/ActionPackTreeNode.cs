@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using ACTP0Tools.Classes.Quester;
@@ -8,7 +7,6 @@ using Astral.Quester.Classes;
 using EntityCore.Tools;
 using MyNW.Classes;
 using QuesterAction = Astral.Quester.Classes.Action;
-using QuesterCondition = Astral.Quester.Classes.Condition;
 
 
 namespace EntityTools.Quester.Editor.TreeViewCustomization
@@ -25,7 +23,7 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
             ActionPack actPack = clone ? actionPack.CreateXmlCopy() : actionPack;
             Tag = actPack;
             this.actionPack = actPack;
-            Nodes.AddRange(TreeViewHelper.ToTreeNodes(owner, actPack.Actions, clone));
+            Nodes.AddRange(TreeViewHelper.ToTreeNodes(Owner, actPack.Actions, clone));
             UpdateViewInternal(null);
         }
 
@@ -44,7 +42,7 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
             var copy = (ActionPack) ReconstructInternal().CreateXmlCopy();
             copy.RegenActionID(true);
 
-            return new ActionPackTreeNode(owner, copy);
+            return new ActionPackTreeNode(Owner, copy);
         }
 
         public override void RegenActionID() => actionPack.RegenActionID(true);
@@ -146,7 +144,7 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
         public override TreeNode[] GetConditionTreeNodes()
         {
             return conditionTreeNodes ?? (conditionTreeNodes = actionPack.Conditions
-                                                                         .ToTreeNodes()
+                                                                         .ToTreeNodes(Owner)
                                                                          .ToArray());
         }
 #endif

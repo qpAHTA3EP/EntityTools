@@ -40,7 +40,7 @@ namespace EntityTools.Editors
         public static bool SetInfos(ref MissionGiverInfo missionGiver, MissionGiverType giverType = MissionGiverType.None)
         {
             if (giverType == MissionGiverType.None)
-                if(ItemSelectForm.GetAnItem(() => DisplayedGivers, ref giverType))
+                if (!ItemSelectForm.GetAnItem(() => DisplayedGivers, ref giverType))
                     return false;
 
             switch (giverType)

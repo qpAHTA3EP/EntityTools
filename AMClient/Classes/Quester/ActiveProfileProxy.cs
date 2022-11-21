@@ -62,6 +62,28 @@ namespace ACTP0Tools.Classes.Quester
                     _vendors.ListChanged += Vendors_Changed;
                 }
             }
+            else
+            {
+
+                if (_customRegions != null)
+                {
+                    _customRegions.Clear();
+                    OnPropertyChanged(nameof(CustomRegions));
+                }
+
+                if (_blackList != null)
+                {
+                    _blackList.Clear();
+                    OnPropertyChanged(nameof(BlackList));
+
+                }
+
+                if (_vendors != null)
+                {
+                    _vendors.Clear();
+                    OnPropertyChanged(nameof(Vendors));
+                }
+            }
             OnPropertyChanged(nameof(Actions));
             OnPropertyChanged(nameof(FileName));
             OnPropertyChanged(nameof(MapsMeshes));
@@ -107,8 +129,8 @@ namespace ACTP0Tools.Classes.Quester
             get => AstralAccessors.Quester.Core.Profile.Saved;
             set
             {
-                OnPropertyChanged();
                 AstralAccessors.Quester.Core.Profile.Saved = value;
+                OnPropertyChanged();
             }
         }
 
@@ -238,8 +260,8 @@ namespace ACTP0Tools.Classes.Quester
             get => AstralAccessors.Quester.Core.Profile.KillRadius;
             set
             {
-                OnPropertyChanged();
                 AstralAccessors.Quester.Core.Profile.KillRadius = value;
+                OnPropertyChanged();
             }
         }
 
@@ -253,8 +275,8 @@ namespace ACTP0Tools.Classes.Quester
             get => AstralAccessors.Quester.Core.Profile.UseExternalMeshFile;
             set
             {
-                OnPropertyChanged();
                 AstralAccessors.Quester.Core.Profile.UseExternalMeshFile = value;
+                OnPropertyChanged();
             }
         }
 
@@ -267,8 +289,8 @@ namespace ACTP0Tools.Classes.Quester
             get => AstralAccessors.Quester.Core.Profile.ExternalMeshFileName;
             set
             {
-                OnPropertyChanged();
                 AstralAccessors.Quester.Core.Profile.ExternalMeshFileName = value;
+                OnPropertyChanged();
             }
         }
 
@@ -277,8 +299,8 @@ namespace ACTP0Tools.Classes.Quester
             get => AstralAccessors.Quester.Core.Profile.DisablePet;
             set
             {
-                OnPropertyChanged();
                 AstralAccessors.Quester.Core.Profile.DisablePet = value;
+                OnPropertyChanged();
             }
         }
 
@@ -288,8 +310,8 @@ namespace ACTP0Tools.Classes.Quester
             get => AstralAccessors.Quester.Core.Profile.FollowerDistance;
             set
             {
-                OnPropertyChanged();
                 AstralAccessors.Quester.Core.Profile.FollowerDistance = value;
+                OnPropertyChanged();
             }
         }
 
@@ -299,8 +321,8 @@ namespace ACTP0Tools.Classes.Quester
             get => AstralAccessors.Quester.Core.Profile.DisableFollow;
             set
             {
-                OnPropertyChanged();
                 AstralAccessors.Quester.Core.Profile.DisableFollow = value;
+                OnPropertyChanged();
             }
         }
 
@@ -310,20 +332,10 @@ namespace ACTP0Tools.Classes.Quester
             get => AstralAccessors.Quester.Core.Profile.AssociateMissionsDefault;
             set
             {
-                OnPropertyChanged();
                 AstralAccessors.Quester.Core.Profile.AssociateMissionsDefault = value;
+                OnPropertyChanged();
             }
         }
-
-#if false
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        [NotifyPropertyChangedInvocator]
-        public override void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        } 
-#endif
 
         /// <summary>
         /// Загрузка профиля из файла <paramref name="fileName"/>

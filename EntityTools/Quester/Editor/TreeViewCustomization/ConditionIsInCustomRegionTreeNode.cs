@@ -14,7 +14,7 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
     /// </summary>
     internal sealed class ConditionIsInCustomRegionTreeNode : ConditionBaseTreeNode
     {
-        public ConditionIsInCustomRegionTreeNode(IsInCustomRegion condition)
+        public ConditionIsInCustomRegionTreeNode(QuesterProfileProxy profile, IsInCustomRegion condition) : base(profile)
         {
             Tag = condition;
             this.condition = condition;
@@ -23,26 +23,8 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
 
         public override QuesterCondition Content => condition;
         private readonly IsInCustomRegion condition;
-        
-        /*
-            foreach (CustomRegion customRegion in Core.Profile.CustomRegions)
-            {
-                if (customRegion.Name == this.CustomRegionName)
-                {
-                    Condition.Presence tested = this.Tested;
-                    if (tested == Condition.Presence.Equal)
-                    {
-                        return customRegion.IsIn;
-                    }
-                    if (tested == Condition.Presence.NotEquel)
-                    {
-                        return !customRegion.IsIn;
-                    }
-                }
-            }
-            return false;
-         */
-        public override bool IsValid(QuesterProfileProxy profile)
+
+        public override bool IsValid()
         {
             var crName = condition.CustomRegionName;
             if (string.IsNullOrEmpty(crName))
@@ -50,7 +32,7 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
             var player = EntityManager.LocalPlayer;
             if (player.IsLoading)
                 return false;
-            var customRegion = profile.CustomRegions.FirstOrDefault(cr => cr.Name == crName);
+            var customRegion = Owner.CustomRegions.FirstOrDefault(cr => cr.Name == crName);
             if (customRegion is null)
                 return false;
             bool withing = CustomRegionExtensions.IsInCustomRegion(player.Location, customRegion);
@@ -59,7 +41,7 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
                 : !withing;
         }
 
-        public override string TestInfo(QuesterProfileProxy profile)
+        public override string TestInfo()
         {
             var crName = condition.CustomRegionName;
             if (string.IsNullOrEmpty(crName))
@@ -73,7 +55,7 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
             bool foundTestedCR = false;
             int numOfDetectedCR = 0;
 
-            foreach (var customRegion in profile.CustomRegions)
+            foreach (var customRegion in Owner.CustomRegions)
             {
                 if (CustomRegionExtensions.IsInCustomRegion(location, customRegion))
                 {
@@ -125,8 +107,8 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
 
         public override object Clone()
         {
-            var copy = ((QuesterCondition)condition).CreateXmlCopy();
-            return new ConditionIsInCustomRegionTreeNode((IsInCustomRegion)copy);
+            var copy = (condition).CreateXmlCopy();
+            return new ConditionIsInCustomRegionTreeNode(Owner, (IsInCustomRegion)copy);
         }
     }
 }

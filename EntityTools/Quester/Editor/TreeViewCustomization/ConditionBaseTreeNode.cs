@@ -6,6 +6,8 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
 {
     public abstract class ConditionBaseTreeNode : TreeNode, ITreeNode<QuesterCondition>
     {
+        protected readonly QuesterProfileProxy Owner;
+
         public abstract QuesterCondition Content { get; }
 
         public virtual bool Locked
@@ -18,8 +20,14 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
                     Checked = value;
             }
         }
-        public abstract bool IsValid(QuesterProfileProxy profile);
-        public abstract string TestInfo(QuesterProfileProxy profile);
+
+        protected ConditionBaseTreeNode(QuesterProfileProxy profile)
+        {
+            Owner = profile;
+        }
+
+        public abstract bool IsValid();
+        public abstract string TestInfo();
         public abstract bool AllowChildren { get; }
         public abstract void UpdateView();
         public abstract QuesterCondition ReconstructInternal();
