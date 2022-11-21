@@ -115,7 +115,7 @@
             // 
             // tabPane
             // 
-            this.tabPane.Appearance.BackColor = System.Drawing.SystemColors.Window;
+            this.tabPane.Appearance.BackColor = System.Drawing.SystemColors.Control;
             this.tabPane.Appearance.Options.UseBackColor = true;
             this.tabPane.Controls.Add(this.tabUnion);
             this.tabPane.Controls.Add(this.tabIntersection);
@@ -146,7 +146,7 @@
             // 
             // textUnion
             // 
-            this.textUnion.Appearance.BackColor = System.Drawing.SystemColors.Window;
+            this.textUnion.Appearance.BackColor = System.Drawing.SystemColors.Control;
             this.textUnion.Appearance.Options.UseBackColor = true;
             this.textUnion.Appearance.Options.UseTextOptions = true;
             this.textUnion.Appearance.TextOptions.VAlignment = DevExpress.Utils.VertAlignment.Top;
@@ -164,10 +164,12 @@
             this.tabIntersection.Caption = "INTERSECTION";
             this.tabIntersection.Controls.Add(this.textIntersection);
             this.tabIntersection.Name = "tabIntersection";
-            this.tabIntersection.Size = new System.Drawing.Size(314, 72);
+            this.tabIntersection.Size = new System.Drawing.Size(314, 71);
             // 
             // textIntersection
             // 
+            this.textIntersection.Appearance.BackColor = System.Drawing.SystemColors.Control;
+            this.textIntersection.Appearance.Options.UseBackColor = true;
             this.textIntersection.Appearance.Options.UseTextOptions = true;
             this.textIntersection.Appearance.TextOptions.VAlignment = DevExpress.Utils.VertAlignment.Top;
             this.textIntersection.Appearance.TextOptions.WordWrap = DevExpress.Utils.WordWrap.Wrap;
@@ -175,7 +177,7 @@
             this.textIntersection.Dock = System.Windows.Forms.DockStyle.Fill;
             this.textIntersection.Location = new System.Drawing.Point(0, 0);
             this.textIntersection.Name = "textIntersection";
-            this.textIntersection.Size = new System.Drawing.Size(314, 72);
+            this.textIntersection.Size = new System.Drawing.Size(314, 71);
             this.textIntersection.TabIndex = 7;
             this.textIntersection.Text = resources.GetString("textIntersection.Text");
             // 
@@ -184,10 +186,12 @@
             this.tabExclusion.Caption = "EXCLUSION";
             this.tabExclusion.Controls.Add(this.textExclusion);
             this.tabExclusion.Name = "tabExclusion";
-            this.tabExclusion.Size = new System.Drawing.Size(314, 72);
+            this.tabExclusion.Size = new System.Drawing.Size(314, 71);
             // 
             // textExclusion
             // 
+            this.textExclusion.Appearance.BackColor = System.Drawing.SystemColors.Control;
+            this.textExclusion.Appearance.Options.UseBackColor = true;
             this.textExclusion.Appearance.Options.UseTextOptions = true;
             this.textExclusion.Appearance.TextOptions.VAlignment = DevExpress.Utils.VertAlignment.Top;
             this.textExclusion.Appearance.TextOptions.WordWrap = DevExpress.Utils.WordWrap.Wrap;
@@ -195,7 +199,7 @@
             this.textExclusion.Dock = System.Windows.Forms.DockStyle.Fill;
             this.textExclusion.Location = new System.Drawing.Point(0, 0);
             this.textExclusion.Name = "textExclusion";
-            this.textExclusion.Size = new System.Drawing.Size(314, 72);
+            this.textExclusion.Size = new System.Drawing.Size(314, 71);
             this.textExclusion.TabIndex = 6;
             this.textExclusion.Text = "Отметьте несколько регионов, которые будут ИСКЛЮЧЕНЫ из итоговой области. Персона" +
     "жу запрещено находиться в любом из отмеченных регионов.";
@@ -251,7 +255,7 @@
             this.Name = "CustomRegionCollectionEditorForm";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Shown += new System.EventHandler(this.handler_FormShown);
+            this.Shown += new System.EventHandler(this.handler_Reload);
             this.HelpRequested += new System.Windows.Forms.HelpEventHandler(this.handler_HelpRequested);
             ((System.ComponentModel.ISupportInitialize)(this.crList)).EndInit();
             this.spliter.Panel1.ResumeLayout(false);

@@ -1,15 +1,14 @@
-﻿using Astral.Logic.Classes.Map;
-using HarmonyLib;
-using MyNW.Classes;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using ACTP0Tools;
+using ACTP0Tools.Classes.Quester;
 using AStar;
-using Astral.Logic.Classes.FSM;
-using DevExpress.Data.Filtering.Helpers;
+using Astral.Logic.Classes.Map;
+using HarmonyLib;
+using MyNW.Classes;
 
 // ReSharper disable InconsistentNaming
 
@@ -185,6 +184,17 @@ namespace EntityTools.Patches.Mapper
             }
             mapperForm.Show();
             return false;
+        }
+        internal static void OpenMapper(QuesterProfileProxy profile)
+        {
+            if (!EntityTools.Config.Mapper.Patch
+                || profile is null)
+            {
+                OpenMapper();
+                return;
+            }
+            var mapper = new MapperFormExt(profile);
+            mapper.Show();
         }
 
         internal static void CloseMapper()

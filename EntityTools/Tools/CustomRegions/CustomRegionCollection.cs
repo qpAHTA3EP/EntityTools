@@ -105,8 +105,16 @@ namespace EntityTools.Tools.CustomRegions
         public QuesterProfileProxy DesignContext
         {
             get => _context ?? AstralAccessors.Quester.Core.ActiveProfileProxy;
-            set => _context = value;
+            set
+            {
+                if (_context != value)
+                {
+                    _context = value;
+                    label = string.Empty;
+                }
+            }
         }
+
         private QuesterProfileProxy _context;
 
         #region Within

@@ -36,6 +36,7 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
 
         public override void UpdateView()
         {
+            condition.CustomRegions.DesignContext = Owner;
             var txt = condition.ToString();
             var type = condition.GetType();
             if (string.IsNullOrEmpty(txt)
