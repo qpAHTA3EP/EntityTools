@@ -352,11 +352,7 @@ namespace EntityTools.Quester.Editor
             if (sender is TreeView treeView)
             {
                 // Извлечение перетаскиваемого узла
-                TreeNode draggedNode = (TreeNode) (e.Data.GetData(typeof(ActionTreeNode))
-                                                   ?? e.Data.GetData(typeof(ActionPackTreeNode))
-                                                   ?? e.Data.GetData(typeof(ConditionPackTreeNode))
-                                                   ?? e.Data.GetData(typeof(ConditionTreeNode))
-                                                   ?? e.Data.GetData(typeof(TreeNode)));
+                TreeNode draggedNode = GetTreeNodeFrom(e.Data);
 
                 // Запрет копировая/перепещения узлов между разными деревьями
                 if (!ReferenceEquals(treeView, draggedNode.TreeView))
@@ -490,6 +486,20 @@ namespace EntityTools.Quester.Editor
             }
         }
 
+        private static TreeNode GetTreeNodeFrom(IDataObject data)
+        {
+            // Необходимо перечислить точные все типы узлов дерева, которые могут перемещаться
+            // поскольку приведение к базовому не работает
+            return (data.GetData(typeof(ActionTreeNode))
+                    ?? data.GetData(typeof(ActionPackTreeNode))
+                    ?? data.GetData(typeof(ActionPushProfileToStackAndLoadTreeNode))
+                    ?? data.GetData(typeof(ConditionPackTreeNode))
+                    ?? data.GetData(typeof(ConditionTreeNode))
+                    ?? data.GetData(typeof(ConditionIsInCustomRegionSetTreeNode))
+                    ?? data.GetData(typeof(ConditionIsInCustomRegionTreeNode))
+                    ?? data.GetData(typeof(TreeNode))) as TreeNode;
+        }
+
         /// <summary>
         /// Проверяем иерархическое отношене узла <paramref name="parentNode"/> по отношению к <paramref name="childNode"/>
         /// </summary>
@@ -522,7 +532,9 @@ namespace EntityTools.Quester.Editor
 
                 // Select the node at the mouse position.
                 var targetTreeNode = treeView.GetNodeAt(targetPoint);
-                pgProperties.SelectedObject = targetTreeNode.Tag;
+                if (targetTreeNode?.Nodes.Count > 0)
+                    targetTreeNode.Expand();
+                treeView.SelectedNode = targetTreeNode;
                 e.Effect = e.AllowedEffect;
             }
         }
@@ -537,11 +549,7 @@ namespace EntityTools.Quester.Editor
             if (sender is TreeView treeView)
             {
                 // Извлечение перетаскиваемого узла
-                TreeNode draggedNode = (TreeNode) (e.Data.GetData(typeof(ActionTreeNode))
-                                                   ?? e.Data.GetData(typeof(ActionPackTreeNode))
-                                                   ?? e.Data.GetData(typeof(ConditionPackTreeNode))
-                                                   ?? e.Data.GetData(typeof(ConditionTreeNode))
-                                                   ?? e.Data.GetData(typeof(TreeNode)));
+                TreeNode draggedNode = GetTreeNodeFrom(e.Data);
 
                 if (ReferenceEquals(treeView, draggedNode.TreeView))
                 {
@@ -1671,8 +1679,8 @@ namespace EntityTools.Quester.Editor
 
         private void DrawSelectedAction(MapperGraphics graphics)
         {
-            var tag = treeActions.SelectedNode?.Tag;
-            switch (tag)
+            var contentAction = (treeActions.SelectedNode as ActionBaseTreeNode)?.Content;
+            switch (contentAction)
             {
                 case ActionPack actionPack when actionPack.SimultaneousActions:
                     bool shouldDrawHotSpots = true;
@@ -1832,12 +1840,12 @@ namespace EntityTools.Quester.Editor
         {
             if (node.Text.IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0)
                 return true;
-            var tag = node.Tag;
-            if (tag is null)
+            var content = (node as ActionBaseTreeNode)?.Content;
+            if (content is null)
                 return false;
-            if (tag.GetType().Name.IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0)
+            if (content.GetType().Name.IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0)
                 return true;
-            if (tag is QuesterAction action
+            if (content is QuesterAction action
                 && action.ActionID.ToString().IndexOf(filter, StringComparison.OrdinalIgnoreCase) >= 0)
                 return true;
             return false;
