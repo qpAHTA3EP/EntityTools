@@ -365,7 +365,7 @@ namespace EntityTools.Quester.Editor
                 TreeNode targetNode = treeView.GetNodeAt(targetPoint);
 
                 // Проверка нажтия кнопки ALT
-                bool altHolded = (e.KeyState & 32) != 0;
+                bool altHeld = (e.KeyState & 32) != 0;
 
                 // Проверяем что перемещаемый узел не является родительским по отношению к целевому узлу,
                 // расположенному под курсором мыши
@@ -377,7 +377,7 @@ namespace EntityTools.Quester.Editor
 
                     treeView.BeginUpdate();
                     if (targetNode is ActionPackTreeNode actionPackNode
-                        && !altHolded)
+                        && !altHeld)
                     {
                         // Если удерживается ALT, то dtaggedNode помещается после actionPack'a
 
@@ -407,7 +407,7 @@ namespace EntityTools.Quester.Editor
                         targetNode.Expand();
                     }
                     else if (targetNode is ConditionPackTreeNode conditionPackNode
-                             && !altHolded)
+                             && !altHeld)
                     {
                         // Если удерживается ALT, то dtaggedNode помещается после actionPack'a
 
@@ -616,8 +616,8 @@ namespace EntityTools.Quester.Editor
 
         private void AddCondition(object sender, EventArgs e = null)
         {
-            // Добавление 
-            //if (ItemSelectForm.GetAnInstance(out QuesterCondition newCondition, false))
+            var altHeld = (ModifierKeys & Keys.Alt) > 0;
+
             if (Astral.Quester.Forms.AddAction.Show(typeof(QuesterCondition)) is QuesterCondition newCondition)
             {
                 InvokeConditionCallback();
@@ -625,7 +625,7 @@ namespace EntityTools.Quester.Editor
                 var selectedNode = treeConditions.SelectedNode as ConditionBaseTreeNode;
                 var newTreeNode = newCondition.MakeTreeNode(profile);
 
-                InsertCondition(selectedNode, newTreeNode);
+                InsertCondition(selectedNode, newTreeNode, altHeld);
 
                 profile.Saved = false;
                 
@@ -684,8 +684,9 @@ namespace EntityTools.Quester.Editor
                 var newCondition = conditionCache.CreateXmlCopy();
                 var newNode = newCondition.MakeTreeNode(profile);
                 var selectedNode = treeConditions.SelectedNode as ConditionBaseTreeNode;
-                
-                InsertCondition(selectedNode, newNode);
+                var altHeld = (ModifierKeys & Keys.Alt) > 0;
+
+                InsertCondition(selectedNode, newNode, altHeld);
 
                 SetSelectedConditionTo(newNode);
 
@@ -793,12 +794,12 @@ namespace EntityTools.Quester.Editor
             }
         }
         
-        private void InsertCondition(ConditionBaseTreeNode selectedNode, ConditionBaseTreeNode insertingNode)
+        private void InsertCondition(ConditionBaseTreeNode selectedNode, ConditionBaseTreeNode insertingNode, bool altHeld = default)
         {
             treeConditions.BeginUpdate();
             if (selectedNode != null)
             {
-                if (selectedNode.AllowChildren)
+                if (!altHeld && selectedNode.AllowChildren)
                 {
                     // добавляем новое условие в список его узлов ConditionPackTreeNode
                     selectedNode.Nodes.Insert(0, insertingNode);
@@ -880,6 +881,9 @@ namespace EntityTools.Quester.Editor
 
         private void AddAction(object sender, EventArgs e = null)
         {
+            // Проверка нажтия кнопки ALT
+            bool altHeld = (ModifierKeys & Keys.Alt) > 0;
+
             if (Astral.Quester.Forms.AddAction.Show(typeof(QuesterAction)) is QuesterAction newAction)
             {
                 InvokeActionCallback();
@@ -889,7 +893,7 @@ namespace EntityTools.Quester.Editor
 
                 var selectedNode = treeActions.SelectedNode as ActionBaseTreeNode;
 
-                InsertAction(selectedNode, newNode);
+                InsertAction(selectedNode, newNode, altHeld);
 
                 profile.Saved = false;
 
@@ -948,10 +952,11 @@ namespace EntityTools.Quester.Editor
 
                 var newAction = actionCache.CreateXmlCopy();
                 var newNode = newAction.MakeTreeNode(profile);
+                var altHeld = (ModifierKeys & Keys.Alt) > 0;
                 newNode.RegenActionID();
 
                 var selectedNode = treeActions.SelectedNode as ActionBaseTreeNode;
-                InsertAction(selectedNode, newNode);
+                InsertAction(selectedNode, newNode, altHeld);
 
                 pgProperties.SelectedObject = newAction;
                 SetSelectedActionTo(newNode);
@@ -1083,12 +1088,12 @@ namespace EntityTools.Quester.Editor
             }
         }
 
-        private void InsertAction(ActionBaseTreeNode selectedNode, ActionBaseTreeNode insertingNode)
+        private void InsertAction(ActionBaseTreeNode selectedNode, ActionBaseTreeNode insertingNode, bool altHeld = false)
         {
             treeActions.BeginUpdate();
             if (selectedNode is null)
                 treeActions.Nodes.Add(insertingNode);
-            else if (selectedNode.AllowChildren)
+            else if (!altHeld && selectedNode.AllowChildren)
             {
                 selectedNode.Nodes.Insert(0, insertingNode);
                 selectedNode.UpdateView();
