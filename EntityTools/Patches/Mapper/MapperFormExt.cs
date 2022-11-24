@@ -84,14 +84,14 @@ namespace EntityTools.Patches.Mapper
         /// <summary>
         /// Координаты курсора мыши, относительно формы <see cref="MapperFormExt"/>
         /// </summary>
-        internal Point RelativeMousePosition => MapPicture.PointToClient(MousePosition);
+        protected Point RelativeMousePosition => MapPicture.PointToClient(MousePosition);
 
         // BUG После загрузки нового профиля в Quester'е, продолжает отображаться старый профиль
         public QuesterProfileProxy Profile
         {
             get => _profile;
         }
-        private QuesterProfileProxy _profile;
+        private readonly QuesterProfileProxy _profile;
 
         #region Инициализация формы
         IGraph GetGraph() => _profile.CurrentMesh;
@@ -863,8 +863,15 @@ namespace EntityTools.Patches.Mapper
                     if (ModifierKeys == Keys.Alt)
                     {
                         if (e.Delta > 0)
+                        {
                             _graphics.MoveCenterPosition(0, 0, 50);
-                        else _graphics.MoveCenterPosition(0, 0, -50);
+                            _graphCache.MoveCenterPosition(0, 0, -50);
+                        }
+                        else
+                        {
+                            _graphics.MoveCenterPosition(0, 0, -50);
+                            _graphCache.MoveCenterPosition(0,0, -50);
+                        }
                     }
                     else
                     {
@@ -907,6 +914,8 @@ namespace EntityTools.Patches.Mapper
         {
             if (!IsDisposed && Visible && MapPicture.Visible && MapPicture.Width > 0 && MapPicture.Height > 0)
             {
+                var errorCounter = 0;
+                var errorNotifyTimeout = new Timeout(0);
                 try
                 {
                     using (_graphics.WriteLock())
@@ -914,9 +923,10 @@ namespace EntityTools.Patches.Mapper
                         int imgWidth = MapPicture.Width;
                         int imgHeight = MapPicture.Height;
 
-                        double leftBorder, topBorder, rightBorder, downBorder;
-
-                        (leftBorder, topBorder, rightBorder, downBorder) = AdjustImageAndCacheArea(imgWidth, imgHeight);
+                        (double leftBorder,
+                            double topBorder,
+                            double rightBorder,
+                            double downBorder) = AdjustImageAndCacheArea(imgWidth, imgHeight);
 
                         DrawMapMeshes();
                         DrawCustomRegions(topBorder, downBorder, leftBorder, rightBorder);
@@ -932,36 +942,43 @@ namespace EntityTools.Patches.Mapper
                         DrawDestination(leftBorder, rightBorder, downBorder, topBorder);
                         DrawPlayer(leftBorder, rightBorder, downBorder, topBorder);
 
-
                         return _graphics.getImage();
                     }
                 }
                 catch (ObjectDisposedException ex)
                 {
-                    Logger.WriteLine(Logger.LogType.Debug, "Error in map thread :\r\n" + ex);
+                    Logger.WriteLine(Logger.LogType.Debug, "Error in map thread :\n" + ex);
                     throw;
                 }
                 catch (InvalidOperationException ex)
                 {
-                    Logger.WriteLine(Logger.LogType.Debug, "Error in map thread :\r\n" + ex);
+                    Logger.WriteLine(Logger.LogType.Debug, "Error in map thread :\n" + ex);
                     throw;
                 }
                 catch (ThreadAbortException ex)
                 {
-                    Logger.WriteLine(Logger.LogType.Debug, "Error in map thread :\r\n" + ex);
+                    Logger.WriteLine(Logger.LogType.Debug, "Error in map thread :\n" + ex);
                     throw;
                 }
                 catch (Exception ex)
                 {
-                    ETLogger.WriteLine(LogType.Error,
-                        string.Concat(nameof(DrawMapper), " catch an exception: \n\r", ex), true);
+                    errorCounter++;
+                    if (errorNotifyTimeout.IsTimedOut)
+                    {
+                        ETLogger.WriteLine(LogType.Error,
+                            $"{nameof(DrawMapper)} catch {errorCounter} exceptions :\n{ex}", true);
+                        errorCounter = 0;
+                        errorNotifyTimeout.ChangeTime(10_000_000);
+                    }
                 }
+                
             }
 
             return null;
         }
 
-        private (double leftBorder, double topBorder, double rightBorder, double downBorder) AdjustImageAndCacheArea(int imgWidth, int imgHeight)
+        private (double leftBorder, double topBorder, double rightBorder, double downBorder)
+            AdjustImageAndCacheArea(int imgWidth, int imgHeight)
         {
             double leftBorder;
             double topBorder;
@@ -969,13 +986,22 @@ namespace EntityTools.Patches.Mapper
             double downBorder;
             // Вычисляем координаты границ изображения
             if (LockOnPlayer)
-                _graphics.Reinitialize(EntityManager.LocalPlayer.Location, imgWidth, imgHeight, Zoom,
+            {
+                var location = EntityManager.LocalPlayer.Location;
+                _graphics.Reinitialize(location, imgWidth, imgHeight, Zoom,
                     out leftBorder, out topBorder, out rightBorder, out downBorder);
+
+                var depthZ = _graphCache.CacheDistanceZ;
+                _graphCache.SetCacheArea(leftBorder, topBorder, location.Z + depthZ, rightBorder, downBorder, location.Z - depthZ);
+            }
             else
+
+            {
                 _graphics.Reinitialize(imgWidth, imgHeight, Zoom, out leftBorder, out topBorder,
                     out rightBorder, out downBorder);
             
-            _graphCache.SetCacheArea(leftBorder, topBorder, rightBorder, downBorder);
+                _graphCache.SetCacheArea(leftBorder, topBorder, rightBorder, downBorder);
+            }
             return (leftBorder, topBorder, rightBorder, downBorder);
         }
 

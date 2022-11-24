@@ -1,5 +1,4 @@
-﻿//#define USE_GRAPH_CACHE
-using AStar.Tools;
+﻿using AStar.Tools;
 using Astral.Logic.Classes.Map;
 using EntityTools.Settings;
 using MyNW.Classes;
@@ -15,24 +14,12 @@ namespace EntityTools.Patches.Mapper
     public partial class MapperGraphics : GraphicsNW
     {
         public MapperGraphics(int width, int height
-#if USE_GRAPH_CACHE
-        , MapperGraphCache graphCache = null 
-#endif
             ) : base(width, height)
         {
             var mapperFormConfig = EntityTools.Config.Mapper.MapperForm;
             backColor = mapperFormConfig.BackgroundColor;
 
             mapperFormConfig.PropertyChanged += handler_PropertyChanged;
-#if USE_GRAPH_CACHE
-            GetWorldPosition(0, 0, out double left, out double top);
-            GetWorldPosition(width, height, out double right, out double down);
-            if (graphCache is null)
-                cache = new MapperGraphCache(() => ACTP0Tools.AstralAccessors.Quester.Core.Meshes,
-                    EntityTools.Config.Mapper.CacheActive);
-            else cache = graphCache;
-            cache.SetCacheArea(left, top, right, down); 
-#endif
         }
 
         private void handler_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -45,15 +32,13 @@ namespace EntityTools.Patches.Mapper
         }
 
         #region Reflection
+#if false
         public override int ImageHeight
         {
             get => base.ImageHeight;
             set
             {
                 base.ImageHeight = value;
-#if USE_GRAPH_CACHE
-                cache.CacheDistanceY = value / 1.8d / Zoom; 
-#endif
             }
         }
         public override int ImageWidth
@@ -62,9 +47,6 @@ namespace EntityTools.Patches.Mapper
             set
             {
                 base.ImageWidth = value;
-#if USE_GRAPH_CACHE
-                cache.CacheDistanceX = value / 1.8d / Zoom; 
-#endif
             }
         }
 
@@ -77,13 +59,6 @@ namespace EntityTools.Patches.Mapper
                 if (Math.Abs(base.Zoom - value) > 0.05f)
                 {
                     base.Zoom = value;
-#if USE_GRAPH_CACHE
-                    if (cache != null)
-                    {
-                        cache.CacheDistanceX = base.ImageWidth / 1.8d / value;
-                        cache.CacheDistanceY = base.ImageHeight / 1.8d / value;
-                    } 
-#endif
                 }
             }
         }
@@ -95,11 +70,9 @@ namespace EntityTools.Patches.Mapper
             set
             {
                 base.CenterPosition = value;
-#if USE_GRAPH_CACHE
-                cache?.SetCacheInitialPosition(value); 
-#endif
             }
-        }
+        } 
+#endif
         /// <summary>
         /// Перемещение центра изображения на величины <paramref name="dx"/> и <paramref name="dy"/>
         /// </summary>
@@ -108,9 +81,6 @@ namespace EntityTools.Patches.Mapper
             base.CenterPosition.X += (float)dx;
             base.CenterPosition.Y += (float)dy;
             base.CenterPosition.Z += (float)dz;
-#if USE_GRAPH_CACHE
-            cache.MoveCenterPosition(dx, dy, dz); 
-#endif
         }
 
         /// <summary>
@@ -154,16 +124,6 @@ namespace EntityTools.Patches.Mapper
 
             if (imgWidth != width || imgHeight != height || !base.Zoom.Equals(zoom))
             {
-#if USE_GRAPH_CACHE
-                if (cache.CacheDistanceX > dx * 1.25
-                            || cache.CacheDistanceY > dy * 1.25
-                            || !cache.InCacheArea(x1, y1)
-                            || !cache.InCacheArea(x2, y2))
-                {
-                    cache.SetCacheArea(x1, y1, x2, y2);
-                } 
-#endif
-
                 base.ImageHeight = height;
                 base.ImageWidth = width;
                 base.Zoom = zoom;
@@ -194,14 +154,6 @@ namespace EntityTools.Patches.Mapper
                 || Math.Abs(pos.Y - centerY) > 0.1
                 || Math.Abs(pos.Z - centerZ) > 0.1)
             {
-#if USE_GRAPH_CACHE
-                if (cache.CacheDistanceX > dx * 1.25
-                            || cache.CacheDistanceY > dy * 1.25
-                            || !cache.InCacheArea(x1, y1)
-                            || !cache.InCacheArea(x2, y2))
-                    cache.SetCacheArea(x1, y1, centerZ + cache.CacheDistanceZ, x2, y2, centerZ - cache.CacheDistanceZ); 
-#endif
-
                 pos.X = (float)centerX;
                 pos.Y = (float)centerY;
                 pos.Z = (float)centerZ;
@@ -232,14 +184,6 @@ namespace EntityTools.Patches.Mapper
         public RWLocker.WriteLockToken WriteLock() => new RWLocker.WriteLockToken(@lock);
         #endregion
 
-#if false
-        /// <summary>
-        /// Отображаемый подграф (часть карты путей, на которой находится персонаж)
-        /// </summary>
-        public MapperGraphCache GraphCache => cache;
-        private readonly MapperGraphCache cache; 
-#endif
-
         public MapperDrawingTools DrawingTools { get; } = new MapperDrawingTools();
 
         #region Перевод координат
@@ -258,21 +202,6 @@ namespace EntityTools.Patches.Mapper
             double y = ImageHeight / 2.0 - (worldX - CenterPosition.Y) * scale;// - 0.5f;
 
             return new PointF((float)x, (float)y);
-#if false
-        public static Point getImgPos(Vector3 worldPost, int imgWidth, int imgHeight, Vector3 centerPos, double Zoom)
-		{
-			int num = Convert.ToInt32((double)worldPost.X + 0.5);
-			double num2 = (double)Convert.ToInt32((double)worldPost.Y + 0.5);
-			double num3 = (double)Convert.ToInt32((double)centerPos.X + 0.5);
-			int num4 = Convert.ToInt32((double)centerPos.Y + 0.5);
-			Point point = new Point(Convert.ToInt32((double)imgWidth / 2.0 + 0.5), Convert.ToInt32((double)imgHeight / 2.0 + 0.5));
-			int num5 = Convert.ToInt32((num3 - (double)num) * Zoom + (double)point.X);
-			int num6 = Convert.ToInt32((num2 - (double)num4) * Zoom + (double)point.Y);
-			num5 = imgWidth - num5;
-			num6 = imgHeight - num6;
-			return new Point(num5, num6);
-		}
-#endif
         }
         /// <summary>
         /// Перевод мировых координат <param name="worldPos"/> в координаты изображения
@@ -302,21 +231,6 @@ namespace EntityTools.Patches.Mapper
         /// </summary>
         public void GetWorldPosition(Point imgPos, out double x, out double y)
         {
-#if false
-        public static Vector3 getWorldPos(Point imgPoint, int boxWidth, int boxHeight, Vector3 centerPos, double Zoom)
-		{
-			Point point = imgPoint;
-			point.X = boxWidth - point.X;
-			point.Y = boxHeight - point.Y;
-			Vector3 vector = Vector3.Empty;
-			int num = Convert.ToInt32((double)boxWidth + 0.5);
-			int num2 = Convert.ToInt32((double)boxHeight + 0.5);
-			Point point2 = new Point(Convert.ToInt32((double)num / 2.0 + 0.5), Convert.ToInt32((double)num2 / 2.0 + 0.5));
-			vector.X = (double)Convert.ToInt32((double)(point2.X - point.X) * 1.0 / Zoom + (double)centerPos.X);
-			vector.Y = (double)Convert.ToInt32((double)(point.Y - point2.Y) * 1.0 / Zoom + (double)centerPos.Y);
-			return vector;
-		}
-#endif
             double scale = Zoom;
 
             x = CenterPosition.X - (ImageWidth / 2.0 - imgPos.X /*- 0.75*/) / scale;

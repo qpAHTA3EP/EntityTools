@@ -14,11 +14,6 @@ namespace EntityTools.Patches.Mapper
 #if PATCH_ASTRAL
     public class MapperGraphCache :IGraph
     {
-        public MapperGraphCache()
-        {
-            getGraph = () => ACTP0Tools.AstralAccessors.Quester.Core.Meshes;
-            _active = EntityTools.Config.Mapper.CacheActive;
-        }
         public MapperGraphCache(Func<IGraph> getGraph, bool activate = true, bool hold = true)
         {
             this.getGraph = getGraph;
@@ -231,7 +226,7 @@ namespace EntityTools.Patches.Mapper
                 if (result)
                 {
                     using (_nodesLocker.WriteLock()) 
-                    _nodes.AddLast(newNode);
+                        _nodes.AddLast(newNode);
 #if LastAddedNode
                     lastAddedNode = newNode; 
 #endif
@@ -273,12 +268,8 @@ namespace EntityTools.Patches.Mapper
         }
 
         /// <summary>
-        /// Добавление связи
+        /// Добавление направленной связи от <paramref name="startNode"/> к <paramref name="endNode"/>
         /// </summary>
-        /// <param name="startNode"></param>
-        /// <param name="endNode"></param>
-        /// <param name="weight"></param>
-        /// <returns></returns>
         public Arc AddArc(Node startNode, Node endNode, double weight = 1)
         {
             var graph = getGraph();
@@ -287,7 +278,7 @@ namespace EntityTools.Patches.Mapper
         }
 
         /// <summary>
-        /// Добавление связи
+        /// Добавление связи двунаправленной связи между <paramref name="node1"/> и <paramref name="node2"/>
         /// </summary>
         public void Add2Arcs(Node node1, Node node2, double weight = 1)
         {
@@ -505,7 +496,6 @@ namespace EntityTools.Patches.Mapper
         /// <summary>
         /// Сканирование графа и заполнение кэша
         /// </summary>
-        /// <returns></returns>
         private void ScanNodes()
         {
             using (_nodesLocker.WriteLock()) 
@@ -529,17 +519,15 @@ namespace EntityTools.Patches.Mapper
         }
 
         /// <summary>
-        /// Проверка попадания узла node в кэшируемый объем
+        /// Проверка попадания узла <paramref name="node"/> в кэшируемый объем
         /// </summary>
-        /// <param name="node"></param>
-        /// <returns></returns>
         private bool NeedCache(Node node)
         {
             return node.Passable && InCacheArea(node.Position);
         }
 
         /// <summary>
-        /// Проверка нахождения точки <param name="pos"/> в области кэширования
+        /// Проверка нахождения точки <paramref name="pos"/> в области кэширования
         /// </summary>
         public bool InCacheArea(Point3D pos)
         {
@@ -663,7 +651,9 @@ namespace EntityTools.Patches.Mapper
         }
 
         /// <summary>
-        /// Установка области кеширования координатами противолежащих точек параллелограмма с <param name="x1"/>, <param name="y1"/>, <param name="z1"/> и <param name="x2"/>, <param name="y2"/>, <param name="z2"/>
+        /// Установка области кеширования координатами противолежащих точек параллелограмма
+        /// {<paramref name="x1"/>, <paramref name="y1"/>, <paramref name="z1"/>} и
+        /// {<paramref name="x2"/>, <paramref name="y2"/>, <paramref name="z2"/>}
         /// </summary>
         public void SetCacheArea(double x1, double y1, double z1, double x2, double y2, double z2)
         {
@@ -717,6 +707,12 @@ namespace EntityTools.Patches.Mapper
                 } 
             }
         }
+        /// <summary>
+        /// Установка области кеширования координатами противолежащих точек прямоугольника
+        /// {<paramref name="x1"/>, <paramref name="y1"/>} и
+        /// {<paramref name="x2"/>, <paramref name="y2"/>}.<br/>
+        /// При этом границы кэшируемой облости вдоль оси Z не изменяются.
+        /// </summary>
         public void SetCacheArea(double x1, double y1, double x2, double y2)
         {
             SetCacheArea(x1, y1, minZ, x2, y2, maxZ);
