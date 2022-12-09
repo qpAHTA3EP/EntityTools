@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Drawing.Design;
 using Astral.Quester.Forms;
-using EntityCore.Forms;
+using EntityTools.Forms;
 using EntityTools.UCC.Conditions;
 
 namespace EntityTools.Editors

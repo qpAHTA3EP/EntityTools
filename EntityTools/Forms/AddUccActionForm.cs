@@ -1,15 +1,13 @@
-﻿using DevExpress.XtraEditors;
-using System;
-using System.Windows.Forms;
-using Astral.Logic.UCC.Classes;
-using EntityTools.Extensions;
-using UCCEditor = Astral.Logic.UCC.Forms.Editor;
+﻿using System;
 using System.Collections.Generic;
+using System.Windows.Forms;
 using ACTP0Tools.Reflection;
-using EntityCore.Extensions;
+using Astral.Logic.UCC.Classes;
+using DevExpress.XtraEditors;
 using EntityTools.Tools.Extensions;
+using UCCEditor = Astral.Logic.UCC.Forms.Editor;
 
-namespace EntityCore.Forms
+namespace EntityTools.Forms
 {
     public partial class AddUccActionForm : XtraForm //*/Form
     {

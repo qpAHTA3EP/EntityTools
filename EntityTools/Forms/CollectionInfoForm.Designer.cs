@@ -1,5 +1,5 @@
 ﻿
-namespace EntityCore.Forms
+namespace EntityTools.Forms
 {
     partial class CollectionInfoForm
     {

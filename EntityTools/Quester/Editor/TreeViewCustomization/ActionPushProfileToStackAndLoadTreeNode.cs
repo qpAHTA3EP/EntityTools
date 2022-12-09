@@ -5,7 +5,7 @@ using System.Windows.Forms;
 using ACTP0Tools.Classes.Quester;
 using ACTP0Tools.Patches;
 using ACTP0Tools.Reflection;
-using EntityCore.Tools;
+using EntityTools.Tools;
 using MyNW.Classes;
 using QuesterAction = Astral.Quester.Classes.Action;
 using QuesterCondition = Astral.Quester.Classes.Condition;
@@ -21,7 +21,7 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
     {
         private readonly QuesterAction action;
 
-        private static readonly PropertyAccessor<string> designProfilePathAccessor =
+        private static readonly PropertyAccessor<string> DesignProfilePathAccessor =
             ACTP0Serializer.PushProfileToStackAndLoad.GetProperty<string>("DesignProfilePath");
         public ActionPushProfileToStackAndLoadTreeNode(QuesterProfileProxy profile, QuesterAction action, bool clone = false) : base(profile)
         {
@@ -48,7 +48,7 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
 
         public override void UpdateView()
         {
-            designProfilePathAccessor[action] = Owner.FileName;
+            DesignProfilePathAccessor[action] = Owner.FileName;
 
             if (Parent is ActionBaseTreeNode parentPackNode)
                 parentPackNode.UpdateView();

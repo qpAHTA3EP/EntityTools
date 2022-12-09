@@ -1,7 +1,7 @@
 ﻿using DevExpress.XtraEditors;
 using System.Drawing;
 
-namespace EntityCore.Forms
+namespace EntityTools.Forms
 {
     partial class InputBox
     {

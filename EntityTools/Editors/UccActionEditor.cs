@@ -1,5 +1,5 @@
 ﻿using Astral.Logic.UCC.Classes;
-using EntityCore.Forms;
+using EntityTools.Forms;
 using System;
 using System.ComponentModel;
 using System.Drawing.Design;

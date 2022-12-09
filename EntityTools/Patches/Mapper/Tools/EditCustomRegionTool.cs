@@ -14,19 +14,19 @@ namespace EntityTools.Patches.Mapper.Tools
     /// <summary>
     /// Инструмент для удаления вершин
     /// </summary>
-    public sealed class EditCustomRegionTool : CustomRegionToolBase//ICustomRegionTool
+    public sealed class EditCustomRegionTool : CustomRegionToolBase
     {
         /// <summary>
-        /// Функция вызываемая после применения изменений к CustomRegion'y
+        /// Функция вызываемая после применения изменений к CustomRegion'y, где<br/>
+        /// <see cref="CustomRegion">Модифицированный CustomRegion</see><br/>
+        /// <see cref="IMapperTool">Объект для отката изменений</see>
         /// </summary>
-        /// <typeparam name="CustomRegion">Модифицированный CustomRegion</typeparam>
-        /// <typeparam name="IMapperTool">Объект для отката изменений</typeparam>
-        private readonly System.Action<CustomRegion, IMapperTool> onComplete;
+        private readonly Action<CustomRegion, IMapperTool> onComplete;
 
         public BindingList<CustomRegion> CustomRegions => _profile.CustomRegions;
-        private QuesterProfileProxy _profile;
+        private readonly QuesterProfileProxy _profile;
 
-        public EditCustomRegionTool(CustomRegion cr = null, MapperFormExt mapperForm = null, System.Action<CustomRegion, IMapperTool> onCompleteCallback = null)
+        public EditCustomRegionTool(CustomRegion cr = null, MapperFormExt mapperForm = null, Action<CustomRegion, IMapperTool> onCompleteCallback = null)
         {
             onComplete = onCompleteCallback;
             AttachTo(cr);

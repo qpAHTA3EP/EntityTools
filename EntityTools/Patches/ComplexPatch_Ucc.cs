@@ -70,7 +70,7 @@ namespace EntityTools.Patches
         {
             if (EntityTools.Config.Patches.UccComplexPatch)
             {
-                UccEditor.Edit(Astral.Logic.UCC.API.CurrentProfile, false);
+                UccEditor.Edit(Astral.Logic.UCC.API.CurrentProfile, Astral.API.CurrentSettings.LastUCCProfile, false);
                 MainUccRefreshAll?.Invoke(__instance);
                 return false;
             }

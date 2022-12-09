@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 using System.Windows.Forms;
 using ACTP0Tools.Reflection;
 using Astral.Logic.UCC.Classes;
-using EntityCore.Tools;
+using EntityTools.Tools;
 using EntityTools.UCC.Conditions;
 
 namespace EntityTools.UCC.Editor.TreeViewCustomization

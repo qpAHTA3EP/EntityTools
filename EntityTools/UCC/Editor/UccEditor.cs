@@ -10,8 +10,7 @@ using ACTP0Tools.Reflection;
 using Astral.Logic.UCC.Classes;
 using Astral.Logic.UCC.Forms;
 using DevExpress.XtraEditors;
-using EntityCore.Forms;
-using EntityCore.Tools;
+using EntityTools.Forms;
 using EntityTools.Tools;
 using EntityTools.UCC.Conditions;
 using EntityTools.UCC.Editor.TreeViewCustomization;
@@ -92,27 +91,27 @@ namespace EntityTools.UCC.Editor
         private new void ShowDialog(){}
         private bool Show(Profil profile, string profileFileName = "", bool modal = false)
         {
-            UI_reset();
 
             if (profile != null)
             {
                 uccProfile = profile;
-                uccProfileFileName = string.IsNullOrEmpty(profileFileName) ? string.Empty : Path.GetFullPath(profileFileName);
-                Text = string.IsNullOrEmpty(profileFileName) ? "UCC Editor" : uccProfileFileName;
                 profileUnsaved = false;
-                UI_fill(uccProfile);
+                uccProfileFileName = profileFileName;
+                UI_fill();
             }
             else
             {
                 uccProfile = new Profil();
                 uccProfileFileName = string.Empty;
-                Text = "UCC Editor";
                 profileUnsaved = false;
+                UI_reset();
             }
-            txtLog.AppendText(string.Concat("Profile",
-                string.IsNullOrEmpty(profileFileName) ? string.Empty : " '" + uccProfileFileName + "'",
-                " opened.",
-                Environment.NewLine));
+            if (!string.IsNullOrEmpty(uccProfileFileName))
+                txtLog.AppendText(string.Concat("Profile",
+                    string.IsNullOrEmpty(profileFileName) ? string.Empty : " '" + uccProfileFileName + "'",
+                    " opened.",
+                    Environment.NewLine)
+                );
 
 
 #if does_not_work
@@ -130,7 +129,6 @@ namespace EntityTools.UCC.Editor
 
             return !profileUnsaved;
         }
-
 
 
         #region Drag & Drop
@@ -173,7 +171,7 @@ namespace EntityTools.UCC.Editor
                 TreeNode targetNode = treeView.GetNodeAt(targetPoint);
 
                 // Проверка нажтия кнопки ALT
-                bool altHolded = (e.KeyState & 32) != 0;
+                bool altHeld = (e.KeyState & 32) != 0;
 
                 // Проверяем что перемещаемый узел не является родительским по отношению к целевому узлу,
                 // расположенному под курсором мыши
@@ -183,7 +181,7 @@ namespace EntityTools.UCC.Editor
                         && !ContainsNode(draggedNode, targetNode))
                     {
                         if (targetNode is UccActionPackTreeNode actionPackNode
-                            && !altHolded)
+                            && !altHeld)
                         {
                             // Если удерживается ALT, то dtaggedNode помещается после actionPack'a
 
@@ -191,14 +189,12 @@ namespace EntityTools.UCC.Editor
                             // Пепремещаем узел во нутрь целевого узла
                             if (e.Effect == DragDropEffects.Move)
                             {
-                                //Logger.WriteLine(Logger.LogType.Debug, $"Move [{draggedNode.Index}]'{draggedNode.Text}' into Children of [{targetNode.Index}]'{targetNode.Text}'");
                                 draggedNode.Remove();
                                 actionPackNode.Nodes.Insert(0, draggedNode);
                             }
                             // Вставляем копию перетаскиваемого узла во внутрь целевого узла
                             else if (e.Effect == DragDropEffects.Copy)
                             {
-                                //Logger.WriteLine(Logger.LogType.Debug, $"Copy [{draggedNode.Index}]'{draggedNode.Text}' into Children of [{targetNode.Index}]'{targetNode.Text}'");
                                 targetNode.Nodes.Insert(0, (TreeNode)draggedNode.Clone());//Add((TreeNode)draggedNode.Clone());
                             }
                             ChangeWindowCaption();
@@ -207,7 +203,7 @@ namespace EntityTools.UCC.Editor
                             targetNode.Expand();
                         }
                         else if (targetNode is UccConditionPackTreeNode conditionPackNode
-                                 && !altHolded)
+                                 && !altHeld)
                         {
                             // Если удерживается ALT, то dtaggedNode помещается после actionPack'a
 
@@ -215,14 +211,12 @@ namespace EntityTools.UCC.Editor
                             // Пепремещаем узел во нутрь целевого узла
                             if (e.Effect == DragDropEffects.Move)
                             {
-                                //Logger.WriteLine(Logger.LogType.Debug, $"Move [{draggedNode.Index}]'{draggedNode.Text}' into Children of [{targetNode.Index}]'{targetNode.Text}'");
                                 draggedNode.Remove();
                                 conditionPackNode.Nodes.Insert(0, draggedNode);
                             }
                             // Вставляем копию перетаскиваемого узла во внутрь целевого узла
                             else if (e.Effect == DragDropEffects.Copy)
                             {
-                                //Logger.WriteLine(Logger.LogType.Debug, $"Copy [{draggedNode.Index}]'{draggedNode.Text}' into Children of [{targetNode.Index}]'{targetNode.Text}'");
                                 targetNode.Nodes.Insert(0, (TreeNode)draggedNode.Clone());//Add((TreeNode)draggedNode.Clone());
                             }
                             ChangeWindowCaption();
@@ -235,10 +229,6 @@ namespace EntityTools.UCC.Editor
                             // Выбираем коллекцию узлов, в которую нужно добавить перетаскиваемый узел
                             var treeNodeCollection = targetNode.Parent?.Nodes ?? treeView.Nodes;
 
-                            // Если нажата клавиша ALT, вставляем ПЕРЕД targetNode.
-                            // В противном случае - после targetNode.
-                            //var targetInd = targetNode.Index + (e.KeyState & 32) == 32 ? 0 : 1;// Проверяем нажатие клавиши ALT
-
                             // Перемещение узла
                             if (e.Effect == DragDropEffects.Move)
                             {
@@ -250,7 +240,6 @@ namespace EntityTools.UCC.Editor
                             // Копирование узла
                             else if (e.Effect == DragDropEffects.Copy)
                             {
-                                //Logger.WriteLine(Logger.LogType.Debug, $"Copy [{draggedNode.Index}]'{draggedNode.Text}' after [{targetNode.Index}]'{targetNode.Text}'");
                                 treeNodeCollection.Insert(targetNode.Index + 1, (TreeNode)draggedNode.Clone());
                             }
                             ChangeWindowCaption();
@@ -262,7 +251,6 @@ namespace EntityTools.UCC.Editor
                     // Перемещаем в конец списка 
                     if (e.Effect == DragDropEffects.Move)
                     {
-                        //Logger.WriteLine(Logger.LogType.Debug, $"Move [{draggedNode.Index}]'{draggedNode.Text}' at the of action list");
                         draggedNode.Remove();
 
                         treeView.Nodes.Add(draggedNode);
@@ -270,7 +258,6 @@ namespace EntityTools.UCC.Editor
                     // Копирование узла
                     else if (e.Effect == DragDropEffects.Copy)
                     {
-                        //Logger.WriteLine(Logger.LogType.Debug, $"Copy [{draggedNode.Index}]'{draggedNode.Text}' at the of action list");
                         treeView.Nodes.Add((TreeNode)draggedNode.Clone());
                     }
                     ChangeWindowCaption();
@@ -332,7 +319,6 @@ namespace EntityTools.UCC.Editor
                     // Определяем узел дерева, расположенный под курсором мыши
                     treeView.SelectedNode = targetNode;
 
-#if true
                     // Если нажата левая кнопка мыши, то Drag&Drop в режиме перемещения узла
                     if ((e.KeyState & 1) > 0)
                     {
@@ -343,9 +329,6 @@ namespace EntityTools.UCC.Editor
                     {
                         e.Effect = DragDropEffects.Copy;
                     }
-#else
-                    e.Effect = e.AllowedEffect;  
-#endif
                 }
                 else e.Effect = DragDropEffects.None;
             }
@@ -425,16 +408,15 @@ namespace EntityTools.UCC.Editor
                     var prof = Astral.Functions.XmlSerializer.Deserialize<Profil>(openDialog.FileName, false, 1);
                     if (prof != null)
                     {
-                        UI_reset();
-                        UI_fill(prof);
                         uccProfile = prof;
                         uccProfileFileName = openDialog.FileName;
-                        Text = string.IsNullOrEmpty(uccProfileFileName) ? "UCC Editor" : uccProfileFileName;
+                        profileUnsaved = false;
+                        UI_fill();
+                        ChangeWindowCaption();
                         txtLog.AppendText(string.Concat("Profile",
                             string.IsNullOrEmpty(uccProfileFileName) ? string.Empty : " '" + uccProfileFileName + "'",
                             " loaded.",
                             Environment.NewLine));
-                        profileUnsaved = false;
                     }
                 }
                 catch (Exception exc)
@@ -448,10 +430,9 @@ namespace EntityTools.UCC.Editor
         {
             if (uccProfile != null)
             {
-                UI_reset();
-                UI_fill(uccProfile);
+                UI_fill();
                 txtLog.AppendText(string.Concat("Profile",
-                    string.IsNullOrEmpty(uccProfileFileName) ? String.Empty : " '" + uccProfileFileName + "'",
+                    string.IsNullOrEmpty(uccProfileFileName) ? string.Empty : " '" + uccProfileFileName + "'",
                     " reloaded.",
                     Environment.NewLine));
             }
@@ -461,8 +442,6 @@ namespace EntityTools.UCC.Editor
         {
             uccProfile = new Profil();
             uccProfileFileName = string.Empty;
-            Text = "UCC Editor";
-            profileUnsaved = false;
             UI_reset();
             txtLog.AppendText("Make blank Profile.\n");
         }
@@ -569,18 +548,7 @@ namespace EntityTools.UCC.Editor
                 DialogResult = DialogResult.OK;
                 if (string.IsNullOrEmpty(fileName))
                     return true;
-#if true
                 return Astral.Functions.XmlSerializer.Serialize(fileName, uccProfile, 1);
-#else
-                using (TextWriter fileStream = new StreamWriter(fileName, false))
-                {
-                    //ACTP0Serializer.GetExtraTypes(out List<Type> types, 2);
-
-                    profileSerializer.Serialize(fileStream, profile); 
-                    return true;
-                }
-#endif 
-
             }
             catch (Exception exc)
             {
@@ -604,51 +572,56 @@ namespace EntityTools.UCC.Editor
         }
 
         /// <summary>
-        /// Отображение профиля <paramref name="profile"/> в окне редактора.
+        /// Отображение профиля <see cref="uccProfile"/> в окне редактора.
         /// </summary>
-        /// <param name="profile"></param>
-        private void UI_fill(Profil profile)
+        private void UI_fill()
         {
-            if(profile is null)
+            if (uccProfile is null)
+            {
+                UI_reset();
                 return;
+            }
 
             propertyGrid.SelectedObject = null;
             treeConditions.Nodes.Clear();
             // Отображение дерева умений, используемых в бою
-            if (profile.ActionsCombat?.Count > 0)
+            treeCombatActions.Nodes.Clear();
+            if (uccProfile.ActionsCombat?.Count > 0)
             {
-                treeCombatActions.Nodes.Clear();
-                treeCombatActions.Nodes.AddRange(profile.ActionsCombat.ToUccTreeNodes(true));
+                treeCombatActions.Nodes.AddRange(uccProfile.ActionsCombat.ToUccTreeNodes(true));
             }
             // Отображение дерева умений, 
-            if (profile.ActionsPatrol?.Count > 0)
+            treePatrolActions.Nodes.Clear();
+            if (uccProfile.ActionsPatrol?.Count > 0)
             {
-                treePatrolActions.Nodes.Clear();
-                treePatrolActions.Nodes.AddRange(profile.ActionsPatrol.ToUccTreeNodes(true));
+                treePatrolActions.Nodes.AddRange(uccProfile.ActionsPatrol.ToUccTreeNodes(true));
             }
             // Отображение тактики
             {
                 // Использование зелий
-                checkerUsePotion.Checked = profile.UsePotions;
-                checkerSmartPotionUsage.Checked = profile.SmartPotionUse;
-                editHealthProcent.Value = profile.PotionHealth == 0 ? 40 : profile.PotionHealth;
+                checkerUsePotion.Checked = uccProfile.UsePotions;
+                checkerSmartPotionUsage.Checked = uccProfile.SmartPotionUse;
+                editHealthProcent.Value = uccProfile.PotionHealth == 0 ? 40 : uccProfile.PotionHealth;
 
-                checkerTacticActivator.Checked = profile.EnableTargetPriorities;
+                checkerTacticActivator.Checked = uccProfile.EnableTargetPriorities;
                 handler_TacticUsageChanged(checkerTacticActivator);
-                editBasePriority.EditValue = profile.TargetPriority;
-                editChangeCooldown.Value = profile.TargetChangeCD;
-                editBasePriorityRange.Value = profile.TargetPriorityRange;
+                editBasePriority.EditValue = uccProfile.TargetPriority;
+                editChangeCooldown.Value = uccProfile.TargetChangeCD;
+                editBasePriorityRange.Value = uccProfile.TargetPriorityRange;
 
                 listPriorities.Items.Clear();
-                if(profile.TargetPriorities?.Count > 0)
-                    listPriorities.Items.AddRange(profile.TargetPriorities.ToArray());
+                if (uccProfile.TargetPriorities?.Count > 0)
+                    listPriorities.Items.AddRange(uccProfile.TargetPriorities.Cast<object>().ToArray());
             }
+            ChangeWindowCaption();
         }
         /// <summary>
         /// Очистка содержимого списков и деревьев
         /// </summary>
         private void UI_reset()
         {
+            profileUnsaved = false;
+            uccProfileFileName = string.Empty;
             treeCombatActions.Nodes.Clear();
             treePatrolActions.Nodes.Clear();
             treeConditions.Nodes.Clear();
@@ -658,13 +631,13 @@ namespace EntityTools.UCC.Editor
             selectedUccAction = null;
             propertyCallback = null;
             conditionCallback = null;
+            ChangeWindowCaption();
         }
-        
-        private void ChangeWindowCaption(bool saved = false)
+
+        private void ChangeWindowCaption()
         {
-            Text = (saved ? string.Empty : "* ")
-                 + (string.IsNullOrEmpty(uccProfileFileName) ? "New ucc-Profile" : uccProfileFileName);
-            profileUnsaved = !saved;
+            Text = (profileUnsaved ? "* " : string.Empty)
+                 + (string.IsNullOrEmpty(uccProfileFileName) ? "New UCC-profile" : uccProfileFileName);
         }
 
         private void handler_Closing(object sender, FormClosingEventArgs e)
@@ -673,7 +646,10 @@ namespace EntityTools.UCC.Editor
             {
                 switch (XtraMessageBox.Show("Profile was modified but did not saved!\n" +
                                             "Would you like to save it ?\n" +
-                                            "Press 'Cancel' button to continue profile edition.", "Caution!", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Exclamation))
+                                            "Press 'Cancel' button to continue profile edition.", 
+                            "Caution!", 
+                            MessageBoxButtons.YesNoCancel, 
+                            MessageBoxIcon.Exclamation))
                 {
                     case DialogResult.Yes:
                         SaveProfile(uccProfileFileName);
@@ -771,7 +747,7 @@ namespace EntityTools.UCC.Editor
 
                     propertyGrid.SelectedObject = newCondition;
                     propertyCallback = newTreeNode.UpdateView;
-
+                    profileUnsaved = true;
                     ChangeWindowCaption();
                 }
             }
@@ -797,6 +773,7 @@ namespace EntityTools.UCC.Editor
                 propertyGrid.SelectedObject = null;
                 conditionNode.Remove();
 
+                profileUnsaved = true;
                 ChangeWindowCaption();
             }
         }
@@ -841,6 +818,7 @@ namespace EntityTools.UCC.Editor
                 if (newNode is IUccTreeNode<UCCCondition> uccConditionTreeNode)
                     propertyCallback = uccConditionTreeNode.UpdateView;
 
+                profileUnsaved = true;
                 ChangeWindowCaption();
             }
         }
@@ -1075,6 +1053,7 @@ namespace EntityTools.UCC.Editor
                     propertyGrid.SelectedObject = action;
                     propertyCallback = newTreeNode.UpdateView;
 
+                    profileUnsaved = true;
                     ChangeWindowCaption();
                 }
             }
@@ -1107,6 +1086,7 @@ namespace EntityTools.UCC.Editor
                 propertyGrid.SelectedObject = null;
                 actionNode.Remove();
 
+                profileUnsaved = true;
                 ChangeWindowCaption();
             }
         }
@@ -1169,6 +1149,7 @@ namespace EntityTools.UCC.Editor
                 if (newNode is IUccActionTreeNode uccActionTreeNode)
                     propertyCallback = uccActionTreeNode.UpdateView;
 
+                profileUnsaved = true;
                 ChangeWindowCaption();
             }
         }
@@ -1247,6 +1228,7 @@ namespace EntityTools.UCC.Editor
 
         private void handler_TacticUsageChanged(object sender, EventArgs e = null)
         {
+            profileUnsaved = true;
             groupPriority.Enabled = checkerTacticActivator.Checked;
         }
 
@@ -1301,7 +1283,6 @@ namespace EntityTools.UCC.Editor
                 {
                     listPriorities.Items.RemoveAt(selectedTargetPriorityInd);
                     listPriorities.Items.Add(item);
-                    ChangeWindowCaption();
                 }
                 else if (selectedTargetPriorityInd != currentInd)
                 {
@@ -1315,8 +1296,9 @@ namespace EntityTools.UCC.Editor
                         listPriorities.Items.RemoveAt(selectedTargetPriorityInd);
                         listPriorities.Items.Insert(currentInd, item);
                     }
-                    ChangeWindowCaption();
                 }
+                profileUnsaved = true;
+                ChangeWindowCaption();
                 pointPrioritiesItem = Point.Empty;
                 selectedTargetPriorityInd = -1;
             }
@@ -1350,6 +1332,7 @@ namespace EntityTools.UCC.Editor
                     listPriorities.Items.Insert(selectedPriorityInd + 1, targetPriorityEntry);
                 else listPriorities.Items.Add(targetPriorityEntry);
 
+                profileUnsaved = true;
                 ChangeWindowCaption();
             }
         }
@@ -1361,6 +1344,7 @@ namespace EntityTools.UCC.Editor
             if (selectedPriorityInd >= 0)
             {
                 listPriorities.Items.RemoveAt(selectedPriorityInd);
+                profileUnsaved = true;
                 ChangeWindowCaption();
             }
         }

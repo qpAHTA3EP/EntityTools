@@ -3,7 +3,7 @@ using System;
 using System.Windows.Forms;
 using DevExpress.Utils;
 
-namespace EntityCore.Forms
+namespace EntityTools.Forms
 {
     public partial class InputBox : XtraForm //*/ Form
     {

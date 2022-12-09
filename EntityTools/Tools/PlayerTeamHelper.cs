@@ -1,20 +1,20 @@
-﻿using Astral.Classes;
-using EntityTools.Enums;
-using EntityTools.Tools.Navigation;
-using MyNW.Classes;
-using MyNW.Internals;
-using MyNW.Patchables.Enums;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using ACTP0Tools;
+using Astral.Classes;
+using EntityTools.Enums;
 using EntityTools.Tools.Entities;
+using EntityTools.Tools.Navigation;
+using MyNW.Classes;
+using MyNW.Internals;
+using MyNW.Patchables.Enums;
 
 // ReSharper disable CollectionNeverUpdated.Local
 // ReSharper disable InconsistentNaming
 
-namespace EntityCore.Tools
+namespace EntityTools.Tools
 {
     public static class PlayerTeamHelper
     {
@@ -178,7 +178,7 @@ namespace EntityCore.Tools
             var id = character.CurrentPowerTreeBuild.SecondaryPaths.FirstOrDefault()?.Path.Name;
             return GetParagonType(id);
         }
-        
+
         private static readonly Dictionary<string, PlayerParagonType> id2type =
             new Dictionary<string, PlayerParagonType>(24);
 
@@ -187,8 +187,8 @@ namespace EntityCore.Tools
         /// </summary>
         public static string GetParagonId(PlayerParagonType type)
         {
-            return type2id.TryGetValue(type, out string id) 
-                ? id 
+            return type2id.TryGetValue(type, out string id)
+                ? id
                 : string.Empty;
         }
         /// <summary>
@@ -238,7 +238,7 @@ namespace EntityCore.Tools
         /// </summary>
         public static TeamRoles GetTeamRole(this Entity entity)
         {
-            var id = GetParagonId(entity);
+            var id = entity.GetParagonId();
 
             return GetTeamRole(id);
         }
@@ -867,7 +867,7 @@ namespace EntityCore.Tools
                     if (NavigationHelper.SquareDistance3D(playerPos, tmEntity.Location) < squareRange)
                     {
                         if (playerInst != tm.MapInstanceNumber
-                            || playerMap != tm.MapName 
+                            || playerMap != tm.MapName
                             || playerRegion != tmEntity.RegionInternalName)
                             continue;
 
@@ -959,7 +959,7 @@ namespace EntityCore.Tools
             }
             return mostInjured;
         }
-        
+
         private static TeamMember GetWeakestTeamMember(TeamMember[] members, uint memberNum, Predicate<Entity> specialCheck)
         {
             if (cacheTimeout.IsTimedOut
@@ -998,7 +998,7 @@ namespace EntityCore.Tools
             }
             return weakest;
         }
-        
+
         private static TeamMember GetSturdiestTeamMember(TeamMember[] members, uint memberNum, Predicate<Entity> specialCheck)
         {
 
@@ -1072,7 +1072,7 @@ namespace EntityCore.Tools
             Tank = null;
             Healer = null;
             Player = null;
-            
+
             TanksNum = 0;
             HealersNum = 0;
             DDsNum = 0;
@@ -1382,8 +1382,8 @@ namespace EntityCore.Tools
                         break;
                 }
             }
-            
-        //TeamMember_0:
+
+            //TeamMember_0:
             teamMember = members[0];
             if (teamMember.EntityId == selfId)
             {
@@ -1453,8 +1453,8 @@ namespace EntityCore.Tools
 
         RegenerateCacheFinish:
             cacheTimeout.ChangeTime(player.InCombat
-                ? EntityTools.EntityTools.Config.EntityCache.CombatCacheTime
-                : EntityTools.EntityTools.Config.EntityCache.GlobalCacheTime);
+                ? EntityTools.Config.EntityCache.CombatCacheTime
+                : EntityTools.Config.EntityCache.GlobalCacheTime);
             return CachedTeamId = team.TeamId;
         }
 
@@ -1578,8 +1578,8 @@ namespace EntityCore.Tools
             float maxHealth = 0;
 
             foreach (var attacker in from entity in Astral.Logic.NW.Attackers.List
-                where entity.Character.CurrentTarget.ContainerId == teammateId
-                select entity)
+                                     where entity.Character.CurrentTarget.ContainerId == teammateId
+                                     select entity)
             {
                 var health = attacker.Character.AttribsBasic.MaxHealth;
                 if (maxHealth < health)
@@ -1602,8 +1602,8 @@ namespace EntityCore.Tools
             float maxHealth = float.MaxValue;
 
             foreach (var attacker in from entity in Astral.Logic.NW.Attackers.List
-                where entity.Character.CurrentTarget.ContainerId == teammateId
-                select entity)
+                                     where entity.Character.CurrentTarget.ContainerId == teammateId
+                                     select entity)
             {
                 var health = attacker.Character.AttribsBasic.MaxHealth;
                 if (maxHealth > health)
@@ -1626,8 +1626,8 @@ namespace EntityCore.Tools
             float maxHealth = float.MaxValue;
 
             foreach (var attacker in from entity in Astral.Logic.NW.Attackers.List
-                where entity.Character.CurrentTarget.ContainerId == teammateId
-                select entity)
+                                     where entity.Character.CurrentTarget.ContainerId == teammateId
+                                     select entity)
             {
                 var health = attacker.Character.AttribsBasic.Health;
                 if (maxHealth > health)
@@ -1687,7 +1687,7 @@ namespace EntityCore.Tools
             [TypeConverter(typeof(ExpandableObjectConverter))]
             [Category("Team")]
             public object Leader => new SimpleEntityWrapper(GetLeader());
-            
+
             [TypeConverter(typeof(ExpandableObjectConverter))]
             [Category("Team")]
             public object Teammate_0

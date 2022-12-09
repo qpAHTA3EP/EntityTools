@@ -2,7 +2,7 @@
 using MyNW.Classes;
 using System;
 
-namespace EntityCore.Tools
+namespace EntityTools.Tools
 {
     public static class GameHelper
     {
@@ -34,7 +34,7 @@ namespace EntityCore.Tools
             }
             foreach (var uiGen in UIManager.AllUIGen)
             {
-                if(uiGen.IsVisible)
+                if (uiGen.IsVisible)
                 {
                     if (uiGen.Type == MyNW.Patchables.Enums.UIGenType.Button)
                     {
@@ -46,11 +46,11 @@ namespace EntityCore.Tools
                             case "Eventdetails_Cancelbutton": // Кнопка закрытия окна "детали эвента"
                                 GameCommands.Execute("GenButtonClick Eventdetails_Cancelbutton");
                                 break;
-                        } 
+                        }
                     }
-                    else if(uiGen.Type == MyNW.Patchables.Enums.UIGenType.MovableBox)
+                    else if (uiGen.Type == MyNW.Patchables.Enums.UIGenType.MovableBox)
                     {
-                        switch(uiGen.Name)
+                        switch (uiGen.Name)
                         {
                             case "Invocationresults_Root": // Окно награды за молитву
                                 GameCommands.Execute("GenSendMessage Invocationresults_Root Close");

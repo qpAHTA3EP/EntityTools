@@ -6,17 +6,17 @@ namespace EntityTools.Quester.Editor
 {
     public partial class QuesterEditor
     {
-        private class DeleteQuesterAction : IQEdit
+        private class DeleteQuesterCondition : IEditAct
         {
-            private readonly ActionBaseTreeNode deletingNode;
-            private ActionBaseTreeNode parentNodeBeforeDeleting;
+            private readonly ConditionBaseTreeNode deletingNode;
+            private ConditionBaseTreeNode parentNodeBeforeDeleting;
             
             private TreeView treeViewOwner;
             private int nodeIndexBeforeDeleting;
             
             private readonly EditActionEvent onApply;
             private readonly EditActionEvent onRedo;
-            public DeleteQuesterAction(ActionBaseTreeNode deletingNode = null, EditActionEvent onApply = null, EditActionEvent onRedo = null)
+            public DeleteQuesterCondition(ConditionBaseTreeNode deletingNode = null, EditActionEvent onApply = null, EditActionEvent onRedo = null)
             {
                 this.deletingNode = deletingNode ?? throw new ArgumentException(nameof(deletingNode));
                 this.onApply = onApply;
@@ -29,7 +29,7 @@ namespace EntityTools.Quester.Editor
                 {
                     treeViewOwner = deletingNode.TreeView ?? throw new InvalidOperationException($"Node '{deletingNode.Text}' does not attached to the TreeView.");
 
-                    parentNodeBeforeDeleting = deletingNode.Parent as ActionPackTreeNode;
+                    parentNodeBeforeDeleting = deletingNode.Parent as ConditionPackTreeNode;
                     nodeIndexBeforeDeleting = deletingNode.Index;
 
                     treeViewOwner.BeginUpdate();
@@ -62,9 +62,9 @@ namespace EntityTools.Quester.Editor
 
             public bool Applied { get; private set; }
 
-            public string Label => $"Delete action '{deletingNode.Text}'";
+            public string Label => $"Delete condition '{deletingNode.Text}'";
 
-            public string UndoLabel => $"Restore action '{deletingNode.Text}'";
+            public string UndoLabel => $"Restore condition '{deletingNode.Text}'";
         }
     }
 }

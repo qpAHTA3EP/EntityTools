@@ -5,7 +5,7 @@ using System.Linq;
 using System.Windows.Forms;
 using ACTP0Tools.Reflection;
 using Astral.Quester.Forms;
-using EntityCore.Forms;
+using EntityTools.Forms;
 using QuesterEditor = EntityTools.Quester.Editor.QuesterEditor;
 
 namespace EntityTools.Editors

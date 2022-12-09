@@ -1,11 +1,10 @@
-﻿using Astral.Classes.ItemFilter;
-using EntityTools.Enums;
-using EntityTools.Forms;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
-using EntityCore.Forms;
+using Astral.Classes.ItemFilter;
+using EntityTools.Enums;
+using EntityTools.Forms;
 
 namespace EntityTools.Editors
 {

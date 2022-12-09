@@ -6,7 +6,7 @@ namespace EntityTools.Quester.Editor
 {
     public partial class QuesterEditor
     {
-        private class MoveQuesterAction : IQEdit
+        private class MoveQuesterAction : IEditAct
         {
             private readonly ActionBaseTreeNode movingNode;
             private readonly ActionBaseTreeNode targetNode;
@@ -16,9 +16,9 @@ namespace EntityTools.Quester.Editor
             private ActionBaseTreeNode parentNodeBeforeMoving;
             private int nodeIndexBeforeMoving;
 
-            private readonly Editor.QuesterEditor.EditActionEvent onApply;
-            private readonly Editor.QuesterEditor.EditActionEvent onRedo;
-            public MoveQuesterAction(ActionBaseTreeNode movingNode, ActionBaseTreeNode targetNode, bool suppressMovingIn, Editor.QuesterEditor.EditActionEvent onApply = null, Editor.QuesterEditor.EditActionEvent onRedo = null)
+            private readonly EditActionEvent onApply;
+            private readonly EditActionEvent onRedo;
+            public MoveQuesterAction(ActionBaseTreeNode movingNode, ActionBaseTreeNode targetNode, bool suppressMovingIn, EditActionEvent onApply = null, EditActionEvent onRedo = null)
             {
                 this.movingNode = movingNode ?? throw new ArgumentException(nameof(movingNode));
                 this.targetNode = targetNode ?? throw new ArgumentException(nameof(targetNode));
@@ -66,7 +66,7 @@ namespace EntityTools.Quester.Editor
                     treeViewOwnedNodeBeforeMoving.BeginUpdate();
                     movingNode.Remove();
                     if (parentNodeBeforeMoving is null)
-                        treeViewOwnedNodeBeforeMoving?.Nodes.Insert(nodeIndexBeforeMoving, movingNode);
+                        treeViewOwnedNodeBeforeMoving.Nodes.Insert(nodeIndexBeforeMoving, movingNode);
                     else parentNodeBeforeMoving.Nodes.Insert(nodeIndexBeforeMoving, movingNode);
                     treeViewOwnedNodeBeforeMoving.EndUpdate();
                     

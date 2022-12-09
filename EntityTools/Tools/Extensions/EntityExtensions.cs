@@ -1,5 +1,4 @@
 ﻿using System;
-using EntityCore.Enums;
 using EntityTools.Enums;
 using EntityTools.Tools.Extensions;
 using MyNW.Classes;
@@ -18,20 +17,17 @@ namespace EntityTools.Tools.Extensions
             //if (!entity.IsValid)
             //    return entityLabel + "[INVALID]";
             return string.Concat(entityLabel, "[",
-                    ((detail & EntityDetail.Pointer) > 0) ? entity.ContainerId + "; " : string.Empty,
-                    (nameType == EntityNameType.InternalName) ? entity.InternalName : entity.NameUntranslated,
-                    ((detail & EntityDetail.RelationToPlayer) > 0) ? "; " + entity.RelationToPlayer : string.Empty,
-                    ((detail & EntityDetail.Alive) > 0) ? (entity.IsDead ? "; Dead" : "; Alive") : string.Empty,
-                    ((detail & EntityDetail.Health) > 0) ? entity.Character.AttribsBasic.Health.ToString("; N0 HP") : string.Empty,
-                    ((detail & EntityDetail.HealthPercent) > 0) ? entity.Character.AttribsBasic.HealthPercent.ToString("; N0 HP%") : string.Empty,
-                    ((detail & EntityDetail.Distance) > 0) ? "; " + entity.CombatDistance3.ToString("N2") : string.Empty,
+                    (detail & EntityDetail.Pointer) > 0 ? entity.ContainerId + "; " : string.Empty,
+                    nameType == EntityNameType.InternalName ? entity.InternalName : entity.NameUntranslated,
+                    (detail & EntityDetail.RelationToPlayer) > 0 ? "; " + entity.RelationToPlayer : string.Empty,
+                    (detail & EntityDetail.Alive) > 0 ? entity.IsDead ? "; Dead" : "; Alive" : string.Empty,
+                    (detail & EntityDetail.Health) > 0 ? entity.Character.AttribsBasic.Health.ToString("; N0 HP") : string.Empty,
+                    (detail & EntityDetail.HealthPercent) > 0 ? entity.Character.AttribsBasic.HealthPercent.ToString("; N0 HP%") : string.Empty,
+                    (detail & EntityDetail.Distance) > 0 ? "; " + entity.CombatDistance3.ToString("N2") : string.Empty,
                     ']');
 
         }
     }
-}
-namespace EntityCore.Enums
-{
     /// <summary>
     /// Набор флагов, определяющих детализацию описания <seealso cref="Entity"/>, возвращаемого <seealso cref="EntityExtensions.GetDebugString"/>
     /// </summary>

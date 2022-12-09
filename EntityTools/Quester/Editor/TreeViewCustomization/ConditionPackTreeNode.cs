@@ -2,7 +2,7 @@
 using System.Text;
 using ACTP0Tools.Classes.Quester;
 using ACTP0Tools.Reflection;
-using EntityCore.Tools;
+using EntityTools.Tools;
 using EntityTools.Enums;
 using EntityTools.Quester.Conditions;
 using QuesterCondition = Astral.Quester.Classes.Condition;

@@ -2,7 +2,6 @@
 
 using ACTP0Tools;
 using Astral.Logic.Classes.Map;
-using EntityCore.Enums;
 using EntityTools.Editors;
 using EntityTools.Enums;
 using EntityTools.Patches.Mapper;

@@ -17,7 +17,7 @@ using EntityTools.UCC.Editor.TreeViewCustomization;
 using QuesterAction = Astral.Quester.Classes.Action;
 using QuesterCondition = Astral.Quester.Classes.Condition;
 
-namespace EntityCore.Tools
+namespace EntityTools.Tools
 {
     public static class TreeViewHelper
     {

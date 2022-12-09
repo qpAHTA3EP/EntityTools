@@ -4,7 +4,7 @@ using System.Windows.Forms;
 using ACTP0Tools.Reflection;
 using Astral.Logic.UCC.Classes;
 using DevExpress.XtraEditors;
-using EntityCore.Forms;
+using EntityTools.Forms;
 using EntityTools.Enums;
 using EntityTools.Tools.Extensions;
 using EntityTools.UCC.Actions;

@@ -8,7 +8,7 @@ using System.ComponentModel;
 using System.Drawing.Design;
 using System.Windows.Forms;
 using Astral.Logic.NW;
-using EntityCore.Forms;
+using EntityTools.Forms;
 using EntityTools.Tools;
 
 namespace EntityTools.Editors

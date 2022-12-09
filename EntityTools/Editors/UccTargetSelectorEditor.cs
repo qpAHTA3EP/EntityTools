@@ -4,7 +4,7 @@ using EntityTools.Enums;
 using System;
 using System.ComponentModel;
 using System.Drawing.Design;
-using EntityCore.Forms;
+using EntityTools.Forms;
 using EntityTools.Tools.Targeting;
 
 namespace EntityTools.Editors

@@ -4,7 +4,7 @@ using System.Windows.Forms;
 using ACTP0Tools.Classes.Quester;
 using ACTP0Tools.Reflection;
 using Astral.Quester.Classes;
-using EntityCore.Tools;
+using EntityTools.Tools;
 using MyNW.Classes;
 using QuesterAction = Astral.Quester.Classes.Action;
 

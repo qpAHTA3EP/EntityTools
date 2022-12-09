@@ -8,7 +8,7 @@ using AStar;
 using DevExpress.Utils;
 using DevExpress.XtraEditors;
 
-using EntityCore.Forms;
+using EntityTools.Forms;
 
 using MyNW.Classes;
 using MyNW.Internals;

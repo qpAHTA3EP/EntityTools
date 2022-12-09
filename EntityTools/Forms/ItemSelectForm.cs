@@ -7,7 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 
-namespace EntityCore.Forms
+namespace EntityTools.Forms
 {
     public partial class ItemSelectForm : XtraForm
     {

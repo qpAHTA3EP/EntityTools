@@ -1,6 +1,6 @@
 ﻿namespace EntityTools.Quester.Editor
 {
-    public interface IQEdit
+    public interface IEditAct
     {
         /// <summary>
         /// Применениие команды редактирования

@@ -5,16 +5,16 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 
-[assembly: AssemblyVersion("1.22.1121.2038")]
+[assembly: AssemblyVersion("1.22.1209.2008")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyTitle("AMClient")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyFileVersion("1.22.1121.2038")]
+[assembly: AssemblyFileVersion("1.22.1209.2008")]
 [assembly: Guid("62031767-8156-4461-ab97-7fd0b247a1a4")]
 [assembly: AssemblyCopyright("Copyright ©  2012")]
 [assembly: AssemblyProduct("AMClient")]
 [assembly: ComVisible(false)]
 [assembly: AssemblyTrademark("")]
 
-[assembly: AssemblyInformationalVersion("0.22.1121.2038")]
+[assembly: AssemblyInformationalVersion("0.22.1209.2008")]

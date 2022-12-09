@@ -23,8 +23,6 @@ using DevExpress.XtraEditors;
 using DevExpress.XtraEditors.Controls;
 using DevExpress.XtraGrid.Views.Grid;
 using DevExpress.XtraGrid.Views.Grid.ViewInfo;
-using EntityCore.Forms;
-using EntityCore.Tools;
 using EntityTools.Annotations;
 using EntityTools.Enums;
 using EntityTools.Forms;
@@ -35,7 +33,6 @@ using EntityTools.Tools;
 using MyNW.Classes;
 using MyNW.Internals;
 using MyNW.Patchables.Enums;
-
 using QuesterAction = Astral.Quester.Classes.Action;
 using QuesterCondition = Astral.Quester.Classes.Condition;
 
@@ -43,96 +40,61 @@ namespace EntityTools.Quester.Editor
 {
     public partial class QuesterEditor : XtraForm
     {
+        //TODO Отслеживать изменение CustomRegion в Mapper'e и изменять PropertyGrid
+
         /// <summary>
-        /// Редактируемый профиль
+        /// Редактируемый Quester-профиль (<see cref="QuesterProfileProxy"/>)
         /// </summary>
         public QuesterProfileProxy Profile => profile;
         private readonly ProfileProxy profile;
         private readonly Guid startActionId;
-        private Stack<IQEdit> undoStack = new Stack<IQEdit>();
-        private Stack<IQEdit> redoStack = new Stack<IQEdit>();
 
-        // Функтор, выполняемый при изменении pgProperties
+        /// <summary>
+        /// Стэк команд для отмены манипуляций с Quester-профилем
+        /// </summary>
+        private readonly Stack<IEditAct> undoStack = new Stack<IEditAct>();
+        /// <summary>
+        /// Стэк команд для повторения манипуляций с Quester-профилем
+        /// </summary>
+        private readonly Stack<IEditAct> redoStack = new Stack<IEditAct>();
+
+        /// <summary>
+        /// Функтор, выполняемый при изменении <see cref="pgProperties"/>
+        /// для отображения внесенный изменений в элементе управления, ассоциированном с <see cref="pgProperties"/>
+        /// </summary>
         private System.Action propertyChangedCallback;
 
-        // Функтор, выполняемый при изменении списка treeConditions
+        /// <summary>
+        /// Функтор, выполняемый при изменении списка <see cref="treeConditions"/> 
+        /// для отображения внесенный изменений в списке условий Quester-команды,
+        /// ассоциированной со списком условий <see cref="treeConditions"/> 
+        /// </summary>
         private Action<TreeNodeCollection> conditionListChangedCallback;
 
-        // Скопированная команда
+        /// <summary>
+        /// Буфер обмена Quester-команд <see cref="QuesterAction"/>
+        /// </summary>
         private static QuesterAction actionCache;
 
-        // Скопированная условие
+        /// <summary>
+        /// Буфер обмена Quester-условий <see cref="QuesterCondition"/>
+        /// </summary>
         private static QuesterCondition conditionCache;
 
-        #region Инициализация
-#if false   //Попытка подмены PropertyDescriptor'a для установки редактора свойств типа CustomRegionCollection
-        private static readonly List<TypeDescriptionProvider> descriptorProvider = new List<TypeDescriptionProvider>();
-        static QuesterEditor()
-        {
-            // Ни один из испробованных способов не привел к вызову редактора CustomRegionSetEditor,
-            // определенного в EntityCore. Вместе с тем успешно прикреплялся редактор CustomRegionCollectionEditor,
-            // определенный в EntityTools, однако, его можно указать непосредственно в атрибутах свойств нужных классов
-            // и нет необходимости использовать механизмы TypeDescriptor
-#if true
-            var tCustomRegionCollection = typeof(CustomRegionCollection);
-            var editor = new EditorAttribute(typeof(CustomRegionSetEditor), typeof(UITypeEditor));
-            bool PropertyPredicate(PropertyDescriptor pd) => pd.PropertyType == tCustomRegionCollection;
-            typeof(IsInCustomRegionSet).DecoratePropertyWithAttribute(PropertyPredicate, editor);
-            typeof(MoveToEntity).DecoratePropertyWithAttribute(PropertyPredicate, editor);
-#elif false
-            //var cond = new IsInCustomRegionSet();
-            var type = typeof(IsInCustomRegionSet);
-            var tEditor = typeof(CustomRegionSetEditor);
-#elif false
-            // Декорирование свойств типов для вызова корректного редактора
-            var tCustomRegionCollection = typeof(CustomRegionCollection);
-            //var editorAttribute = new EditorAttribute(typeof(CustomRegionSetEditor),
-            //                                         typeof(UITypeEditor));
-            foreach (Type type in ACTP0Serializer.QuesterTypes)
-            {
-                bool shouldOverrideProperty = false;
-                PropertyOverridingTypeDescriptor ctd = new PropertyOverridingTypeDescriptor(TypeDescriptor.GetProvider(type).GetTypeDescriptor(type));
-                // iterate through properties in the supplied object/type
-                foreach (PropertyDescriptor pd in TypeDescriptor.GetProperties(type))
-                {
-                    // for every property that complies to our criteria
-                    if (pd.PropertyType == tCustomRegionCollection)
-                    {
-                        // we first construct the custom PropertyDescriptor with the TypeDescriptor's built-in capabilities
-                        var newPD = TypeDescriptor.CreateProperty(
-                                tCustomRegionCollection, // or just _settings, if it's already a type
-                                pd,                      // base property descriptor to which we want to add attributes
-                                                         // The PropertyDescriptor which we'll get will just wrap that
-                                                         // base one returning attributes we need.
-                                new EditorAttribute(typeof(CustomRegionCollectionEditor),//typeof(CustomRegionSetEditor),//
-                                    typeof(UITypeEditor)));
-
-                        // and then we tell our new PropertyOverridingTypeDescriptor to override that property
-                        ctd.OverrideProperty(newPD);
-                        shouldOverrideProperty = true;
-                    }
-                }
-
-                // then we add new descriptor provider that will return our descriptor instead of default
-                if (shouldOverrideProperty)
-                {
-                    var descriptor = new TypeDescriptorOverridingProvider(ctd);
-                    descriptorProvider.Add(descriptor);
-                    TypeDescriptor.AddProviderTransparent(descriptor, type);
-                }
-            } 
-#endif
-        } 
-#endif
+        #region Initialization
+        /// <summary>
+        /// Форма Mapper'a (<see cref="MapperFormExt"/>)
+        /// </summary>
+        private MapperFormExt mapperForm;
 
         public QuesterEditor(Profile profile, string fileName, Guid actionId)
         {
             InitializeComponent();
 
             this.profile = profile is null 
-                ? new ProfileProxy()
-                : new ProfileProxy(profile, fileName);
-
+                         ? new ProfileProxy()
+                         : new ProfileProxy(profile, fileName);
+             
             var settingFile = FileTools.QuesterEditorSettingsFile;
             if (File.Exists(settingFile))
             {
@@ -152,7 +114,6 @@ namespace EntityTools.Quester.Editor
         /// <param name="param">Дополнительные аргументы:<br/>
         /// - адресная строка файла редактируемого профиля;<br/>
         /// - флаг модального режима</param>
-        /// <returns></returns>
         public static bool Edit(Profile profile = null, params object[] param)
         {
             string profileName = string.Empty;
@@ -256,7 +217,9 @@ namespace EntityTools.Quester.Editor
 
         private void handler_Form_Load(object sender, EventArgs e)
         {
-            SetTypeAssociations();
+#if false
+            SetTypeAssociations(); 
+#endif
 
             UI_fill();
 
@@ -647,18 +610,26 @@ namespace EntityTools.Quester.Editor
                         return;
                 }
 
-                if (pgProperties.SelectedObject is QuesterCondition)
-                {
-                    propertyChangedCallback = null;
-                    pgProperties.SelectedObject = null;
-                }
-
+                ResetSelectedCondition();
+#if true
+                ApplyEditAct(new DeleteQuesterCondition(conditionNode));
+#else
                 treeConditions.BeginUpdate();
                 conditionNode.Remove();
                 treeConditions.EndUpdate();
 
                 profile.Saved = false;
-                UpdateWindowCaption();
+                UpdateWindowCaption(); 
+#endif
+            }
+        }
+
+        private void ResetSelectedCondition()
+        {
+            if (pgProperties.SelectedObject is QuesterCondition)
+            {
+                propertyChangedCallback = null;
+                pgProperties.SelectedObject = null;
             }
         }
 
@@ -727,7 +698,7 @@ namespace EntityTools.Quester.Editor
             {
                 var result = selectedNode.IsValid();
                 var testInfo = selectedNode.TestInfo();
-                var msg = $"{selectedNode.Text}\n{testInfo}\nResult: {result}";
+                var msg = $"{selectedNode.Text}\t\n{testInfo}\t\nResult: {result}";
                 XtraMessageBox.Show(msg, "Condition Test", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 txtLog.AppendText(msg);
                 return;
@@ -745,6 +716,7 @@ namespace EntityTools.Quester.Editor
             if (treeConditions.Nodes.Count > 0)
             {
                 var stringBuilder = new StringBuilder();
+                stringBuilder.AppendLine($"Testing All Conditions:");
                 foreach (ConditionBaseTreeNode node in treeConditions.Nodes)
                 {
                     // Тестирование выбранного условия
@@ -830,6 +802,7 @@ namespace EntityTools.Quester.Editor
         {
             if (node is null)
             {
+                treeConditions.SelectedNode = null;
                 if (pgProperties.SelectedObject is QuesterCondition)
                 {
                     pgProperties.SelectedObject = null;
@@ -838,6 +811,7 @@ namespace EntityTools.Quester.Editor
             }
             else
             {
+                treeConditions.SelectedNode = node;
                 pgProperties.SelectedObject = node.Content;
                 propertyChangedCallback = node.UpdateView;
             }
@@ -917,10 +891,7 @@ namespace EntityTools.Quester.Editor
 
                 ResetSelectedAction();
 
-                var deleteAction = new DeleteQuesterAction(actionNode);
-                deleteAction.Apply();
-
-                AfterQuesterActionEdited(deleteAction);
+                ApplyEditAct(new DeleteQuesterAction(actionNode));
             }
         }
 
@@ -1005,26 +976,31 @@ namespace EntityTools.Quester.Editor
         {
             InvokeActionCallback();
 
-            if (treeActions.SelectedNode is ActionBaseTreeNode actionNode
-                && XMLEdit.Show(actionNode.Content) is QuesterAction modifiedAction)
+            if (treeActions.SelectedNode is ActionBaseTreeNode actionNode)
             {
-                var newActionNode = modifiedAction.MakeTreeNode(profile);
-                int selectedInd = actionNode.Index;
-                var parentNode = actionNode.Parent as ActionBaseTreeNode;
-                
-                treeActions.BeginUpdate();
-                actionNode.Remove();
-                if (parentNode !=  null)
-                {
-                    parentNode.Nodes.Insert(selectedInd, newActionNode);
-                    parentNode.UpdateView();
-                }
-                else treeActions.Nodes.Insert(selectedInd, newActionNode);
-                treeActions.EndUpdate();
-                
-                profile.Saved = false;
+                var editedAction = actionNode.ReconstructInternal();
 
-                SetSelectedActionTo(newActionNode);
+                if (XMLEdit.Show(editedAction) is QuesterAction modifiedAction)
+                {
+                    var newActionNode = modifiedAction.MakeTreeNode(profile);
+                    int selectedInd = actionNode.Index;
+                    var parentNode = actionNode.Parent as ActionBaseTreeNode;
+
+                    treeActions.BeginUpdate();
+                    actionNode.Remove();
+                    if (parentNode != null)
+                    {
+                        parentNode.Nodes.Insert(selectedInd, newActionNode);
+                        parentNode.UpdateView();
+                    }
+                    else treeActions.Nodes.Insert(selectedInd, newActionNode);
+
+                    treeActions.EndUpdate();
+
+                    profile.Saved = false;
+
+                    SetSelectedActionTo(newActionNode);
+                }
             }
         }
 
@@ -1151,6 +1127,7 @@ namespace EntityTools.Quester.Editor
                     break;
             }
             profile.Saved = false;
+            UpdateWindowCaption();
         }
 
         private void handler_PropertyChanged(object sender, PropertyValueChangedEventArgs e)
@@ -1619,7 +1596,7 @@ namespace EntityTools.Quester.Editor
             var btn = e.Button;
             switch (btn.Properties.Caption)
             {
-                case "Add":
+                case "Add Enemy":
                     {
                         string entPattern = string.Empty;
                         ItemFilterStringType strMatchType = ItemFilterStringType.Simple;
@@ -1650,7 +1627,7 @@ namespace EntityTools.Quester.Editor
                         XtraMessageBox.Show("Already in list.");
                         break;
                     }
-                case "Delete":
+                case "Delete Enemy":
                     {
                         var item = listBlackList.SelectedItem?.ToString();
                         if (!string.IsNullOrEmpty(item))
@@ -1669,7 +1646,6 @@ namespace EntityTools.Quester.Editor
 
 
         #region Mapper manupulation
-        private MapperFormExt mapperForm;
         private void handler_OpenMapper(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
         {
             if (mapperForm is null || mapperForm.IsDisposed)
@@ -1888,26 +1864,17 @@ namespace EntityTools.Quester.Editor
             }
         }
 
-        private delegate void EditActionEvent(IQEdit qEdit);
+        private delegate void EditActionEvent(IEditAct editAct);
 
-        private void AfterQuesterActionEdited(IQEdit qEdit)
+        private void ApplyEditAct(IEditAct editAct)
         {
+            editAct.Apply();
+
             profile.Saved = false;
             UpdateWindowCaption();
 
-            undoStack.Push(qEdit);
-            btnUndo.Hint = qEdit.UndoLabel;
-            redoStack.Clear();
-            btnRedo.Hint = string.Empty;
-        }
-
-        private void ApplyEditCondition(IQEdit editCondition)
-        {
-            treeConditions.BeginUpdate();
-            editCondition.Apply();
-            treeConditions.EndUpdate();
-            undoStack.Push(editCondition);
-            btnUndo.Hint = editCondition.UndoLabel;
+            undoStack.Push(editAct);
+            btnUndo.Hint = editAct.UndoLabel;
             redoStack.Clear();
             btnRedo.Hint = string.Empty;
         }

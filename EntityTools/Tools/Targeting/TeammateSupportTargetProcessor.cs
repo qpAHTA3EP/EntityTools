@@ -1,8 +1,6 @@
 ﻿#define DEBUG_CHANGE_TARGET
 
 using Astral.Classes;
-using EntityCore.Enums;
-using EntityCore.Tools;
 using EntityTools.Enums;
 using EntityTools.Tools.Entities;
 using EntityTools.Tools.Extensions;

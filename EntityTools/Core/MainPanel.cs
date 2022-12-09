@@ -19,8 +19,6 @@ using Astral.Logic.Classes.FSM;
 using Astral.Logic.NW;
 using DevExpress.XtraEditors;
 using DevExpress.XtraEditors.Controls;
-using EntityCore.Forms;
-using EntityCore.Tools;
 using EntityTools.Core.Interfaces;
 using EntityTools.Enums;
 using EntityTools.Forms;

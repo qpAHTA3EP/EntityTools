@@ -320,6 +320,9 @@
     <Compile Include="Forms\TargetSelectForm.Designer.cs">
       <DependentUpon>TargetSelectForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Quester\Editor\EditAct\DeleteQuesterCondition.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Quester\Editor\TreeViewCustomization\ConditionIsInCustomRegionSetTreeNode.cs" />
     <Compile Include="UCC\Editor\UccEditor.cs">
       <SubType>Form</SubType>
@@ -382,11 +385,11 @@
     <Compile Include="Quester\Editor\Classes\LoadProfileMetadatType.cs" />
     <Compile Include="Quester\Editor\Classes\ProfileProxy.cs" />
     <Compile Include="Quester\Editor\Classes\PushProfileToStackAndLoadMetadataType.cs" />
-    <Compile Include="Quester\Editor\EditActions\DeleteQuesterAction.cs">
+    <Compile Include="Quester\Editor\EditAct\DeleteQuesterAction.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Quester\Editor\EditActions\IQEdit.cs" />
-    <Compile Include="Quester\Editor\EditActions\MoveQuesterAction.cs">
+    <Compile Include="Quester\Editor\EditAct\IQEdit.cs" />
+    <Compile Include="Quester\Editor\EditAct\MoveQuesterAction.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Quester\Editor\QuesterEditor.cs">

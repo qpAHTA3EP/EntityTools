@@ -17,7 +17,7 @@ using DevExpress.XtraEditors;
 using DevExpress.XtraEditors.Controls;
 using DevExpress.XtraGrid.Views.Grid;
 
-using EntityCore.Forms;
+using EntityTools.Forms;
 
 using EntityTools.Enums;
 using EntityTools.Tools.Inventory;

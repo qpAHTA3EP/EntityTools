@@ -7,16 +7,14 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
 using Astral.Logic.NW;
-using EntityCore.Enums;
-using EntityCore.Forms;
-using EntityTools;
+using EntityTools.Forms;
 using EntityTools.Enums;
 using EntityTools.Tools.Navigation;
 using MyNW.Classes;
 using MyNW.Internals;
 using MyNW.Patchables.Enums;
 
-namespace EntityCore.Tools
+namespace EntityTools.Tools
 {
     public static class MissionHelper
     {
@@ -27,7 +25,7 @@ namespace EntityCore.Tools
         {
             foreach (var dialogOption in contactDialog.Options)
             {
-                if(dialogOption.Key.Equals(key)) continue;
+                if (dialogOption.Key.Equals(key)) continue;
 
                 bool result = dialogOption.Select();
                 Thread.Sleep(500);
@@ -214,7 +212,7 @@ namespace EntityCore.Tools
         /// </summary>
         public static bool ApproachMissionGiver(this Entity giverEntity, float interactDistance = 5.5f, float maxZDifference = 5)
         {
-            if (EntityTools.EntityTools.Config.Logger.DebugMissionTools)
+            if (EntityTools.Config.Logger.DebugMissionTools)
             {
                 string currentMethodName = MethodBase.GetCurrentMethod().Name;
 
@@ -229,7 +227,7 @@ namespace EntityCore.Tools
                 ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Begins (",
                     "CalculatedInteractDistance = ", interactDistance.ToString("N1"),
                     "; Distance = ", distance.ToString("N1"), withingInteractDistance ? "(withing)" : "(out)",
-                    "; zDifference = ", zDifference.ToString("N1"), ignoreInteractZDifferenceConstraint ? " (unlimited))" : (withingInteractZDifference ? " (withing))" : " (out))")));
+                    "; zDifference = ", zDifference.ToString("N1"), ignoreInteractZDifferenceConstraint ? " (unlimited))" : withingInteractZDifference ? " (withing))" : " (out))"));
 
                 if (!(withingInteractDistance && withingInteractZDifference))
                 {
@@ -252,11 +250,11 @@ namespace EntityCore.Tools
                     ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": Approach time = ", sw.ElapsedMilliseconds.ToString("N2"), " (", sw.ElapsedTicks, ')',
                         "\n\t\tCalculatedInteractDistance = ", interactDistance.ToString("N1"),
                         "\n\t\tDistance = ", distance.ToString("N1"), withingInteractDistance ? "(withing)" : "(out)",
-                        "\n\t\tzDifference = ", zDifference.ToString("N1"), ignoreInteractZDifferenceConstraint ? " (unlimited)" : (withingInteractZDifference ? " (withing)" : " (out)"),
+                        "\n\t\tzDifference = ", zDifference.ToString("N1"), ignoreInteractZDifferenceConstraint ? " (unlimited)" : withingInteractZDifference ? " (withing)" : " (out)",
                         "\n\t" + nameof(Approach.EntityByDistance) + " => ", result));
                     return result;
                 }
-                
+
                 ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ": " + nameof(Approach.EntityByDistance) + " Skipped"));
             }
             else
@@ -295,7 +293,7 @@ namespace EntityCore.Tools
         /// </summary>
         public static bool InteractMissionGiver(this Entity giverEntity, float interactDistance = 5.5f)
         {
-            bool debugInfoEnabled = EntityTools.EntityTools.Config.Logger.DebugMissionTools;
+            bool debugInfoEnabled = EntityTools.Config.Logger.DebugMissionTools;
 
             string currentMethodName = debugInfoEnabled
                     ? MethodBase.GetCurrentMethod().Name
@@ -344,7 +342,7 @@ namespace EntityCore.Tools
         /// </summary>
         public static MissionProcessingResult ProcessingMissionDialog(string missionId, bool turnInMission = false, IList<string> optionalDialog = null, Predicate<Item> isRewardItem = null, int timeout = 5000)
         {
-            bool debugInfoEnabled = EntityTools.EntityTools.Config.Logger.DebugMissionTools;
+            bool debugInfoEnabled = EntityTools.Config.Logger.DebugMissionTools;
 
             string currentMethodName = debugInfoEnabled
                     ? MethodBase.GetCurrentMethod().Name
@@ -359,9 +357,9 @@ namespace EntityCore.Tools
 
             // обрабатываем предварительные пункты диалога, если задано
             if (optionalDialog?.Count > 0)
-                MissionHelper.ProcessingOptionalDialogs(optionalDialog);
+                ProcessingOptionalDialogs(optionalDialog);
 
-            
+
             var timer = new Astral.Classes.Timeout(timeout);
             // Ключ принятия миссии:
             //      OptionsList.MissionOffer.Идентификатор_миссии_\d*
@@ -477,20 +475,20 @@ namespace EntityCore.Tools
                     }
 
                     // В наградах отсутствуют обязательные итемы - отказываемся от миссии.
-                    else 
+                    else
                     {
                         result = MissionProcessingResult.MissionRequiredRewardMissing;
                         bool goBackScreen = contactDialog.CheckDialogOptionAndSelect(
                                                             d => d.Key.Equals("ViewOfferedMission.Back", StringComparison.Ordinal),
                                                             () => player.InteractInfo.ContactDialog.ScreenType == ScreenType.MissionOffer);
-                        
+
                         if (debugInfoEnabled)
                             ETLogger.WriteLine(LogType.Debug, string.Concat(currentMethodName, ":" +
                                 "\n\t\tScreenType = ", screenType,
                                 "\n\t\tCheckRequeredRewardItem = False" +
                                 "\n\t\tSelect 'ViewOfferedMission.Back' = " + goBackScreen +
                                 "\n\t" + nameof(ProcessingMissionDialog) + " => ", result));
-                        
+
                         return result;
                     }
 
@@ -504,7 +502,7 @@ namespace EntityCore.Tools
 
                     //return result;
                 }
-                
+
                 if (screenType == ScreenType.List)
                 {
                     // Открыт экран списка пунктов диалога
@@ -653,7 +651,7 @@ namespace EntityCore.Tools
         {
             if (dialogs?.Count > 0)
             {
-                bool debugInfoEnabled = EntityTools.EntityTools.Config.Logger.DebugMissionTools;
+                bool debugInfoEnabled = EntityTools.Config.Logger.DebugMissionTools;
 
                 string currentMethodName = debugInfoEnabled
                     ? MethodBase.GetCurrentMethod().Name

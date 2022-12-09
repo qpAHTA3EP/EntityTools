@@ -17,6 +17,11 @@ namespace EntityTools.Patches.Mapper.Tools
     /// </summary>
     public sealed class AddCustomRegionTool : CustomRegionToolBase
     {
+        /// <summary>
+        /// Функция вызываемая после применения изменений к CustomRegion'y, где<br/>
+        /// <see cref="CustomRegion">Модифицированный CustomRegion</see><br/>
+        /// <see cref="IMapperTool">Объект для отката изменений</see>
+        /// </summary>
         private readonly Action<CustomRegion, IMapperTool> onComplete;
 
         public BindingList<CustomRegion> CustomRegions => _profile.CustomRegions;

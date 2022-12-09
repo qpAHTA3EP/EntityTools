@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Linq;
-using EntityCore.Forms;
+using EntityTools.Forms;
 
 namespace EntityTools.Editors
 {

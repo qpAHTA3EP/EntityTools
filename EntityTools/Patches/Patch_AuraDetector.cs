@@ -1,7 +1,7 @@
 ﻿using HarmonyLib;
 using System;
 using System.Reflection;
-using EntityCore.Forms;
+using EntityTools.Forms;
 
 namespace EntityTools.Patches
 {

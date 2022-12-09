@@ -1,10 +1,12 @@
 ﻿using System;
-
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using ACTP0Tools.Patches;
 using ACTP0Tools.Reflection;
-
+using Astral.Quester.Classes.Actions;
+using Astral.Quester.Classes.Conditions;
 using DevExpress.XtraEditors;
-
+using EntityTools.Quester.Editor.Classes;
 using HarmonyLib;
 using QuesterEditor = EntityTools.Quester.Editor.QuesterEditor;
 
@@ -12,7 +14,7 @@ namespace EntityTools.Patches.Quester
 {
     public static class ComplexPatch_Quester_Editor
     {
-        private static readonly PropertyAccessor<Astral.Quester.Classes.Action> selectedActionAccessor;
+        private static PropertyAccessor<Astral.Quester.Classes.Action> selectedActionAccessor;
 
         public static bool PatchesWasApplied { get; private set; }
 
@@ -53,11 +55,33 @@ namespace EntityTools.Patches.Quester
             return true;
         }
 
-        public static void Apply(){}
-
-        static ComplexPatch_Quester_Editor()
+        private static void SetTypeAssociations()
         {
-            if (!EntityTools.Config.Patches.QuesterPatches.ReplaceQuesterEditor)
+            // Подмена метаданных для IsInCustomRegion
+            // https://stackoverflow.com/questions/46099675/can-you-how-to-specify-editor-at-runtime-for-propertygrid-for-pcl
+            var provider = new AssociatedMetadataTypeTypeDescriptionProvider(
+                typeof(IsInCustomRegion),
+                typeof(IsInCustomRegionMetadataType));
+            TypeDescriptor.AddProvider(provider, typeof(IsInCustomRegion));
+
+            provider = new AssociatedMetadataTypeTypeDescriptionProvider(
+                typeof(LoadProfile),
+                typeof(LoadProfileMetadataType));
+            TypeDescriptor.AddProvider(provider, typeof(LoadProfile));
+
+            var tPushProfileToStackAndLoad = ACTP0Serializer.PushProfileToStackAndLoad;
+            if (tPushProfileToStackAndLoad != null)
+            {
+                provider = new AssociatedMetadataTypeTypeDescriptionProvider(
+                    tPushProfileToStackAndLoad,
+                    typeof(PushProfileToStackAndLoadMetadataType));
+                TypeDescriptor.AddProvider(provider, tPushProfileToStackAndLoad);
+            }
+        }
+
+        public static void Apply()
+        {
+            if (PatchesWasApplied || !EntityTools.Config.Patches.QuesterPatches.ReplaceQuesterEditor)
                 return;
 
             var tPatch = typeof(ComplexPatch_Quester_Editor);
@@ -99,6 +123,8 @@ namespace EntityTools.Patches.Quester
                 selectedActionAccessor = tMain.GetProperty<Astral.Quester.Classes.Action>("SelectedAction");
 
                 ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Quester_Editor)}' succeeded", true);
+
+                SetTypeAssociations();
                 PatchesWasApplied = true;
             }
             catch (Exception e)

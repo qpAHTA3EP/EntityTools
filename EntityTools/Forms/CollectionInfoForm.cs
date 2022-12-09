@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Windows.Forms;
 
-namespace EntityCore.Forms
+namespace EntityTools.Forms
 {
     public partial class CollectionInfoForm : DevExpress.XtraEditors.XtraForm
     {

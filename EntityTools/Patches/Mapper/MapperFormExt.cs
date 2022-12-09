@@ -31,6 +31,7 @@ using ACTP0Tools.Classes.Quester;
 using Astral.Logic.NW;
 using Astral.Quester.Classes;
 using EntityTools.Forms;
+using EntityTools.Quester.Editor.Classes;
 using MyNW.Classes;
 
 #endif
@@ -497,6 +498,18 @@ namespace EntityTools.Patches.Mapper
 #else
             try
             {
+                string captionMapOnlyPattern;
+                string captionMapAndRegionPattern;
+                if (Profile is ProfileProxy)
+                {
+                    captionMapOnlyPattern = "<{0}> : {1}";
+                    captionMapAndRegionPattern = "<{0}> : {1}[{2}]";
+                }
+                else
+                {
+                    captionMapOnlyPattern = "{0} : {1}";
+                    captionMapAndRegionPattern = "{0} : {1}[{2}]";
+                }
                 while (!IsDisposed
                         && !backgroundWorker.CancellationPending)
                 {
@@ -514,24 +527,26 @@ namespace EntityTools.Patches.Mapper
                     {
                         image = DrawMapper();
                         var regionName = player.RegionInternalName;
-                        formCaption = string.IsNullOrEmpty(regionName)
-                            ? player.MapState.MapName
-                            : $"{player.MapState.MapName}[{regionName}]";
+                        var profileName = Profile.FileName;
+                        if (!string.IsNullOrEmpty(profileName))
+                        {
+                            profileName = Path.GetFileName(profileName);
+                            formCaption = string.IsNullOrEmpty(regionName)
+                                ? string.Format(captionMapOnlyPattern, profileName, player.MapState.MapName)
+                                : string.Format(captionMapAndRegionPattern, profileName, player.MapState.MapName, regionName);
+                        }
+                        else
+                        {
+                            formCaption = string.IsNullOrEmpty(regionName)
+                                ? player.MapState.MapName
+                                : $"{player.MapState.MapName}[{regionName}]";
+                        }
+
                         var pos = LockOnPlayer ? player.Location : _graphics.CenterPosition;
                         playerPosStr = $"{pos.X:N1} | {pos.Y:N1} | {pos.Z:N1}";
                     }
 
-                    if (InvokeRequired)
-                    {
-                        Invoke(new Action(() =>
-                        {
-                            Text = formCaption;
-                            lblZoom.Caption = zoomStr;
-                            lblPlayerPos.Caption = playerPosStr;
-                            MapPicture.Image = image;
-                        }));
-                    }
-                    else
+                    void UpdateFormText()
                     {
                         Text = formCaption;
                         lblZoom.Caption = zoomStr;
@@ -539,18 +554,22 @@ namespace EntityTools.Patches.Mapper
                         MapPicture.Image = image;
                     }
 
+                    if (InvokeRequired)
+                    {
+                        Invoke(new Action(UpdateFormText));
+                    }
+                    else UpdateFormText();
+
                     Thread.Sleep(EntityTools.Config.Mapper.MapperForm.RedrawMapperTimeout);
                 }
             }
             catch (Exception exc)
             {
                 ETLogger.WriteLine(LogType.Error, "MapperFormUpdate catch an exception: " + exc);
+                var text = exc.Message;
                 if (InvokeRequired)
-                    Invoke(new Action(() => Text = exc.Message));
-                else
-                {
-                    Text = exc.Message;
-                }
+                    Invoke(new Action(() => Text = text));
+                else Text = text;
                 throw;
             }
 #endif

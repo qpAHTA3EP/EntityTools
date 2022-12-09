@@ -42,13 +42,13 @@ namespace EntityTools.Patches.Quester
         private static KeyValuePair<Profil, List<TargetPriorityEntry>> tempPriorities;
         public static void Apply()
         {
-            if (EntityTools.Config.Patches.QuesterPatches.ReplaceEditorForAddUccActions || PatchesWasApplied)
+            if (!EntityTools.Config.Patches.QuesterPatches.ReplaceEditorForAddUccActions || PatchesWasApplied)
                 return;
             
             tAddUCCActions = typeof(Astral.Quester.Classes.Actions.AddUCCActions);
             tPatch = typeof(ComplexPatch_Quester_UccEditing);
 
-            original_AddUCCAction_InternalValidity = AccessTools.Property(tAddUCCActions, "InternalValidity" /*nameof(Astral.Quester.Classes.Actions.AddUCCActions.InternalValidity)*/)
+            original_AddUCCAction_InternalValidity = AccessTools.Property(tAddUCCActions, "InternalValidity")
                                                                 ?.GetGetMethod(true);
             if (original_AddUCCAction_InternalValidity is null)
             {
@@ -362,7 +362,7 @@ namespace EntityTools.Patches.Quester
                     if (EntityTools.Config.Patches.QuesterPatches.ReplaceEditorForAddUccActions)
                     {
                         // Вызов собственного ucc-редактора
-                        __result = UccEditor.Edit(uccProfile, "", true) 
+                        __result = UccEditor.Edit(uccProfile, Astral.API.CurrentSettings.LastUCCProfile, true) 
                                  ? uccProfile 
                                  : __2;
                         return false;

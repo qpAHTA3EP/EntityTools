@@ -9,7 +9,7 @@ using System.ComponentModel;
 using System.Drawing.Design;
 using System.Linq;
 using System.Windows.Forms;
-using EntityCore.Forms;
+using EntityTools.Forms;
 using EntityTools.Tools;
 
 namespace EntityTools.Editors

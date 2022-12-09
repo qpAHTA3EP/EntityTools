@@ -1,4 +1,4 @@
-﻿namespace EntityCore.Forms
+﻿namespace EntityTools.Forms
 {
     partial class AddUccActionForm
     {

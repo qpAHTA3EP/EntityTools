@@ -4,7 +4,7 @@ using System.Linq;
 using System.Windows.Forms;
 using ACTP0Tools.Reflection;
 using Astral.Logic.UCC.Classes;
-using EntityCore.Tools;
+using EntityTools.Tools;
 using EntityTools.UCC.Actions;
 
 namespace EntityTools.UCC.Editor.TreeViewCustomization

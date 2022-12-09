@@ -7,7 +7,7 @@ using System;
 using System.Windows.Forms;
 using EntityTools.Tools.Entities;
 
-namespace EntityCore.Forms
+namespace EntityTools.Forms
 {
     public partial class EntityViewer : XtraForm //*/ Form
     {

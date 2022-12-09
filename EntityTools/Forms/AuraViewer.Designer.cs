@@ -1,7 +1,7 @@
 ﻿using DevExpress.XtraEditors;
 using System.Windows.Forms;
 
-namespace EntityCore.Forms
+namespace EntityTools.Forms
 {
     partial class AuraViewer
     {

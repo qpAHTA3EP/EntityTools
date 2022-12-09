@@ -30,49 +30,49 @@ namespace EntityTools.Quester.Editor
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions customHeaderButtonImageOptions22 = new DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject22 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions customHeaderButtonImageOptions23 = new DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject23 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions customHeaderButtonImageOptions24 = new DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject24 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions customHeaderButtonImageOptions25 = new DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject25 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions customHeaderButtonImageOptions26 = new DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject26 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions customHeaderButtonImageOptions27 = new DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions();
+            DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions customHeaderButtonImageOptions4 = new DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject4 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions customHeaderButtonImageOptions5 = new DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject5 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions customHeaderButtonImageOptions3 = new DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject3 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions customHeaderButtonImageOptions1 = new DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject1 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions customHeaderButtonImageOptions2 = new DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject2 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions customHeaderButtonImageOptions16 = new DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject16 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions customHeaderButtonImageOptions17 = new DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject17 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions customHeaderButtonImageOptions18 = new DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject18 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions customHeaderButtonImageOptions19 = new DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject19 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions customHeaderButtonImageOptions20 = new DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject20 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions customHeaderButtonImageOptions21 = new DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject21 = new DevExpress.Utils.SerializableAppearanceObject();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(QuesterEditor));
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject27 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions customHeaderButtonImageOptions28 = new DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject28 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions customHeaderButtonImageOptions29 = new DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject29 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions customHeaderButtonImageOptions30 = new DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject30 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions customHeaderButtonImageOptions31 = new DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject31 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions customHeaderButtonImageOptions32 = new DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject32 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions customHeaderButtonImageOptions33 = new DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject33 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions customHeaderButtonImageOptions34 = new DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject34 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions customHeaderButtonImageOptions35 = new DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject35 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions customHeaderButtonImageOptions36 = new DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject36 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions customHeaderButtonImageOptions37 = new DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject37 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions customHeaderButtonImageOptions38 = new DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject38 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions customHeaderButtonImageOptions39 = new DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject39 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions customHeaderButtonImageOptions40 = new DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject40 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions customHeaderButtonImageOptions41 = new DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject41 = new DevExpress.Utils.SerializableAppearanceObject();
-            DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions customHeaderButtonImageOptions42 = new DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions();
-            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject42 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions customHeaderButtonImageOptions6 = new DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject6 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions customHeaderButtonImageOptions7 = new DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject7 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions customHeaderButtonImageOptions8 = new DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject8 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions customHeaderButtonImageOptions9 = new DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject9 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions customHeaderButtonImageOptions10 = new DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject10 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions customHeaderButtonImageOptions11 = new DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject11 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions customHeaderButtonImageOptions12 = new DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject12 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions customHeaderButtonImageOptions13 = new DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject13 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions customHeaderButtonImageOptions14 = new DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject14 = new DevExpress.Utils.SerializableAppearanceObject();
+            DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions customHeaderButtonImageOptions15 = new DevExpress.XtraBars.Docking.CustomHeaderButtonImageOptions();
+            DevExpress.Utils.SerializableAppearanceObject serializableAppearanceObject15 = new DevExpress.Utils.SerializableAppearanceObject();
             this.dockManager = new DevExpress.XtraBars.Docking.DockManager(this.components);
             this.hideContainerRight = new DevExpress.XtraBars.Docking.AutoHideContainer();
             this.panelContainer3 = new DevExpress.XtraBars.Docking.DockPanel();
@@ -196,7 +196,7 @@ namespace EntityTools.Quester.Editor
             // 
             // panelContainer3
             // 
-            this.panelContainer3.ActiveChild = this.panVendor;
+            this.panelContainer3.ActiveChild = this.panBlackList;
             this.panelContainer3.Controls.Add(this.panSettings);
             this.panelContainer3.Controls.Add(this.panCustomRegions);
             this.panelContainer3.Controls.Add(this.panBlackList);
@@ -219,11 +219,11 @@ namespace EntityTools.Quester.Editor
             // panVendor
             // 
             this.panVendor.Controls.Add(this.controlContainer5);
-            customHeaderButtonImageOptions22.Image = global::EntityTools.Properties.Resources.Cancel;
-            customHeaderButtonImageOptions23.Image = global::EntityTools.Properties.Resources.Add;
+            customHeaderButtonImageOptions4.Image = global::EntityTools.Properties.Resources.Cancel;
+            customHeaderButtonImageOptions5.Image = global::EntityTools.Properties.Resources.Add;
             this.panVendor.CustomHeaderButtons.AddRange(new DevExpress.XtraBars.Docking2010.IButton[] {
-            new DevExpress.XtraBars.Docking.CustomHeaderButton("Delete Vendor", false, customHeaderButtonImageOptions22, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Delete Vendor form list", -1, true, null, true, false, true, serializableAppearanceObject22, null, -1),
-            new DevExpress.XtraBars.Docking.CustomHeaderButton("Add Vendor", false, customHeaderButtonImageOptions23, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Add Vendor to list", -1, true, null, true, false, true, serializableAppearanceObject23, null, -1)});
+            new DevExpress.XtraBars.Docking.CustomHeaderButton("Delete Vendor", false, customHeaderButtonImageOptions4, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Delete Vendor form list", -1, true, null, true, false, true, serializableAppearanceObject4, null, -1),
+            new DevExpress.XtraBars.Docking.CustomHeaderButton("Add Vendor", false, customHeaderButtonImageOptions5, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Add Vendor to list", -1, true, null, true, false, true, serializableAppearanceObject5, null, -1)});
             this.panVendor.Dock = DevExpress.XtraBars.Docking.DockingStyle.Fill;
             this.panVendor.ID = new System.Guid("38123327-94b3-4fd0-830e-ce78d708b1c9");
             this.panVendor.Location = new System.Drawing.Point(4, 32);
@@ -297,9 +297,9 @@ namespace EntityTools.Quester.Editor
             // panCustomRegions
             // 
             this.panCustomRegions.Controls.Add(this.controlContainer3);
-            customHeaderButtonImageOptions24.Image = global::EntityTools.Properties.Resources.Cancel;
+            customHeaderButtonImageOptions3.Image = global::EntityTools.Properties.Resources.Cancel;
             this.panCustomRegions.CustomHeaderButtons.AddRange(new DevExpress.XtraBars.Docking2010.IButton[] {
-            new DevExpress.XtraBars.Docking.CustomHeaderButton("Delete CustomRegion", false, customHeaderButtonImageOptions24, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Delete selected CustomRegion", -1, true, null, true, false, true, serializableAppearanceObject24, null, -1)});
+            new DevExpress.XtraBars.Docking.CustomHeaderButton("Delete CustomRegion", false, customHeaderButtonImageOptions3, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Delete selected CustomRegion", -1, true, null, true, false, true, serializableAppearanceObject3, null, -1)});
             this.panCustomRegions.Dock = DevExpress.XtraBars.Docking.DockingStyle.Fill;
             this.panCustomRegions.ID = new System.Guid("9d3814b3-6012-4d5c-9296-9d1cd3bb3671");
             this.panCustomRegions.Location = new System.Drawing.Point(4, 32);
@@ -341,11 +341,11 @@ namespace EntityTools.Quester.Editor
             // panBlackList
             // 
             this.panBlackList.Controls.Add(this.controlContainer4);
-            customHeaderButtonImageOptions25.Image = global::EntityTools.Properties.Resources.Cancel;
-            customHeaderButtonImageOptions26.Image = global::EntityTools.Properties.Resources.Add;
+            customHeaderButtonImageOptions1.Image = global::EntityTools.Properties.Resources.Cancel;
+            customHeaderButtonImageOptions2.Image = global::EntityTools.Properties.Resources.Add;
             this.panBlackList.CustomHeaderButtons.AddRange(new DevExpress.XtraBars.Docking2010.IButton[] {
-            new DevExpress.XtraBars.Docking.CustomHeaderButton("Delete Enemy", false, customHeaderButtonImageOptions25, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Delete Enemy from BlackList", -1, true, null, true, false, true, serializableAppearanceObject25, null, -1),
-            new DevExpress.XtraBars.Docking.CustomHeaderButton("Add Enemy", false, customHeaderButtonImageOptions26, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Add Enemy to BlackList", -1, true, null, true, false, true, serializableAppearanceObject26, null, -1)});
+            new DevExpress.XtraBars.Docking.CustomHeaderButton("Delete Enemy", false, customHeaderButtonImageOptions1, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Delete Enemy from BlackList", -1, true, null, true, false, true, serializableAppearanceObject1, null, -1),
+            new DevExpress.XtraBars.Docking.CustomHeaderButton("Add Enemy", false, customHeaderButtonImageOptions2, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Add Enemy to BlackList", -1, true, null, true, false, true, serializableAppearanceObject2, null, -1)});
             this.panBlackList.Dock = DevExpress.XtraBars.Docking.DockingStyle.Fill;
             this.panBlackList.ID = new System.Guid("a0fa556c-be73-48c5-9d86-eb532780077a");
             this.panBlackList.Location = new System.Drawing.Point(4, 32);
@@ -566,19 +566,19 @@ namespace EntityTools.Quester.Editor
             // panActions
             // 
             this.panActions.Controls.Add(this.dockPanel2_Container);
-            customHeaderButtonImageOptions27.Image = ((System.Drawing.Image)(resources.GetObject("customHeaderButtonImageOptions27.Image")));
-            customHeaderButtonImageOptions28.Image = global::EntityTools.Properties.Resources.Paste;
-            customHeaderButtonImageOptions29.Image = global::EntityTools.Properties.Resources.Copy;
-            customHeaderButtonImageOptions30.Image = global::EntityTools.Properties.Resources.Refresh;
-            customHeaderButtonImageOptions31.Image = global::EntityTools.Properties.Resources.Cancel;
-            customHeaderButtonImageOptions32.Image = global::EntityTools.Properties.Resources.Add;
+            customHeaderButtonImageOptions16.Image = ((System.Drawing.Image)(resources.GetObject("customHeaderButtonImageOptions16.Image")));
+            customHeaderButtonImageOptions17.Image = global::EntityTools.Properties.Resources.Paste;
+            customHeaderButtonImageOptions18.Image = global::EntityTools.Properties.Resources.Copy;
+            customHeaderButtonImageOptions19.Image = global::EntityTools.Properties.Resources.Refresh;
+            customHeaderButtonImageOptions20.Image = global::EntityTools.Properties.Resources.Cancel;
+            customHeaderButtonImageOptions21.Image = global::EntityTools.Properties.Resources.Add;
             this.panActions.CustomHeaderButtons.AddRange(new DevExpress.XtraBars.Docking2010.IButton[] {
-            new DevExpress.XtraBars.Docking.CustomHeaderButton("Edit XML", false, customHeaderButtonImageOptions27, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Edit selected action in XML", -1, true, null, true, false, true, serializableAppearanceObject27, null, -1),
-            new DevExpress.XtraBars.Docking.CustomHeaderButton("Paste Action", false, customHeaderButtonImageOptions28, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Paste Action from Clipboard", -1, true, null, true, false, true, serializableAppearanceObject28, null, -1),
-            new DevExpress.XtraBars.Docking.CustomHeaderButton("Copy Action", false, customHeaderButtonImageOptions29, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Copy selected Action to Clipboard", -1, true, null, true, false, true, serializableAppearanceObject29, null, -1),
-            new DevExpress.XtraBars.Docking.CustomHeaderButton("Gather Info", false, customHeaderButtonImageOptions30, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Run Action initialization wizard", -1, true, null, true, false, true, serializableAppearanceObject30, null, -1),
-            new DevExpress.XtraBars.Docking.CustomHeaderButton("Delete Action", false, customHeaderButtonImageOptions31, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Delete selected Action", -1, true, null, true, false, true, serializableAppearanceObject31, null, -1),
-            new DevExpress.XtraBars.Docking.CustomHeaderButton("Add Action", false, customHeaderButtonImageOptions32, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Add Action", -1, true, null, true, false, true, serializableAppearanceObject32, null, -1)});
+            new DevExpress.XtraBars.Docking.CustomHeaderButton("Edit XML", false, customHeaderButtonImageOptions16, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Edit selected action in XML", -1, true, null, true, false, true, serializableAppearanceObject16, null, -1),
+            new DevExpress.XtraBars.Docking.CustomHeaderButton("Paste Action", false, customHeaderButtonImageOptions17, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Paste Action from Clipboard", -1, true, null, true, false, true, serializableAppearanceObject17, null, -1),
+            new DevExpress.XtraBars.Docking.CustomHeaderButton("Copy Action", false, customHeaderButtonImageOptions18, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Copy selected Action to Clipboard", -1, true, null, true, false, true, serializableAppearanceObject18, null, -1),
+            new DevExpress.XtraBars.Docking.CustomHeaderButton("Gather Info", false, customHeaderButtonImageOptions19, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Run Action initialization wizard", -1, true, null, true, false, true, serializableAppearanceObject19, null, -1),
+            new DevExpress.XtraBars.Docking.CustomHeaderButton("Delete Action", false, customHeaderButtonImageOptions20, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Delete selected Action", -1, true, null, true, false, true, serializableAppearanceObject20, null, -1),
+            new DevExpress.XtraBars.Docking.CustomHeaderButton("Add Action", false, customHeaderButtonImageOptions21, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Add Action", -1, true, null, true, false, true, serializableAppearanceObject21, null, -1)});
             this.panActions.Dock = DevExpress.XtraBars.Docking.DockingStyle.Left;
             this.panActions.ID = new System.Guid("d2da03f2-bc90-487d-ae8c-6667f9707648");
             this.panActions.Location = new System.Drawing.Point(0, 24);
@@ -760,21 +760,21 @@ namespace EntityTools.Quester.Editor
             // panConditions
             // 
             this.panConditions.Controls.Add(this.dockPanel4_Container);
-            customHeaderButtonImageOptions33.Image = global::EntityTools.Properties.Resources.PlayAll;
-            customHeaderButtonImageOptions34.Image = global::EntityTools.Properties.Resources.Play;
-            customHeaderButtonImageOptions35.Image = global::EntityTools.Properties.Resources.Paste;
-            customHeaderButtonImageOptions36.Image = global::EntityTools.Properties.Resources.Copy;
-            customHeaderButtonImageOptions37.Image = global::EntityTools.Properties.Resources.Trashcan;
-            customHeaderButtonImageOptions38.Image = global::EntityTools.Properties.Resources.Cancel;
-            customHeaderButtonImageOptions39.Image = global::EntityTools.Properties.Resources.Add;
+            customHeaderButtonImageOptions6.Image = global::EntityTools.Properties.Resources.PlayAll;
+            customHeaderButtonImageOptions7.Image = global::EntityTools.Properties.Resources.Play;
+            customHeaderButtonImageOptions8.Image = global::EntityTools.Properties.Resources.Paste;
+            customHeaderButtonImageOptions9.Image = global::EntityTools.Properties.Resources.Copy;
+            customHeaderButtonImageOptions10.Image = global::EntityTools.Properties.Resources.Trashcan;
+            customHeaderButtonImageOptions11.Image = global::EntityTools.Properties.Resources.Cancel;
+            customHeaderButtonImageOptions12.Image = global::EntityTools.Properties.Resources.Add;
             this.panConditions.CustomHeaderButtons.AddRange(new DevExpress.XtraBars.Docking2010.IButton[] {
-            new DevExpress.XtraBars.Docking.CustomHeaderButton("Test all Conditions", false, customHeaderButtonImageOptions33, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Test all Conditions", -1, true, null, true, false, true, serializableAppearanceObject33, null, -1),
-            new DevExpress.XtraBars.Docking.CustomHeaderButton("Test Condition", false, customHeaderButtonImageOptions34, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Test selected Condition", -1, true, null, true, false, true, serializableAppearanceObject34, null, -1),
-            new DevExpress.XtraBars.Docking.CustomHeaderButton("Paste Condition", false, customHeaderButtonImageOptions35, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Paste Condition from Clipboard", -1, true, null, true, false, true, serializableAppearanceObject35, null, -1),
-            new DevExpress.XtraBars.Docking.CustomHeaderButton("Copy Condition", false, customHeaderButtonImageOptions36, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Copy Condition to Clipboard", -1, true, null, true, false, true, serializableAppearanceObject36, null, -1),
-            new DevExpress.XtraBars.Docking.CustomHeaderButton("Delete all Conditions", false, customHeaderButtonImageOptions37, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Delete all Conditions", -1, true, null, true, false, true, serializableAppearanceObject37, null, -1),
-            new DevExpress.XtraBars.Docking.CustomHeaderButton("Delete Condition", false, customHeaderButtonImageOptions38, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Delete selected Condition", -1, true, null, true, false, true, serializableAppearanceObject38, null, -1),
-            new DevExpress.XtraBars.Docking.CustomHeaderButton("Add Condition", false, customHeaderButtonImageOptions39, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Add Condition", -1, true, null, true, false, true, serializableAppearanceObject39, null, -1)});
+            new DevExpress.XtraBars.Docking.CustomHeaderButton("Test all Conditions", false, customHeaderButtonImageOptions6, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Test all Conditions", -1, true, null, true, false, true, serializableAppearanceObject6, null, -1),
+            new DevExpress.XtraBars.Docking.CustomHeaderButton("Test Condition", false, customHeaderButtonImageOptions7, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Test selected Condition", -1, true, null, true, false, true, serializableAppearanceObject7, null, -1),
+            new DevExpress.XtraBars.Docking.CustomHeaderButton("Paste Condition", false, customHeaderButtonImageOptions8, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Paste Condition from Clipboard", -1, true, null, true, false, true, serializableAppearanceObject8, null, -1),
+            new DevExpress.XtraBars.Docking.CustomHeaderButton("Copy Condition", false, customHeaderButtonImageOptions9, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Copy Condition to Clipboard", -1, true, null, true, false, true, serializableAppearanceObject9, null, -1),
+            new DevExpress.XtraBars.Docking.CustomHeaderButton("Delete all Conditions", false, customHeaderButtonImageOptions10, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Delete all Conditions", -1, true, null, true, false, true, serializableAppearanceObject10, null, -1),
+            new DevExpress.XtraBars.Docking.CustomHeaderButton("Delete Condition", false, customHeaderButtonImageOptions11, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Delete selected Condition", -1, true, null, true, false, true, serializableAppearanceObject11, null, -1),
+            new DevExpress.XtraBars.Docking.CustomHeaderButton("Add Condition", false, customHeaderButtonImageOptions12, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Add Condition", -1, true, null, true, false, true, serializableAppearanceObject12, null, -1)});
             this.panConditions.Dock = DevExpress.XtraBars.Docking.DockingStyle.Fill;
             this.panConditions.ID = new System.Guid("fdd4a8bb-6c0d-4072-9f08-e8b15001e50e");
             this.panConditions.Location = new System.Drawing.Point(3, 32);
@@ -827,13 +827,13 @@ namespace EntityTools.Quester.Editor
             // panHotSpots
             // 
             this.panHotSpots.Controls.Add(this.controlContainer1);
-            customHeaderButtonImageOptions40.Image = global::EntityTools.Properties.Resources.Cancel;
-            customHeaderButtonImageOptions41.Image = global::EntityTools.Properties.Resources.Edit;
-            customHeaderButtonImageOptions42.Image = global::EntityTools.Properties.Resources.Add;
+            customHeaderButtonImageOptions13.Image = global::EntityTools.Properties.Resources.Cancel;
+            customHeaderButtonImageOptions14.Image = global::EntityTools.Properties.Resources.Edit;
+            customHeaderButtonImageOptions15.Image = global::EntityTools.Properties.Resources.Add;
             this.panHotSpots.CustomHeaderButtons.AddRange(new DevExpress.XtraBars.Docking2010.IButton[] {
-            new DevExpress.XtraBars.Docking.CustomHeaderButton("Delete HotSpot", false, customHeaderButtonImageOptions40, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Delete selected HotSpot", -1, true, null, true, false, true, serializableAppearanceObject40, null, -1),
-            new DevExpress.XtraBars.Docking.CustomHeaderButton("Edit Coordinates", false, customHeaderButtonImageOptions41, DevExpress.XtraBars.Docking2010.ButtonStyle.CheckButton, "Edit Coordinates manually", -1, true, null, true, false, true, serializableAppearanceObject41, null, -1),
-            new DevExpress.XtraBars.Docking.CustomHeaderButton("Add HotSpot", false, customHeaderButtonImageOptions42, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Add HotSpot", -1, true, null, true, false, true, serializableAppearanceObject42, null, -1)});
+            new DevExpress.XtraBars.Docking.CustomHeaderButton("Delete HotSpot", false, customHeaderButtonImageOptions13, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Delete selected HotSpot", -1, true, null, true, false, true, serializableAppearanceObject13, null, -1),
+            new DevExpress.XtraBars.Docking.CustomHeaderButton("Edit Coordinates", false, customHeaderButtonImageOptions14, DevExpress.XtraBars.Docking2010.ButtonStyle.CheckButton, "Edit Coordinates manually", -1, true, null, true, false, true, serializableAppearanceObject14, null, -1),
+            new DevExpress.XtraBars.Docking.CustomHeaderButton("Add HotSpot", false, customHeaderButtonImageOptions15, DevExpress.XtraBars.Docking2010.ButtonStyle.PushButton, "Add HotSpot", -1, true, null, true, false, true, serializableAppearanceObject15, null, -1)});
             this.panHotSpots.Dock = DevExpress.XtraBars.Docking.DockingStyle.Fill;
             this.panHotSpots.FloatVertical = true;
             this.panHotSpots.ID = new System.Guid("73cfb6f8-c46e-45da-bd5f-860b165eff40");

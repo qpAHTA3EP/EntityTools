@@ -12,8 +12,6 @@ using ACTP0Tools.Annotations;
 
 using Astral.Logic.UCC.Classes;
 
-using EntityCore.Enums;
-
 using EntityTools.Editors;
 using EntityTools.Editors.TestEditors;
 using EntityTools.Enums;
