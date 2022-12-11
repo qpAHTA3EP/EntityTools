@@ -40,6 +40,8 @@ namespace EntityTools.Quester.Conditions
                 if (value != _bag)
                 {
                     _bag = value;
+                    _label = string.Empty;
+                    itemLevelEvaluator = evaluator_initializer;
                     OnPropertyChanged();
                 }
             }
@@ -61,6 +63,8 @@ namespace EntityTools.Quester.Conditions
                 if (value != _itemSelectorType)
                 {
                     _itemSelectorType = value;
+                    _label = string.Empty;
+                    itemLevelEvaluator = evaluator_initializer;
                     OnPropertyChanged();
                 }
             }
@@ -82,6 +86,7 @@ namespace EntityTools.Quester.Conditions
                 if (_itemFiler != value)
                 {
                     _itemFiler = value;
+                    itemLevelEvaluator = evaluator_initializer;
                     OnPropertyChanged();
                 }
             }
@@ -124,6 +129,7 @@ namespace EntityTools.Quester.Conditions
                 if (_value != value)
                 {
                     _value = value;
+                    _label = string.Empty;
                     OnPropertyChanged();
                 }
             }
@@ -144,6 +150,8 @@ namespace EntityTools.Quester.Conditions
                 if (_sign != value)
                 {
                     _sign = value;
+                    _label = string.Empty;
+                    conditionValidator = conditionValidator_initializer;
                     OnPropertyChanged();
                 }
             }
@@ -157,9 +165,11 @@ namespace EntityTools.Quester.Conditions
 
         protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
         {
+#if false
             _label = string.Empty;
             itemLevelEvaluator = evaluator_initializer;
-            conditionValidator = conditionValidator_initializer;
+            conditionValidator = conditionValidator_initializer; 
+#endif
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 

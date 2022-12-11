@@ -25,7 +25,7 @@ using Timeout = Astral.Classes.Timeout;
 namespace EntityTools.UCC.Actions
 {
     [Serializable]
-    public class DodgeFromEntity : UCCAction, IEntityDescriptor
+    public class DodgeFromEntity : UCCAction, IEntityDescriptor, INotifyPropertyChanged
     {
         #region Опции команды
         #region Entity
@@ -286,7 +286,7 @@ namespace EntityTools.UCC.Actions
         #endregion
         #endregion
 
-        #region Взаимодействие с EntityToolsCore
+        #region Взаимодействие с INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]
@@ -540,171 +540,172 @@ namespace EntityTools.UCC.Actions
         private Predicate<Entity> _specialCheck;
         #endregion
 
-        #region Копия кода dodge
-        //private bool havewaitdel(Func<bool> del)
-        //{
-        //    return del != null && del();
-        //}
 
-        //private bool pathtToLocIsInAOE(Vector3 start, Vector3 loc)
-        //{
+#if false //Копия кода dodge
+        private bool havewaitdel(Func<bool> del)
+        {
+            return del != null && del();
+        }
 
-        //    Vector3 vector3_ = Vector3.Empty;
-        //    foreach (AOECheck.AOE aoe in AOECheck.List)
-        //    {
-        //        if (aoe.IsIn(loc))
-        //        {
-        //            return true;
-        //        }
-        //        if (aoe.Radius != 0f)
-        //        {
-        //            if (aoe.Source != null)
-        //            {
-        //                vector3_ = aoe.Source.Location;
-        //            }
-        //            if (aoe.Location != null)
-        //            {
-        //                vector3_ = aoe.Location();
-        //            }
-        //            if (Class81.smethod_5(vector3_, aoe.Radius, start, loc) > 0)
-        //            {
-        //                return true;
-        //            }
-        //        }
-        //    }
-        //    return false;
-        //}
+        private bool pathtToLocIsInAOE(Vector3 start, Vector3 loc)
+        {
 
-        // Определение направления DodgeSmart
-        // из Astral.Logic.NW.Movements
-        //private static Vector3 smart()
-        //{
-        //    Vector3 playerPos = EntityManager.LocalPlayer.Location;
-        //    float num = 30f;
-        //    List<Vector3> list = new List<Vector3>();
-        //    Vector3 shouldDodgeSource = Combats.ShouldDodgeSource;
-        //    int num2 = 0;
-        //    if (shouldDodgeSource.IsValid)
-        //    {
-        //        if (Combats.ShouldFrontDodge)
-        //        {
-        //            num2 = 1;
-        //        }
-        //        else if (!Combats.AOEIsArc)
-        //        {
-        //            if (shouldDodgeSource.IsInYawFaceByRange(1.5f, 3.40282347E+38f) && shouldDodgeSource.Distance3D(playerPos) > 5.0 && Combats.InitialCombatLoc.Distance3D(playerPos) < 100.0)
-        //            {
-        //                num2 = 2;
-        //            }
-        //            else if ((Combats.IsMeleeChar && shouldDodgeSource.Distance3D(playerPos) < 5.0) || shouldDodgeSource.IsInBackByRange(1.5f, 3.40282347E+38f))
-        //            {
-        //                num2 = 1;
-        //            }
-        //        }
-        //    }
-        //    float num3 = 0f;
-        //    while ((double)num3 < 6.2831853071795862)
-        //    {
-        //        float num4 = (float)Math.Cos((double)num3) * num;
-        //        float num5 = (float)Math.Sin((double)num3) * num;
-        //        Vector3 item = new Vector3(playerPos.X + num4, playerPos.Y + num5, playerPos.Z + 2f);
-        //        list.Add(item);
-        //        num3 += 0.314159274f;
-        //    }
-        //    list = (from i in list
-        //            orderby Guid.NewGuid()
-        //            select i).ToList<Vector3>();
-        //    Vector3 vector = Vector3.Empty;
-        //    List<Astral.Logic.NW.Movements.DodgeLosTestResult> list2 = new List<Astral.Logic.NW.Movements.DodgeLosTestResult>();
-        //    if (EntityManager.CurrentSettings.UsePathfinding3)
-        //    {
-        //        using (List<Vector3>.Enumerator enumerator = list.GetEnumerator())
-        //        {
-        //            while (enumerator.MoveNext())
-        //            {
-        //                Vector3 vector2 = enumerator.Current;
-        //                Vector3 collidePos = Vector3.Empty;
-        //                bool collided = PathFinding.CheckDirection(playerPos, vector2, ref collidePos);
-        //                list2.Add(new Astral.Logic.NW.Movements.DodgeLosTestResult(vector2, collided, collidePos));
-        //            }
-        //            goto IL_2E7;
-        //        }
-        //    }
-        //    List<Injection.RayCastParams> list3 = new List<Injection.RayCastParams>();
-        //    Vector3 from = new Vector3(playerPos.X, playerPos.Y, playerPos.Z + 2f);
-        //    foreach (Vector3 vector3 in list)
-        //    {
-        //        list3.Add(new Injection.RayCastParams(from, vector3));
-        //        Vector3 to = new Vector3(vector3.X, vector3.Y, vector3.Z - 5f);
-        //        list3.Add(new Injection.RayCastParams(vector3, to));
-        //    }
-        //    Injection.RayCastResult[] array = Injection.MassPosRayCast(list3.ToArray(), 142u);
-        //    for (int j = 0; j < list.Count; j++)
-        //    {
-        //        Injection.RayCastResult rayCastResult = array[j + j];
-        //        if (array[j + j + 1].collided)
-        //        {
-        //            list2.Add(new Astral.Logic.NW.Movements.DodgeLosTestResult(list[j], rayCastResult.collided, rayCastResult.result));
-        //        }
-        //    }
-        //    IL_2E7:
-        //    Astral.Logic.NW.Movements.LastValidPoses = list2;
-        //    Astral.Logic.NW.Movements.lastvlidposto.ChangeTime(2500);
-        //    bool flag;
-        //    if (!(flag = list2.Any((Astral.Logic.NW.Movements.DodgeLosTestResult r) => !r.Collided)))
-        //    {
-        //        list2 = (from r in list2
-        //                 orderby r.CollidePos.Distance2D(playerPos) descending
-        //                 select r).ToList<Astral.Logic.NW.Movements.DodgeLosTestResult>();
-        //    }
-        //    List<Entity> entities = EntityManager.GetEntities();
-        //    float yaw = EntityManager.LocalPlayer.Yaw;
-        //    using (List<Astral.Logic.NW.Movements.DodgeLosTestResult>.Enumerator enumerator2 = list2.GetEnumerator())
-        //    {
-        //        IL_490:
-        //        while (enumerator2.MoveNext())
-        //        {
-        //            Astral.Logic.NW.Movements.DodgeLosTestResult dodgeLosTestResult = enumerator2.Current;
-        //            Vector3 vector4 = dodgeLosTestResult.TestedPos;
-        //            if (!flag || !dodgeLosTestResult.Collided)
-        //            {
-        //                if (dodgeLosTestResult.Collided)
-        //                {
-        //                    vector4 = dodgeLosTestResult.CollidePos;
-        //                }
-        //                if (!Combats.InitialCombatLoc.IsValid || Combats.InitialCombatLoc.Distance3D(playerPos) >= 150.0 || vector4.Distance3D(Combats.InitialCombatLoc) <= 70.0)
-        //                {
-        //                    if (!vector.IsValid)
-        //                    {
-        //                        vector = vector4;
-        //                    }
-        //                    if ((num2 != 2 || !vector4.IsInYawFaceByRange(1.5f, 3.40282347E+38f)) && (num2 != 1 || !vector4.IsInBackByRange(1.5f, 3.40282347E+38f)) && (num2 != 0 || (!vector4.IsInYawFaceByRange(0.5f, 3.40282347E+38f) && !vector4.IsInBackByRange(0.5f, 3.40282347E+38f))))
-        //                    {
-        //                        using (List<AOECheck.AOE>.Enumerator enumerator3 = AOECheck.List.GetEnumerator())
-        //                        {
-        //                            while (enumerator3.MoveNext())
-        //                            {
-        //                                if (enumerator3.Current.IsIn(vector4))
-        //                                {
-        //                                    goto IL_490;
-        //                                }
-        //                            }
-        //                        }
-        //                        if (!Astral.Logic.NW.Movements.ThereIsDangerousEntities(vector4, 70.0, entities))
-        //                        {
-        //                            return vector4;
-        //                        }
-        //                    }
-        //                }
-        //            }
-        //        }
-        //    }
-        //    if (!vector.IsValid && list.Count > 0)
-        //    {
-        //        vector = list[0];
-        //    }
-        //    return vector;
-        //} 
-        #endregion
+            Vector3 vector3_ = Vector3.Empty;
+            foreach (AOECheck.AOE aoe in AOECheck.List)
+            {
+                if (aoe.IsIn(loc))
+                {
+                    return true;
+                }
+                if (aoe.Radius != 0f)
+                {
+                    if (aoe.Source != null)
+                    {
+                        vector3_ = aoe.Source.Location;
+                    }
+                    if (aoe.Location != null)
+                    {
+                        vector3_ = aoe.Location();
+                    }
+                    if (Class81.smethod_5(vector3_, aoe.Radius, start, loc) > 0)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+         Определение направления DodgeSmart
+         из Astral.Logic.NW.Movements
+        private static Vector3 smart()
+        {
+            Vector3 playerPos = EntityManager.LocalPlayer.Location;
+            float num = 30f;
+            List<Vector3> list = new List<Vector3>();
+            Vector3 shouldDodgeSource = Combats.ShouldDodgeSource;
+            int num2 = 0;
+            if (shouldDodgeSource.IsValid)
+            {
+                if (Combats.ShouldFrontDodge)
+                {
+                    num2 = 1;
+                }
+                else if (!Combats.AOEIsArc)
+                {
+                    if (shouldDodgeSource.IsInYawFaceByRange(1.5f, 3.40282347E+38f) && shouldDodgeSource.Distance3D(playerPos) > 5.0 && Combats.InitialCombatLoc.Distance3D(playerPos) < 100.0)
+                    {
+                        num2 = 2;
+                    }
+                    else if ((Combats.IsMeleeChar && shouldDodgeSource.Distance3D(playerPos) < 5.0) || shouldDodgeSource.IsInBackByRange(1.5f, 3.40282347E+38f))
+                    {
+                        num2 = 1;
+                    }
+                }
+            }
+            float num3 = 0f;
+            while ((double)num3 < 6.2831853071795862)
+            {
+                float num4 = (float)Math.Cos((double)num3) * num;
+                float num5 = (float)Math.Sin((double)num3) * num;
+                Vector3 item = new Vector3(playerPos.X + num4, playerPos.Y + num5, playerPos.Z + 2f);
+                list.Add(item);
+                num3 += 0.314159274f;
+            }
+            list = (from i in list
+                    orderby Guid.NewGuid()
+                    select i).ToList<Vector3>();
+            Vector3 vector = Vector3.Empty;
+            List<Astral.Logic.NW.Movements.DodgeLosTestResult> list2 = new List<Astral.Logic.NW.Movements.DodgeLosTestResult>();
+            if (EntityManager.CurrentSettings.UsePathfinding3)
+            {
+                using (List<Vector3>.Enumerator enumerator = list.GetEnumerator())
+                {
+                    while (enumerator.MoveNext())
+                    {
+                        Vector3 vector2 = enumerator.Current;
+                        Vector3 collidePos = Vector3.Empty;
+                        bool collided = PathFinding.CheckDirection(playerPos, vector2, ref collidePos);
+                        list2.Add(new Astral.Logic.NW.Movements.DodgeLosTestResult(vector2, collided, collidePos));
+                    }
+                    goto IL_2E7;
+                }
+            }
+            List<Injection.RayCastParams> list3 = new List<Injection.RayCastParams>();
+            Vector3 from = new Vector3(playerPos.X, playerPos.Y, playerPos.Z + 2f);
+            foreach (Vector3 vector3 in list)
+            {
+                list3.Add(new Injection.RayCastParams(from, vector3));
+                Vector3 to = new Vector3(vector3.X, vector3.Y, vector3.Z - 5f);
+                list3.Add(new Injection.RayCastParams(vector3, to));
+            }
+            Injection.RayCastResult[] array = Injection.MassPosRayCast(list3.ToArray(), 142u);
+            for (int j = 0; j < list.Count; j++)
+            {
+                Injection.RayCastResult rayCastResult = array[j + j];
+                if (array[j + j + 1].collided)
+                {
+                    list2.Add(new Astral.Logic.NW.Movements.DodgeLosTestResult(list[j], rayCastResult.collided, rayCastResult.result));
+                }
+            }
+            IL_2E7:
+            Astral.Logic.NW.Movements.LastValidPoses = list2;
+            Astral.Logic.NW.Movements.lastvlidposto.ChangeTime(2500);
+            bool flag;
+            if (!(flag = list2.Any((Astral.Logic.NW.Movements.DodgeLosTestResult r) => !r.Collided)))
+            {
+                list2 = (from r in list2
+                         orderby r.CollidePos.Distance2D(playerPos) descending
+                         select r).ToList<Astral.Logic.NW.Movements.DodgeLosTestResult>();
+            }
+            List<Entity> entities = EntityManager.GetEntities();
+            float yaw = EntityManager.LocalPlayer.Yaw;
+            using (List<Astral.Logic.NW.Movements.DodgeLosTestResult>.Enumerator enumerator2 = list2.GetEnumerator())
+            {
+                IL_490:
+                while (enumerator2.MoveNext())
+                {
+                    Astral.Logic.NW.Movements.DodgeLosTestResult dodgeLosTestResult = enumerator2.Current;
+                    Vector3 vector4 = dodgeLosTestResult.TestedPos;
+                    if (!flag || !dodgeLosTestResult.Collided)
+                    {
+                        if (dodgeLosTestResult.Collided)
+                        {
+                            vector4 = dodgeLosTestResult.CollidePos;
+                        }
+                        if (!Combats.InitialCombatLoc.IsValid || Combats.InitialCombatLoc.Distance3D(playerPos) >= 150.0 || vector4.Distance3D(Combats.InitialCombatLoc) <= 70.0)
+                        {
+                            if (!vector.IsValid)
+                            {
+                                vector = vector4;
+                            }
+                            if ((num2 != 2 || !vector4.IsInYawFaceByRange(1.5f, 3.40282347E+38f)) && (num2 != 1 || !vector4.IsInBackByRange(1.5f, 3.40282347E+38f)) && (num2 != 0 || (!vector4.IsInYawFaceByRange(0.5f, 3.40282347E+38f) && !vector4.IsInBackByRange(0.5f, 3.40282347E+38f))))
+                            {
+                                using (List<AOECheck.AOE>.Enumerator enumerator3 = AOECheck.List.GetEnumerator())
+                                {
+                                    while (enumerator3.MoveNext())
+                                    {
+                                        if (enumerator3.Current.IsIn(vector4))
+                                        {
+                                            goto IL_490;
+                                        }
+                                    }
+                                }
+                                if (!Astral.Logic.NW.Movements.ThereIsDangerousEntities(vector4, 70.0, entities))
+                                {
+                                    return vector4;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if (!vector.IsValid && list.Count > 0)
+            {
+                vector = list[0];
+            }
+            return vector;
+        }   
+#endif
     }
 }

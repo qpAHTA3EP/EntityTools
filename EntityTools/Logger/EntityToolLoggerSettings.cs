@@ -131,6 +131,25 @@ namespace EntityTools.Settings
         }
         private bool _debugEntityTools;
 
+        /// <summary>
+        /// Активация анализа изменений Quuester-профиля перед сохранением
+        /// </summary>
+        [Bindable(true)]
+        [Description("Активация анализа изменений Quuester-профиля перед сохранением")]
+        public bool QuesterProfilePresaveDiffeence
+        {
+            get => _questerProfilePresaveDiffeence;
+            set
+            {
+                if (_questerProfilePresaveDiffeence != value)
+                {
+                    _questerProfilePresaveDiffeence = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        private bool _questerProfilePresaveDiffeence;
+
         [Serializable]
         public class QuesterActionLoggerSettings : PluginSettingsBase
         {

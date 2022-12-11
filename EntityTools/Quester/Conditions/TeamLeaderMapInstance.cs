@@ -9,13 +9,6 @@ namespace EntityTools.Quester.Conditions
     [Serializable]
     public class TeamLeaderMapInstance : Condition
     {
-#if PATCH_ASTRAL
-        static TeamLeaderMapInstance()
-        {
-            // Пременение патча на этапе десериализации (до инициализации плагина)
-            //ETPatcher.Apply();
-        }
-#endif
         [Description("There is a bug: the bot does not detect correctly the current number of the map's instance \n" +
             "if the player changed the map's instance while it is in the party, \n" +
             "Therefore this condition has the false result in this case.")]

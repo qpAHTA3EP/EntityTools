@@ -33,6 +33,8 @@ namespace EntityTools.Quester.Conditions
                 if (_uiGenID != value)
                 {
                     _uiGenID = value;
+                    label = string.Empty;
+                    uiGen = null;
                     NotifyPropertyChanged();
                 }
             }
@@ -142,15 +144,7 @@ namespace EntityTools.Quester.Conditions
         
         protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = default)
         {
-            InternalResetOnPropertyChanged(propertyName);
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        internal void InternalResetOnPropertyChanged([CallerMemberName] string propertyName = default)
-        {
-            if (propertyName == nameof(UiGenID))
-                label = string.Empty;
-            uiGen = null;
         }
         #endregion
 

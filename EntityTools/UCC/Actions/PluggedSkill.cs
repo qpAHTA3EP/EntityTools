@@ -5,19 +5,15 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Xml.Serialization;
-
 using Astral.Logic.NW;
 using Astral.Logic.UCC.Classes;
 using Astral.Quester.UIEditors;
-
 using EntityTools.Enums;
 using EntityTools.Tools.Powers;
 using EntityTools.UCC.Conditions;
-
 using MyNW.Classes;
 using MyNW.Internals;
 using MyNW.Patchables.Enums;
-
 using PowerResult = EntityTools.Tools.Powers.PowerResult;
 using Unit = Astral.Logic.UCC.Ressources.Enums.Unit;
 
@@ -57,11 +53,12 @@ namespace EntityTools.UCC.Actions
             get => null;
             set
             {
-                if(value != null)
+                if (value != null)
                     Conditions.Add(value);
             }
         }
         public bool ShouldSerializeCustomConditions() => false;
+
 
         #region Hide Inherited Properties
         [XmlIgnore]
@@ -101,7 +98,8 @@ namespace EntityTools.UCC.Actions
 
         public override UCCAction Clone()
         {
-            return BaseClone(new PluggedSkill {
+            return BaseClone(new PluggedSkill
+            {
                 _source = _source
             });
         }
@@ -119,9 +117,9 @@ namespace EntityTools.UCC.Actions
         private Power _power;
         #endregion
 
-        
 
-        
+
+
 
         #region IUCCActionEngine
         public override bool NeedToRun
@@ -312,7 +310,7 @@ namespace EntityTools.UCC.Actions
         {
             get
             {
-                var logConf = global::EntityTools.EntityTools.Config.Logger;
+                var logConf = EntityTools.Config.Logger;
                 return logConf.UccActions.DebugChangeTarget && logConf.Active;
             }
         }

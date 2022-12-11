@@ -4,19 +4,15 @@ using System.Drawing.Design;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Xml.Serialization;
-
 using Astral.Classes.ItemFilter;
 using Astral.Logic.UCC.Classes;
 using Astral.Quester.UIEditors;
-
 using EntityTools.Editors;
 using EntityTools.Tools;
 using EntityTools.Tools.Inventory;
-
 using MyNW.Classes;
 using MyNW.Internals;
 using MyNW.Patchables.Enums;
-
 using Timeout = Astral.Classes.Timeout;
 
 namespace EntityTools.UCC.Actions
@@ -143,22 +139,17 @@ namespace EntityTools.UCC.Actions
 
         protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
-            InternalResetOnPropertyChanged(propertyName);
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        private void InternalResetOnPropertyChanged([CallerMemberName] string memberName = default)
-        {
-            if (memberName == nameof(ItemId))
+            if (propertyName == nameof(ItemId))
                 itemChecker = itemChecker_Initializer;
             _label = string.Empty;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         public UseItemSpecial()
         {
             Target = Astral.Logic.UCC.Ressources.Enums.Unit.Player;
             CoolDown = 18000;
-
+            itemChecker = itemChecker_Initializer;
             Astral.Logic.UCC.API.AfterCallCombat += ResetCache;
         }
         #endregion

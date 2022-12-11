@@ -26,16 +26,26 @@ namespace ACTP0Tools.Classes.Quester
             ReconstructProfile();
             return AstralAccessors.Quester.Core.Profile;
         }
-        public override void SetProfile(Profile _, string __)
+        public override void SetProfile(Profile profile, string newProfileFilename)
         {
-            var profile = AstralAccessors.Quester.Core.Profile;
+            var oldProfile = AstralAccessors.Quester.Core.Profile;
+            if (ReferenceEquals(oldProfile, profile))
+                return;
+
+            if (AstralAccessors.Controllers.Roles.IsRunning)
+                AstralAccessors.Controllers.Roles.ToggleRole(true);
+
             if (profile != null)
             {
+                AstralAccessors.Quester.Core.Profile = profile;
+                Astral.API.CurrentSettings.LastQuesterProfile = newProfileFilename;
+
                 if (_customRegions != null)
                 {
                     _customRegions.ListChanged -= CustomRegions_Changed;
+                    var newCustomRegions = profile.CustomRegions;
                     _customRegions.Clear();
-                    foreach (var cr in profile.CustomRegions)
+                    foreach (var cr in newCustomRegions)
                         _customRegions.Add(cr);
                     _customRegions.ListChanged += CustomRegions_Changed;
                     OnPropertyChanged(nameof(CustomRegions));
@@ -44,8 +54,9 @@ namespace ACTP0Tools.Classes.Quester
                 if (_blackList != null)
                 {
                     _blackList.ListChanged -= BlackList_Changed;
+                    var newBlackList = profile.BlackList;
                     _blackList.Clear();
-                    foreach (var bl in profile.BlackList)
+                    foreach (var bl in newBlackList)
                         _blackList.Add(bl);
                     _blackList.ListChanged += BlackList_Changed;
                     OnPropertyChanged(nameof(BlackList));
@@ -55,8 +66,9 @@ namespace ACTP0Tools.Classes.Quester
                 if (_vendors != null)
                 {
                     _vendors.ListChanged -= Vendors_Changed;
+                    var newVendors = profile.Vendors;
                     _vendors.Clear();
-                    foreach (var vendor in profile.Vendors)
+                    foreach (var vendor in newVendors)
                         _vendors.AddUnique(vendor);
                     OnPropertyChanged(nameof(Vendors));
                     _vendors.ListChanged += Vendors_Changed;
@@ -64,7 +76,6 @@ namespace ACTP0Tools.Classes.Quester
             }
             else
             {
-
                 if (_customRegions != null)
                 {
                     _customRegions.Clear();
@@ -84,6 +95,8 @@ namespace ACTP0Tools.Classes.Quester
                     OnPropertyChanged(nameof(Vendors));
                 }
             }
+
+            AstralAccessors.Quester.Entrypoint.RefreshQuesterMainPanel();
             OnPropertyChanged(nameof(Actions));
             OnPropertyChanged(nameof(FileName));
             OnPropertyChanged(nameof(MapsMeshes));

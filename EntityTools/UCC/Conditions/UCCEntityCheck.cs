@@ -430,8 +430,7 @@ namespace EntityTools.UCC.Conditions
         /// Комплексный (составной) идентификатор, используемый для поиска <see cref="Entity"/> в кэше
         /// </summary>
         public EntityCacheRecordKey EntityKey =>
-            _key ??
-            (_key = new EntityCacheRecordKey(EntityID, EntityIdType, EntityNameType));
+            _key ?? (_key = new EntityCacheRecordKey(EntityID, EntityIdType, EntityNameType));
 
         private EntityCacheRecordKey _key;
 

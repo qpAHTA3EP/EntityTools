@@ -1,12 +1,4 @@
-﻿using ACTP0Tools.Classes.Quester;
-using ACTP0Tools.Patches;
-using ACTP0Tools.Reflection;
-using AStar;
-using Astral;
-using Astral.Quester.Classes;
-using HarmonyLib;
-using MyNW.Internals;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -16,7 +8,14 @@ using System.Threading;
 using System.Windows.Forms;
 using System.Xml.Serialization;
 using ACTP0Tools.Classes;
-using MyNW.Classes;
+using ACTP0Tools.Classes.Quester;
+using ACTP0Tools.Patches;
+using ACTP0Tools.Reflection;
+using AStar;
+using Astral;
+using Astral.Quester.Classes;
+using HarmonyLib;
+using MyNW.Internals;
 
 // ReSharper disable InconsistentNaming
 // ReSharper disable RedundantAssignment
@@ -89,7 +88,7 @@ namespace ACTP0Tools
                 public static bool LoadMeshFromZipFile(string zipFileName, string mapName, out Graph meshes)
                 {
                     meshes = null;
-                    if (!File.Exists(zipFileName)) 
+                    if (!File.Exists(zipFileName))
                         return false;
 
                     try
@@ -202,7 +201,7 @@ namespace ACTP0Tools
                                             result++;
                                         }
                                     }
-                                } 
+                                }
                             }
 
                             return result;
@@ -213,7 +212,7 @@ namespace ACTP0Tools
                         Console.WriteLine(e);
                         throw;
                     }
-                } 
+                }
 
                 private static bool PrefixLoadAllMeshes(out int __result)
                 {
@@ -265,7 +264,7 @@ namespace ACTP0Tools
                     string profileDir = Path.GetDirectoryName(profilePath);
                     if (string.IsNullOrEmpty(profileDir))
                         profileDir = Astral.Controllers.Directories.ProfilesPath;
-                    
+
                     meshesFile = Path.GetFullPath(Path.Combine(profileDir, meshesFile));
                     return meshesFile;
                 }
@@ -312,7 +311,7 @@ namespace ACTP0Tools
                         if (Controllers.BotComs.BotServer.Server.IsRunning)
                         {
                             Controllers.BotComs.BotServer.SendQuesterProfileInfos();
-                        } 
+                        }
                     }
 
                     return false;
@@ -413,7 +412,7 @@ namespace ACTP0Tools
                 {
                     string currentProfileName = Astral.API.CurrentSettings.LastQuesterProfile;
                     string profileName = saveas ? string.Empty : currentProfileName;
-                    if(Save(Profile, _mapsMeshes, currentProfileName, ref profileName))
+                    if (Save(Profile, _mapsMeshes, currentProfileName, ref profileName))
                         Astral.API.CurrentSettings.LastQuesterProfile = profileName;
                 }
 
@@ -435,7 +434,7 @@ namespace ACTP0Tools
                     if (string.IsNullOrEmpty(currentProfileName) || string.IsNullOrEmpty(newProfileName))
                     {
                         newProfileName = RequestUserForNewProfileFileName(currentProfileName);
-                        if (string.IsNullOrEmpty(newProfileName)) 
+                        if (string.IsNullOrEmpty(newProfileName))
                             return false;
                         needLoadAllInternalMeshes = currentProfileName != newProfileName;
                     }
@@ -446,13 +445,13 @@ namespace ACTP0Tools
                     string externalMeshesFullFilePath = string.Empty;
                     if (useExternalMeshes)
                     {
-                        string currentDir = string.Empty;    
+                        string currentDir = string.Empty;
                         if (!string.IsNullOrEmpty(currentProfileName))
                             currentDir = Path.GetDirectoryName(currentProfileName);
                         if (string.IsNullOrEmpty(currentDir))
                             currentDir = Astral.Controllers.Directories.ProfilesPath;
 
-                        externalMeshesFullFilePath = Path.GetFullPath(Path.Combine(currentDir,  profile.ExternalMeshFileName));
+                        externalMeshesFullFilePath = Path.GetFullPath(Path.Combine(currentDir, profile.ExternalMeshFileName));
 
                         // изменяем путь к файлу внешних мешей, поскольку новое имя файла профиля отличается от текущего
                         if (currentProfileName != newProfileName)
@@ -564,7 +563,7 @@ namespace ACTP0Tools
                     return false;
                 }
 
-                private static string  RequestUserForNewProfileFileName(string currentProfileName)
+                private static string RequestUserForNewProfileFileName(string currentProfileName)
                 {
                     string profileNameWithoutExtension = currentProfileName;
                     if (string.IsNullOrEmpty(profileNameWithoutExtension))
@@ -613,8 +612,6 @@ namespace ACTP0Tools
                         return false;
 
                     //TODO: Безопасное сохранение mesh'а, чтобы при возникновении ошибки старое содержимое не удалялось
-                    //TODO: Исправить сохранение внешних мешей
-
                     if (binaryFormatter is null)
                         binaryFormatter = new BinaryFormatter();
 
@@ -661,10 +658,6 @@ namespace ACTP0Tools
                         && zipFile.Mode != ZipArchiveMode.Create)
                         return false;
 
-                    //TODO: Безопасное сохранение профиля, чтобы при возникновении ошибки старое содержимое не удалялось
-                    //ACTP0Serializer.GetExtraTypes(out List<Type> types, 2);
-                    //XmlSerializer serializer = new XmlSerializer(profile.GetType(), types.ToArray());
-
                     using (var memStream = new MemoryStream())
                     {
                         try
@@ -686,8 +679,14 @@ namespace ACTP0Tools
                             using (var zipProfileStream = zipProfileEntry.Open())
                             {
                                 if (upgrading)
+                                {
+                                    MackProfileBackup(zipFile, zipProfileStream);
+                                    zipProfileStream.Seek(0, SeekOrigin.Begin);
                                     zipProfileStream.SetLength(memStream.Length);
+                                }
                                 memStream.WriteTo(zipProfileStream);
+
+                                RemovePorfileBackups(zipFile);
                                 return true;
                             }
                         }
@@ -700,6 +699,38 @@ namespace ACTP0Tools
                     return false;
                 }
 
+                private static void MackProfileBackup(ZipArchive zipFile, Stream zipProfileStream)
+                {
+                    var zipProfileBackup = zipFile.CreateEntry($"profile_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.xml");
+                    using (var zipProfileBackupStream = zipProfileBackup.Open())
+                    {
+                        zipProfileStream.CopyTo(zipProfileBackupStream);
+
+                    }
+                }
+
+                private static void RemovePorfileBackups(ZipArchive zipFile)
+                {
+                    var trunkateDate = DateTime.Now.AddDays(-7);
+                    var oldBackups = new List<ZipArchiveEntry>();
+                    foreach (var entry in zipFile.Entries)
+                    {
+                        var entryName = entry.Name;
+                        if (entryName.StartsWith("profile_"))
+                        {
+                            var backupDateStr = entryName.Substring(8, entryName.Length - entryName.IndexOf(".xml"));
+                            if (DateTime.TryParse(backupDateStr, out DateTime backupDateTime))
+                                oldBackups.Add(entry);
+                        }
+
+                    }
+                    if (oldBackups.Count > 0)
+                    {
+                        foreach (var entry in oldBackups)
+                            entry.Delete();
+                    }
+                }
+
                 /// <summary>
                 /// Установка профиля в качестве активного профиля Quester'a
                 /// </summary>
@@ -707,35 +738,38 @@ namespace ACTP0Tools
                 {
                     if (profile is null)
                         return;
-                  
+
                     if (AstralAccessors.Controllers.Roles.IsRunning)
                         AstralAccessors.Controllers.Roles.ToggleRole(true);
 
-                    AstralAccessors.Quester.Core.Profile = profile;//.CreateDeepCopy();
-                    
+                    if (!ReferenceEquals(profile, AstralAccessors.Quester.Core.Profile))
+                    {
+                        AstralAccessors.Quester.Core.Profile = profile;
+
+                        var allProfileMeshes = _mapsMeshes;
+                        lock (allProfileMeshes)
+                        {
+                            allProfileMeshes.Clear();
+                        }
+
+                        if (actionId != Guid.Empty)
+                            QuesterHelper.SetStartPoint(profile.MainActionPack, actionId);
+                        else
+                        {
+                            profile.MainActionPack.Reset();
+                            QuesterHelper.ResetActionPlayer(profile.MainActionPack);
+                        }
+                    }
+
                     Astral.API.CurrentSettings.LastQuesterProfile = profilePath;
-
-                    var allProfileMeshes = _mapsMeshes;
-                    lock (allProfileMeshes)
-                    {
-                        allProfileMeshes.Clear();
-                    }
-
-                    if (actionId != Guid.Empty)
-                        QuesterHelper.SetStartPoint(profile.MainActionPack, actionId);
-                    else
-                    {
-                        profile.MainActionPack.Reset();
-                        QuesterHelper.ResetActionPlayer(profile.MainActionPack);
-                    }
 
                     if (Controllers.BotComs.BotServer.Server.IsRunning)
                     {
                         Controllers.BotComs.BotServer.SendQuesterProfileInfos();
                     }
 
-                    AstralAccessors.Quester.Entrypoint.RefreshQuesterMainPanel(); 
-                    
+                    AstralAccessors.Quester.Entrypoint.RefreshQuesterMainPanel();
+
                 }
                 #endregion
 

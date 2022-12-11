@@ -247,18 +247,14 @@ namespace EntityTools.UCC.Actions
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = default)
         {
-            InternalResetOnPropertyChanged(propertyName);
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        protected virtual void InternalResetOnPropertyChanged([CallerMemberName] string propertyName = default)
-        {
             _key = null;
             _specialCheck = null;
             _label = string.Empty;
             
             entityCache = null;
             timeout.ChangeTime(0);
+
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
         #endregion
 

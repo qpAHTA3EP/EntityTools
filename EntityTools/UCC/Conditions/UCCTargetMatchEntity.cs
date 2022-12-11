@@ -36,6 +36,7 @@ namespace EntityTools.UCC.Conditions
                 if (_entityId != value)
                 {
                     _entityId = value;
+                    _key = null;
                     NotifyPropertyChanged();
                 }
             }
@@ -58,6 +59,7 @@ namespace EntityTools.UCC.Conditions
                 if (_entityIdType != value)
                 {
                     _entityIdType = value;
+                    _key = null;
                     NotifyPropertyChanged();
                 }
             }
@@ -78,6 +80,7 @@ namespace EntityTools.UCC.Conditions
                 if (_entityNameType != value)
                 {
                     _entityNameType = value;
+                    _key = null;
                     NotifyPropertyChanged();
                 }
             }
@@ -139,7 +142,6 @@ namespace EntityTools.UCC.Conditions
 
         protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = default)
         {
-            _key = null;
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
         #endregion

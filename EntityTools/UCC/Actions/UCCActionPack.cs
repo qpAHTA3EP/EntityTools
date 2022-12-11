@@ -6,8 +6,6 @@ using System.Runtime.CompilerServices;
 using System.Xml.Serialization;
 
 using Astral.Logic.UCC.Classes;
-
-using EntityTools.Core.Interfaces;
 // ReSharper disable InconsistentNaming
 
 namespace EntityTools.UCC.Actions
@@ -61,14 +59,18 @@ namespace EntityTools.UCC.Actions
         #endregion
         #endregion
 
-        #region Интерфейс команды
 
+
+
+        #region Интерфейс команды
         public override bool NeedToRun => _actions.Count > 0;
 
         public override bool Run()
         {
-            return (_actionPlayer ?? (_actionPlayer = new ActionsPlayer(_actions))).playActionList(!ExecuteSequentially) > 0;
+            return ActionsPlayer.playActionList(!ExecuteSequentially) > 0;
         }
+
+        protected ActionsPlayer ActionsPlayer => _actionPlayer ?? (_actionPlayer = new ActionsPlayer(_actions));
         private ActionsPlayer _actionPlayer;
 
         public override UCCAction Clone()

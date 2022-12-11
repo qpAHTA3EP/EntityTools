@@ -6,17 +6,14 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Xml.Serialization;
-
 using Astral.Classes.ItemFilter;
 using Astral.Quester.Classes;
-
 using EntityTools.Core.Interfaces;
 using EntityTools.Editors;
 using EntityTools.Enums;
 using EntityTools.Extensions;
 using EntityTools.Tools.CustomRegions;
 using EntityTools.Tools.Entities;
-
 using MyNW.Classes;
 
 namespace EntityTools.Quester.Conditions
@@ -44,6 +41,9 @@ namespace EntityTools.Quester.Conditions
                 if (_entityId != value)
                 {
                     _entityId = value;
+                    _key = null;
+                    _label = string.Empty;
+                    entities?.Clear();
                     NotifyPropertyChanged();
                 }
             }
@@ -64,6 +64,9 @@ namespace EntityTools.Quester.Conditions
                 if (_entityNameType != value)
                 {
                     _entityNameType = value;
+                    _key = null;
+                    _label = string.Empty;
+                    entities?.Clear();
                     NotifyPropertyChanged();
                 }
             }
@@ -86,6 +89,9 @@ namespace EntityTools.Quester.Conditions
                 if (_entityIdType != value)
                 {
                     _entityIdType = value;
+                    _key = null;
+                    _label = string.Empty;
+                    entities?.Clear();
                     NotifyPropertyChanged();
                 }
             }
@@ -138,6 +144,7 @@ namespace EntityTools.Quester.Conditions
                 if (_regionCheck != value)
                 {
                     _regionCheck = value;
+                    _specialCheck = null;
                     NotifyPropertyChanged();
                 }
             }
@@ -160,6 +167,7 @@ namespace EntityTools.Quester.Conditions
                 if (_healthCheck == value)
                 {
                     _healthCheck = value;
+                    _specialCheck = null;
                     NotifyPropertyChanged();
                 }
             }
@@ -200,6 +208,7 @@ namespace EntityTools.Quester.Conditions
                 if (_sign != value)
                 {
                     _sign = value;
+                    countChecker = Initialize_CountChecker;
                     NotifyPropertyChanged();
                 }
             }
@@ -241,6 +250,7 @@ namespace EntityTools.Quester.Conditions
                 if (Math.Abs(_reactionZRange - value) > 0.1)
                 {
                     _reactionZRange = value;
+                    _specialCheck = null;
                     NotifyPropertyChanged();
                 }
             }
@@ -263,6 +273,7 @@ namespace EntityTools.Quester.Conditions
                 if (_customRegionNames != value)
                 {
                     _customRegionNames = value;
+                    _specialCheck = null;
                     NotifyPropertyChanged();
                 }
             }
@@ -285,6 +296,7 @@ namespace EntityTools.Quester.Conditions
                 if (_customRegionCheck != value)
                 {
                     _customRegionCheck = value;
+                    _specialCheck = null;
                     NotifyPropertyChanged();
                 }
             }
@@ -300,22 +312,19 @@ namespace EntityTools.Quester.Conditions
 
         protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            InternalResetOnPropertyChanged(propertyName);
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
-        internal void InternalResetOnPropertyChanged([CallerMemberName] string memberName = default)
-        {
-            _key = null;
-            _label = string.Empty;
-            _specialCheck = null;
-            _idStr = string.Concat(GetType().Name, '[', GetHashCode().ToString("X2"), ']');
-            
-            countChecker = Initialize_CountChecker;
-
-            entities?.Clear();
-        }
         #endregion
+
+
+
+
+        public EntityCount()
+        {
+            _idStr = string.Concat(GetType().Name, '[', GetHashCode().ToString("X2"), ']');
+            countChecker = Initialize_CountChecker;
+        }
+
 
 
 

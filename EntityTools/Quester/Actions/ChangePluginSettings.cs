@@ -1,4 +1,5 @@
-﻿using Astral.Logic.Classes.Map;
+﻿using ACTP0Tools.Reflection;
+using Astral.Logic.Classes.Map;
 using EntityTools.Editors;
 using EntityTools.Enums;
 using MyNW.Classes;
@@ -108,7 +109,7 @@ namespace EntityTools.Quester.Actions
                                 "The positive integer greater then 1 is required.");
                         break;
                 }
-                return new ActionValidity();
+                return Empty.ActionValidity;
             }
         }
         public override void GatherInfos() { }

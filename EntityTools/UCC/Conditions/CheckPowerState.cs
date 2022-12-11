@@ -28,6 +28,7 @@ namespace EntityTools.UCC.Conditions
                 if (_powerId != value)
                 {
                     _powerId = value;
+                    powerCache.PowerIdPattern = PowerId;
                     NotifyPropertyChanged();
                 }
             }
@@ -89,13 +90,7 @@ namespace EntityTools.UCC.Conditions
 
         protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = default)
         {
-            InternalResetOnPropertyChanged(propertyName);
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-        private void InternalResetOnPropertyChanged([CallerMemberName] string propertyName = default)
-        {
-            if (propertyName == nameof(PowerId))
-                powerCache.PowerIdPattern = PowerId;
         }
         #endregion
 

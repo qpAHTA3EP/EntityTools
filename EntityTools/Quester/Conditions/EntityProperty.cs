@@ -38,6 +38,9 @@ namespace EntityTools.Quester.Conditions
                 if (_entityId != value)
                 {
                     _entityId = value;
+                    _key = null;
+                    _label = string.Empty;
+                    entity = null;
                     NotifyPropertyChanged();
                 }
             }
@@ -58,6 +61,9 @@ namespace EntityTools.Quester.Conditions
                 if (_entityNameType != value)
                 {
                     _entityNameType = value;
+                    _key = null;
+                    _label = string.Empty;
+                    entity = null;
                     NotifyPropertyChanged();
                 }
             }
@@ -80,6 +86,9 @@ namespace EntityTools.Quester.Conditions
                 if (_entityIdType != value)
                 {
                     _entityIdType = value;
+                    _key = null;
+                    _label = string.Empty;
+                    entity = null;
                     NotifyPropertyChanged();
                 }
             }
@@ -109,6 +118,8 @@ namespace EntityTools.Quester.Conditions
                 if (_regionCheck != value)
                 {
                     _regionCheck = value;
+                    _specialCheck = null;
+                    entity = null;
                     NotifyPropertyChanged();
                 }
             }
@@ -130,6 +141,8 @@ namespace EntityTools.Quester.Conditions
                 if (_healthCheck == value)
                 {
                     _healthCheck = value;
+                    _specialCheck = null;
+                    entity = null;
                     NotifyPropertyChanged();
                 }
             }
@@ -153,6 +166,7 @@ namespace EntityTools.Quester.Conditions
                 if (_entitySetType != value)
                 {
                     _entitySetType = value;
+                    entity = null;
                     NotifyPropertyChanged();
                 }
             }
@@ -174,6 +188,8 @@ namespace EntityTools.Quester.Conditions
                 if (Math.Abs(_reactionRange - value) > 0.1)
                 {
                     _reactionRange = value;
+                    _specialCheck = null;
+                    entity = null;
                     NotifyPropertyChanged();
                 }
             }
@@ -195,6 +211,8 @@ namespace EntityTools.Quester.Conditions
                 if (Math.Abs(_reactionZRange - value) > 0.1)
                 {
                     _reactionZRange = value;
+                    _specialCheck = null;
+                    entity = null;
                     NotifyPropertyChanged();
                 }
             }
@@ -216,6 +234,8 @@ namespace EntityTools.Quester.Conditions
                 if (_customRegionNames != value)
                 {
                     _customRegionNames = value;
+                    _specialCheck = null;
+                    entity = null;
                     NotifyPropertyChanged();
                 }
             }
@@ -234,6 +254,7 @@ namespace EntityTools.Quester.Conditions
                 if (_propertyType != value)
                 {
                     _propertyType = value;
+                    propertyValueChecker = Initialize_PropertyValueChecker;
                     NotifyPropertyChanged();
                 }
             }
@@ -253,6 +274,8 @@ namespace EntityTools.Quester.Conditions
                 if (Math.Abs(_value - value) > 0.1)
                 {
                     _value = value;
+                    propertyValueChecker = Initialize_PropertyValueChecker;
+                    entity = null;
                     NotifyPropertyChanged();
                 }
             }
@@ -273,6 +296,7 @@ namespace EntityTools.Quester.Conditions
                 if (_sign != value)
                 {
                     _sign = value;
+                    propertyValueChecker = Initialize_PropertyValueChecker;
                     NotifyPropertyChanged();
                 }
             }
@@ -288,20 +312,7 @@ namespace EntityTools.Quester.Conditions
 
         protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = default)
         {
-            InternalResetOnPropertyChanged(propertyName);
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        private void InternalResetOnPropertyChanged([CallerMemberName] string propertyName = default)
-        {
-            _key = null;
-            _label = string.Empty;
-            _specialCheck = null;
-            
-            propertyValueChecker = Initialize_PropertyValueChecker;
-
-            entity = null;
-            timeout.ChangeTime(0);
         }
         #endregion
 
@@ -399,9 +410,9 @@ namespace EntityTools.Quester.Conditions
 
         #region EntityPropertyChecker
         /// <summary>
-        /// Предикат, проверяющий истинность соотношения <seealso cref="EntityProperty.Sign"/> 
-        /// между величиной атрибута, заданного <seealso cref="EntityProperty.PropertyType"/>, 
-        /// и референтным значением <seealso cref="EntityProperty.Value"/>
+        /// Предикат, проверяющий истинность соотношения <seealso cref="Sign"/> 
+        /// между величиной атрибута, заданного <seealso cref="PropertyType"/>, 
+        /// и референтным значением <seealso cref="Value"/>
         /// </summary>
         Predicate<Entity> propertyValueChecker;
         private bool Initialize_PropertyValueChecker(Entity e)

@@ -63,6 +63,10 @@ namespace EntityTools.Quester.Actions
                 if (_entityId != value)
                 {
                     _entityId = value;
+                    _key = null;
+                    _label = string.Empty;
+                    targetEntity = null;
+                    closestEntity = null;
                     NotifyPropertyChanged();
                 }
             }
@@ -87,6 +91,8 @@ namespace EntityTools.Quester.Actions
                     _entityIdType = value;
                     _key = null;
                     _label = string.Empty;
+                    targetEntity = null;
+                    closestEntity = null;
                     NotifyPropertyChanged();
                 }
             }
@@ -109,6 +115,8 @@ namespace EntityTools.Quester.Actions
                     _entityNameType = value;
                     _key = null;
                     _label = string.Empty;
+                    targetEntity = null;
+                    closestEntity = null;
                     NotifyPropertyChanged();
                 }
             }
@@ -147,6 +155,7 @@ namespace EntityTools.Quester.Actions
                 if (_healthCheck != value)
                 {
                     _healthCheck = value;
+                    _specialEntityCheck = null;
                     NotifyPropertyChanged();
                 }
             }
@@ -193,6 +202,7 @@ namespace EntityTools.Quester.Actions
                 if (Math.Abs(_reactionRange - value) > 0.1f)
                 {
                     _reactionRange = value;
+                    _specialEntityCheck = null;
                     NotifyPropertyChanged();
                 }
             }
@@ -215,6 +225,7 @@ namespace EntityTools.Quester.Actions
                 if (Math.Abs(_reactionZRange - value) > 0.1f)
                 {
                     _reactionZRange = value;
+                    _specialEntityCheck = null;
                     NotifyPropertyChanged();
                 }
             }
@@ -236,6 +247,7 @@ namespace EntityTools.Quester.Actions
                 if (_regionCheck != value)
                 {
                     _regionCheck = value;
+                    _specialEntityCheck = null;
                     NotifyPropertyChanged();
                 }
             }
@@ -260,6 +272,7 @@ namespace EntityTools.Quester.Actions
                 if (_customRegionNames != value)
                 {
                     _customRegionNames = value;
+                    _specialEntityCheck = null;
                     NotifyPropertyChanged();
                 }
             }
@@ -564,36 +577,11 @@ namespace EntityTools.Quester.Actions
 
 
 
-        #region Взаимодействие с ядром EntityToolsCore
+        #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
         protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
-            InternalResetOnPropertyChanged(propertyName);
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-        public void InternalResetOnPropertyChanged([CallerMemberName] string memberName = default)
-        {
-            switch (memberName)
-            {
-                case nameof(EntityID):
-                case nameof(EntityIdType):
-                case nameof(EntityNameType):
-                    _key = null;
-                    _label = string.Empty;
-                    break;
-                case nameof(PowerId):
-                    powerCache.Reset(PowerId);
-                    break;
-                case nameof(EntitySearchTime):
-                    entityAbsenceTimer = null;
-                    break;
-                default:
-                    _specialEntityCheck = null;
-                    break;
-            }
-
-            targetEntity = null;
-            closestEntity = null;
         }
         #endregion
 

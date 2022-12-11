@@ -180,6 +180,15 @@ namespace EntityTools.UCC.Conditions
 
 
 
+        public UCCGameUICheck()
+        {
+            uiGenChecker = initialize_uiGenChecker;
+            uiGenPropertyValueChecker = initialize_CheckUIGenVarName;
+        }
+
+
+
+
         public new ICustomUCCCondition Clone()
         {
             return new UCCGameUICheck

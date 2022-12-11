@@ -635,7 +635,7 @@ namespace EntityTools.Quester.Actions
 
 
 
-        #region Данные ядра
+        #region Данные
         private readonly TempBlackList<uint> blackList = new TempBlackList<uint>();
         private Entity targetEntity;
         private Entity closestEntity;

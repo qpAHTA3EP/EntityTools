@@ -399,10 +399,6 @@ namespace EntityTools.Quester.Editor
                         // Выбираем коллекцию узлов, в которую нужно добавить перетаскиваемый узел
                         TreeNodeCollection treeNodeCollection = targetNode.Parent?.Nodes ?? treeView.Nodes;
 
-                        // Если нажата клавиша ALT, вставляем ПЕРЕД targetNode.
-                        // В противном случае - после targetNode.
-                        //var targetInd = targetNode.Index + (e.KeyState & 32) == 32 ? 0 : 1;// Проверяем нажатие клавиши ALT
-
                         // Перемещение узла
                         if (e.Effect == DragDropEffects.Move)
                         {
@@ -514,7 +510,7 @@ namespace EntityTools.Quester.Editor
                 // Извлечение перетаскиваемого узла
                 TreeNode draggedNode = GetTreeNodeFrom(e.Data);
 
-                if (ReferenceEquals(treeView, draggedNode.TreeView))
+                if (ReferenceEquals(treeView, draggedNode?.TreeView))
                 {
                     // Определяем координаты курсора мыши относительно treeView
                     Point targetPoint = treeView.PointToClient(new Point(e.X, e.Y));
@@ -1233,7 +1229,7 @@ namespace EntityTools.Quester.Editor
             var saved = profile.Saved;
             if (saved || SaveProfile())
             {
-                var actualProfile = profile.GetProfile();//.CreateDeepCopy();
+                var actualProfile = profile.GetProfile();
                 AstralAccessors.Quester.Core.SetProfile(actualProfile, profile.FileName);
 
                 txtLog.AppendText(
@@ -1259,7 +1255,7 @@ namespace EntityTools.Quester.Editor
             var saved = profile.Saved;
             if (saved || SaveProfile())
             {
-                var actualProfile = profile.GetProfile();//.CreateDeepCopy();
+                var actualProfile = profile.GetProfile();
                 var actionId = treeActions.SelectedNode is ActionBaseTreeNode selectedNode
                                  ? selectedNode.Content.ActionID
                                  : Guid.Empty;

@@ -1,8 +1,17 @@
 ﻿//#define DEBUG_TARGET
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Drawing.Design;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Xml.Serialization;
 using ACTP0Tools;
 using Astral.Logic.Classes.Map;
 using EntityTools.Editors;
+using EntityTools.Editors.TestEditors;
 using EntityTools.Enums;
 using EntityTools.Patches.Mapper;
 using EntityTools.Tools.CustomRegions;
@@ -12,15 +21,6 @@ using EntityTools.Tools.Targeting;
 using MyNW.Classes;
 using MyNW.Internals;
 using MyNW.Patchables.Enums;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Drawing.Design;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Xml.Serialization;
-using EntityTools.Editors.TestEditors;
 using Action = Astral.Quester.Classes.Action;
 using Timeout = Astral.Classes.Timeout;
 
@@ -52,6 +52,8 @@ namespace EntityTools.Quester.Actions
             set
             {
                 supportOptions = value;
+                _targetProcessor?.Dispose();
+                _targetProcessor = new TeammateSupportTargetProcessor(SupportOptions, GetSpecialTeammateCheck());
                 NotifyPropertyChanged();
             }
         }
@@ -84,6 +86,8 @@ namespace EntityTools.Quester.Actions
                 if (Math.Abs(distance - value) > 0.1f)
                 {
                     distance = value;
+                    _sqrtDistance = distance;
+                    _sqrtDistance *= _sqrtDistance;
                     NotifyPropertyChanged();
                 }
             }
@@ -172,6 +176,8 @@ namespace EntityTools.Quester.Actions
                 if (abortCombatDistance != value)
                 {
                     abortCombatDistance = value;
+                    _sqrtAbortCombatDistance = abortCombatDistance;
+                    _sqrtAbortCombatDistance *= _sqrtAbortCombatDistance;
                     NotifyPropertyChanged();
                 }
             }
@@ -195,6 +201,7 @@ namespace EntityTools.Quester.Actions
                 if (customRegions != value)
                 {
                     customRegions = value;
+                    _targetProcessor.SpecialCheck = GetSpecialTeammateCheck();
                     NotifyPropertyChanged();
                 }
             }
@@ -751,8 +758,7 @@ namespace EntityTools.Quester.Actions
             var crSet = CustomRegions;
             if (crSet.Count > 0)
             {
-                specialCheck = (ett) =>
-                    crSet.Within(ett);
+                specialCheck = crSet.Within;
             }
 
             return specialCheck;

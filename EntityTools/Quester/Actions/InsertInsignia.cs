@@ -154,7 +154,6 @@ namespace EntityTools.Quester.Actions
         /// <returns></returns>
         internal static int InsigniaQualityDescendingComparison(InventorySlot slot1, InventorySlot slot2)
         {
-
             if (slot1 != null && slot1.IsValid && slot1.Item.IsValid && slot1.Item.Count > 0)
             {
                 if (slot2 != null && slot2.IsValid && slot2.Item.IsValid && slot2.Item.Count > 0)
@@ -166,7 +165,7 @@ namespace EntityTools.Quester.Actions
                 if (slot2 != null && slot2.IsValid && slot2.Item.IsValid && slot2.Item.Count > 0)
                     return 1;
             }
-            // оба slot1 и slot2 являются невалидными. т.е. одинкаовыми
+            // оба slot1 и slot2 являются невалидными. т.е. одинаковыми
             return 0;
         }
         #endregion

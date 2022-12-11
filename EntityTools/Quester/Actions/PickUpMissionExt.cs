@@ -31,7 +31,7 @@ namespace EntityTools.Quester.Actions
     [Serializable]
     public class PickUpMissionExt : Action, INotifyPropertyChanged
     {
-        #region данные ядра
+        #region данные
         /// <summary>
         /// Константа длины строки "MissionOffer." 
         /// </summary>
@@ -65,6 +65,7 @@ namespace EntityTools.Quester.Actions
                 if (_missionId != value)
                 {
                     _missionId = value;
+                    label = string.Empty;
                     NotifyPropertyChanged();
                 }
             }
@@ -318,6 +319,7 @@ namespace EntityTools.Quester.Actions
             {
                 if (_requiredRewardItem == value) return;
                 _requiredRewardItem = value;
+                _rewardItemCheck = null;
                 NotifyPropertyChanged();
             }
         }
@@ -375,16 +377,7 @@ namespace EntityTools.Quester.Actions
         [NotifyPropertyChangedInvocator]
         protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
-            InternalResetOnPropertyChanged(propertyName);
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        public void InternalResetOnPropertyChanged([CallerMemberName] string propertyName = default)
-        {
-            if (propertyName == nameof(RequiredRewardItem))
-                //isRewardItem = initializer_IsRewardItem;
-                _rewardItemCheck = null;
-            else if (propertyName == nameof(MissionId)) label = string.Empty;
         }
         #endregion
 

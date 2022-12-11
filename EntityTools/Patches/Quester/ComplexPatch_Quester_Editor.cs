@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using ACTP0Tools;
 using ACTP0Tools.Patches;
 using ACTP0Tools.Reflection;
 using Astral.Quester.Classes.Actions;
@@ -22,8 +23,9 @@ namespace EntityTools.Patches.Quester
         {
             if (EntityTools.Config.Patches.QuesterPatches.ReplaceQuesterEditor)
             {
-                var profile = Astral.Quester.API.CurrentProfile;
-                var profileName = Astral.API.CurrentSettings.LastQuesterProfile;
+                var activeProfile = AstralAccessors.Quester.Core.ActiveProfileProxy;
+                var profile = activeProfile.GetProfile();
+                var profileName = activeProfile.FileName;
 
                 if (profile.Saved && !string.IsNullOrEmpty(profileName))
                     QuesterEditor.Edit(profile, profileName);
@@ -44,8 +46,9 @@ namespace EntityTools.Patches.Quester
                     return false;
                 }
 
-                var profile = Astral.Quester.API.CurrentProfile;
-                var profileName = Astral.API.CurrentSettings.LastQuesterProfile;
+                var activeProfile = AstralAccessors.Quester.Core.ActiveProfileProxy;
+                var profile = activeProfile.GetProfile();
+                var profileName = activeProfile.FileName;
 
                 if (profile.Saved && !string.IsNullOrEmpty(profileName))
                     QuesterEditor.Edit(profile, profileName, selectedAction.ActionID);

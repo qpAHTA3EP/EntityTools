@@ -106,6 +106,7 @@
     <Compile Include="AMClient\Client.cs" />
     <Compile Include="Classes\Credentials\CredAccountExt.cs" />
     <Compile Include="Classes\Credentials\CredentialsExt.cs" />
+    <Compile Include="Classes\DiffMatchPatch.cs" />
     <Compile Include="Classes\Enums.cs" />
     <Compile Include="Classes\FileTools.cs" />
     <Compile Include="Classes\Quester\ActiveProfileProxy.cs" />

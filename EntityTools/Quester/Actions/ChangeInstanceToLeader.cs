@@ -1,4 +1,5 @@
 ﻿using System;
+using ACTP0Tools.Reflection;
 using Astral.Logic.Classes.Map;
 using Astral.Logic.NW;
 using EntityTools.Tools;
@@ -30,7 +31,7 @@ namespace EntityTools.Quester.Actions
 
         protected override Vector3 InternalDestination => Vector3.Empty;
 
-        protected override ActionValidity InternalValidity => new ActionValidity();
+        protected override ActionValidity InternalValidity => Empty.ActionValidity;
 
         public override void GatherInfos(){}
         public override void InternalReset(){}

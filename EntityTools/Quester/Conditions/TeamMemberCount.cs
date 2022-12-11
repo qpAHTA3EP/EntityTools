@@ -3,15 +3,11 @@ using System.ComponentModel;
 using System.Drawing.Design;
 using System.Runtime.CompilerServices;
 using System.Text;
-
 using Astral.Quester.Classes;
-
-using EntityTools.Core.Interfaces;
 using EntityTools.Editors;
 using EntityTools.Extensions;
 using EntityTools.Patches.Mapper;
 using EntityTools.Tools.CustomRegions;
-
 using MyNW.Classes;
 using MyNW.Internals;
 
@@ -37,6 +33,7 @@ namespace EntityTools.Quester.Conditions
                 if (_customRegionNames != value)
                 {
                     _customRegionNames = value;
+                    counter = Initialize_Counter;
                     NotifyPropertyChanged();
                 }
             }
@@ -56,6 +53,7 @@ namespace EntityTools.Quester.Conditions
             get => _customRegionCheck; set
             {
                 _customRegionCheck = value;
+                counter = Initialize_Counter;
                 NotifyPropertyChanged();
             }
         }
@@ -90,6 +88,7 @@ namespace EntityTools.Quester.Conditions
             get => _distanceSign; set
             {
                 _distanceSign = value;
+                counter = Initialize_Counter;
                 NotifyPropertyChanged();
             }
         }
@@ -106,6 +105,7 @@ namespace EntityTools.Quester.Conditions
             get => _memberCount; set
             {
                 _memberCount = value;
+                _label = string.Empty;
                 NotifyPropertyChanged();
             }
         }
@@ -122,6 +122,8 @@ namespace EntityTools.Quester.Conditions
             get => _sign; set
             {
                 _sign = value;
+                _label = string.Empty;
+                memberCountChecker = Initicalize_MemberCountChecker;
                 NotifyPropertyChanged();
             }
         }
@@ -140,6 +142,7 @@ namespace EntityTools.Quester.Conditions
             get => _regionCheck; set
             {
                 _regionCheck = value;
+                counter = Initialize_Counter;
                 NotifyPropertyChanged();
             }
         }
@@ -153,20 +156,17 @@ namespace EntityTools.Quester.Conditions
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            InternalResetOnPropertyChanged(propertyName);
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+        #endregion
 
-        private void InternalResetOnPropertyChanged([CallerMemberName] string memberName = default)
+        public TeamMembersCount()
         {
             _label = string.Empty;
             _idStr = string.Concat(GetType().Name, '[', GetHashCode().ToString("X2"), ']');
             memberCountChecker = Initicalize_MemberCountChecker;
             counter = Initialize_Counter;
         }
-        #endregion
-
-
 
 
         #region данные ядра
@@ -320,7 +320,7 @@ namespace EntityTools.Quester.Conditions
             }
         }
 
-        public string Label()
+        public override string ToString()
         {
             if (string.IsNullOrEmpty(_label))
                 _label = $"{GetType().Name} {Sign} to {MemberCount}";

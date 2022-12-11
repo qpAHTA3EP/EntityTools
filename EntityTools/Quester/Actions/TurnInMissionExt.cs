@@ -30,7 +30,7 @@ namespace EntityTools.Quester.Actions
     [Serializable]
     public class TurnInMissionExt : Action, INotifyPropertyChanged
     {
-        #region данные ядра
+        #region данные
         private const int TIME = 10_000;
 
         private ContactInfo giverContactInfo;
@@ -60,6 +60,7 @@ namespace EntityTools.Quester.Actions
                 if (_missionId != value)
                 {
                     _missionId = value;
+                    _label = string.Empty;
                     NotifyPropertyChanged();
                 }
             }
@@ -276,6 +277,7 @@ namespace EntityTools.Quester.Actions
             {
                 if (_requiredRewardItem == value) return;
                 _requiredRewardItem = value;
+                _rewardItemCheck = null;
                 NotifyPropertyChanged();
             }
         }
@@ -317,26 +319,14 @@ namespace EntityTools.Quester.Actions
         public override string Category => "Basic";
         #endregion
 
-        #region Взаимодействие с EntityToolsCore
+
+        #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]
         protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
-            InternalResetOnPropertyChanged(propertyName);
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-        public void InternalResetOnPropertyChanged([CallerMemberName] string propertyName = default)
-        {
-            switch (propertyName)
-            {
-                case nameof(RequiredRewardItem):
-                    _rewardItemCheck = null;
-                    break;
-                case nameof(MissionId):
-                    _label = string.Empty;
-                    break;
-            }
         }
         #endregion
 

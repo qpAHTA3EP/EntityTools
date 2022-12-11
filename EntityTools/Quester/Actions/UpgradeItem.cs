@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Threading;
-using ACTP0Tools;
 using Astral;
 using Astral.Classes.ItemFilter;
 using Astral.Logic.Classes.Map;
@@ -25,6 +22,7 @@ namespace EntityTools.Quester.Actions
     public class UpgradeItem : Astral.Quester.Classes.Action
     {
 
+        #region Опции команды
         /// <summary>
         /// Идентификатор предмета, который нужно "обработать"
         /// </summary>
@@ -67,7 +65,7 @@ namespace EntityTools.Quester.Actions
         [DisplayName("AllowBoundToCharacter")]
         [Description("Флаг, позволяющий обрабатывать предметы, привязанные к персонажу.")]
         public bool B2C
-        { 
+        {
             get => _b2c;
             set
             {
@@ -132,7 +130,12 @@ namespace EntityTools.Quester.Actions
         [Description("The list of the Catalysts with have to be protected by [Preservation Ward].")]
         [Editor(typeof(ItemIdFilterEditor), typeof(UITypeEditor))]
         public ItemFilterCore ProtectedCatalysts { get; set; } = new ItemFilterCore();
-        public bool ShouldSerializeProtectedCatalysts() => ProtectedCatalysts.Entries.Count > 0;
+        public bool ShouldSerializeProtectedCatalysts() => ProtectedCatalysts.Entries.Count > 0; 
+        #endregion
+
+
+
+
 
         /// <summary>
         /// Функтор, определяющий соответствие <see cref="InventorySlot"/> группе идентификаторов:
@@ -342,188 +345,6 @@ namespace EntityTools.Quester.Actions
             return SearchResult.Absent;
         }
 
-#if false
-        /// <summary>
-        /// Поиск слотов инвентаря, содержащих предмет, соответствующий <param name="predicate"/>, и катализатор
-        /// </summary>
-        /// <param name="predicate">Критерий отбора предметов. Как правило - идентификатор</param>
-        /// <param name="moteType">Тип частицы</param>
-        /// <param name="wardType">Тип катализатора</param>
-        /// <param name="itemSlot">Слот инвентаря, содержащего искомый предмет</param>
-        /// <param name="moteSlot">Слот инвентаря, содержащий найденную частицу</param>
-        /// <param name="wardSlot">Слот инвентаря, содержащий найденный катализатор</param>
-        /// <returns>Перечисление, описывающее результаты поиска</returns>
-        private static SearchResult FindSlot(Predicate<InventorySlot> predicate, MoteType moteType, out InventorySlot itemSlot, out InventorySlot moteSlot, out InventorySlot wardSlot)
-        {
-            itemSlot = null;
-            moteSlot = null;
-            wardSlot = null;
-
-            if (moteType == MoteType.None)
-                return FindSlot(predicate, out itemSlot);
-
-            InventorySlot unboundedItem = null;
-            InventorySlot bounded2CharacterItem = null;
-            InventorySlot bounded2AccountItem = null;
-
-            InventorySlot unboundedWard = null;
-            InventorySlot bounded2CharacterWard = null;
-            InventorySlot bounded2AccountWard = null;
-
-            InventorySlot unboundedMote = null;
-            InventorySlot bounded2CharacterMote = null;
-            InventorySlot bounded2AccountMote = null;
-
-            var player = EntityManager.LocalPlayer;
-
-            Predicate<InventorySlot> wardPredicate;
-            switch (wardType)
-            {
-                case WardType.Preservation:
-                    wardPredicate = slot => slot.Item.ItemDef.InternalName.StartsWith("Fuse_Ward_Preservation", StringComparison.Ordinal);
-                    break;
-#if false
-                case WardType.Coalescent:
-                    wardPredicate = slot => slot.Item.ItemDef.InternalName.StartsWith("Fuse_Ward_Coalescent", StringComparison.Ordinal);
-                    break; 
-#endif
-                default:
-                    wardPredicate = slot => false;
-                    break;
-            }
-
-            Predicate<InventorySlot> motePredicate;
-            switch (moteType)
-            {
-                case MoteType.Mote_1:
-                    motePredicate = slot => slot.Item.ItemDef.InternalName.StartsWith("Fuse_Ward_1", StringComparison.Ordinal);
-                    break;
-                case MoteType.Mote_2:
-                    motePredicate = slot => slot.Item.ItemDef.InternalName.StartsWith("Fuse_Ward_2", StringComparison.Ordinal);
-                    break;
-                case MoteType.Mote_5:
-                    motePredicate = slot => slot.Item.ItemDef.InternalName.StartsWith("Fuse_Ward_5", StringComparison.Ordinal);
-                    break;
-                case MoteType.Mote_10:
-                    motePredicate = slot => slot.Item.ItemDef.InternalName.StartsWith("Fuse_Ward_10", StringComparison.Ordinal);
-                    break;
-                case MoteType.Mote_100:
-                    motePredicate = slot => slot.Item.ItemDef.InternalName.StartsWith("Fuse_Ward_Coalescent", StringComparison.Ordinal);
-                    break;
-#if false
-                case WardType.Coalescent:
-                    wardPredicate = slot => slot.Item.ItemDef.InternalName.StartsWith("Fuse_Ward_Coalescent", StringComparison.Ordinal);
-                    break; 
-#endif
-                default:
-                    motePredicate = slot => false;
-                    break;
-            }
-
-            foreach (var s in player.BagsItems)
-            {
-                if (predicate(s))
-                {
-                    var flag = (ItemFlags)s.Item.Flags;
-
-                    if ((flag & ItemFlags.Bound) > 0)
-                        bounded2CharacterItem = s;
-                    else if ((flag & ItemFlags.BoundToAccount) > 0)
-                        bounded2AccountItem = s;
-                    else unboundedItem = s;
-                }
-                else if (bounded2CharacterMote is null
-                         && motePredicate(s))
-                {
-                    var flag = (ItemFlags)s.Item.Flags;
-
-                    if ((flag & ItemFlags.Bound) > 0)
-                        bounded2CharacterMote = s;
-                    else if ((flag & ItemFlags.BoundToAccount) > 0)
-                        bounded2AccountMote = s;
-                    else unboundedMote = s;
-                }
-                else if (bounded2CharacterWard is null
-                        && wardPredicate(s))
-                {
-                    var flag = (ItemFlags)s.Item.Flags;
-
-                    if ((flag & ItemFlags.Bound) > 0)
-                        bounded2CharacterWard = s;
-                    else if ((flag & ItemFlags.BoundToAccount) > 0)
-                        bounded2AccountWard = s;
-                    else unboundedWard = s;
-                }
-            }
-
-            if (bounded2CharacterMote != null)
-            {
-                moteSlot = bounded2CharacterMote;
-                Logger.WriteLine(Logger.LogType.Log, $"Found mote '{moteSlot.Item.ItemDef.InternalName}' bounded to character.");
-            }
-            else if (bounded2AccountMote != null)
-            {
-                moteSlot = bounded2AccountMote;
-                Logger.WriteLine(Logger.LogType.Log, $"Found mote '{moteSlot.Item.ItemDef.InternalName}' bounded to account.");
-            }
-            else if (unboundedMote != null)
-            {
-                moteSlot = unboundedMote;
-                Logger.WriteLine(Logger.LogType.Log, $"Found unbounded mote '{moteSlot.Item.ItemDef.InternalName}'.");
-            }
-            else if (moteType != MoteType.None)
-            {
-                Logger.WriteLine(Logger.LogType.Log, $"No required mote found.");
-                return SearchResult.Absent;
-            }
-
-            if (bounded2CharacterWard != null)
-            {
-                wardSlot = bounded2CharacterWard;
-                Logger.WriteLine(Logger.LogType.Log, $"Found ward '{wardSlot.Item.ItemDef.InternalName}' bounded to character.");
-            }
-            else if (bounded2AccountWard != null)
-            {
-                wardSlot = bounded2AccountWard;
-                Logger.WriteLine(Logger.LogType.Log, $"Found ward '{wardSlot.Item.ItemDef.InternalName}' bounded to account.");
-            }
-            else if (unboundedWard != null)
-            {
-                wardSlot = unboundedWard;
-                Logger.WriteLine(Logger.LogType.Log, $"Found unbounded ward '{wardSlot.Item.ItemDef.InternalName}'.");
-            }
-            else if (wardType != WardType.None)
-            {
-                Logger.WriteLine(Logger.LogType.Log, $"No required ward found.");
-                return SearchResult.Absent;
-            }
-
-            if (unboundedItem != null && unboundedItem.IsValid && unboundedItem.Filled)
-            {
-                itemSlot = unboundedItem;
-                Logger.WriteLine(Logger.LogType.Log, $"Found unbounded item '{itemSlot.Item.ItemDef.InternalName}'[{itemSlot.Item.Id:X}].");
-                return SearchResult.Unbounded;
-            }
-
-            if (bounded2AccountItem != null && bounded2AccountItem.IsValid && bounded2AccountItem.Filled)
-            {
-                itemSlot = bounded2AccountItem;
-                Logger.WriteLine(Logger.LogType.Log, $"Found bounded to account item '{itemSlot.Item.ItemDef.InternalName}'[{itemSlot.Item.Id:X}].");
-                return SearchResult.Bounded2Account;
-            }
-
-            if (bounded2CharacterItem != null && bounded2CharacterItem.IsValid && bounded2CharacterItem.Filled)
-            {
-                itemSlot = bounded2CharacterItem;
-                Logger.WriteLine(Logger.LogType.Log, $"Found bounded to character item '{itemSlot.Item.ItemDef.InternalName}'[{itemSlot.Item.Id:X}].");
-                return SearchResult.Bounded2Character;
-            }
-
-            Logger.WriteLine(Logger.LogType.Log, $"No item found.");
-            return SearchResult.Absent;
-        }
-
-#endif
         /// <summary>
         /// Поиск слотов инвентаря, содержащих предмет, соответствующий <param name="predicate"/>, и катализатор
         /// </summary>
@@ -658,54 +479,6 @@ namespace EntityTools.Quester.Actions
             return SearchResult.Absent;
         }
 
-#if false
-
-        /// <summary>
-        /// Заполнение предмета очками обработки
-        /// </summary>
-        /// <param name="s">Слот инвентаря, в котором находится обрабатываемый предмет</param>
-        /// <returns>Успешность заполнения полной шкалы очков обработки</returns>
-        private bool FeedSlot(InventorySlot s)
-        {
-            var progress = s.Item.ProgressionLogic;
-
-            int points;
-            if (progress.IsValid)
-                points = (int)(progress.CurrentRankTotalRequiredXP - progress.CurrentRankXP);
-            else
-            {
-                var defaultFeed = Feed;
-                if (defaultFeed < 0)
-                {
-                    Logger.WriteLine(Logger.LogType.Log, $"Can not calculate required RP. Feed Skip feeding.");
-                    return true;
-                }
-
-                if (defaultFeed == 0)
-                {
-                    Logger.WriteLine(Logger.LogType.Log, $"Can not calculate required RP and 'ForcedFeedingRPNumber' does not set.");
-                    return false;
-                }
-                points = defaultFeed;
-            }
-
-            if (points == 0)
-                return true;
-
-            int refinementCurrency = EntityManager.LocalPlayer.Inventory.RefinementCurrency;
-            if (refinementCurrency >= points)
-            {
-                Logger.WriteLine(Logger.LogType.Log, $"Feeding item {s.Item.ItemDef.InternalName}[{s.Item.Id:X}] with {points} RP.");
-                s.Feed(points);
-                Thread.Sleep(500);
-                return true;
-            }
-
-            Logger.WriteLine(Logger.LogType.Log, $"Not enough {refinementCurrency - points} RP to feed item {s.Item.ItemDef.InternalName}[{s.Item.Id:X}].");
-            return false;
-        }
-
-#endif
         /// <summary>
         /// Проверяем наличие всех компонентов, необходимых для обработки предмета <param name="itemSlot" />
         /// </summary>
@@ -786,15 +559,17 @@ namespace EntityTools.Quester.Actions
         /// <summary>
         /// Формирование списка страхующих катализаторов для защиты компонентов (Catalysts), перечисленных в <paramref name="protectedCatalysts"/>
         /// </summary>
-        /// <param name="evolvingItemntorySlot">Слот с улучшаемым предметом.</param>
+        /// <param name="evolvingItem">Улучшаемый предмет.</param>
         /// <param name="protectedCatalysts"></param>
         /// <param name="wardsInBag">Слоты инвентаря, содержащие страхующие катализаторы</param>
         /// <returns>Список слотов с катализаторами, в том же порядке, в котором следуют защищаемые компоненты в <see cref="evolvingInventorySlot.Item.ProgressionLogic.CurrentTier.CatalystItems"/>.<br/>
         /// Если компонент не подлежит защите (отсутствует в <paramref name="protectedCatalysts"/>), в соответствующей позиции списка страхующищ катализаторов указывается пустой слот <see cref="InventorySlot(IntPtr.Zero)"/>.<br/>
         /// 
         /// </returns>
-        private static List<InventorySlot> MakeWardListForCatalysts(Item evolvingItem,
-            ItemFilterCore protectedCatalysts, List<InventorySlot> wardsInBag)
+        private static List<InventorySlot> MakeWardListForCatalysts(
+            Item evolvingItem,
+            ItemFilterCore protectedCatalysts, 
+            List<InventorySlot> wardsInBag)
         {
             var itemTierDef = evolvingItem.ItemProgression_GetItemTierDef();
             List<ItemProgressionCatalyst> catalystItems;

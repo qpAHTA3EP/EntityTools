@@ -3,7 +3,6 @@ using System.ComponentModel;
 using System.Drawing.Design;
 using Astral.Quester.Classes;
 using EntityTools.Editors;
-using EntityTools.Patches;
 using MyNW.Internals;
 
 namespace EntityTools.Quester.Conditions

@@ -42,6 +42,9 @@ namespace EntityTools.Quester.Editor.Classes
         /// </summary>
         public override void SetProfile(Profile profile, string fileName)
         {
+            if (ReferenceEquals(_profile, profile))
+                return;
+
             if (profile != null)
             {
                 _profile = profile;
@@ -49,8 +52,9 @@ namespace EntityTools.Quester.Editor.Classes
                 if (_customRegions != null)
                 {
                     _customRegions.ListChanged -= CustomRegions_Changed;
+                    var newCustomRegions = profile.CustomRegions;
                     _customRegions.Clear();
-                    foreach (var cr in profile.CustomRegions)
+                    foreach (var cr in newCustomRegions)
                         _customRegions.Add(cr);
                     _customRegions.ListChanged += CustomRegions_Changed;
                     OnPropertyChanged(nameof(CustomRegions));
@@ -59,8 +63,9 @@ namespace EntityTools.Quester.Editor.Classes
                 if (_blackList != null)
                 {
                     _blackList.ListChanged -= BlackList_Changed;
+                    var newBlackList = profile.BlackList;
                     _blackList.Clear();
-                    foreach (var bl in profile.BlackList)
+                    foreach (var bl in newBlackList)
                         _blackList.Add(bl);
                     _blackList.ListChanged += BlackList_Changed;
                     OnPropertyChanged(nameof(BlackList));
@@ -69,8 +74,9 @@ namespace EntityTools.Quester.Editor.Classes
                 if (_vendors != null)
                 {
                     _vendors.ListChanged -= Vendors_Changed;
+                    var newVendors = profile.Vendors;
                     _vendors.Clear();
-                    foreach (var vendor in profile.Vendors)
+                    foreach (var vendor in newVendors)
                         _vendors.AddUnique(vendor);
                     _vendors.ListChanged += Vendors_Changed;
                     OnPropertyChanged(nameof(Vendors));
@@ -90,7 +96,6 @@ namespace EntityTools.Quester.Editor.Classes
                 {
                     _blackList.Clear();
                     OnPropertyChanged(nameof(BlackList));
-
                 }
 
                 if (_vendors != null)
@@ -264,6 +269,7 @@ namespace EntityTools.Quester.Editor.Classes
                     _blackList = blList?.Count > 0 
                         ? new BindingList<string>(blList)
                         : new BindingList<string>();
+                    _blackListChangeNum = 0;
                     _blackList.ListChanged += BlackList_Changed;
                 }
                 return _blackList;
@@ -292,6 +298,7 @@ namespace EntityTools.Quester.Editor.Classes
                     _customRegions = crList?.Count > 0 
                         ? new BindingList<CustomRegion>(crList) 
                         : new BindingList<CustomRegion>();
+                    _customRegionsChangeNum = 0;
                     _customRegions.ListChanged += CustomRegions_Changed;
                 }
                 return _customRegions;
@@ -320,6 +327,7 @@ namespace EntityTools.Quester.Editor.Classes
                     _vendors = vndList?.Count > 0 
                         ? new BindingList<NPCInfos>(vndList) 
                         : new BindingList<NPCInfos>();
+                    _vendorsChangeNum = 0;
                     _vendors.ListChanged += Vendors_Changed;
                 }
                 return _vendors;
@@ -488,7 +496,7 @@ namespace EntityTools.Quester.Editor.Classes
             string externalMeshes = _profile.ExternalMeshFileName;
             if (AstralAccessors.Quester.Core.Save(_profile, _mapsMeshes, _fileName, ref newProfileName))
             {
-                //TODO Переопределение относительных путей для PushProfileToStackAndLoad 
+                //TODO Переопределение относительных путей для PushProfileToStackAndLoad и LoadProfile
                 _fileName = newProfileName;
                 if (_profile.UseExternalMeshFile
                     && externalMeshes != _profile.ExternalMeshFileName)
@@ -502,7 +510,9 @@ namespace EntityTools.Quester.Editor.Classes
         {
             if (_customRegions != null && _customRegionsChangeNum > 0)
             {
-                _profile.CustomRegions = _customRegions.ToList();
+                var newCustomRegions = _customRegions.ToList();
+                var currentCustomRetions = _profile.CustomRegions;
+                _profile.CustomRegions = newCustomRegions;
                 _customRegionsChangeNum = 0;
             }
 

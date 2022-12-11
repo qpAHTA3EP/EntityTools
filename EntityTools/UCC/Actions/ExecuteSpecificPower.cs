@@ -157,18 +157,15 @@ namespace EntityTools.UCC.Actions
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
-        private void InternalResetOnPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            _label = string.Empty;
-            _idStr = $"{GetType().Name}[{GetHashCode():X2}]";
-            powerCache.PowerIdPattern = PowerId;
-        }
         #endregion
 
 
 
+        public ExecuteSpecificPower()
+        {
+            _idStr = $"{GetType().Name}[{GetHashCode():X2}]";
 
+        }
         public override UCCAction Clone()
         {
             return BaseClone(new ExecuteSpecificPower {
