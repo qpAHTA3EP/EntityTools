@@ -18,7 +18,7 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
     public sealed class ActionTreeNode : ActionBaseTreeNode
     {
         private readonly QuesterAction action;
-        public ActionTreeNode(QuesterProfileProxy profile, QuesterAction action, bool clone = false) : base(profile)
+        public ActionTreeNode(BaseQuesterProfileProxy profile, QuesterAction action, bool clone = false) : base(profile)
         {
             var act = clone ? action.CreateXmlCopy() : action;
             Tag = act;

@@ -31,7 +31,7 @@ namespace EntityTools.Editors
                 {
                     if (pgAccessor.Value?.ParentForm is QuesterEditor questerEditor)
                     {
-                        profileFile = questerEditor.Profile.FileName;   
+                        profileFile = questerEditor.Profile.ProfilePath;   
                     }
                 }
 

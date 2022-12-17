@@ -102,9 +102,9 @@ namespace EntityTools.Tools.CustomRegions
         #endregion
 
         [Browsable(false), XmlIgnore]
-        public QuesterProfileProxy DesignContext
+        public BaseQuesterProfileProxy DesignContext
         {
-            get => _context ?? AstralAccessors.Quester.Core.ActiveProfileProxy;
+            get => _context ?? AstralAccessors.Quester.Core.CurrentProfile;
             set
             {
                 if (_context != value)
@@ -115,7 +115,7 @@ namespace EntityTools.Tools.CustomRegions
             }
         }
 
-        private QuesterProfileProxy _context;
+        private BaseQuesterProfileProxy _context;
 
         #region Within
         /// <summary>

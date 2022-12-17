@@ -18,7 +18,7 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
     {
         private readonly ActionPack actionPack;
 
-        public ActionPackTreeNode(QuesterProfileProxy profile, ActionPack actionPack, bool clone = false) : base(profile)
+        public ActionPackTreeNode(BaseQuesterProfileProxy profile, ActionPack actionPack, bool clone = false) : base(profile)
         {
             ActionPack actPack = clone ? actionPack.CreateXmlCopy() : actionPack;
             Tag = actPack;

@@ -15,7 +15,7 @@ namespace EntityTools.Editors
             {
                 var playerPos = player.Location.Clone();
 
-                var node = AstralAccessors.Quester.Core.Meshes.ClosestNode(playerPos.X, playerPos.Y, playerPos.Z,
+                var node = AstralAccessors.Quester.Core.CurrentProfile.CurrentMesh.ClosestNode(playerPos.X, playerPos.Y, playerPos.Z,
                     out double dist, false);
 
                 if (node != null && dist <= 10)

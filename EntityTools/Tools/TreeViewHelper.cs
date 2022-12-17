@@ -119,7 +119,7 @@ namespace EntityTools.Tools
         /// </summary>
         /// <param name="clone">Флаг принудительного создания копии ucc-команд для соответствующего узла дерева</param>
         /// <returns></returns>
-        public static TreeNode[] ToTreeNodes(this QuesterProfileProxy profile, bool clone = false)
+        public static TreeNode[] ToTreeNodes(this BaseQuesterProfileProxy profile, bool clone = false)
         {
             var actions = profile.Actions;
             if (actions.Any())
@@ -139,7 +139,7 @@ namespace EntityTools.Tools
 
             return Array.Empty<TreeNode>();
         }
-        public static TreeNode[] ToTreeNodes(QuesterProfileProxy profile, IEnumerable<QuesterAction> questerActionList, bool clone = false)
+        public static TreeNode[] ToTreeNodes(BaseQuesterProfileProxy profile, IEnumerable<QuesterAction> questerActionList, bool clone = false)
         {
             if (questerActionList?.Any() == true)
             {
@@ -182,7 +182,7 @@ namespace EntityTools.Tools
         /// <param name="action"></param>
         /// <param name="clone">Флаг принудительного создания копии quester-команды для узла дерева</param>
         /// <returns></returns>
-        public static ActionBaseTreeNode MakeTreeNode(this QuesterAction action, QuesterProfileProxy profile, bool clone = false)
+        public static ActionBaseTreeNode MakeTreeNode(this QuesterAction action, BaseQuesterProfileProxy profile, bool clone = false)
         {
             if (clone)
                 action = action.CreateXmlCopy();
@@ -229,7 +229,7 @@ namespace EntityTools.Tools
         /// <returns></returns>
         public static TreeNode[] ToTreeNodes(
             this IEnumerable<Condition> questerConditionList,
-            QuesterProfileProxy profile, 
+            BaseQuesterProfileProxy profile, 
             bool clone = false)
         {
             return questerConditionList.Select(item => MakeTreeNode(item, profile, clone)).Cast<TreeNode>().ToArray();
@@ -260,7 +260,7 @@ namespace EntityTools.Tools
         /// <returns></returns>
         public static ConditionBaseTreeNode MakeTreeNode(
             this Condition condition, 
-            QuesterProfileProxy profile,
+            BaseQuesterProfileProxy profile,
             bool clone = false)
         {
             if (clone)

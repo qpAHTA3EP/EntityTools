@@ -23,9 +23,9 @@ namespace EntityTools.Patches.Quester
         {
             if (EntityTools.Config.Patches.QuesterPatches.ReplaceQuesterEditor)
             {
-                var activeProfile = AstralAccessors.Quester.Core.ActiveProfileProxy;
+                var activeProfile = AstralAccessors.Quester.Core.CurrentProfile;
                 var profile = activeProfile.GetProfile();
-                var profileName = activeProfile.FileName;
+                var profileName = activeProfile.ProfilePath;
 
                 if (profile.Saved && !string.IsNullOrEmpty(profileName))
                     QuesterEditor.Edit(profile, profileName);
@@ -46,9 +46,9 @@ namespace EntityTools.Patches.Quester
                     return false;
                 }
 
-                var activeProfile = AstralAccessors.Quester.Core.ActiveProfileProxy;
+                var activeProfile = AstralAccessors.Quester.Core.CurrentProfile;
                 var profile = activeProfile.GetProfile();
-                var profileName = activeProfile.FileName;
+                var profileName = activeProfile.ProfilePath;
 
                 if (profile.Saved && !string.IsNullOrEmpty(profileName))
                     QuesterEditor.Edit(profile, profileName, selectedAction.ActionID);

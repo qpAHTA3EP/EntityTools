@@ -1,9 +1,7 @@
-﻿using AStar;
-using Astral.Quester.Classes;
-using System.Collections.Generic;
+﻿using System;
 using System.ComponentModel;
-using System.Linq;
-using QuesterAction = Astral.Quester.Classes.Action;
+using System.Reflection;
+using Astral.Quester.Classes;
 
 namespace ACTP0Tools.Classes.Quester
 {
@@ -11,398 +9,75 @@ namespace ACTP0Tools.Classes.Quester
     /// Синглтон прокси-объекта, опосредующего доступ к активному загруженному профилю Quester'a: <br/>
     /// <see cref="AstralAccessors.Quester.Core.Profile"/>
     /// </summary>
-    public class ActiveProfileProxy : QuesterProfileProxy, INotifyPropertyChanged
+    internal class ActiveProfileProxy : BaseQuesterProfileProxy
     {
-        // ReSharper disable once InconsistentNaming
-        private static readonly ActiveProfileProxy @this = new ActiveProfileProxy();
+        private MethodInfo engineSetProfile;
         
-        private ActiveProfileProxy(){}
-
-        public static ActiveProfileProxy Get() => @this;
-
-        [Browsable(false)]
-        public override Profile GetProfile()
+        internal ActiveProfileProxy(MethodInfo engineSetProfile)
         {
-            ReconstructProfile();
-            return AstralAccessors.Quester.Core.Profile;
+            if (engineSetProfile is null)
+                throw new ArgumentNullException(nameof(engineSetProfile));
+            this.engineSetProfile = engineSetProfile;
         }
-        public override void SetProfile(Profile profile, string newProfileFilename)
-        {
-            var oldProfile = AstralAccessors.Quester.Core.Profile;
-            if (ReferenceEquals(oldProfile, profile))
-                return;
-
-            if (AstralAccessors.Controllers.Roles.IsRunning)
-                AstralAccessors.Controllers.Roles.ToggleRole(true);
-
-            if (profile != null)
+        protected override Profile RealProfile 
+        { 
+            get => Astral.Quester.API.CurrentProfile;
+#if false
+            set
             {
-                AstralAccessors.Quester.Core.Profile = profile;
-                Astral.API.CurrentSettings.LastQuesterProfile = newProfileFilename;
-
-                if (_customRegions != null)
+                var currentProfile = Astral.Quester.API.CurrentProfile;
+                if (value != null
+                    && !ReferenceEquals(currentProfile, value))
                 {
-                    _customRegions.ListChanged -= CustomRegions_Changed;
-                    var newCustomRegions = profile.CustomRegions;
-                    _customRegions.Clear();
-                    foreach (var cr in newCustomRegions)
-                        _customRegions.Add(cr);
-                    _customRegions.ListChanged += CustomRegions_Changed;
-                    OnPropertyChanged(nameof(CustomRegions));
+                    AstralAccessors.Quester.Core.SetProfileToEngine(value);
                 }
+            } 
+#endif
+        }
 
-                if (_blackList != null)
+#if DEBUG
+        [Browsable(true)]
+        [Category("File")]
+#else
+        [Browsable(false)] 
+#endif
+        public override string ProfilePath
+        {
+            get => Astral.API.CurrentSettings.LastQuesterProfile;
+            protected set
+            {
+                if (!string.Equals(Astral.API.CurrentSettings.LastQuesterProfile, value, System.StringComparison.OrdinalIgnoreCase))
                 {
-                    _blackList.ListChanged -= BlackList_Changed;
-                    var newBlackList = profile.BlackList;
-                    _blackList.Clear();
-                    foreach (var bl in newBlackList)
-                        _blackList.Add(bl);
-                    _blackList.ListChanged += BlackList_Changed;
-                    OnPropertyChanged(nameof(BlackList));
-
-                }
-
-                if (_vendors != null)
-                {
-                    _vendors.ListChanged -= Vendors_Changed;
-                    var newVendors = profile.Vendors;
-                    _vendors.Clear();
-                    foreach (var vendor in newVendors)
-                        _vendors.AddUnique(vendor);
-                    OnPropertyChanged(nameof(Vendors));
-                    _vendors.ListChanged += Vendors_Changed;
+                    Astral.API.CurrentSettings.LastQuesterProfile = value;
+                    OnPropertyChanged(); 
+                    ResetCachedMeshes();
                 }
             }
-            else
+        }
+
+        public override void SetProfile(Profile profile, string newProfileFilename)
+        {
+            var currentProfile = Astral.Quester.API.CurrentProfile;
+            if (profile is null
+                || ReferenceEquals(currentProfile, profile))
+                return;
+
+#if false
+            if (AstralAccessors.Controllers.Roles.IsRunning)
+                AstralAccessors.Controllers.Roles.ToggleRole(true); 
+#endif
+
+            engineSetProfile.Invoke(null, new[] { profile });
+            Astral.API.CurrentSettings.LastQuesterProfile = newProfileFilename;
+
+            AssignInternals(profile);
+
+            if (AstralAccessors.Controllers.BotComs.BotServer.Server.IsRunning)
             {
-                if (_customRegions != null)
-                {
-                    _customRegions.Clear();
-                    OnPropertyChanged(nameof(CustomRegions));
-                }
-
-                if (_blackList != null)
-                {
-                    _blackList.Clear();
-                    OnPropertyChanged(nameof(BlackList));
-
-                }
-
-                if (_vendors != null)
-                {
-                    _vendors.Clear();
-                    OnPropertyChanged(nameof(Vendors));
-                }
+                AstralAccessors.Controllers.BotComs.BotServer.SendQuesterProfileInfos();
             }
 
             AstralAccessors.Quester.Entrypoint.RefreshQuesterMainPanel();
-            OnPropertyChanged(nameof(Actions));
-            OnPropertyChanged(nameof(FileName));
-            OnPropertyChanged(nameof(MapsMeshes));
-            OnPropertyChanged(nameof(CurrentProfileZipMeshFile));
-            OnPropertyChanged(nameof(CurrentMesh));
-            OnPropertyChanged(nameof(KillRadius));
-            OnPropertyChanged(nameof(UseExternalMeshFile));
-            OnPropertyChanged(nameof(ExternalMeshFileName));
-            OnPropertyChanged(nameof(DisablePet));
-            OnPropertyChanged(nameof(FollowerDistance));
-            OnPropertyChanged(nameof(DisableFollow));
-            OnPropertyChanged(nameof(AssociateMissionsDefault));
-
-            _customRegionsChangeNum = 0;
-            _vendorsChangeNum = 0;
-            _blackListChangeNum = 0;
-        }
-
-#if DEBUG
-        [Browsable(true)]
-        [Category("File")]
-#else
-        [Browsable(false)] 
-#endif
-        public override string FileName
-        {
-            get => Astral.API.CurrentSettings.LastQuesterProfile;
-            set
-            {
-                OnPropertyChanged();
-                Astral.API.CurrentSettings.LastQuesterProfile = value;
-            }
-        }
-
-#if DEBUG
-        [Browsable(true)]
-        [Category("File")]
-#else
-        [Browsable(false)] 
-#endif
-        public override bool Saved
-        {
-            get => AstralAccessors.Quester.Core.Profile.Saved;
-            set
-            {
-                AstralAccessors.Quester.Core.Profile.Saved = value;
-                OnPropertyChanged();
-            }
-        }
-
-        /// <summary>
-        /// Путевой граф для карты, на которой находится персонаж
-        /// </summary>
-        [Browsable(false)]
-        public override Graph CurrentMesh => AstralAccessors.Quester.Core.Meshes;
-
-        /// <summary>
-        /// Набор путевых графов, ассоциированных с профилем
-        /// </summary>
-        [Browsable(false)]
-        public override IDictionary<string, Graph> MapsMeshes => AstralAccessors.Quester.Core.MapsMeshes;
-
-        /// <summary>
-        /// Имя файла, в котором хранятся файлы путевых графов
-        /// </summary>
-#if DEBUG
-        [Browsable(true)]
-        [Category("File")]
-#else
-        [Browsable(false)] 
-#endif
-        public override string CurrentProfileZipMeshFile => AstralAccessors.Quester.Core.CurrentProfileZipMeshFile;
-
-        /// <summary>
-        /// Набор команд quester'a
-        /// </summary>
-        [Browsable(false)]
-        [NotifyParentProperty(true)]
-        public override IEnumerable<QuesterAction> Actions
-        {
-            get => AstralAccessors.Quester.Core.Profile.MainActionPack.Actions;
-            set
-            {
-                if (AstralAccessors.Controllers.Roles.IsRunning)
-                    AstralAccessors.Controllers.Roles.ToggleRole(true);
-
-                var mainActionPack = AstralAccessors.Quester.Core.Profile.MainActionPack;
-                mainActionPack.Reset();
-                QuesterHelper.ResetActionPlayer(mainActionPack);
-                var actions = mainActionPack.Actions;
-                actions.Clear();
-                if (value?.Any() == true)
-                    actions.AddRange(value);
-                OnPropertyChanged();
-            }
-        }
-
-        /// <summary>
-        /// Набор идентификаторов противников, которые на должны быть атакованы (игнорируются в бою).
-        /// </summary>
-        [Browsable(false)]
-        public override BindingList<string> BlackList
-        {
-            get
-            {
-                if (_blackList is null)
-                {
-                    var blList = AstralAccessors.Quester.Core.Profile.BlackList;
-                    _blackList = blList?.Count > 0
-                        ? new BindingList<string>(blList)
-                        : new BindingList<string>();
-                    _blackList.ListChanged += BlackList_Changed;
-                }
-                return _blackList;
-            }
-        }
-        private BindingList<string> _blackList;
-        private int _blackListChangeNum;
-        private void BlackList_Changed(object sender, ListChangedEventArgs e) => _blackListChangeNum++;
-
-        /// <summary>
-        /// Набор <see cref="CustomRegion"/>
-        /// </summary>
-        [Browsable(false)]
-        [NotifyParentProperty(true)]
-        public override BindingList<CustomRegion> CustomRegions
-        {
-            get
-            {
-                if (_customRegions is null)
-                {
-                    var crList = AstralAccessors.Quester.Core.Profile.CustomRegions;
-                    _customRegions = crList?.Count > 0
-                        ? new BindingList<CustomRegion>(crList)
-                        : new BindingList<CustomRegion>();
-                    _customRegions.ListChanged += CustomRegions_Changed;
-                }
-                return _customRegions;
-            }
-        }
-        private BindingList<CustomRegion> _customRegions;
-        private int _customRegionsChangeNum;
-        private void CustomRegions_Changed(object sender, ListChangedEventArgs e) => _customRegionsChangeNum++;
-
-        /// <summary>
-        /// Набор описаний продавцов.
-        /// </summary>
-        [Browsable(false)]
-        [NotifyParentProperty(true)]
-        public override BindingList<NPCInfos> Vendors
-        {
-            get
-            {
-                if (_vendors is null)
-                {
-                    var vndList = AstralAccessors.Quester.Core.Profile.Vendors;
-                    _vendors = vndList?.Count > 0
-                        ? new BindingList<NPCInfos>(vndList)
-                        : new BindingList<NPCInfos>();
-                    _vendors.ListChanged += Vendors_Changed;
-                }
-                return _vendors;
-            }
-        }
-        private BindingList<NPCInfos> _vendors;
-        private int _vendorsChangeNum;
-        private void Vendors_Changed(object sender, ListChangedEventArgs e) => _vendorsChangeNum++;
-
-        /// <summary>
-        /// Радиус вступления в бой
-        /// </summary>
-        public override int KillRadius
-        {
-            get => AstralAccessors.Quester.Core.Profile.KillRadius;
-            set
-            {
-                AstralAccessors.Quester.Core.Profile.KillRadius = value;
-                OnPropertyChanged();
-            }
-        }
-
-
-        /// <summary>
-        /// Признак использования внешнего файла мешей
-        /// </summary>
-        [Category("External Meshes")]
-        public override bool UseExternalMeshFile
-        {
-            get => AstralAccessors.Quester.Core.Profile.UseExternalMeshFile;
-            set
-            {
-                AstralAccessors.Quester.Core.Profile.UseExternalMeshFile = value;
-                OnPropertyChanged();
-            }
-        }
-
-        /// <summary>
-        /// Путь к внешнему файлу мешей
-        /// </summary>
-        [Category("External Meshes")]
-        public override string ExternalMeshFileName
-        {
-            get => AstralAccessors.Quester.Core.Profile.ExternalMeshFileName;
-            set
-            {
-                AstralAccessors.Quester.Core.Profile.ExternalMeshFileName = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public override bool DisablePet
-        {
-            get => AstralAccessors.Quester.Core.Profile.DisablePet;
-            set
-            {
-                AstralAccessors.Quester.Core.Profile.DisablePet = value;
-                OnPropertyChanged();
-            }
-        }
-
-        [Category("Follower")]
-        public override int FollowerDistance
-        {
-            get => AstralAccessors.Quester.Core.Profile.FollowerDistance;
-            set
-            {
-                AstralAccessors.Quester.Core.Profile.FollowerDistance = value;
-                OnPropertyChanged();
-            }
-        }
-
-        [Category("Follower")]
-        public override bool DisableFollow
-        {
-            get => AstralAccessors.Quester.Core.Profile.DisableFollow;
-            set
-            {
-                AstralAccessors.Quester.Core.Profile.DisableFollow = value;
-                OnPropertyChanged();
-            }
-        }
-
-        [Description("False : Ignore AssociateMission attribute if character don't have mission\r\nTrue : skip action if don't have the AssociateMission")]
-        public override bool AssociateMissionsDefault
-        {
-            get => AstralAccessors.Quester.Core.Profile.AssociateMissionsDefault;
-            set
-            {
-                AstralAccessors.Quester.Core.Profile.AssociateMissionsDefault = value;
-                OnPropertyChanged();
-            }
-        }
-
-        /// <summary>
-        /// Загрузка профиля из файла <paramref name="fileName"/>
-        /// </summary>
-        /// <param name="fileName"></param>
-        /// <returns></returns>
-        public override bool LoadFromFile(string fileName) => AstralAccessors.Quester.Core.PrefixLoad(fileName);
-
-        /// <summary>
-        /// Сохранение профиля в заданный файл
-        /// </summary>
-        public override void Save()
-        {
-            ReconstructProfile();
-
-            string externalMeshes = ExternalMeshFileName;
-            AstralAccessors.Quester.Core.Save();
-            _customRegionsChangeNum = 0;
-            _vendorsChangeNum = 0;
-            _blackListChangeNum = 0;
-            if (UseExternalMeshFile
-                && externalMeshes != ExternalMeshFileName)
-            {
-                OnPropertyChanged(nameof(ExternalMeshFileName));
-            }
-        }
-
-        /// <summary>
-        /// Сохранение профиля в новый файл
-        /// </summary>
-        public override void SaveAs()
-        {
-            ReconstructProfile();
-
-            string externalMeshes = ExternalMeshFileName;
-            AstralAccessors.Quester.Core.Save(true);
-            if (UseExternalMeshFile
-                && externalMeshes != ExternalMeshFileName)
-            {
-                OnPropertyChanged(nameof(ExternalMeshFileName));
-            }
-            _customRegionsChangeNum = 0;
-            _vendorsChangeNum = 0;
-            _blackListChangeNum = 0;
-        }
-
-        private void ReconstructProfile()
-        {
-            if (_customRegions != null && _customRegionsChangeNum > 0)
-                AstralAccessors.Quester.Core.Profile.CustomRegions = _customRegions.ToList();
-            if (_blackList != null && _blackListChangeNum > 0)
-                AstralAccessors.Quester.Core.Profile.BlackList = _blackList.ToList();
-            if (_vendors != null && _vendorsChangeNum > 0)
-                AstralAccessors.Quester.Core.Profile.Vendors = _vendors.ToList();
         }
     }
 }

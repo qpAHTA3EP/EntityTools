@@ -43,9 +43,9 @@ namespace EntityTools.Quester.Editor
         //TODO Отслеживать изменение CustomRegion в Mapper'e и изменять PropertyGrid
 
         /// <summary>
-        /// Редактируемый Quester-профиль (<see cref="QuesterProfileProxy"/>)
+        /// Редактируемый Quester-профиль (<see cref="BaseQuesterProfileProxy"/>)
         /// </summary>
-        public QuesterProfileProxy Profile => profile;
+        public BaseQuesterProfileProxy Profile => profile;
         private readonly ProfileProxy profile;
         private readonly Guid startActionId;
 
@@ -209,10 +209,10 @@ namespace EntityTools.Quester.Editor
         private void UpdateWindowCaption()
         {
             if (profile is null
-                || string.IsNullOrEmpty(profile.FileName))
+                || string.IsNullOrEmpty(profile.ProfilePath))
                 Text = "* New profile";
             else Text = (profile.Saved ? string.Empty : "* ")
-                       + profile.FileName;
+                       + profile.ProfilePath;
         }
 
         private void handler_Form_Load(object sender, EventArgs e)
@@ -1162,6 +1162,7 @@ namespace EntityTools.Quester.Editor
             }
 
             profile.SetProfile(new Profile { Saved = true }, string.Empty);
+
             UI_fill();
 
             txtLog.AppendText($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] Make new Profile.");
@@ -1185,7 +1186,7 @@ namespace EntityTools.Quester.Editor
             }
 
             string path = string.Empty;
-            var prof = AstralAccessors.Quester.Core.Load(ref path);
+            var prof = QuesterHelper.Load(ref path);
             if (prof != null)
             {
                 profile.SetProfile(prof, path);
@@ -1200,9 +1201,9 @@ namespace EntityTools.Quester.Editor
             {
                 txtLog.AppendText(string.Concat("[", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
                     "] Profile",
-                    string.IsNullOrEmpty(profile.FileName)
+                    string.IsNullOrEmpty(profile.ProfilePath)
                         ? string.Empty
-                        : " '" + profile.FileName + "'",
+                        : " '" + profile.ProfilePath + "'",
                     " saved.",
                     Environment.NewLine));
                 UpdateWindowCaption();
@@ -1215,9 +1216,9 @@ namespace EntityTools.Quester.Editor
             {
                 txtLog.AppendText(string.Concat("[", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
                     "] Profile",
-                    string.IsNullOrEmpty(profile.FileName)
+                    string.IsNullOrEmpty(profile.ProfilePath)
                         ? string.Empty
-                        : " '" + profile.FileName + "'",
+                        : " '" + profile.ProfilePath + "'",
                     " saved.",
                     Environment.NewLine));
                 UpdateWindowCaption();
@@ -1230,14 +1231,16 @@ namespace EntityTools.Quester.Editor
             if (saved || SaveProfile())
             {
                 var actualProfile = profile.GetProfile();
-                AstralAccessors.Quester.Core.SetProfile(actualProfile, profile.FileName);
+
+                AstralAccessors.Controllers.Roles.StopPlaingRole();
+                AstralAccessors.Quester.Core.CurrentProfile.SetProfile(actualProfile, profile.ProfilePath);
 
                 txtLog.AppendText(
                     string.Concat("[", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
                     "] Profile",
-                    string.IsNullOrEmpty(profile.FileName)
+                    string.IsNullOrEmpty(profile.ProfilePath)
                         ? string.Empty
-                        : " '" + profile.FileName + "'",
+                        : " '" + profile.ProfilePath + "'",
                     saved ? string.Empty : " saved and",
                     " uploaded to the Quester-engine.",
                     Environment.NewLine));
@@ -1260,13 +1263,15 @@ namespace EntityTools.Quester.Editor
                                  ? selectedNode.Content.ActionID
                                  : Guid.Empty;
 
-                AstralAccessors.Quester.Core.SetProfile(actualProfile, profile.FileName, actionId);
+                AstralAccessors.Controllers.Roles.StopPlaingRole();
+                AstralAccessors.Quester.Core.CurrentProfile.SetProfile(actualProfile, profile.ProfilePath);
+                actualProfile.MainActionPack.SetStartPoint(actionId);
 
                 txtLog.AppendText(string.Concat("[", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
                     "] Profile",
-                    string.IsNullOrEmpty(profile.FileName)
+                    string.IsNullOrEmpty(profile.ProfilePath)
                         ? string.Empty
-                        : " '" + profile.FileName + "'",
+                        : " '" + profile.ProfilePath + "'",
                     saved ? string.Empty : " saved and",
                     " uploaded to the Quester-engine.",
                     Environment.NewLine));

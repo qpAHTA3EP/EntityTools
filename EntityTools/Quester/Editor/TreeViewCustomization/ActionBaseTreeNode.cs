@@ -9,12 +9,12 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
 {
     public abstract class ActionBaseTreeNode : TreeNode, ITreeNode<QuesterAction>
     {
-        protected readonly QuesterProfileProxy Owner;
+        protected readonly BaseQuesterProfileProxy Owner;
         public abstract QuesterAction Content { get; }
         public abstract bool UseHotSpots { get; }
         public abstract List<Vector3> HotSpots { get; }
 
-        protected ActionBaseTreeNode(QuesterProfileProxy profile)
+        protected ActionBaseTreeNode(BaseQuesterProfileProxy profile)
         {
             Owner = profile;
         }
@@ -47,7 +47,7 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
             }
         }
 
-        public virtual void GatherActionInfo(QuesterProfileProxy profile)
+        public virtual void GatherActionInfo(BaseQuesterProfileProxy profile)
         {
             Content.GatherInfos();
             UpdateView();

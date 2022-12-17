@@ -199,14 +199,14 @@ namespace EntityTools.Patches.Mapper.Tools
                 {
                     if (Owner is MapperFormExt mapper)
                         return (_profile = mapper.Profile).CustomRegions;
-                    _profile = AstralAccessors.Quester.Core.ActiveProfileProxy;
+                    _profile = AstralAccessors.Quester.Core.CurrentProfile;
                 }
 
                 return _profile.CustomRegions;
             }
         }
 
-        private QuesterProfileProxy _profile;
+        private BaseQuesterProfileProxy _profile;
 
         public void Show(ViewMode viewMode, MapperFormExt owner = null, CustomRegion customRegion = null)
         {

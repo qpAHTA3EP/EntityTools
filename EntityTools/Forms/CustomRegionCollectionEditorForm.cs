@@ -16,7 +16,7 @@ namespace EntityTools.Forms
         //TODO: Добавить кнопки: отметить все, снять все отметки, отметить все свободные, снять все отмеченные
 
         private static CustomRegionCollectionEditorForm editor;
-        private QuesterProfileProxy profile;
+        private BaseQuesterProfileProxy profile;
         private CustomRegionCollection customRegionCollection;
 
         public CustomRegionCollectionEditorForm()

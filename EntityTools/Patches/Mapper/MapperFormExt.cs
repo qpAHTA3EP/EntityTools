@@ -88,11 +88,11 @@ namespace EntityTools.Patches.Mapper
         protected Point RelativeMousePosition => MapPicture.PointToClient(MousePosition);
 
         // BUG После загрузки нового профиля в Quester'е, продолжает отображаться старый профиль
-        public QuesterProfileProxy Profile
+        public BaseQuesterProfileProxy Profile
         {
             get => _profile;
         }
-        private readonly QuesterProfileProxy _profile;
+        private readonly BaseQuesterProfileProxy _profile;
 
         #region Инициализация формы
         IGraph GetGraph() => _profile.CurrentMesh;
@@ -101,7 +101,7 @@ namespace EntityTools.Patches.Mapper
         {
             InitializeComponent();
 
-            _profile = AstralAccessors.Quester.Core.ActiveProfileProxy;
+            _profile = AstralAccessors.Quester.Core.CurrentProfile;
 
             MouseWheel += handler_MouseWheel;
 
@@ -145,7 +145,7 @@ namespace EntityTools.Patches.Mapper
             lblPlayerPos.Visibility = BarItemVisibility.Always;
         }
 
-        internal MapperFormExt(QuesterProfileProxy profile)
+        internal MapperFormExt(BaseQuesterProfileProxy profile)
         {
             if (profile is null)
                 throw new ArgumentException(nameof(profile));
@@ -527,7 +527,7 @@ namespace EntityTools.Patches.Mapper
                     {
                         image = DrawMapper();
                         var regionName = player.RegionInternalName;
-                        var profileName = Profile.FileName;
+                        var profileName = Profile.ProfilePath;
                         if (!string.IsNullOrEmpty(profileName))
                         {
                             profileName = Path.GetFileName(profileName);
@@ -1036,21 +1036,27 @@ namespace EntityTools.Patches.Mapper
 #endif
         }
 
+#if false
         private void DrawRoleGraphics()
         {
             try
             {
                 if (!AstralAccessors.Controllers.Roles.CurrentRole.OnMapDraw(_graphics))
-                    //lock (AstralAccessors.Quester.Core.Meshes.Value.SyncRoot) <- Блокировка графа есть в DrawMeshes(..)
-                    ComplexPatch_Mapper.DrawMeshes(_graphics, AstralAccessors.Quester.Core.Meshes);
+                    ComplexPatch_Mapper.DrawMeshes(
+                        _graphics,
+                        AstralAccessors.Quester.Core.CurrentProfile.CurrentMesh
+                    );
             }
             catch (Exception ex)
             {
                 ETLogger.WriteLine(LogType.Error, string.Concat(nameof(DrawRoleGraphics), " catch an exception:\n\r", ex), true);
-                ComplexPatch_Mapper.DrawMeshes(_graphics,
-                    AstralAccessors.Quester.Core.Meshes);
+                ComplexPatch_Mapper.DrawMeshes(
+                    _graphics,
+                    AstralAccessors.Quester.Core.CurrentProfile.CurrentMesh
+                );
             }
-        }
+        } 
+#endif
         private void DrawMapMeshes()
         {
             ComplexPatch_Mapper.DrawMeshes(_graphics, _graphCache);
@@ -1502,7 +1508,7 @@ namespace EntityTools.Patches.Mapper
         {
             _profile.Save();
             if (!_profile.Saved)
-                Logger.Notify($"Fail to save profile '{Path.GetFileName(_profile.FileName)}'", true);
+                Logger.Notify($"Fail to save profile '{Path.GetFileName(_profile.ProfilePath)}'", true);
         }
 
         /// <summary>

@@ -23,7 +23,7 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
 
         private static readonly PropertyAccessor<string> DesignProfilePathAccessor =
             ACTP0Serializer.PushProfileToStackAndLoad.GetProperty<string>("DesignProfilePath");
-        public ActionPushProfileToStackAndLoadTreeNode(QuesterProfileProxy profile, QuesterAction action, bool clone = false) : base(profile)
+        public ActionPushProfileToStackAndLoadTreeNode(BaseQuesterProfileProxy profile, QuesterAction action, bool clone = false) : base(profile)
         {
             if (!action.IsPushProfileToStackAndLoad())
                 throw new ArgumentException($"Action has type '{action.GetType().Name}' instead of the expected type 'PushProfileToStackAndLoad'");
@@ -48,7 +48,7 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
 
         public override void UpdateView()
         {
-            DesignProfilePathAccessor[action] = Owner.FileName;
+            DesignProfilePathAccessor[action] = Owner.ProfilePath;
 
             if (Parent is ActionBaseTreeNode parentPackNode)
                 parentPackNode.UpdateView();

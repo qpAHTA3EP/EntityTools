@@ -14,7 +14,7 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
     /// </summary>
     internal sealed class ConditionIsInCustomRegionTreeNode : ConditionBaseTreeNode
     {
-        public ConditionIsInCustomRegionTreeNode(QuesterProfileProxy profile, IsInCustomRegion condition) : base(profile)
+        public ConditionIsInCustomRegionTreeNode(BaseQuesterProfileProxy profile, IsInCustomRegion condition) : base(profile)
         {
             Tag = condition;
             this.condition = condition;

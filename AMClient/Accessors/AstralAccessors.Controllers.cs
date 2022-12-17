@@ -124,7 +124,11 @@ namespace ACTP0Tools
                 }
                 private static readonly Action<bool> toggleRoleAccessor;
 
-
+                public static void StopPlaingRole()
+                {
+                    if (IsRunning)
+                        ToggleRole(true);
+                }
                 public static class CurrentRole
                 {
                     /// <summary>

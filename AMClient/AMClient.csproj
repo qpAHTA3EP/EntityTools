@@ -102,7 +102,7 @@
   <ItemGroup>
     <Compile Include="Accessors\AstralAccessors.General.cs" />
     <Compile Include="Accessors\AstralAccessors.Quester.Core.cs" />
-    <Compile Include="Accessors\AstralAccessors.Quester.Preprocessor.cs" />
+    <Compile Include="Classes\Quester\AstralAccessors.Quester.Preprocessor.cs" />
     <Compile Include="AMClient\Client.cs" />
     <Compile Include="Classes\Credentials\CredAccountExt.cs" />
     <Compile Include="Classes\Credentials\CredentialsExt.cs" />
@@ -111,7 +111,7 @@
     <Compile Include="Classes\FileTools.cs" />
     <Compile Include="Classes\Quester\ActiveProfileProxy.cs" />
     <Compile Include="Classes\Quester\QuesterHelper.cs" />
-    <Compile Include="Classes\Quester\QuesterProfileProxy.cs" />
+    <Compile Include="Classes\Quester\BaseQuesterProfileProxy.cs" />
     <Compile Include="Classes\SortableBindingList.cs" />
     <Compile Include="Classes\TypeDescriptorTools\PropertyOverridingTypeDescriptor.cs" />
     <Compile Include="Classes\TypeDescriptorTools\TypeDescriptorHelper.cs" />

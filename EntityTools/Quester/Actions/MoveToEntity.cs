@@ -1141,8 +1141,16 @@ namespace EntityTools.Quester.Actions
                 if (HotSpots.Count == 0)
                 {
                     var pos = player.Location.Clone();
-                    Node node;
-                    if ((node = AstralAccessors.Quester.Core.Meshes.ClosestNode(pos.X, pos.Y, pos.Z, out double distance, false)) != null
+                    Node node = AstralAccessors.Quester
+                                               .Core
+                                               .CurrentProfile
+                                               .CurrentMesh
+                                               .ClosestNode(pos.X, 
+                                                            pos.Y, 
+                                                            pos.Z, 
+                                                            out double distance,
+                                                            false);
+                    if (node != null
                         && distance < 10)
                         HotSpots.Add(node.Position);
                     else HotSpots.Add(pos);

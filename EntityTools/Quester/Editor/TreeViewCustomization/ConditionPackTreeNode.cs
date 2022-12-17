@@ -16,7 +16,7 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
     {
         private readonly ConditionPack conditionPack;
 
-        public ConditionPackTreeNode(QuesterProfileProxy profile, ConditionPack conditionPack) : base(profile)
+        public ConditionPackTreeNode(BaseQuesterProfileProxy profile, ConditionPack conditionPack) : base(profile)
         {
             Tag = conditionPack;
             this.conditionPack = conditionPack;

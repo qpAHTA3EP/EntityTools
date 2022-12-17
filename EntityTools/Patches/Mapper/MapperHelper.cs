@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using Astral.Quester.Classes;
 using DevExpress.Emf;
+using ACTP0Tools;
 
 namespace EntityTools.Patches.Mapper
 {
@@ -631,7 +632,7 @@ namespace EntityTools.Patches.Mapper
                 distance = double.MaxValue;
 
             if (graph is null)
-                graph = ACTP0Tools.AstralAccessors.Quester.Core.Meshes;
+                graph = AstralAccessors.Quester.Core.CurrentProfile.CurrentMesh;
 
             Node node = graph?.ClosestNodeOxyProjection(worldX, worldY, distance);
             if (node != null)

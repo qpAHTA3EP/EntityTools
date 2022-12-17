@@ -592,7 +592,7 @@ namespace EntityTools.Quester.Actions
                 var iniPos = player.Location;
                 if (iniPos.IsValid)
                 {
-                    var node = AstralAccessors.Quester.Core.Meshes.ClosestNode(iniPos.X, iniPos.Y, iniPos.Z, out double dist, false);
+                    var node = AstralAccessors.Quester.Core.CurrentProfile.CurrentMesh.ClosestNode(iniPos.X, iniPos.Y, iniPos.Z, out double dist, false);
 
                     if (node is null
                         || dist > 10)
@@ -608,7 +608,7 @@ namespace EntityTools.Quester.Actions
                         var tarPos = EntityManager.LocalPlayer.Location;
                         if (tarPos.IsValid)
                         {
-                            node = AstralAccessors.Quester.Core.Meshes.ClosestNode(tarPos.X, tarPos.Y, tarPos.Z,
+                            node = AstralAccessors.Quester.Core.CurrentProfile.CurrentMesh.ClosestNode(tarPos.X, tarPos.Y, tarPos.Z,
                                out dist, false);
 
                             if (node is null

@@ -181,7 +181,7 @@ namespace EntityTools.Patches.Mapper.Tools
                             if (userAnswer != DialogResult.Cancel)
                             {
                                 bool pathfinding = userAnswer == DialogResult.Yes;
-                                var fullGraph = AstralAccessors.Quester.Core.Meshes;
+                                var fullGraph = AstralAccessors.Quester.Core.CurrentProfile.CurrentMesh;
                                 road = ComplexPatch_Navigation.GenerateRoad(fullGraph, new Vector3((float)startX, (float)startY, (float)startZ), new Vector3((float)endX, (float)endY, (float)endZ), pathfinding);
                                 if (road?.Waypoints.Count > 0)
                                     pathLen = ComplexPatch_Navigation.TotalDistance(road.Waypoints);

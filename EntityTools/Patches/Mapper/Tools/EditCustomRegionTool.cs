@@ -24,13 +24,13 @@ namespace EntityTools.Patches.Mapper.Tools
         private readonly Action<CustomRegion, IMapperTool> onComplete;
 
         public BindingList<CustomRegion> CustomRegions => _profile.CustomRegions;
-        private readonly QuesterProfileProxy _profile;
+        private readonly BaseQuesterProfileProxy _profile;
 
         public EditCustomRegionTool(CustomRegion cr = null, MapperFormExt mapperForm = null, Action<CustomRegion, IMapperTool> onCompleteCallback = null)
         {
             onComplete = onCompleteCallback;
             AttachTo(cr);
-            _profile = mapperForm?.Profile ?? AstralAccessors.Quester.Core.ActiveProfileProxy;
+            _profile = mapperForm?.Profile ?? AstralAccessors.Quester.Core.CurrentProfile;
             toolForm.Mode = CustomRegionToolForm.ViewMode.Edit;
             toolForm.Show(CustomRegionToolForm.ViewMode.Edit, mapperForm, cr);
         }

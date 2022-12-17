@@ -1,4 +1,5 @@
 ﻿using ACTP0Tools;
+using ACTP0Tools.Classes.Quester;
 using Astral.Addons;
 using Astral.Forms;
 using Astral.Logic.UCC;
@@ -165,7 +166,7 @@ namespace EntityTools
         {
             try
             {
-                AstralAccessors.Quester.SavePreprocessor();
+                QuesterHelper.SavePreprocessor();
 
                 if (!Directory.Exists(Path.GetDirectoryName(FileTools.SettingsFile)))
                 {

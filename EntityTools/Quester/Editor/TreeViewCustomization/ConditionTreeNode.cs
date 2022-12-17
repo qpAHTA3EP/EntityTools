@@ -9,7 +9,7 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
     /// </summary>
     internal sealed class ConditionTreeNode : ConditionBaseTreeNode
     {
-        public ConditionTreeNode(QuesterProfileProxy profile, QuesterCondition condition) : base(profile)
+        public ConditionTreeNode(BaseQuesterProfileProxy profile, QuesterCondition condition) : base(profile)
         {
             Tag = condition;
             this.condition = condition;

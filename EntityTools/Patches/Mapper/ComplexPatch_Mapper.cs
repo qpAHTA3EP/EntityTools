@@ -185,7 +185,7 @@ namespace EntityTools.Patches.Mapper
             mapperForm.Show();
             return false;
         }
-        internal static void OpenMapper(QuesterProfileProxy profile)
+        internal static void OpenMapper(BaseQuesterProfileProxy profile)
         {
             if (!EntityTools.Config.Mapper.Patch
                 || profile is null)
@@ -209,7 +209,7 @@ namespace EntityTools.Patches.Mapper
         {
             if (AstralAccessors.Controllers.Roles.IsRunning)
             {
-                var profile = AstralAccessors.Quester.Core.Profile;
+                var profile = Astral.Quester.API.CurrentProfile;//AstralAccessors.Quester.Core.CurrentProfile;
                 if (profile != null)
                 {
                     bool hotSpotsNotYetDrawn = true;

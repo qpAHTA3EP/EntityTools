@@ -10,6 +10,7 @@ using System.Threading;
 using System.Windows.Forms;
 using System.Xml.Serialization;
 using ACTP0Tools;
+using ACTP0Tools.Classes.Quester;
 using ACTP0Tools.Patches;
 using Astral;
 using Astral.Classes.ItemFilter;
@@ -104,26 +105,26 @@ namespace EntityTools.Core
 #endif
             #region QuesterProfilePreprocessing
             ckbEnapleQuesterProfilePreprocessing.DataBindings.Add(nameof(ckbEnapleQuesterProfilePreprocessing.Checked),
-                    AstralAccessors.Quester.Preprocessor,
-                    nameof(AstralAccessors.Quester.Preprocessor.Active),
+                    QuesterHelper.Preprocessor,
+                    nameof(QuesterHelper.Preprocessor.Active),
                     false, DataSourceUpdateMode.OnPropertyChanged);
 
             ckbAutoSavePreprocessedProfile.DataBindings.Add(nameof(ckbAutoSavePreprocessedProfile.Checked),
-                AstralAccessors.Quester.Preprocessor,
-                nameof(AstralAccessors.Quester.Preprocessor.AutoSave),
+                QuesterHelper.Preprocessor,
+                nameof(QuesterHelper.Preprocessor.AutoSave),
                 false, DataSourceUpdateMode.OnPropertyChanged);
 
             ckbAutoSavePreprocessedProfile.DataBindings.Add(nameof(ckbAutoSavePreprocessedProfile.Enabled),
-                AstralAccessors.Quester.Preprocessor,
-                nameof(AstralAccessors.Quester.Preprocessor.Active),
+                QuesterHelper.Preprocessor,
+                nameof(QuesterHelper.Preprocessor.Active),
                 false, DataSourceUpdateMode.OnPropertyChanged);
 
 
-            gridReplacements.DataSource = AstralAccessors.Quester.Preprocessor.Replacement;
+            gridReplacements.DataSource = QuesterHelper.Preprocessor.Replacement;
 
             gridReplacements.DataBindings.Add(nameof(gridReplacements.Enabled),
-                AstralAccessors.Quester.Preprocessor,
-                nameof(AstralAccessors.Quester.Preprocessor.Active),
+                QuesterHelper.Preprocessor,
+                nameof(QuesterHelper.Preprocessor.Active),
                 false, DataSourceUpdateMode.OnPropertyChanged);
             #endregion
 
@@ -909,27 +910,13 @@ namespace EntityTools.Core
 
         private void handler_AddProcessingItem(object sender, EventArgs e)
         {
-#if true
-            var item = new AstralAccessors.Quester.ReplacementItem();
-            AstralAccessors.Quester.Preprocessor.Replacement.Add(item);
-#else
-            gridViewPreprocessing.AddNewRow();
-#endif
+            var item = new QuesterHelper.ReplacementItem();
+            QuesterHelper.Preprocessor.Replacement.Add(item);
         }
 
         private void handler_DeleteProcessingItem(object sender, EventArgs e)
         {
-#if false
-            if (gridPreprocessingProfile.FocusedView is GridView gridView)
-            {
-                if (gridView.FocusedValue is ReplacementItem item)
-                {
-                    gridView.DeleteSelectedRows();
-                }
-            } 
-#else
             gridViewPreprocessing.DeleteSelectedRows(); 
-#endif
         }
 
         private void handler_ClearProcessingItems(object sender, EventArgs e)
@@ -938,7 +925,7 @@ namespace EntityTools.Core
                                     "Clear Items", MessageBoxButtons.YesNo) ==
                 DialogResult.Yes)
             {
-                AstralAccessors.Quester.Preprocessor.Replacement.Clear();
+                QuesterHelper.Preprocessor.Replacement.Clear();
             }
         }
 
@@ -976,7 +963,7 @@ namespace EntityTools.Core
                 XtraMessageBox.Show(sb.ToString());
             } 
 #else
-            var replacement = AstralAccessors.Quester.Preprocessor.Replacement;
+            var replacement = QuesterHelper.Preprocessor.Replacement;
 
             if(replacement.Count == 0)
                 return;
@@ -1104,7 +1091,7 @@ namespace EntityTools.Core
 
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
-                var items = AstralAccessors.Quester.Preprocessor.Replacement;
+                var items = QuesterHelper.Preprocessor.Replacement;
                 XmlSerializer serializer = new XmlSerializer(items.GetType());
                 using (FileStream file = File.Create(saveFileDialog.FileName))
                 {
@@ -1121,19 +1108,19 @@ namespace EntityTools.Core
                 
             if (openDialog.ShowDialog() == DialogResult.OK)
             {
-                List<AstralAccessors.Quester.ReplacementItem> items = null;
+                List<QuesterHelper.ReplacementItem> items = null;
 
-                XmlSerializer serialiser = new XmlSerializer(typeof(List<AstralAccessors.Quester.ReplacementItem>));
+                XmlSerializer serialiser = new XmlSerializer(typeof(List<QuesterHelper.ReplacementItem>));
                 using (StreamReader fileStream = new StreamReader(openDialog.FileName))
                 {
-                    if (serialiser.Deserialize(fileStream) is List<AstralAccessors.Quester.ReplacementItem> list)
+                    if (serialiser.Deserialize(fileStream) is List<QuesterHelper.ReplacementItem> list)
                     {
                         items = list;
                     }
                 }
                 if (items?.Count > 0)
                 {
-                    var replacements = AstralAccessors.Quester.Preprocessor.Replacement;
+                    var replacements = QuesterHelper.Preprocessor.Replacement;
                     gridReplacements.BeginUpdate();
                     if (replacements.Count > 0)
                     {
@@ -1170,7 +1157,7 @@ namespace EntityTools.Core
 
         private void handler_SaveQuesterProfilePreprocessor(object sender, EventArgs e)
         {
-            AstralAccessors.Quester.SavePreprocessor();
+            QuesterHelper.SavePreprocessor();
         }
 
         private void handler_EntityCacheMonitor(object sender, EventArgs e)
