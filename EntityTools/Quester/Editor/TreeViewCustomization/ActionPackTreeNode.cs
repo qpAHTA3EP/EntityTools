@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
-using ACTP0Tools.Classes.Quester;
-using ACTP0Tools.Reflection;
+using Infrastructure.Quester;
+using Infrastructure.Reflection;
 using Astral.Quester.Classes;
 using EntityTools.Tools;
 using MyNW.Classes;

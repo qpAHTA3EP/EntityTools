@@ -2,11 +2,13 @@
 using System.ComponentModel;
 using System.IO;
 using Astral.Controllers;
-using ACTP0Tools.Reflection;
+using Infrastructure.Reflection;
 using EntityTools.Quester.Actions;
 using EntityTools.Quester.Conditions;
 using EntityTools.Servises.SlideMonitor;
 using EntityTools.UCC.Actions;
+using Infrastructure;
+using Astral.Quester.Classes;
 
 namespace EntityTools.Settings
 {
@@ -29,6 +31,7 @@ namespace EntityTools.Settings
                 if (_active != value)
                 {
                     _active = value;
+                    ETLogger.Active = _active;
                     NotifyPropertyChanged();
                 }
             }
@@ -48,6 +51,7 @@ namespace EntityTools.Settings
                 if(_logFilePath != value)
                 {
                     _logFilePath = value.Replace(Directories.AstralStartupPath, ".");
+                    ETLogger.LogFilePath = _logFilePath;
                     NotifyPropertyChanged();
                 }
             }

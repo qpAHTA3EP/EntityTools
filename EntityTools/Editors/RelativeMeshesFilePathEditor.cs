@@ -3,8 +3,8 @@ using System.ComponentModel;
 using System.Drawing.Design;
 using System.IO;
 using System.Windows.Forms;
-using ACTP0Tools.Reflection;
-using FileTools = ACTP0Tools.Classes.FileTools;
+using Infrastructure.Reflection;
+using FileTools = Infrastructure.Classes.FileTools;
 using QuesterEditor = EntityTools.Quester.Editor.QuesterEditor;
 
 namespace EntityTools.Editors

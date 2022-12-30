@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Astral;
 using Astral.Logic.NW;
+using Infrastructure;
 using MyNW.Classes;
 using MyNW.Internals;
 using MyNW.Patchables.Enums;

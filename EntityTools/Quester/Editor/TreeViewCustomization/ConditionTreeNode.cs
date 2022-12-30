@@ -1,5 +1,5 @@
-﻿using ACTP0Tools.Classes.Quester;
-using ACTP0Tools.Reflection;
+﻿using Infrastructure.Quester;
+using Infrastructure.Reflection;
 using QuesterCondition = Astral.Quester.Classes.Condition;
 
 namespace EntityTools.Quester.Editor.TreeViewCustomization

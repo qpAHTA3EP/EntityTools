@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using Infrastructure;
 
 namespace EntityTools.Patches
 {

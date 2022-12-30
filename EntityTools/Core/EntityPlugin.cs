@@ -1,5 +1,10 @@
-﻿using ACTP0Tools;
-using ACTP0Tools.Classes.Quester;
+﻿using System;
+using System.Drawing;
+using System.IO;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
+using System.Xml.Serialization;
 using Astral.Addons;
 using Astral.Forms;
 using Astral.Logic.UCC;
@@ -9,13 +14,8 @@ using EntityTools.Patches.Mapper;
 using EntityTools.Properties;
 using EntityTools.Services;
 using EntityTools.Tools;
-using System;
-using System.Drawing;
-using System.IO;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Text.RegularExpressions;
-using System.Xml.Serialization;
+using Infrastructure;
+using Infrastructure.Quester;
 
 [assembly: InternalsVisibleTo("EntityCore")]
 #if !ENCRYPTED_CORE

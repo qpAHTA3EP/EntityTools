@@ -7,8 +7,8 @@ using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Forms;
-using ACTP0Tools;
-using ACTP0Tools.Classes.Quester;
+using Infrastructure;
+using Infrastructure.Quester;
 
 namespace EntityTools.Patches.Mapper.Tools
 {

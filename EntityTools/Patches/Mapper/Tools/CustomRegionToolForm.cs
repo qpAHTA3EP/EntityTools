@@ -1,5 +1,5 @@
-﻿using ACTP0Tools;
-using ACTP0Tools.Classes.Quester;
+﻿using Infrastructure;
+using Infrastructure.Quester;
 using Astral.Quester.Classes;
 using DevExpress.XtraEditors;
 using EntityTools.Properties;

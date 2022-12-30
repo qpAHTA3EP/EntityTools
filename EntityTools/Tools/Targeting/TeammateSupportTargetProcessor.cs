@@ -9,6 +9,7 @@ using System;
 using System.ComponentModel;
 using System.Reflection;
 using System.Xml.Serialization;
+using Infrastructure;
 
 namespace EntityTools.Tools.Targeting
 {

@@ -10,6 +10,7 @@ using Astral.Logic.NW;
 using EntityTools.Forms;
 using EntityTools.Enums;
 using EntityTools.Tools.Navigation;
+using Infrastructure;
 using MyNW.Classes;
 using MyNW.Internals;
 using MyNW.Patchables.Enums;

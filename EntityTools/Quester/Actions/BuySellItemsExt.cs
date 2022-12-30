@@ -18,6 +18,7 @@ using EntityTools.Editors;
 using EntityTools.Enums;
 using EntityTools.Extensions;
 using EntityTools.Tools.Inventory;
+using Infrastructure;
 using MyNW.Classes;
 using MyNW.Internals;
 using MyNW.Patchables.Enums;

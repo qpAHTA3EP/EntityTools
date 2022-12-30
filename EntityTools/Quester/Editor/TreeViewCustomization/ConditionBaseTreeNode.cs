@@ -1,5 +1,5 @@
 ﻿using System.Windows.Forms;
-using ACTP0Tools.Classes.Quester;
+using Infrastructure.Quester;
 using QuesterCondition = Astral.Quester.Classes.Condition;
 
 namespace EntityTools.Quester.Editor.TreeViewCustomization

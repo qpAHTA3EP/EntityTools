@@ -24,10 +24,10 @@ using Action = System.Action;
 using GoldenPath = Astral.Logic.NW.GoldenPath;
 using MinimapWaypoint = MyNW.Classes.MinimapWaypoint;
 using Timeout = Astral.Classes.Timeout;
-using ACTP0Tools;
+using Infrastructure;
 #if PATCH_ASTRAL
-using ACTP0Tools.Classes;
-using ACTP0Tools.Classes.Quester;
+using Infrastructure.Classes;
+using Infrastructure.Quester;
 using Astral.Logic.NW;
 using Astral.Quester.Classes;
 using EntityTools.Forms;

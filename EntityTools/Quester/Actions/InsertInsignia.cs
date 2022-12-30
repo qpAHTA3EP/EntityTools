@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using Infrastructure;
 using Action = Astral.Quester.Classes.Action;
 
 namespace EntityTools.Quester.Actions

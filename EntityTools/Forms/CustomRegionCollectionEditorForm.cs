@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
-using ACTP0Tools.Classes.Quester;
+using Infrastructure.Quester;
 using DevExpress.XtraBars.Navigation;
 using DevExpress.XtraEditors;
 using EntityTools.Enums;

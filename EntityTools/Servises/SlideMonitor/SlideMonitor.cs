@@ -6,6 +6,7 @@ using MyNW.Classes;
 using EntityTools.Enums;
 using System.Reflection;
 using HarmonyLib;
+using Infrastructure;
 
 namespace EntityTools.Servises.SlideMonitor
 {
@@ -50,12 +51,12 @@ namespace EntityTools.Servises.SlideMonitor
 
             try
             {
-                ACTP0Tools.Patches.ACTP0Patcher.Harmony.Patch(original_Navigation_ChangeWPDist,
+                Infrastructure.Patches.ACTP0Patcher.Harmony.Patch(original_Navigation_ChangeWPDist,
                     new HarmonyMethod(prefix_Navigation_ChangeWPDist));
                 unPatch = () =>
                 {
                     ETLogger.WriteLine(LogType.Debug, $@"Unpatch method '{original_Navigation_ChangeWPDist}'.");
-                    ACTP0Tools.Patches.ACTP0Patcher.Harmony.Unpatch(original_Navigation_ChangeWPDist,
+                    Infrastructure.Patches.ACTP0Patcher.Harmony.Unpatch(original_Navigation_ChangeWPDist,
                         prefix_Navigation_ChangeWPDist);
                 };
             }

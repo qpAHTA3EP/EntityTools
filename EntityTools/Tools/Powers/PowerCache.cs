@@ -1,6 +1,7 @@
 ﻿#define DEBUG_POWERCACHE
 using System;
 using EntityTools.Core.Interfaces;
+using Infrastructure;
 using MyNW.Internals;
 
 namespace EntityTools.Tools.Powers

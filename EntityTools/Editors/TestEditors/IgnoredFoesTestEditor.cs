@@ -1,4 +1,4 @@
-﻿using ACTP0Tools;
+﻿using Infrastructure;
 using DevExpress.XtraEditors;
 using EntityTools.Quester.Actions;
 using EntityTools.Tools.Combats.IgnoredFoes;

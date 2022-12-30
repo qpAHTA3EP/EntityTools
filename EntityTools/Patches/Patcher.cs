@@ -4,13 +4,13 @@ using EntityTools.Patches.Quester;
 using EntityTools.Patches.UCC;
 using System.Reflection;
 using EntityTools.Servises.SlideMonitor;
+using Infrastructure;
 
 // ReSharper disable UnusedMember.Local
 // ReSharper disable InconsistentNaming
 
 namespace EntityTools.Patches
 {
-#if PATCH_ASTRAL
     /// <summary>
     /// Патчер, содержащий список всех патчей
     /// </summary>
@@ -67,12 +67,7 @@ namespace EntityTools.Patches
 
                 try
                 {
-#if true
-                    ACTP0Tools.Patches.ACTP0Patcher.Harmony.PatchAll();
-#else
-                    var harmony = new HarmonyLib.Harmony(nameof(EntityTools));
-                    harmony.PatchAll(); 
-#endif
+                    Infrastructure.Patches.ACTP0Patcher.Harmony.PatchAll();
                 }
                 catch
                 {
@@ -82,5 +77,4 @@ namespace EntityTools.Patches
             }
         }
     }
-#endif
 }

@@ -7,10 +7,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using ACTP0Tools;
-using ACTP0Tools.Classes.Quester;
-using ACTP0Tools.Patches;
-using ACTP0Tools.Reflection;
+using Infrastructure;
+using Infrastructure.Quester;
+using Infrastructure.Patches;
+using Infrastructure.Reflection;
 using Astral.Classes.ItemFilter;
 using Astral.Controllers;
 using Astral.Logic.NW;
@@ -637,7 +637,9 @@ namespace EntityTools.Quester.Editor
 
                 if (conditionNode.AllowChildren)
                     conditionListChangedCallback?.Invoke(treeConditions.Nodes);
-                    
+
+                conditionNode.ReconstructInternal();
+
                 conditionCache = conditionNode.Content.CreateXmlCopy();
             }
         }

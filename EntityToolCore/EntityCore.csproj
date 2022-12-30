@@ -314,9 +314,9 @@
     <EmbeddedResource Include="Resources\Icons_Inventory_Enchantments_Insignia_Universal.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AMClient\AMClient.csproj">
+    <ProjectReference Include="..\AMClient\Infrastructure.csproj">
       <Project>{fd0c9e2a-5d26-43aa-a227-bddaf9c30705}</Project>
-      <Name>AMClient</Name>
+      <Name>Infrastructure</Name>
       <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\EntityTools\EntityTools.csproj">

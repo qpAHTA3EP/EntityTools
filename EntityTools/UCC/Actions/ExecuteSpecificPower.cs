@@ -11,7 +11,7 @@ using Astral.Logic.UCC.Classes;
 using EntityTools.Editors;
 using EntityTools.Tools.Powers;
 using EntityTools.UCC.Conditions;
-
+using Infrastructure;
 using MyNW.Classes;
 using MyNW.Internals;
 

@@ -5,6 +5,7 @@ using AStar;
 using MyNW.Classes;
 using System;
 using System.Threading;
+using Infrastructure;
 
 namespace EntityTools.Patches.Mapper.Tools
 {

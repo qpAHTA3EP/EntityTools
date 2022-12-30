@@ -6,8 +6,8 @@ using System.Linq;
 using System.Windows.Forms;
 using System.Xml.Serialization;
 
-using ACTP0Tools.Classes;
-using ACTP0Tools.Reflection;
+using Infrastructure.Classes;
+using Infrastructure.Reflection;
 
 using Astral.Classes.ItemFilter;
 using Astral.Controllers;

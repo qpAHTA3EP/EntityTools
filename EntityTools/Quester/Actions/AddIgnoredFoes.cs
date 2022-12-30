@@ -1,4 +1,4 @@
-﻿using ACTP0Tools.Reflection;
+﻿using Infrastructure.Reflection;
 using Astral.Logic.Classes.Map;
 using EntityTools.Editors;
 using EntityTools.Tools.Combats.IgnoredFoes;

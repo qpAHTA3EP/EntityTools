@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using ACTP0Tools.Annotations;
+using Infrastructure.Annotations;
 
 namespace EntityTools.Settings
 {

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using ACTP0Tools;
-using ACTP0Tools.Patches;
-using ACTP0Tools.Reflection;
+using Infrastructure;
+using Infrastructure.Patches;
+using Infrastructure.Reflection;
 using Astral.Quester.Classes.Actions;
 using Astral.Quester.Classes.Conditions;
 using DevExpress.XtraEditors;

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using ACTP0Tools;
-using ACTP0Tools.Reflection;
+using Infrastructure;
+using Infrastructure.Reflection;
 
 namespace EntityTools.Tools.Combats.IgnoredFoes
 {

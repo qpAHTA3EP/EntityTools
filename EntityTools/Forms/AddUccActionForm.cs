@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using ACTP0Tools.Reflection;
+using Infrastructure.Reflection;
 using Astral.Logic.UCC.Classes;
 using DevExpress.XtraEditors;
 using EntityTools.Tools.Extensions;
@@ -21,7 +21,7 @@ namespace EntityTools.Forms
         static AddUccActionForm()
         {
             // Формируем список типов uccAction;
-            ACTP0Tools.Patches.ACTP0Serializer.GetExtraTypes(out List<Type> uccTypes, 1);
+            Infrastructure.Patches.ACTP0Serializer.GetExtraTypes(out List<Type> uccTypes, 1);
             if(uccTypes != null && uccTypes.Count > 0)
             {
                 foreach (Type t in uccTypes)

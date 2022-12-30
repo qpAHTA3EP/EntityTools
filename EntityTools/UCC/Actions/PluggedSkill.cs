@@ -11,6 +11,7 @@ using Astral.Quester.UIEditors;
 using EntityTools.Enums;
 using EntityTools.Tools.Powers;
 using EntityTools.UCC.Conditions;
+using Infrastructure;
 using MyNW.Classes;
 using MyNW.Internals;
 using MyNW.Patchables.Enums;

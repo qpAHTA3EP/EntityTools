@@ -5,8 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using ACTP0Tools;
-using ACTP0Tools.Reflection;
+using Infrastructure;
+using Infrastructure.Reflection;
 using Astral.Logic.UCC.Classes;
 using Astral.Logic.UCC.Forms;
 using DevExpress.XtraEditors;
@@ -397,7 +397,7 @@ namespace EntityTools.UCC.Editor
         #region Profile manipucation
         private void handler_LoadProfile(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
         {
-            var openDialog = ACTP0Tools.Classes.FileTools.GetOpenDialog(filter: "UсcProfile|*.xml",
+            var openDialog = Infrastructure.Classes.FileTools.GetOpenDialog(filter: "UсcProfile|*.xml",
                                                                         defaultExtension:"xml",
                                                                         initialDir: Path.Combine(Astral.Controllers.Directories.SettingsPath, "CC"));
 
@@ -461,7 +461,7 @@ namespace EntityTools.UCC.Editor
 
         private void handler_SaveProfileAs(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
         {
-            var saveDialog = ACTP0Tools.Classes.FileTools.GetSaveDialog(filter: "UсcProfile|*.xml",
+            var saveDialog = Infrastructure.Classes.FileTools.GetSaveDialog(filter: "UсcProfile|*.xml",
                 defaultExtension: "xml",
                 initialDir: Path.Combine(Astral.Controllers.Directories.SettingsPath, "CC"));
 

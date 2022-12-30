@@ -156,14 +156,15 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="0Harmony, Version=2.2.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Lib.Harmony.2.2.2\lib\net48\0Harmony.dll</HintPath>
+    </Reference>
     <Reference Include="AStar">
       <HintPath>..\..\References\AStar.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Astral_patched, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\References\Astral_patched.exe</HintPath>
-      <Private>False</Private>
+    <Reference Include="Astral">
+      <HintPath>..\..\References\Astral.exe</HintPath>
     </Reference>
     <Reference Include="DevExpress.Data.v21.2, Version=21.2.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -336,7 +337,6 @@
     <Compile Include="Forms\UIViewer.Designer.cs">
       <DependentUpon>UIViewer.cs</DependentUpon>
     </Compile>
-    <Compile Include="Logger\EntityToolLogger.cs" />
     <Compile Include="Patches\ComplexPatch_Navigation.cs" />
     <Compile Include="Patches\QuesterPatchSettings.cs" />
     <Compile Include="Patches\Quester\ComplexPatch_Quester.cs" />
@@ -698,6 +698,7 @@
     <None Include="..\.editorconfig">
       <Link>.editorconfig</Link>
     </None>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -720,13 +721,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\NodeTools.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\AMClient\AMClient.csproj">
-      <Project>{fd0c9e2a-5d26-43aa-a227-bddaf9c30705}</Project>
-      <Name>AMClient</Name>
-      <Private>False</Private>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Patches\Patcher.tt">
@@ -809,6 +803,12 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Infrastructure\Infrastructure.csproj">
+      <Project>{fd0c9e2a-5d26-43aa-a227-bddaf9c30705}</Project>
+      <Name>Infrastructure</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

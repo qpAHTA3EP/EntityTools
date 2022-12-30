@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using ACTP0Tools.Reflection;
+using Infrastructure.Reflection;
 
 namespace EntityTools.Tools.Extensions
 {

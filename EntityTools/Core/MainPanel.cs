@@ -9,9 +9,9 @@ using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using System.Xml.Serialization;
-using ACTP0Tools;
-using ACTP0Tools.Classes.Quester;
-using ACTP0Tools.Patches;
+using Infrastructure;
+using Infrastructure.Quester;
+using Infrastructure.Patches;
 using Astral;
 using Astral.Classes.ItemFilter;
 using Astral.Controllers;
@@ -968,7 +968,7 @@ namespace EntityTools.Core
             if(replacement.Count == 0)
                 return;
 
-            OpenFileDialog openDialog = ACTP0Tools.Classes.FileTools.GetOpenDialog( filter: @"Astral mission profile (*.amp.zip)|*.amp.zip",
+            OpenFileDialog openDialog = Infrastructure.Classes.FileTools.GetOpenDialog( filter: @"Astral mission profile (*.amp.zip)|*.amp.zip",
                                                                                     defaultExtension: "amp.zip",
                                                                                     initialDir: Directories.ProfilesPath );
 
@@ -1102,7 +1102,7 @@ namespace EntityTools.Core
 
         private void handler_ImportPreprocessingProfile(object sender, EventArgs e)
         {
-            OpenFileDialog openDialog = ACTP0Tools.Classes.FileTools.GetOpenDialog(filter: "Replacements (*.xml)|*.xml",
+            OpenFileDialog openDialog = Infrastructure.Classes.FileTools.GetOpenDialog(filter: "Replacements (*.xml)|*.xml",
                                                                                    defaultExtension: "xml",
                                                                                    initialDir: Directories.SettingsPath);
                 

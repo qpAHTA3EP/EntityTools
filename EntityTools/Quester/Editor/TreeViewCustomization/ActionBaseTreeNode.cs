@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using ACTP0Tools.Classes.Quester;
+using Infrastructure.Quester;
 using MyNW.Classes;
 using QuesterAction = Astral.Quester.Classes.Action;
 

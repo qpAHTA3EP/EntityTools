@@ -3,6 +3,7 @@ using System.Threading;
 using System.Windows.Forms;
 using Astral;
 using Astral.Logic.NW;
+using Infrastructure;
 using MyNW.Classes;
 using MyNW.Internals;
 using Timeout = Astral.Classes.Timeout;

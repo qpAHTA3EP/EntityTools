@@ -7,6 +7,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using Astral.Classes.ItemFilter;
 using EntityTools.Enums;
+using Infrastructure;
 using MyNW.Classes;
 using MyNW.Internals;
 

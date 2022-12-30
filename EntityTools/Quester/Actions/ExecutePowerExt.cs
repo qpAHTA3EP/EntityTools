@@ -1,6 +1,6 @@
 ﻿#define DEBUG_INSERTINSIGNIA
 
-using ACTP0Tools;
+using Infrastructure;
 using Astral.Logic.Classes.Map;
 using Astral.Quester.UIEditors;
 using EntityTools.Editors;

@@ -2,6 +2,7 @@
 using System;
 using System.Reflection;
 using EntityTools.Forms;
+using Infrastructure;
 
 namespace EntityTools.Patches
 {
@@ -24,7 +25,7 @@ namespace EntityTools.Patches
 
             try
             {
-                tAuraDetector = ACTP0Tools.Reflection.ReflectionHelper.GetTypeByName("\u0003.\u0004", true);
+                tAuraDetector = Infrastructure.Reflection.ReflectionHelper.GetTypeByName("\u0003.\u0004", true);
 
                 if (tAuraDetector is null)
                 {
@@ -56,7 +57,7 @@ namespace EntityTools.Patches
                     return;
                 }
 
-                ACTP0Tools.Patches.ACTP0Patcher.Harmony.Patch(original_AuraDetector_GetAura, new HarmonyMethod(prefix_AuraDetector_GetAura));
+                Infrastructure.Patches.ACTP0Patcher.Harmony.Patch(original_AuraDetector_GetAura, new HarmonyMethod(prefix_AuraDetector_GetAura));
 
                 ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Navigation)}' succeeded", true);
             }

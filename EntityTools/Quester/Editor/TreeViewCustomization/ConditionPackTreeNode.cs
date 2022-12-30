@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text;
-using ACTP0Tools.Classes.Quester;
-using ACTP0Tools.Reflection;
+using Infrastructure.Quester;
+using Infrastructure.Reflection;
 using EntityTools.Tools;
 using EntityTools.Enums;
 using EntityTools.Quester.Conditions;

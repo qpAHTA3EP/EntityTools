@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using Astral.Classes.ItemFilter;
 using EntityTools.Enums;
 using EntityTools.Extensions;
+using Infrastructure;
 using MyNW.Classes;
 
 namespace EntityTools.Tools.Entities

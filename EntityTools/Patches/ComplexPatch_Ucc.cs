@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Reflection;
-using ACTP0Tools.Reflection;
+using Infrastructure.Reflection;
 using Astral.Logic.UCC.Classes;
 using Astral.Logic.UCC.Panels;
 using EntityTools.UCC.Conditions;
 using EntityTools.UCC.Editor;
 using HarmonyLib;
+using Infrastructure;
+
 // ReSharper disable InconsistentNaming
 
 namespace EntityTools.Patches
@@ -135,21 +137,21 @@ namespace EntityTools.Patches
 
             try
             {
-                ACTP0Tools.Patches.ACTP0Patcher.Harmony.Patch(original_IsOK, new HarmonyMethod(prefix_IsOK));
+                Infrastructure.Patches.ACTP0Patcher.Harmony.Patch(original_IsOK, new HarmonyMethod(prefix_IsOK));
                 unPatch = () =>
                 {
                     ETLogger.WriteLine(LogType.Debug, $@"Unpatch method '{original_IsOK}'.", true);
-                    ACTP0Tools.Patches.ACTP0Patcher.Harmony.Unpatch(original_IsOK, prefix_IsOK);
+                    Infrastructure.Patches.ACTP0Patcher.Harmony.Unpatch(original_IsOK, prefix_IsOK);
                 };
 
-                ACTP0Tools.Patches.ACTP0Patcher.Harmony.Patch(original_Clone, new HarmonyMethod(prefix_Clone));
+                Infrastructure.Patches.ACTP0Patcher.Harmony.Patch(original_Clone, new HarmonyMethod(prefix_Clone));
                 unPatch = () =>
                 {
                     ETLogger.WriteLine(LogType.Debug, $@"Unpatch method '{original_Clone}'.", true);
-                    ACTP0Tools.Patches.ACTP0Patcher.Harmony.Unpatch(original_Clone, prefix_Clone);
+                    Infrastructure.Patches.ACTP0Patcher.Harmony.Unpatch(original_Clone, prefix_Clone);
                 };
 
-                ACTP0Tools.Patches.ACTP0Patcher.Harmony.Patch(original_UccEditor, new HarmonyMethod(prefix_UccEditor));
+                Infrastructure.Patches.ACTP0Patcher.Harmony.Patch(original_UccEditor, new HarmonyMethod(prefix_UccEditor));
                 MainUccRefreshAll = tMainUcc.GetAction("refreshAll");
 
 

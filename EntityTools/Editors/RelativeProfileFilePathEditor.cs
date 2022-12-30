@@ -3,10 +3,10 @@ using System.ComponentModel;
 using System.Drawing.Design;
 using System.IO;
 using System.Windows.Forms;
-using ACTP0Tools.Patches;
-using ACTP0Tools.Reflection;
+using Infrastructure.Patches;
+using Infrastructure.Reflection;
 using Astral.Quester.Classes.Actions;
-using PathHelper = ACTP0Tools.Classes.FileTools;
+using PathHelper = Infrastructure.Classes.FileTools;
 using QuesterEditor = EntityTools.Quester.Editor.QuesterEditor;
 
 namespace EntityTools.Editors

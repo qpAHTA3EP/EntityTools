@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using Astral.Logic.NW;
-using ACTP0Tools.Reflection;
+using Infrastructure.Reflection;
 using MyNW.Classes;
 using MyNW.Internals;
 
