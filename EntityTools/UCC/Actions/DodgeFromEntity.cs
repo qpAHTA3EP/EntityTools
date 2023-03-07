@@ -29,13 +29,9 @@ namespace EntityTools.UCC.Actions
     {
         #region Опции команды
         #region Entity
-#if DEVELOPER
         [Description("ID of the Entity for the search")]
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
         [Category("Entity")]
-#else
-        [Browsable(false)]
-#endif
         public string EntityID
         {
             get => _entityId;
@@ -50,14 +46,10 @@ namespace EntityTools.UCC.Actions
         }
         private string _entityId = string.Empty;
 
-#if DEVELOPER
         [Description("Type of and EntityID:\n" +
             "Simple: Simple text string with a wildcard at the beginning or at the end (char '*' means any symbols)\n" +
             "Regex: Regular expression")]
         [Category("Entity")]
-#else
-        [Browsable(false)]
-#endif
         public ItemFilterStringType EntityIdType
         {
             get => _entityIdType;
@@ -72,12 +64,8 @@ namespace EntityTools.UCC.Actions
         }
         private ItemFilterStringType _entityIdType = ItemFilterStringType.Simple;
 
-#if DEVELOPER
         [Description("The switcher of the Entity filed which compared to the property EntityID")]
         [Category("Entity")]
-#else
-        [Browsable(false)]
-#endif
         public EntityNameType EntityNameType
         {
             get => _entityNameType;
@@ -92,11 +80,7 @@ namespace EntityTools.UCC.Actions
         }
         private EntityNameType _entityNameType = EntityNameType.InternalName;
 
-#if DEVELOPER
         [Category("Entity")]
-#else
-        [Browsable(false)]
-#endif
         public float EntityRadius
         {
             get => _entityRadius;
@@ -110,24 +94,19 @@ namespace EntityTools.UCC.Actions
             }
         }
         private float _entityRadius = 12;
-#if DEVELOPER
+
         [XmlIgnore]
         [Editor(typeof(EntityTestEditor), typeof(UITypeEditor))]
         [Description("Test the Entity searching.")]
         [Category("Entity")]
         public string EntityTestInfo => "Push button '...' =>";
-#endif 
         #endregion
 
-#if DEVELOPER
         [Description("Check Entity's Ingame Region (Not CustomRegion):\n" +
             "True: Only Entities located in the same Region as Player are detected\n" +
             "False: Entity's Region does not checked during search")]
         //[Category("Entity")]
         [Category("Optional")]
-#else
-        [Browsable(false)]
-#endif
         public bool RegionCheck
         {
             get => _regionCheck;
@@ -142,15 +121,10 @@ namespace EntityTools.UCC.Actions
         }
         private bool _regionCheck = true;
 
-#if DEVELOPER
         [Description("Check if Entity's health greater than zero:\n" +
             "True: Only Entities with nonzero health are detected\n" +
             "False: Entity's health does not checked during search")]
-        //[Category("Entity")]
         [Category("Optional")]
-#else
-        [Browsable(false)]
-#endif
         public bool HealthCheck
         {
             get => _healthCheck;
@@ -165,14 +139,9 @@ namespace EntityTools.UCC.Actions
         }
         private bool _healthCheck = true;
 
-#if DEVELOPER
         [Description("Aura which checked on the Entity")]
         [TypeConverter(typeof(ExpandableObjectConverter))]
-        //[Category("Entity")]
         [Category("Optional")]
-#else
-        [Browsable(false)]
-#endif
         public AuraOption Aura
         {
             get => _aura;
@@ -187,14 +156,9 @@ namespace EntityTools.UCC.Actions
         }
         private AuraOption _aura = new AuraOption();
 
-#if DEVELOPER
         [Description("The maximum distance from the character within which the Entity is searched\n" +
             "The 0 (zero) value disables distance checking")]
-        //[Category("Entity")]
         [Category("Optional")]
-#else
-        [Browsable(false)]
-#endif
         public float ReactionRange
         {
             get => _reactionRange;
@@ -209,13 +173,9 @@ namespace EntityTools.UCC.Actions
         }
         private float _reactionRange = 30;
 
-#if DEVELOPER
         [Description("The maximum ZAxis difference from the withing which the Entity is searched\n" +
             "The default value is 0, which disables ZAxis checking")]
         [Category("Optional")]
-#else
-        [Browsable(false)]
-#endif
         public float ReactionZRange
         {
             get => _reactionZRange;
@@ -230,12 +190,8 @@ namespace EntityTools.UCC.Actions
         }
         private float _reactionZRange;
 
-#if DEVELOPER
         [DisplayName("Moving time")]
         [Category("Required")]
-#else
-        [Browsable(false)]
-#endif
         public int MovingTime
         {
             get => _movingTime;
@@ -250,12 +206,8 @@ namespace EntityTools.UCC.Actions
         }
         private int _movingTime = 700;
 
-#if DEVELOPER
         [DisplayName("Dodge Direction")]
         [Category("Required")]
-#else
-        [Browsable(false)]
-#endif
         public DodgeDirection Direction
         {
             get => _dodgeDirection;
@@ -286,7 +238,7 @@ namespace EntityTools.UCC.Actions
         #endregion
         #endregion
 
-        #region Взаимодействие с INotifyPropertyChanged
+        #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]

@@ -3,15 +3,12 @@ using System.ComponentModel;
 using System.Drawing.Design;
 using System.Runtime.CompilerServices;
 using System.Xml.Serialization;
-
 using Astral.Classes.ItemFilter;
 using Astral.Logic.UCC.Classes;
 using Astral.Quester.Classes;
-
 using EntityTools.Editors;
 using EntityTools.Enums;
 using EntityTools.Tools;
-
 using MyNW.Classes;
 // ReSharper disable InconsistentNaming
 
@@ -20,12 +17,8 @@ namespace EntityTools.UCC.Conditions
     public class UCCGameUICheck : UCCCondition, ICustomUCCCondition, INotifyPropertyChanged
     {
         #region Опции команды
-#if DEVELOPER
         [Description("The Identifier of the Ingame user interface element")]
         [Editor(typeof(UiIdEditor), typeof(UITypeEditor))]
-#else
-        [Browsable(false)]
-#endif
         public string UiGenId
         {
             get { return uiGenId; }
@@ -40,13 +33,9 @@ namespace EntityTools.UCC.Conditions
         }
         private string uiGenId = "Team_Maptransferchoice_Waitingonteamlabel";
 
-#if DEVELOPER
         [Description("The Name of the GUI element's property which is checked\n" +
                      "Ignored if property 'Tested' is not equals to 'Property'")]
         [Category("GuiProperty")]
-#else
-        [Browsable(false)]
-#endif
         public string UiGenProperty
         {
             get => _uiGenProperty; set
@@ -60,14 +49,10 @@ namespace EntityTools.UCC.Conditions
         }
         private string _uiGenProperty;
 
-#if DEVELOPER
         [Description("The Value of the GUI element's property which is checked\n" +
                      "Ignored if property 'Tested' is not equals to 'Property'")]
         [DisplayName("PropertyValue")]
         [Category("GuiProperty")]
-#else
-        [Browsable(false)]
-#endif
         public string UiGenPropertyValue
         {
             get => _uiGenPropertyValue; set
@@ -81,16 +66,12 @@ namespace EntityTools.UCC.Conditions
         }
         private string _uiGenPropertyValue = string.Empty;
 
-#if DEVELOPER
         [Description("Type of and UiGenPropertyValue:\n" +
                      "Simple: Simple text string with a wildcard at the beginning or at the end (char '*' means any symbols)\n" +
                      "Regex: Regular expression\n" +
                      "Ignored if property 'Tested' is not equals to 'Property'")]
         [DisplayName("UiGenPropertyType")]
         [Category("GuiProperty")]
-#else
-        [Browsable(false)]
-#endif
         public ItemFilterStringType UiGenPropertyValueType
         {
             get => _uiGenPropertyValueType;
@@ -105,11 +86,7 @@ namespace EntityTools.UCC.Conditions
         }
         private ItemFilterStringType _uiGenPropertyValueType = ItemFilterStringType.Simple;
 
-#if DEVELOPER
         [Category("GuiProperty")]
-#else
-        [Browsable(false)]
-#endif
         public Condition.Presence PropertySign
         {
             get => _propertySign; set
@@ -123,9 +100,6 @@ namespace EntityTools.UCC.Conditions
         }
         private Condition.Presence _propertySign = Condition.Presence.Equal;
 
-#if !DEVELOPER
-        [Browsable(false)]
-#endif
         public UiGenCheckType Check
         {
             get => _check;

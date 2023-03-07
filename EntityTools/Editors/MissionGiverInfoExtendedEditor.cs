@@ -9,11 +9,8 @@ using EntityTools.Tools.Missions;
 using MyNW.Classes;
 using MyNW.Internals;
 
-//using static EntityTools.Reflection.PrivateConsructor;
-
 namespace EntityTools.Editors
 {
-#if DEVELOPER
     internal class MissionGiverInfoExtendedEditor : UITypeEditor
     {
         static MissionGiverInfoExtendedEditor(){ }
@@ -75,6 +72,5 @@ namespace EntityTools.Editors
             }
             return false;
         }
-#endif
     }
 }

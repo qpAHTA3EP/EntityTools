@@ -10,13 +10,9 @@ namespace EntityTools.UCC.Conditions
 {
     public class UCCQuesterCheck : UCCCondition, ICustomUCCCondition
     {
-#if DEVELOPER
         [Editor(typeof(QuesterConditionEditor), typeof(UITypeEditor))]
         [TypeConverter(typeof(ExpandableObjectConverter))]
         [XmlElement("QuesterCondition", typeof(QuesterCondition))]
-#else
-        [Browsable(false)]
-#endif
         public QuesterCondition Condition { get; set; }
 
         #region ICustomUCCCondition

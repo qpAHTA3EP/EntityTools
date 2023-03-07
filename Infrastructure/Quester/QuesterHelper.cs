@@ -106,7 +106,7 @@ namespace Infrastructure.Quester
 
 
 
-            /// <summary>
+        /// <summary>
         /// Загрузка графа путей <param name="meshes"/> для карты <param name="mapName"/>
         /// из файла <param name="zipFileName"/>
         /// </summary>
@@ -355,9 +355,11 @@ namespace Infrastructure.Quester
                         profileNameWithoutExtension.Substring(0, profileNameWithoutExtension.Length - 8);
             }
 
-            var saveDialog = FileTools.GetSaveDialog(fileName: profileNameWithoutExtension,
-                filter: @"Astral mission profile (*.amp.zip)|*.amp.zip",
-                defaultExtension: "amp.zip");
+            var saveDialog = FileTools.GetSaveDialog(
+                                                        fileName: profileNameWithoutExtension,
+                                                        filter: @"Astral mission profile (*.amp.zip)|*.amp.zip",
+                                                        defaultExtension: "amp.zip"
+                                                    );
 
             if (saveDialog.ShowDialog() != DialogResult.OK)
                 return string.Empty;
@@ -570,7 +572,7 @@ namespace Infrastructure.Quester
                         // Сохраняем преобразованный файл профиля
                         using (var zipFile = ZipFile.Open(profilePath, ZipArchiveMode.Update))
                         {
-                            Infrastructure.Quester.QuesterHelper.SaveProfile(profile, zipFile);
+                            QuesterHelper.SaveProfile(profile, zipFile);
                         }
                     }
                     return profile;

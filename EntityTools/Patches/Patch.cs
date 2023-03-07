@@ -5,7 +5,6 @@ using Infrastructure;
 
 namespace EntityTools.Patches
 {
-#if PATCH_ASTRAL
     internal abstract class Patch
     {
         protected MethodInfo methodToReplace;
@@ -52,6 +51,5 @@ namespace EntityTools.Patches
                 }
             }
         }
-    } 
-#endif
+    }
 }

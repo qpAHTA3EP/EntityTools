@@ -15,7 +15,6 @@ namespace EntityTools
         [TypeConverter(typeof(ExpandableObjectConverter))]
         public UnstuckSpellsSettings UnstuckSpells { get; set; } = new UnstuckSpellsSettings();
 
-#if DEVELOPER
         /// <summary>
         /// Настройки Mapper'a
         /// </summary>
@@ -23,7 +22,6 @@ namespace EntityTools
         [TypeConverter(typeof(ExpandableObjectConverter))]
         public MapperSettings Mapper { get; set; } = new MapperSettings();
 
-#endif
         /// <summary>
         /// Настройки EntityToolsLogger
         /// </summary>

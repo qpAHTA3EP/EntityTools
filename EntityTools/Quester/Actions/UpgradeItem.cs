@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Linq;
+using System.Threading;
 using Astral;
 using Astral.Classes.ItemFilter;
 using Astral.Logic.Classes.Map;
@@ -21,14 +22,14 @@ namespace EntityTools.Quester.Actions
     [Serializable]
     public class UpgradeItem : Astral.Quester.Classes.Action
     {
-
         #region Опции команды
         /// <summary>
         /// Идентификатор предмета, который нужно "обработать"
         /// </summary>
         [Editor(typeof(ItemIdEditor), typeof(UITypeEditor))]
         [Category("Item")]
-        [Description("Идентификатор обрабатываемого предмета.")]
+        //[Description("Идентификатор обрабатываемого предмета.")]
+        [Description("The identifier of the upgradable item.")]
         public string ItemId
         {
             get => _itemId;
@@ -44,9 +45,12 @@ namespace EntityTools.Quester.Actions
         /// Переключатель типа предмета
         /// </summary>
         [Category("Item")]
-        [Description("Переключатель типа идентификатор предмета:\n" +
-                     "Shimple : текстовая строка, допускающая символ подстановки '*' в начале или в конце.\n" +
-                     "Regex : регулярное выражение.")]
+        //[Description("Переключатель типа идентификатор предмета:\n" +
+        //             "Simple : текстовая строка, допускающая символ подстановки '*' в начале или в конце.\n" +
+        //             "Regex : регулярное выражение.")]
+        [Description("The toggle of the type of the '"+nameof(ItemId) +"'\n" +
+                     "Simple: Simple text string with a wildcard at the beginning or at the end (char '*' means any symbols),\n" +
+                     "Regex: Regular expression.")]
         public ItemFilterStringType ItemIdType
         {
             get => _itemIdType;
@@ -62,8 +66,9 @@ namespace EntityTools.Quester.Actions
         /// Флаг, позволяющий обрабатывать предметы, привязанные к персонажу
         /// </summary>
         [Category("Item")]
-        [DisplayName("AllowBoundToCharacter")]
-        [Description("Флаг, позволяющий обрабатывать предметы, привязанные к персонажу.")]
+        [DisplayName("Allow Bound To Character")]
+        //[Description("Флаг, позволяющий обрабатывать предметы, привязанные к персонажу.")]
+        [Description("The flag allows to upgrade items, bounded to Character.")]
         public bool B2C
         {
             get => _b2c;
@@ -84,8 +89,9 @@ namespace EntityTools.Quester.Actions
         /// Флаг, позволяющий обрабатывать предметы, привязанные к аккаунту
         /// </summary>
         [Category("Item")]
-        [DisplayName("AllowBoundToAccount")]
-        [Description("Флаг, позволяющий обрабатывать предметы, привязанные к аккаунту.")]
+        [DisplayName("Allow Bound To Account")]
+        //[Description("Флаг, позволяющий обрабатывать предметы, привязанные к аккаунту.")]
+        [Description("The flag allows to upgrade items, bounded to Account.")]
         public bool B2A
         {
             get => _b2a;
@@ -105,9 +111,10 @@ namespace EntityTools.Quester.Actions
         /// Принудительное улочшение без учета ProgressionLogic
         /// </summary>
         [Category("Options")]
-        [Description("Флаг, принудительного улучшения предмета, отключающий проверки возможности улучешния и наличия необходимых компонентов.\n" +
-                     "Требуется для улучшения квестовых (обучающих) предметов, и первого улучшения некоторых предметов.\n" +
-                     "Применять следует с осторожностью, так как может спровоцировать отключение игрового клиента от сервера или аварийное завершение программы.")]
+        //[Description("Флаг, принудительного улучшения предмета, отключающий проверки возможности улучешния и наличия необходимых компонентов.\n" +
+        //             "Требуется для улучшения квестовых (обучающих) предметов, и первого улучшения некоторых предметов.\n" +
+        //             "Применять следует с осторожностью, так как может спровоцировать отключение игрового клиента от сервера или аварийное завершение программы.")]
+        [Description("A flag for forced upgrade of an item that disables checks for the possibility of upgrade and the availability of requered components.")]
         public bool Forced
         {
             get => _forced;
@@ -127,10 +134,44 @@ namespace EntityTools.Quester.Actions
         public MoteType Mote { get; set; } = MoteType.None;
 
         [Category("Options")]
-        [Description("The list of the Catalysts with have to be protected by [Preservation Ward].")]
+        [Description("The list of the Components to be protected by [Preservations_Ward].")]
         [Editor(typeof(ItemIdFilterEditor), typeof(UITypeEditor))]
+        [DisplayName("ProtectedComponents")]
         public ItemFilterCore ProtectedCatalysts { get; set; } = new ItemFilterCore();
-        public bool ShouldSerializeProtectedCatalysts() => ProtectedCatalysts.Entries.Count > 0; 
+        public bool ShouldSerializeProtectedCatalysts() => ProtectedCatalysts.Entries.Count > 0;
+
+        [Category("Options")]
+        [Description("The minimum number of the [Copper] to be protected by [Preservations_Ward].")]
+        [Editor(typeof(ItemIdFilterEditor), typeof(UITypeEditor))]
+        [DisplayName("ProtectedCopperMinimum")]
+        public uint MinCopper { get; set; }
+        public bool ShouldSerializeCopperMin() => MinCopper > 0;
+
+        [Category("Options")]
+        [Description("The minimum number of the [Refinement_Currency] to be protected by [Preservations_Ward].")]
+        [Editor(typeof(ItemIdFilterEditor), typeof(UITypeEditor))]
+        [DisplayName("ProtectedCopperMinimum")]
+        public uint MinRC { get; set; }
+        public bool ShouldSerializeMinRC() => MinRC > 0;
+
+
+        /// <summary>
+        /// Время ожедания, после завершения попытки улучшения, необходимый для предотвращения краша при последовательных улучшениях
+        /// </summary>
+        [Category("Options")]
+        [DisplayName("AfterDelay")]
+        //[Description("Время ожидания (мс), после завершения попытки улучшения, необходимый для предотвращения краша при последовательных улучшениях.")]
+        [Description("The time to wait after attempting of item's upgrade (ms).")]
+        public int Delay
+        {
+            get => _delay;
+            set
+            {
+                _delay = Math.Max(value, 0);
+            }
+        }
+
+        private int _delay;
         #endregion
 
 
@@ -252,7 +293,11 @@ namespace EntityTools.Quester.Actions
             }
         }
 
-        public override void GatherInfos() {}
+        public override void GatherInfos() 
+        {
+            if (_delay == 0) 
+                _delay = 500;
+        }
         public override void InternalReset() {}
         public override void OnMapDraw(GraphicsNW graph) {}
 
@@ -266,7 +311,13 @@ namespace EntityTools.Quester.Actions
             if (!Forced && !HaveRequiredCatalysts(itemSlot))
                 return ActionResult.Skip;
 
-            var wardSlots = MakeWardListForCatalysts(itemSlot.Item, ProtectedCatalysts, wards);
+            var wardSlots = MakeWardListForCatalysts(
+                itemSlot.Item, 
+                ProtectedCatalysts, 
+                wards,
+                MinCopper,
+                MinRC);
+
             if (wardSlots is null)
             {
                 if (!Forced)
@@ -282,6 +333,8 @@ namespace EntityTools.Quester.Actions
             }
             else itemSlot.Evolve(wardSlots);
 
+            if (_delay > 0)
+                Thread.Sleep(_delay);
             return ActionResult.Completed;
         }
 
@@ -569,7 +622,9 @@ namespace EntityTools.Quester.Actions
         private static List<InventorySlot> MakeWardListForCatalysts(
             Item evolvingItem,
             ItemFilterCore protectedCatalysts, 
-            List<InventorySlot> wardsInBag)
+            List<InventorySlot> wardsInBag,
+            uint minCopper,
+            uint minRC)
         {
             var itemTierDef = evolvingItem.ItemProgression_GetItemTierDef();
             List<ItemProgressionCatalyst> catalystItems;
@@ -601,7 +656,7 @@ namespace EntityTools.Quester.Actions
             {
                 // В сумке несколько слотов с катализаторами
                 // В первую очерещь необходимо использовать привязанные к персонажу катализаторы, поэтому сортируем их с учетом привязки
-                wardsInBag.Sort(new BoundingComparerOfInventorySlot());
+                wardsInBag.Sort(BoundingComparerOfInventorySlot.Default);
             }
 
             var itemDef = evolvingItem.ItemDef;
@@ -616,10 +671,12 @@ namespace EntityTools.Quester.Actions
                 // при этом у них невалидно свойство catalyst.ItemDef,
                 // поэтому невозможно определить его InternalName
 
-                var catalystInternalName = (catalyst.Type == 2u) 
-                                              ? itemInternalName 
-                                              : catalyst.ItemDef.InternalName;
-                if (protectedCatalysts.IsMatch(catalystInternalName))
+                string catalystInternalName = (catalyst.Type == 2u) 
+                                            ? itemInternalName 
+                                            : catalyst.ItemDef.InternalName;
+                if (protectedCatalysts.IsMatch(catalystInternalName)
+                    || IsProtectedCopper(catalyst, minCopper)
+                    || IsProtectedRefinementCurrency(catalyst, minRC))
                 {
                     InventorySlot ward;
                     bool wardAbsent = true;
@@ -651,6 +708,21 @@ namespace EntityTools.Quester.Actions
                 return resultWardList;
 
             return null;
+        }
+
+        private static bool IsProtectedCopper(ItemProgressionCatalyst catalyst, uint minCopper)
+        {
+            return catalyst.Type == 1u
+                && minCopper > 0
+                && catalyst.NumRequired >= minCopper
+                && string.Equals(catalyst.ItemDef.InternalName, "Resources", StringComparison.OrdinalIgnoreCase);
+        }
+        private static bool IsProtectedRefinementCurrency(ItemProgressionCatalyst catalyst, uint minRC)
+        {
+            return catalyst.Type == 1u
+                && minRC > 0
+                && catalyst.NumRequired >= minRC
+                && string.Equals(catalyst.ItemDef.InternalName, "Refinement_Currency", StringComparison.OrdinalIgnoreCase);
         }
     }
 }

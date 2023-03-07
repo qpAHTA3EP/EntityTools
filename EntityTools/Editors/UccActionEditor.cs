@@ -1,12 +1,11 @@
-﻿using Astral.Logic.UCC.Classes;
-using EntityTools.Forms;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Drawing.Design;
+using Astral.Logic.UCC.Classes;
+using EntityTools.Forms;
 
 namespace EntityTools.Editors
 {
-#if DEVELOPER
     internal class UccActionEditor : UITypeEditor
     {
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
@@ -22,5 +21,4 @@ namespace EntityTools.Editors
             return UITypeEditorEditStyle.Modal;
         }
     }
-#endif
 }

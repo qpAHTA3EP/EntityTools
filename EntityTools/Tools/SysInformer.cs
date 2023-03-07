@@ -1,10 +1,5 @@
-﻿#if ENCRYPTOR
-using Extensions;
-using Encrypter;
-#else
-using EntityTools.Extensions;
+﻿using EntityTools.Extensions;
 using EntityTools.Tools;
-#endif
 using System.Management;
 using System.Text;
 
@@ -121,41 +116,5 @@ namespace SysInfo
             }
             return string.Empty;
         }
-
-#if ENCRIPTOR
-        internal static bool MashineIDFromKey(string hexStr, out byte[] decrMachineIdByte, out string decrMachineIdstr)
-        {
-            if (!string.IsNullOrEmpty(hexStr))
-            {
-                if (CryptoHelper.Decrypt_Astral(hexStr.HexToBytes(), publicKey, out decrMachineIdByte))
-                {
-                    decrMachineIdstr = decrMachineIdByte.ToNormalString();
-                    return true;
-                }
-            }
-            decrMachineIdByte = null;
-            decrMachineIdstr = string.Empty;
-            return false;
-        }
-
-        internal static bool MashineIDFromFile(string keyFile, out byte[] decrMachineIdByte, out string decrMachineIdstr)
-        {
-            if (File.Exists(keyFile))
-            {
-                string hexStr = File.ReadAllText(keyFile);
-                if (!string.IsNullOrEmpty(hexStr))
-                {
-                    if (CryptoHelper.Decrypt_Astral(hexStr.HexToBytes(), publicKey, out decrMachineIdByte))
-                    {
-                        decrMachineIdstr = decrMachineIdByte.ToNormalString();
-                        return true;
-                    }
-                }
-            }
-            decrMachineIdByte = null;
-            decrMachineIdstr = string.Empty;
-            return false;
-        } 
-#endif
     }
 }

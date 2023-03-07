@@ -7,21 +7,20 @@ using MyNW.Patchables.Enums;
 
 namespace EntityTools.Patches.UCC
 {
-#if PATCH_ASTRAL
     ///
-    internal class Patch_Logic_UCC_Classes_ActionsPlayer_CheckAlly : Patch
+    internal class Patch_ActionsPlayer_CheckAlly : Patch
     {
         /// <summary>
         /// Доступ к полю <see cref="Astral.Logic.UCC.Classes.ActionsPlayer.mostInjuredAlly"/>
         /// </summary>
         static readonly StaticFieldAccessor<Entity> mostInjuredAlly = typeof(ActionsPlayer).GetStaticField<Entity>("mostInjuredAlly");
 
-        internal Patch_Logic_UCC_Classes_ActionsPlayer_CheckAlly()
+        internal Patch_ActionsPlayer_CheckAlly()
         {
             if (NeedInjection)
             {
                 methodToReplace = typeof(ActionsPlayer).GetMethod("CheckAlly", ReflectionHelper.DefaultFlags);
-                methodToInject = typeof(Patch_Logic_UCC_Classes_ActionsPlayer_CheckAlly).GetMethod(nameof(CheckAlly), ReflectionHelper.DefaultFlags);
+                methodToInject = typeof(Patch_ActionsPlayer_CheckAlly).GetMethod(nameof(CheckAlly), ReflectionHelper.DefaultFlags);
             }
         }
 
@@ -50,6 +49,5 @@ namespace EntityTools.Patches.UCC
 
             mostInjuredAlly.Value.Pointer = mostInjured?.Pointer ?? IntPtr.Zero;
         }
-    } 
-#endif
+    }
 }

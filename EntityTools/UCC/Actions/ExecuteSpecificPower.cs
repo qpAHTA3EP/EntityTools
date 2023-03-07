@@ -23,12 +23,8 @@ namespace EntityTools.UCC.Actions
     public class ExecuteSpecificPower : UCCAction, INotifyPropertyChanged
     {
         #region Опции команды
-#if DEVELOPER
         [Editor(typeof(PowerIdEditor), typeof(UITypeEditor))]
         [Category("Power")]
-#else
-        [Browsable(false)]
-#endif
         public string PowerId
         {
             get => _powerId;
@@ -45,12 +41,8 @@ namespace EntityTools.UCC.Actions
         }
         private string _powerId = string.Empty;
 
-#if DEVELOPER
         [Category("Power")]
         [DisplayName("CastingTime (ms)")]
-#else
-        [Browsable(false)]
-#endif
         public int CastingTime
         {
             get => _castingTime;
@@ -65,11 +57,7 @@ namespace EntityTools.UCC.Actions
         }
         private int _castingTime;
 
-#if DEVELOPER
         [Category("Power")]
-#else
-        [Browsable(false)]
-#endif
         public bool ForceMaintain
         {
             get => _forceMaintain;
@@ -84,11 +72,7 @@ namespace EntityTools.UCC.Actions
         }
         private bool _forceMaintain;
 
-#if DEVELOPER
         [Category("Optional")]
-#else
-        [Browsable(false)]
-#endif
         public bool CheckPowerCooldown
         {
             get => _checkPowerCooldown;
@@ -103,11 +87,7 @@ namespace EntityTools.UCC.Actions
         }
         private bool _checkPowerCooldown;
 
-#if DEVELOPER
         [Category("Optional")]
-#else
-        [Browsable(false)]
-#endif
         public bool CheckInTray
         {
             get => _checkInTray;

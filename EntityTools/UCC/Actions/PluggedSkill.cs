@@ -24,12 +24,8 @@ namespace EntityTools.UCC.Actions
     public class PluggedSkill : UCCAction, INotifyPropertyChanged
     {
         #region Опции команды
-#if DEVELOPER
         [Editor(typeof(PowerAllIdEditor), typeof(UITypeEditor))]
         [Category("Required")]
-#else
-        [Browsable(false)]
-#endif
         public PluggedSkillSource Source
         {
             get => _source;

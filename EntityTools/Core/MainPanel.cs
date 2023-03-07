@@ -56,53 +56,17 @@ namespace EntityTools.Core
                 nameof(EntityTools.Config.UnstuckSpells.Active),
                 false, DataSourceUpdateMode.OnPropertyChanged);
 
-#if DEVELOPER
             // Настройки Mapper'a
             ckbMapperPatch.DataBindings.Add(nameof(ckbMapperPatch.Checked),
                 EntityTools.Config.Mapper,
                 nameof(EntityTools.Config.Mapper.Patch),
                 false, DataSourceUpdateMode.OnPropertyChanged);
 
-#if false
-            seMapperWaipointDistance.DataBindings.Add(nameof(seMapperWaipointDistance.Value),
-                                        EntityTools.Config.Mapper,
-                                        nameof(EntityTools.Config.Mapper.WaypointDistance),
-                                        false, DataSourceUpdateMode.OnPropertyChanged);
-            seMapperMaxZDif.DataBindings.Add(nameof(seMapperMaxZDif.Value),
-                                                EntityTools.Config.Mapper,
-                                                nameof(EntityTools.Config.Mapper.MaxElevationDifference),
-                                                false, DataSourceUpdateMode.OnPropertyChanged);
-            seWaypointEquivalenceDistance.DataBindings.Add(nameof(seWaypointEquivalenceDistance.Value),
-                                                EntityTools.Config.Mapper,
-                                                nameof(EntityTools.Config.Mapper.WaypointEquivalenceDistance),
-                                                false, DataSourceUpdateMode.OnPropertyChanged);
-
-            ckbMapperForceLinkingWaypoint.DataBindings.Add(nameof(ckbMapperForceLinkingWaypoint.Checked),
-                                                EntityTools.Config.Mapper,
-                                                nameof(EntityTools.Config.Mapper.ForceLinkingWaypoint),
-                                                false, DataSourceUpdateMode.OnPropertyChanged);
-            ckbMapperLinearPath.DataBindings.Add(nameof(ckbMapperLinearPath.Checked),
-                                                EntityTools.Config.Mapper,
-                                                nameof(EntityTools.Config.Mapper.LinearPath),
-                                                false, DataSourceUpdateMode.OnPropertyChanged);
-#endif
-
-#if false
-            // Настройки EntityToolsLogger
-            ckbEnableLogger.DataBindings.Add(nameof(ckbEnableLogger.Checked),
-                                                EntityTools.Config.Logger,
-                                                nameof(EntityTools.Config.Logger.Active),
-                                                false, DataSourceUpdateMode.OnPropertyChanged);
-            ckbExtendedActionDebugInfo.DataBindings.Add(nameof(ckbExtendedActionDebugInfo.Checked),
-                                                EntityTools.Config.Logger,
-                                                nameof(EntityTools.Config.Logger.ExtendedActionDebugInfo),
-                                                false, DataSourceUpdateMode.OnPropertyChanged);
-#else
             ckbETLogger.DataBindings.Add(nameof(ckbETLogger.Checked),
                 EntityTools.Config.Logger,
                 nameof(EntityTools.Config.Logger.Active),
                 false, DataSourceUpdateMode.OnPropertyChanged);
-#endif
+
             #region QuesterProfilePreprocessing
             ckbEnapleQuesterProfilePreprocessing.DataBindings.Add(nameof(ckbEnapleQuesterProfilePreprocessing.Checked),
                     QuesterHelper.Preprocessor,
@@ -128,53 +92,6 @@ namespace EntityTools.Core
                 false, DataSourceUpdateMode.OnPropertyChanged);
             #endregion
 
-
-#if false
-            // Настройки EntityCache
-            editGlobalCacheTime.DataBindings.Add(nameof(editGlobalCacheTime.Value),
-                                                EntityTools.Config.EntityCache,
-                                                nameof(EntityTools.Config.EntityCache.GlobalCacheTime),
-                                                false, DataSourceUpdateMode.OnPropertyChanged);
-            editLocalCacheTime.DataBindings.Add(nameof(editLocalCacheTime.Value),
-                                                EntityTools.Config.EntityCache,
-                                                nameof(EntityTools.Config.EntityCache.LocalCacheTime),
-                                                false, DataSourceUpdateMode.OnPropertyChanged);
-            editCombatCacheTime.DataBindings.Add(nameof(editCombatCacheTime.Value),
-                                                EntityTools.Config.EntityCache,
-                                                nameof(EntityTools.Config.EntityCache.CombatCacheTime),
-                                                false, DataSourceUpdateMode.OnPropertyChanged);
-
-            // Настройки SlideMonitor
-            cbxSlideMonitor.DataSource = Enum.GetValues(typeof(SlideMonitorState));
-
-            cbxSlideMonitor.DataBindings.Add(nameof(cbxSlideMonitor.SelectedItem),
-                                             EntityTools.Config.SlideMonitor,
-                                             nameof(EntityTools.Config.SlideMonitor.State),
-                                             false, DataSourceUpdateMode.OnPropertyChanged);
-
-            editSlideTimeout.DataBindings.Add(nameof(editSlideTimeout.Value),
-                                                EntityTools.Config.SlideMonitor,
-                                                nameof(EntityTools.Config.SlideMonitor.Timeout),
-                                                false, DataSourceUpdateMode.OnPropertyChanged);
-
-            editSlideFilter.DataBindings.Add(nameof(editSlideFilter.Value),
-                                                EntityTools.Config.SlideMonitor,
-                                                nameof(EntityTools.Config.SlideMonitor.BoatFilter),
-                                                false, DataSourceUpdateMode.OnPropertyChanged);
-#endif
-
-
-#else
-            btnEntities.Visible = false;
-            btnAuraViewer.Visible = false;
-            btnUiViewer.Visible = false;
-
-            tabOptions.PageVisible = false;
-            tabRelogger.PageVisible = false;
-            tabMapper.PageVisible = false;
-            tabDebug.PageVisible = false;
-#endif
-
             pgConfigs.SelectedObject = EntityTools.Config;
 
 #if DEBUG
@@ -188,328 +105,14 @@ namespace EntityTools.Core
 
         private void handler_Test_1(object sender, EventArgs e)
         {
-#if false
-            StringBuilder sb = new StringBuilder("Powers:\n");
-
-            for (int i = 0; i < 15; i++)
-            {
-                var power = Powers.GetPowerBySlot(i);
-                if (power != null && power.IsValid)
-                {
-                    var powDef = power.PowerDef;
-                    //sb.Append("\t[").Append(i).Append("]\t").Append(powDef.DisplayName).Append(" (").Append(powDef.InternalName).AppendLine(")");
-                    sb.AppendFormat("\t[{0}]\t{1} ({2})\n", i, powDef.DisplayName, powDef.InternalName);
-                }
-                else
-                {
-                    //sb.Append("\t[").Append(i).AppendLine("]\tInvalid");
-                    sb.AppendFormat("\t[{0}]\tInvalid\n", i);
-                }
-            }
-
-            sb.AppendLine("------------------");
-
-            var art = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.ArtifactPrimary).GetItems.FirstOrDefault()?.Item;
-            if (art != null && art.IsValid)
-            {
-                var power = art.Powers.FirstOrDefault();
-                if (power != null && power.IsValid)
-                {
-                    var powDef = power.PowerDef;
-                    sb.AppendFormat("Artifact\t[{0}]\t{1} ({2})\n", power.TraySlot, powDef.DisplayName, powDef.InternalName);
-                }
-            }
-            var mount = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.MountEquippedActivePower).GetItems.FirstOrDefault()?.Item;
-            if (mount != null && mount.IsValid)
-            {
-                var power = mount.Powers.FirstOrDefault();
-                if (power != null && power.IsValid)
-                {
-                    var powDef = power.PowerDef;
-                    sb.AppendFormat("Mount\t[{0}]\t{1} ({2})\n", power.TraySlot, powDef.DisplayName, powDef.InternalName);
-                }
-            }
-
-            XtraMessageBox.Show(sb.ToString()); 
-#elif false
-            var id = tbText.Text;
-            var slot = EntityManager.LocalPlayer.AllItems.FirstOrDefault(s =>
-                s.Filled && s.Item.ItemDef.InternalName == id);
-            if (slot!= null)
-                XtraMessageBox.Show($@"ItemLevel: {slot.Item.ItemProgression_GetItemLevel()}");
-            else XtraMessageBox.Show($@"No item '{id}' found");
-#elif false
-            var path = @"d:\ASTRAL\Astral_RU_1\Profiles\Campaigns\M18_M19_Avernus\M19_Fallen.amp.zip";
-            var profile = AstralAccessors.Quester.Core.Load(ref path);
-
-            var profile1 = profile.CreateDeepCopy();
-            var profile2 = profile.CreateXmlCopy();
-#elif true
-            var mountDef = EntityManager.LocalPlayer.GetMountCostume();
-
-            if (mountDef != null)
-                XtraMessageBox.Show($@"{mountDef.InternalName} {mountDef.Category} {mountDef.Type}");
-
-#endif
         }
 
         private void handler_Test_2(object sender, EventArgs e)
         {
-#if false
-            Traverse aoeList = Traverse.Create(typeof(AOECheck)).Property("List");
-            if (!aoeList.PropertyExists())
-            {
-                XtraMessageBox.Show("AOE list does not accessible");
-                return;
-            }
-
-            if (aoeList.GetValue() is IEnumerable<AOECheck.AOE> enumerable)
-            {
-                var sb = new StringBuilder();
-                foreach (var aoe in enumerable)
-                {
-                    sb.AppendLine(aoe.ID);
-                }
-
-                XtraMessageBox.Show(sb.ToString());
-            }
-            else XtraMessageBox.Show(@"Can't enumerate <AOECheck.AOE> in 'aoeList'");
-#elif false
-            var type = typeof(AOECheck.AOE);
-            var list = Traverse.Create(typeof(AOECheck)).Property("List");
-            if (list.GetValue() is List<AOECheck.AOE> aoeList)
-            {
-                var sb = new StringBuilder();
-                foreach (var aoe in aoeList)
-                {
-                    sb.AppendLine(aoe.ID);
-                }
-
-                XtraMessageBox.Show(sb.ToString());
-            }
-            XtraMessageBox.Show(type.ToString());
-
-#elif false
-            var aoeList = Traverse.Create(typeof(AOECheck)).Property("List").GetValue();
-
-            //var iterator = aoeList.GetValue<List<AOECheck.AOE>>().GetEnumerator();
-            //try
-            //{
-            //    while (iterator.MoveNext())
-            //    {
-            //        var item = iterator.Current;
-            //    }
-            //}
-            //finally
-            //{
-            //    iterator.Dispose();
-            //}
-
-            var aoeList_GetEnumerator = Traverse.Create(aoeList).Method("GetEnumerator");
-            var enumeratorObj = aoeList_GetEnumerator.GetValue();
-            var enumerator = Traverse.Create(enumeratorObj);
-            var enumerator_MoveNext = enumerator.Method("MoveNext");
-            var enumerator_Dispose = enumerator.Method("Dispose");
-
-            var aoeType = typeof(AOECheck.AOE);
-            var ID = aoeType.GetProperty<string>(nameof(AOECheck.AOE.ID));
-            try
-            {
-                if (enumerator_MoveNext.MethodExists())
-                {
-                    var enumerator_Current = enumerator.Property("Current");
-                    if (enumerator_Current.PropertyExists())
-                    {
-                        var sb = new StringBuilder();
-                        while (enumerator_MoveNext.GetValue<bool>())
-                        {
-                            var aoe = enumerator_Current.GetValue();
-                            sb.AppendLine(ID[aoe]);
-                        }
-
-                        XtraMessageBox.Show(sb.ToString());
-                    }
-                }
-            }
-            finally
-            {
-                if (enumerator_Dispose.MethodExists())
-                    enumerator_Dispose.GetValue();
-            }
-#elif false
-            var slot = EntityManager.LocalPlayer.GetInventoryBagById(InvBagIDs.Inventory).Slots
-                .FirstOrDefault(s => s.Filled && s.Item.ItemDef.InternalName == "T1_Enchantment_Tutorial");
-            slot?.Evolve();
-#elif true
-            var pwr = Powers.GetPowerByInternalName("M19_Instance_Fpower_Summon_Lulu");
-            if (pwr != null && pwr.IsValid)
-            {
-                var trg = Astral.Logic.UCC.Core.CurrentTarget;
-                if (trg != null && trg.IsValid)
-                {
-                    Powers.ExecPower(pwr, trg, true);
-                    Thread.Sleep(500);
-                    Powers.ExecPower(pwr, trg, false);
-                }
-            }
-            else
-            {
-                XtraMessageBox.Show("Power does not found");
-            }
-#endif
         }
 
         private void handler_Test_3(object sender, EventArgs e)
         {
-#if false
-            StaticPropertyAccessor<List<AOECheck.AOE>> aoeList =
-                    typeof(AOECheck).GetStaticProperty<List<AOECheck.AOE>>("List");
-            if (!aoeList.IsValid)
-            {
-                XtraMessageBox.Show("AOE list does not accessible");
-                return;
-            }
-
-            var sb = new StringBuilder();
-            foreach (var aoe in aoeList.Value)
-            {
-                sb.AppendLine(aoe.ID);
-            }
-
-            XtraMessageBox.Show(sb.ToString());
-#elif false
-            var aoeType = typeof(AOECheck.AOE);
-            var aoeList = Traverse.Create(typeof(AOECheck)).Property("List");
-            Type aoeListType = aoeList.GetValue()?.GetType();
-            var listType = typeof(List<>); //aoeListType.GetGenericTypeDefinition();
-            var aoeListType1 = listType.MakeGenericType(aoeType);
-
-            bool isEqualType = aoeListType == aoeListType1;
-
-            XtraMessageBox.Show($"{aoeType}\n" +
-                                $"{aoeListType}\n" +
-                                $"{aoeListType1}\n" +
-                                $"{listType}\n" +
-                                $"{isEqualType}");
-#elif false
-            var changeWPDistance = API.Engine.Navigation.GetProperty<double>("ChangeWPDist");
-
-            if (!changeWPDistance.IsValid)
-            {
-                XtraMessageBox.Show($"Не удалось получить доступ к полю 'Navigation.ChangeWPDist'");
-                return;
-            }
-
-            var currentChangeWPDistance = changeWPDistance.Value;
-
-            XtraMessageBox.Show($"Текущее значение 'Navigation.ChangeWPDist' равно {currentChangeWPDistance}");
-#elif false
-            var pwr = Powers.GetPowerBySlot(22);
-            if (pwr != null && pwr.IsValid)
-            {
-                var trg = Astral.Logic.UCC.Core.CurrentTarget;
-                if (trg != null && trg.IsValid)
-                {
-                    Powers.ExecPower(pwr, trg, true);
-                    Thread.Sleep(500);
-                    Powers.ExecPower(pwr, trg, false);
-                }
-            }
-            else
-            {
-                XtraMessageBox.Show("Power does not slotted");
-            }
-#elif false
-            //var editor = TypeDescriptor.GetEditor(typeof(CustomRegionCollection), typeof(UITypeEditor));
-            ////EntityTools.Core.CheckCore();
-            ////var editor2 = TypeDescriptor.GetEditor(typeof(CustomRegionCollection), typeof(UITypeEditor));
-            //var properties = TypeDescriptor.GetProperties(typeof(IsInCustomRegionSet));
-            //var p = properties[nameof(IsInCustomRegionSet.CustomRegions)];
-            //var editorAttribute = p.Attributes[typeof(EditorAttribute)];
-            //XtraMessageBox.Show($"{editor?.GetType().FullName}\n{editorAttribute.}");
-
-            ViewModelDecorator<IsInCustomRegionSet> CustomRegionCollectionDecorator = new ViewModelDecorator<IsInCustomRegionSet>((
-                    typeof(CustomRegionCollection),
-                    new[] { new EditorAttribute(typeof(CustomRegionCollectionEditor), typeof(UITypeEditor)) }));
-
-            var cond = new IsInCustomRegionSet();
-            var typeDef = CustomRegionCollectionDecorator.Decorate(cond);
-
-            var editor1 = TypeDescriptor.GetEditor(cond.CustomRegions, typeof(UITypeEditor));
-            var editor2 = typeDef.GetProperties()[nameof(cond.CustomRegions)].GetEditor(typeof(UITypeEditor));
-
-            XtraMessageBox.Show($"{editor1?.GetType().FullName}\n{editor2?.GetType().FullName}");
-#elif false
-            //var cond = new IsInCustomRegionSet();
-            var condType = typeof(IsInCustomRegionSet);//cond.GetType();
-            // prepare our property overriding type descriptor
-            PropertyOverridingTypeDescriptor ctd = new PropertyOverridingTypeDescriptor(TypeDescriptor.GetProvider(condType).GetTypeDescriptor(condType));
-            // iterate through properies in the supplied object/type
-            foreach (PropertyDescriptor pd in TypeDescriptor.GetProperties(condType)) {
-                // for every property that complies to our criteria
-                if (pd.PropertyType ==  typeof(CustomRegionCollection) ) {
-                    // we first construct the custom PropertyDescriptor with the TypeDescriptor's built-in capabilities
-                    PropertyDescriptor pd2 = TypeDescriptor.CreateProperty(
-                        condType, // or just _settings, if it's already a type
-                        pd,                  // base property descriptor to which we want to add attributes
-                        // The PropertyDescriptor which we'll get will just wrap that
-                        // base one returning attributes we need.
-                        new EditorAttribute( // the attribute in question
-                            typeof(CustomRegionCollectionEditor),
-                            typeof(System.Drawing.Design.UITypeEditor)
-                        )
-                        // this method really can take as many attributes as you like, not just one
-                    );
-                
-                    // and then we tell our new PropertyOverridingTypeDescriptor to override that property
-                    ctd.OverrideProperty(pd2);
-                }
-            }
-            
-            // then we add new descriptor provider that will return our descriptor instead of default
-            TypeDescriptor.AddProvider(new TypeDescriptorOverridingProvider(ctd), condType);
-
-            propertyGrid.SelectedObject = new IsInCustomRegionSet(); //cond;
-#elif false
-            // Декорирование свойств типов для вызова корректного редактора
-            var tCustomRegionCollection = typeof(CustomRegionCollection);
-            var tCustomRegionCollectionEditor = typeof(CustomRegionCollectionEditor);
-            var tUITypeEditor = typeof(UITypeEditor);
-            //var editorAttribute = new EditorAttribute(typeof(CustomRegionSetEditor),
-            //                                         typeof(UITypeEditor));
-            foreach (Type type in ACTP0Serializer.QuesterTypes)
-            {
-                bool shouldOverrideProperty = false;
-                PropertyOverridingTypeDescriptor ctd = new PropertyOverridingTypeDescriptor(TypeDescriptor.GetProvider(type).GetTypeDescriptor(type));
-                // iterate through properties in the supplied object/type
-                foreach (PropertyDescriptor pd in TypeDescriptor.GetProperties(type))
-                {
-                    // for every property that complies to our criteria
-                    if (pd.PropertyType == tCustomRegionCollection)
-                    {
-                        // we first construct the custom PropertyDescriptor with the TypeDescriptor's built-in capabilities
-                        var newPD = TypeDescriptor.CreateProperty(
-                                tCustomRegionCollection, // or just _settings, if it's already a type
-                                pd,                      // base property descriptor to which we want to add attributes
-                                                         // The PropertyDescriptor which we'll get will just wrap that
-                                                         // base one returning attributes we need.
-                                new EditorAttribute(tCustomRegionCollectionEditor,tUITypeEditor));
-
-                        // and then we tell our new PropertyOverridingTypeDescriptor to override that property
-                        ctd.OverrideProperty(newPD);
-                        shouldOverrideProperty = true;
-                    }
-                }
-
-                // then we add new descriptor provider that will return our descriptor instead of default
-                if (shouldOverrideProperty)
-                {
-                    var descriptor = new TypeDescriptorOverridingProvider(ctd);
-                    descriptorProvider.Add(descriptor);
-                    TypeDescriptor.AddProvider(descriptor, type);
-                }
-            }
-#endif
         }
         private static readonly List<TypeDescriptionProvider> descriptorProvider = new List<TypeDescriptionProvider>();
 
@@ -532,45 +135,32 @@ namespace EntityTools.Core
 
         private void handler_OpenUiViewer(object sender, EventArgs e)
         {
-#if DEVELOPER
             string uiGenId = UIViewer.GUIRequest(string.Empty);
             if(!string.IsNullOrEmpty(uiGenId))
                 Clipboard.SetText(uiGenId);
-#endif
         }
 
         private void handler_OpenEntitiesViewer(object sender, EventArgs e)
         {
-#if DEVELOPER
             string pattern = string.Empty;
             EntityNameType nameType = EntityNameType.InternalName;
             ItemFilterStringType strMatch = ItemFilterStringType.Simple;
             EntityViewer.GUIRequest(ref pattern, ref strMatch, ref nameType);
             if (!string.IsNullOrEmpty(pattern))
                 Clipboard.SetText(pattern);
-#endif
         }
 
         private void handler_OpenMissionMonitor(object sender, EventArgs e)
         {
-#if DEVELOPER
-#if false
-            var missMonitor = new MissionMonitorForm2();
-            missMonitor.Show();  
-#else
             var missMonitor = new MissionMonitorForm();
             missMonitor.Show();
-#endif
-#endif
         }
 
         private void handler_OpenAuraViewer(object sender, EventArgs e)
         {
-#if DEVELOPER
             string auraId = AuraViewer.GUIRequest();
             if (!string.IsNullOrEmpty(auraId))
                 Clipboard.SetText(auraId);
-#endif
         }
 
         private void handler_ChangeExportingFileName(object sender, ButtonPressedEventArgs e)
@@ -741,22 +331,6 @@ namespace EntityTools.Core
 #endif
         }
 
-#if ShowMostInjuredAlly
-        private void ShowMostInjuredAlly(Entity entity)
-        {
-            string info = string.Empty;
-            if (entity != null)
-            {
-                info = string.Concat("MostInjuredAlly: ", entity.DebugName, Environment.NewLine,
-                    "--------------------------------------", Environment.NewLine,
-                    '\t', nameof(entity.IsPlayer), '=', entity.IsPlayer, Environment.NewLine,
-                    '\t', nameof(entity.CombatDistance3), '=', entity.CombatDistance3, Environment.NewLine,
-                    '\t', nameof(entity.Character.AttribsBasic.HealthPercent), '=', entity.Character.AttribsBasic.HealthPercent);
-            }
-            tbDebugMonitorInfo.Text = info;
-        } 
-#endif
-
         private void work_PowerSearch(object sender, System.ComponentModel.DoWorkEventArgs e)
         {
             IPowerCache powCache = new PowerCache("M19_Instance_Fpower_Summon_Lulu");
@@ -775,25 +349,6 @@ namespace EntityTools.Core
                 Thread.Sleep(550);
             } 
         }
-
-#if BLAttackersListMonitor
-        StaticFieldAccessor<Func<List<string>>> BLAttackersList = typeof(Astral.Logic.NW.Combats).GetStaticField<Func<List<string>>>("BLAttackersList");
-        private void work_BlackList(object sender, System.ComponentModel.DoWorkEventArgs e)
-        {
-            if (!BLAttackersList.IsValid
-                || BLAttackersList.Value is null)
-                return;
-
-            while (!backgroundWorker.CancellationPending)
-            {
-                var list = BLAttackersList.Value();
-                if (list?.Count > 0)
-                    tbDebugMonitorInfo.Lines = list.ToArray();
-                else tbDebugMonitorInfo.Text = "FoeBlackList is empty";
-                Thread.Sleep(500);
-            }
-        } 
-#endif
 
         private void handler_Up(object sender, EventArgs e)
         {
@@ -870,11 +425,6 @@ namespace EntityTools.Core
 
         private void handler_GetMachineId(object sender, EventArgs e)
         {
-#if false
-            var machineid = Memory.MMemory.ReadString(Memory.BaseAdress + 0x2640BD0, Encoding.UTF8, 64);
-            lblAccount.Text = $@"Account:   @{EntityManager.LocalPlayer.AccountLoginUsername}";
-            tbMashineId.Text = machineid; 
-#endif
             using (var crypticCoreKey = Registry.CurrentUser.OpenSubKey(@"Software\Cryptic\Core"))
             {
                 if (crypticCoreKey != null)
@@ -931,38 +481,6 @@ namespace EntityTools.Core
 
         private void handler_TestProcessingItem(object sender, EventArgs e)
         {
-#if false
-            if (gridViewPreprocessing.GetFocusedRow() is ReplacementItem item)
-            {
-                if (!item.IsValid)
-                {
-                    XtraMessageBox.Show($"Selected processing Item is invalid",
-                        "Error", MessageBoxButtons.OK,
-                        MessageBoxIcon.Error);
-                    return;
-                }
-
-                var testdata = new[]
-                {
-                    "AdventuringHead",
-                    "AdventuringTrousers",
-                    "AdventuringRings",
-                    "AdventuringHands"
-                };
-
-                var sb = new StringBuilder("Processing result: \n\t");
-                sb.AppendLine($"({item.Type}){item.Pattern} => {item.Replacement}\n");
-
-                foreach (var s in testdata)
-                {
-                    sb.AppendLine(item.Replace(s, out string output)
-                        ? $"\t{s} => {output}"
-                        : $"\t{s}");
-                }
-
-                XtraMessageBox.Show(sb.ToString());
-            } 
-#else
             var replacement = QuesterHelper.Preprocessor.Replacement;
 
             if(replacement.Count == 0)
@@ -1055,7 +573,6 @@ namespace EntityTools.Core
                     //XtraMessageBox.Show(ex.ToString());
                 }
             }
-#endif
         }
 
         private void handler_Help(object sender, EventArgs e)

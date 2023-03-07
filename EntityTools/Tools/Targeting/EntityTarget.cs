@@ -16,13 +16,9 @@ namespace EntityTools.Tools.Targeting
     public class EntityTarget : TargetSelector, IEntityIdentifier
     {
         #region Опции команды
-#if DEVELOPER
         [Description("The text identifier or part of it used to search for an Entity")]
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
         [Category("Entity")]
-#else
-        [Browsable(false)]
-#endif
         [NotifyParentProperty(true)]
         public string EntityID
         {
@@ -39,14 +35,10 @@ namespace EntityTools.Tools.Targeting
         }
         private string _entityId = string.Empty;
 
-#if DEVELOPER
         [Description("Type of and EntityID:\n" +
             "Simple: Simple text string with a wildcard at the beginning or at the end (char '*' means any symbols)\n" +
             "Regex: Regular expression")]
         [Category("Entity")]
-#else
-        [Browsable(false)]
-#endif
         [NotifyParentProperty(true)]
         public ItemFilterStringType EntityIdType
         {
@@ -62,12 +54,8 @@ namespace EntityTools.Tools.Targeting
         }
         private ItemFilterStringType _entityIdType = ItemFilterStringType.Simple;
 
-#if DEVELOPER
         [Description("The switcher of the Entity property which compared to 'EntityID'")]
         [Category("Entity")]
-#else
-        [Browsable(false)]
-#endif
         [NotifyParentProperty(true)]
         public EntityNameType EntityNameType
         {

@@ -14,12 +14,8 @@ namespace EntityTools.Tools
     {
         Predicate<string> _idComparer;
 
-#if DEVELOPER
         [Description("An Identifier of the Aura which is checked on the the Entity")]
         [Editor(typeof(AuraIdEditor), typeof(UITypeEditor))]
-#else
-        [Browsable(false)]
-#endif   
         public string AuraName
         {
             get => _auraId;
@@ -32,9 +28,6 @@ namespace EntityTools.Tools
         }
         internal string _auraId;
 
-#if !DEVELOPER
-        [Browsable(false)]
-#endif
         public ItemFilterStringType AuraNameType
         {
             get => _auraNameType;
@@ -45,9 +38,6 @@ namespace EntityTools.Tools
             }
         }
         private ItemFilterStringType _auraNameType = ItemFilterStringType.Simple;
-#if !DEVELOPER
-        [Browsable(false)]
-#endif
         public int Stacks
         {
             get => _stacks;
@@ -59,9 +49,6 @@ namespace EntityTools.Tools
         }
         internal int _stacks;
 
-#if !DEVELOPER
-        [Browsable(false)]
-#endif
         public AstralSign Sign
         {
             get => _sign;

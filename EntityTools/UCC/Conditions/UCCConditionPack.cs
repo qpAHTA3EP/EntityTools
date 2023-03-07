@@ -6,11 +6,9 @@ using System.Text;
 using System.Xml.Serialization;
 
 using Astral.Logic.UCC.Classes;
-
 using EntityTools.Editors;
 using EntityTools.Enums;
 using EntityTools.Tools;
-
 using ConditionList = System.Collections.ObjectModel.ObservableCollection<Astral.Logic.UCC.Classes.UCCCondition>;
 
 namespace EntityTools.UCC.Conditions
@@ -19,36 +17,20 @@ namespace EntityTools.UCC.Conditions
     // ReSharper disable once InconsistentNaming
     public class UCCConditionPack : UCCCondition, ICustomUCCCondition
     {
-#if DEVELOPER
         [Description("Displayed name of the ConditionPack")]
-#else
-        [Browsable(false)]
-#endif
         public string Name { get; set; }
 
-#if DEVELOPER
         [Description("The negation of the result of the ConditionPack")]
-#else
-        [Browsable(false)]
-#endif
         public bool Not { get; set; }
 
-#if DEVELOPER
         [Description("Logical rule of the Conditions checks\n" +
             "Conjunction: All Conditions have to be True (Logical AND)\n" +
             "Disjunction: At least one of the Conditions have to be True (Logical OR)")]
-#else
-        [Browsable(false)]
-#endif
         public LogicRule TestRule { get; set; }
 
-#if DEVELOPER
         [Description("The list of the Conditions")]
         [TypeConverter(typeof(CollectionTypeConverter))]
         [Editor(typeof(UccConditionListEditor), typeof(UITypeEditor))]
-#else
-        [Browsable(false)]
-#endif
         public ConditionList Conditions { get; set; } = new ConditionList();
 
 #region ICustomUCCCondition

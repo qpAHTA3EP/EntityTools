@@ -127,11 +127,7 @@ namespace EntityTools.Tools.Missions
         }
         private string _regionName = string.Empty;
 
-#if DEVELOPER
         [Description("The allowed deviation of the NPC from the specified Position. The minimum value is 1.")]
-#else
-        [Browsable(false)]
-#endif
         [NotifyParentProperty(true)]
         public uint Tolerance
         {

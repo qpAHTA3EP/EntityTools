@@ -26,12 +26,8 @@ namespace EntityTools.Quester.Conditions
         }
 
         #region Опции команды
-#if DEVELOPER
         [Description("ID of the bag containing the item(s)")]
         [Category("ItemSlot")]
-#else
-        [Browsable(false)]
-#endif
         public SpecificBags Bag
         {
             get => _bag;
@@ -71,13 +67,9 @@ namespace EntityTools.Quester.Conditions
         }
         private ItemSelectorType _itemSelectorType = ItemSelectorType.Min;
 
-#if DEVELOPER
         [Description("Filter of the item Id.\n" +
                      "Ignored if empty than means 'All items'")]
         [Category("ItemFilter")]
-#else
-        [Browsable(false)]
-#endif
         public string ItemFilter
         {
             get => _itemFiler;
@@ -93,14 +85,10 @@ namespace EntityTools.Quester.Conditions
         }
         private string _itemFiler = string.Empty;
 
-#if DEVELOPER
         [Description("Type of the '" + nameof(ItemFilter) + "' property:\n" +
             "Simple: Simple text string with a wildcard at the beginning or at the end (char '*' means any symbols)\n" +
             "Regex: Regular expression")]
         [Category("ItemFilter")]
-#else
-        [Browsable(false)]
-#endif
         public ItemFilterStringType ItemFilterType
         {
             get => _itemFilerType;
@@ -115,12 +103,8 @@ namespace EntityTools.Quester.Conditions
         }
         private ItemFilterStringType _itemFilerType = ItemFilterStringType.Simple;
 
-#if DEVELOPER
         [Description("Threshold value of the specified item(s) level")]
         [Category("Tested")]
-#else
-        [Browsable(false)]
-#endif
         public uint Value
         {
             get => _value;
@@ -136,12 +120,8 @@ namespace EntityTools.Quester.Conditions
         }
         private uint _value;
 
-#if DEVELOPER
         [Description("Ratio of the '" + nameof(Value) + "' and the level of the specified item(s)")]
         [Category("Tested")]
-#else
-        [Browsable(false)]
-#endif
         public Relation Sign
         {
             get => _sign;
@@ -165,11 +145,6 @@ namespace EntityTools.Quester.Conditions
 
         protected void OnPropertyChanged([CallerMemberName] string propertyName = "")
         {
-#if false
-            _label = string.Empty;
-            itemLevelEvaluator = evaluator_initializer;
-            conditionValidator = conditionValidator_initializer; 
-#endif
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
@@ -212,7 +187,7 @@ namespace EntityTools.Quester.Conditions
                     case SpecificBags.Shirt:
                     case SpecificBags.Paints:
                     case SpecificBags.RingLeft:
-                    //case SpecificBags.RingRight:
+                    case SpecificBags.RingRight:
                     //case SpecificBags.ArtifactPrimary:
                     //case SpecificBags.ArtifactSecondary1:
                     //case SpecificBags.ArtifactSecondary2:

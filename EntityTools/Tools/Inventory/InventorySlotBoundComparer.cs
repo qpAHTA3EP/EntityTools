@@ -10,6 +10,7 @@ namespace EntityTools.Tools.Inventory
     /// </summary>
     public class BoundingComparerOfInventorySlot : IComparer<InventorySlot>
     {
+        public static readonly BoundingComparerOfInventorySlot Default = new BoundingComparerOfInventorySlot();
         /// <summary>
         /// Сравнение двух слотов инвентаря с учетом привязки в следующем порядке:<br/>
         /// [Привязка к персонажу] &lt; [Привязка к аккаунту] &lt; [Без привязки]

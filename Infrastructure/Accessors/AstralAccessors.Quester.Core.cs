@@ -25,12 +25,13 @@ namespace Infrastructure
         /// </summary>
         public static partial class Quester
         {
+            [Patch]
             public static class Core
             {
                 #region Meshes
                 private static bool PrefixGetMeshes(ref Graph __result)
                 {
-                    __result = CurrentProfile.CurrentMesh;
+                    __result = currentProfile.CurrentMesh;
 
                     return false;
                 }
@@ -40,59 +41,38 @@ namespace Infrastructure
 
                 private static bool PrefixGetMapsMeshes(ref Dictionary<string, Graph> __result)
                 {
-                    __result = CurrentProfile.MapsMeshes;
+                    __result = currentProfile.MapsMeshes;
                     return false;
                 }
                 private static bool PrefixSetMapsMeshes(Dictionary<string, Graph> value)
                 {
-                    CurrentProfile.MapsMeshes = value;
+                    currentProfile.MapsMeshes = value;
                     return false;
-                }
-
-                internal static string CurrentProfileZipMeshFile
-                {
-                    get
-                    {
-                        var lastQuesterProfileFileName = Astral.API.CurrentSettings.LastQuesterProfile;
-                        var currentProfile = Astral.Quester.API.CurrentProfile;
-                        if (lastQuesterProfileFileName.Length > 0
-                            && currentProfile.Saved)
-                        {
-                            string meshesFile;
-                            if (currentProfile.UseExternalMeshFile && currentProfile.ExternalMeshFileName.Length >= 10)
-                                meshesFile = Path.Combine(Path.GetDirectoryName(lastQuesterProfileFileName) ?? string.Empty,
-                                                          currentProfile.ExternalMeshFileName);
-                            else meshesFile = lastQuesterProfileFileName;
-                            if (File.Exists(meshesFile))
-                            {
-                                return meshesFile;
-                            }
-                        }
-                        return string.Empty;
-                    }
                 }
 
                 private static bool PrefixLoadAllMeshes(out int __result)
                 {
-                    __result = QuesterHelper.LoadAllMeshes(CurrentProfile.MapsMeshes, CurrentProfileZipMeshFile);
+                    __result = QuesterHelper.LoadAllMeshes(currentProfile.MapsMeshes, currentProfile.CurrentProfileZipMeshFile);
                     return false;
                 }
                 #endregion
 
                 #region Profile
-                private static readonly MethodInfo engineSetProfile;
+                private static MethodInfo engineSetProfile;
 
                 /// <summary>
                 /// Прокси-объект, опосредующий доступ к активному quester-профилю, выполняемому в роли Quester
                 /// </summary>
-                public static readonly BaseQuesterProfileProxy CurrentProfile;
+                public static BaseQuesterProfileProxy CurrentProfile => currentProfile;
+
+                private static BaseQuesterProfileProxy currentProfile;
 
                 /// <summary>
                 /// препатч <seealso cref="Astral.Quester.Core.Load(string, bool)"/>
                 /// </summary>
                 internal static bool PrefixLoad(string Path, bool savePath = true)
                 {
-                    CurrentProfile.LoadFromFile(Path);
+                    currentProfile.LoadFromFile(Path);
 
                     return false;
                 }
@@ -100,8 +80,8 @@ namespace Infrastructure
                 internal static bool PrefixSave(bool saveas = false)
                 {
                     if (saveas)
-                        CurrentProfile.SaveAs();
-                    else CurrentProfile.Save();
+                        currentProfile.SaveAs();
+                    else currentProfile.Save();
                     return false;
                 }
                 #endregion
@@ -121,7 +101,7 @@ namespace Infrastructure
 
                 internal static void ApplyPatches() { }
 
-                static Core()
+                public static void Apply(Harmony harmony)
                 {
                     // TODO Пропатчить Core.LoadAllMeshes
 
@@ -134,7 +114,7 @@ namespace Infrastructure
                     if (engineSetProfile != null
                         && postfixSetProfile != null)
                     {
-                        ACTP0Patcher.Harmony.Patch(engineSetProfile, null, new HarmonyMethod(postfixSetProfile));
+                        harmony.Patch(engineSetProfile, null, new HarmonyMethod(postfixSetProfile));
                     }
 
                     var propMeshes = AccessTools.Property(tCore, nameof(Astral.Quester.Core.Meshes));
@@ -144,7 +124,7 @@ namespace Infrastructure
                     if (originalGetMeshes != null
                         && prefixGetMeshes != null)
                     {
-                        ACTP0Patcher.Harmony.Patch(originalGetMeshes, new HarmonyMethod(prefixGetMeshes));
+                        harmony.Patch(originalGetMeshes, new HarmonyMethod(prefixGetMeshes));
                         Logger.WriteLine(Logger.LogType.Debug, $"Patch the getter of the property 'Astral.Quester.Core.Meshes' succeeded");
                     }
                     else Logger.WriteLine(Logger.LogType.Debug, $"Patch the getter of the property 'Astral.Quester.Core.Meshes' failed");
@@ -157,7 +137,7 @@ namespace Infrastructure
                     if (originalGetMapsMeshes != null
                         && prefixGetMapsMeshes != null)
                     {
-                        ACTP0Patcher.Harmony.Patch(originalGetMapsMeshes, new HarmonyMethod(prefixGetMapsMeshes));
+                        harmony.Patch(originalGetMapsMeshes, new HarmonyMethod(prefixGetMapsMeshes));
                         Logger.WriteLine(Logger.LogType.Debug,
                             $"Patch the getter of the property 'Astral.Quester.Core.MapsMeshes' succeeded");
                     }
@@ -167,7 +147,7 @@ namespace Infrastructure
                     if (originalSetMapsMeshes != null
                         && prefixSetMapsMeshes != null)
                     {
-                        ACTP0Patcher.Harmony.Patch(originalSetMapsMeshes, new HarmonyMethod(prefixSetMapsMeshes));
+                        harmony.Patch(originalSetMapsMeshes, new HarmonyMethod(prefixSetMapsMeshes));
                         Logger.WriteLine(Logger.LogType.Debug, $"Patch the setter of the property 'Astral.Quester.Core.MapsMeshes' succeeded");
                     }
                     else Logger.WriteLine(Logger.LogType.Debug, $"Patch the setter of the property 'Astral.Quester.Core.MapsMeshes' failed");
@@ -177,7 +157,7 @@ namespace Infrastructure
                     if (originalLoad != null &&
                         prefixLoad != null)
                     {
-                        ACTP0Patcher.Harmony.Patch(originalLoad, new HarmonyMethod(prefixLoad));
+                        harmony.Patch(originalLoad, new HarmonyMethod(prefixLoad));
                         Logger.WriteLine(Logger.LogType.Debug, $"Patch of 'Astral.Quester.Core.Load' succeeded");
                     }
                     else Logger.WriteLine(Logger.LogType.Debug, $"Patch of 'Astral.Quester.Core.Load' failed");
@@ -187,7 +167,7 @@ namespace Infrastructure
                     if (originalSave != null &&
                         prefixSave != null)
                     {
-                        ACTP0Patcher.Harmony.Patch(originalSave, new HarmonyMethod(prefixSave));
+                        harmony.Patch(originalSave, new HarmonyMethod(prefixSave));
                         Logger.WriteLine(Logger.LogType.Debug, $"Patch of 'Astral.Quester.Core.Save' succeeded");
                     }
                     else Logger.WriteLine(Logger.LogType.Debug, $"Patch of 'Astral.Quester.Core.Save' failed");
@@ -197,12 +177,12 @@ namespace Infrastructure
                     if (originalLoadAllMeshes != null &&
                         prefixLoadAllMeshes != null)
                     {
-                        ACTP0Patcher.Harmony.Patch(originalLoadAllMeshes, new HarmonyMethod(prefixLoadAllMeshes));
+                        harmony.Patch(originalLoadAllMeshes, new HarmonyMethod(prefixLoadAllMeshes));
                         Logger.WriteLine(Logger.LogType.Debug, $"Patch of 'Astral.Quester.Core.LoadAllMeshes' succeeded");
                     }
                     else Logger.WriteLine(Logger.LogType.Debug, $"Patch of 'Astral.Quester.Core.LoadAllMeshes' failed");
 
-                    CurrentProfile = new ActiveProfileProxy(engineSetProfile);
+                    currentProfile = new ActiveProfileProxy(engineSetProfile);
                 }
             }
         }

@@ -34,33 +34,21 @@ namespace EntityTools.Quester.Actions
         string _idStr;
 
         #region Опции команды
-#if DEVELOPER
         [Editor(typeof(VendorInfoEditor), typeof(UITypeEditor))]
         [TypeConverter(typeof(ExpandableObjectConverter))]
         [Category("Vendor")]
-#else
-        [Browsable(false)]
-#endif
         public VendorInfo Vendor { get => _vendor; set => _vendor = value; }
         internal VendorInfo _vendor = new VendorInfo();
 
-#if DEVELOPER
         [Editor(typeof(DialogEditor), typeof(UITypeEditor))]
         [Description("Specific dialogs before reaching item list.")]
         [Category("Vendor")]
-#else
-        [Browsable(false)]
-#endif
         [XmlElement(typeof(List<string>), ElementName = "BuyMenus")]
         public List<string> VendorMenus { get => _vendorMenus; set => _vendorMenus = value; }
         internal List<string> _vendorMenus = new List<string>();
 
-#if DEVELOPER
         [Editor(typeof(ItemIdFilterEditor), typeof(UITypeEditor))]
         [Category("Setting of selling")]
-#else
-        [Browsable(false)]
-#endif
         public ItemFilterCore SellOptions
         {
             get => _sellOptions;
@@ -75,12 +63,8 @@ namespace EntityTools.Quester.Actions
         }
         internal ItemFilterCore _sellOptions = new ItemFilterCore();
 
-#if DEVELOPER
         [Description("Use options set in general settings to sell")]
         [Category("Setting of selling")]
-#else
-        [Browsable(false)]
-#endif
         public bool UseGeneralSettingsToSell
         {
             get => _useGeneralSettingsToSell; set
@@ -94,13 +78,9 @@ namespace EntityTools.Quester.Actions
         }
         internal bool _useGeneralSettingsToSell = true;
 
-#if DEVELOPER
         [Description("Список сумок, предметы из которых могут быть проданы")]
         [Editor(typeof(BagsListEditor), typeof(UITypeEditor))]
         [Category("Setting of selling")]
-#else
-        [Browsable(false)]
-#endif
         public BagsList SellBags
         {
             get => _sellBags;
@@ -115,49 +95,29 @@ namespace EntityTools.Quester.Actions
         }
         internal BagsList _sellBags = BagsList.GetPlayerBags();
 
-#if DEVELOPER
         [Editor(typeof(ItemFilterEntryListEditor), typeof(UITypeEditor))]
         [Category("Setting of buying")]
-#else
-        [Browsable(false)]
-#endif
         public List<ItemFilterEntryExt> BuyOptions { get => _buyOptions; set => _buyOptions = value; }
         private List<ItemFilterEntryExt> _buyOptions = new List<ItemFilterEntryExt>();
 
-#if DEVELOPER
         [Description("Use options set in general settings to buy")]
         [Category("Setting of buying")]
-#else
-        [Browsable(false)]
-#endif
         public bool UseGeneralSettingsToBuy { get => _useGeneralSettingsToBuy; set => _useGeneralSettingsToBuy = value; }
         internal bool _useGeneralSettingsToBuy;
 
-#if DEVELOPER
         [Description("Проверять наличие свободных слотов сумки")]
         [Category("Setting of buying")]
-#else
-        [Browsable(false)]
-#endif
         public bool CheckFreeBags { get => _checkFreeBags; set => _checkFreeBags = value; }
         internal bool _checkFreeBags = true;
 
-#if DEVELOPER
         [Description("True: Закрывать диалоговое окно после покупки\n\r" +
             "False: Оставлять диалоговое окно открытым (значение по умолчанию)")]
-#else
-        [Browsable(false)]
-#endif
         public bool CloseContactDialog { get => _closeContactDialog; set => _closeContactDialog = value; }
         internal bool _closeContactDialog;
 
-#if DEVELOPER
         [Description("Список сумок, в которых производится поиск предметов для сравнения с предлагаемыми в магазине")]
         [Editor(typeof(BagsListEditor), typeof(UITypeEditor))]
         [Category("Setting of buying")]
-#else
-        [Browsable(false)]
-#endif
         public BagsList Bags
         {
             get => _buyBags;
@@ -171,20 +131,12 @@ namespace EntityTools.Quester.Actions
         }
         internal BagsList _buyBags = BagsList.GetFullPlayerInventory();
 
-#if DEVELOPER
         [Description("Продолжительно торговой операции (покупки 1 предмета)")]
         [Category("Setting of buying")]
-#else
-        [Browsable(false)]
-#endif
         public uint Timer { get => _timer; set => _timer = value; }
         internal uint _timer = 10000;
 
-#if DEVELOPER
         [Description("Количество попыток инициировать торговую сессию")]
-#else
-        [Browsable(false)]
-#endif
         public uint Tries
         {
             get => _tries;
@@ -242,7 +194,6 @@ namespace EntityTools.Quester.Actions
         protected override Vector3 InternalDestination => _vendor.Position;
         public override void GatherInfos()
         {
-#if DEVELOPER
             if (VendorInfoEditor.SetInfos(out VendorInfo vndInfo))
             {
                 _vendor = vndInfo;
@@ -253,17 +204,14 @@ namespace EntityTools.Quester.Actions
                     {
                         case VendorType.ArtifactVendor:
                             SpecialVendor.UseItem();
-                            //Thread.Sleep(3000);
                             Interact.WaitForInteraction();
                             break;
                         case VendorType.VIPSealTrader:
                             VIP.SummonSealTrader();
-                            //Thread.Sleep(3000);
                             Interact.WaitForInteraction();
                             break;
                         case VendorType.VIPProfessionVendor:
                             VIP.SummonProfessionVendor();
-                            //Thread.Sleep(3000);
                             Interact.WaitForInteraction();
                             break;
                         case VendorType.RemoteVendor:
@@ -281,11 +229,7 @@ namespace EntityTools.Quester.Actions
                                 {
                                     var currentNode = new Interact.DynaNode(targetableNode.WorldInteractionNode.Key);
 
-                                    //Approach.NodeForInteraction(currentNode);
-                                    //Interact.WaitForInteraction();
-                                    //AstralAccessors.Controllers.Engine.MainEngine.Navigation.Stop();
-                                    //Thread.Sleep(500);
-                                    if (!currentNode.Node.WorldInteractionNode.Interact())
+                                                                        if (!currentNode.Node.WorldInteractionNode.Interact())
                                     {
                                         break;
                                     }
@@ -313,7 +257,6 @@ namespace EntityTools.Quester.Actions
                     }
                 }
             }
-#endif
         }
         public override void InternalReset()
         {

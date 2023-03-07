@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\..\AMClient\packages\ILRepack.2.0.18\build\ILRepack.props" Condition="Exists('..\..\AMClient\packages\ILRepack.2.0.18\build\ILRepack.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -42,6 +43,7 @@
   <ItemGroup>
     <Reference Include="0Harmony, Version=2.2.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Lib.Harmony.2.2.2\lib\net48\0Harmony.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="AStar, Version=2.21.508.2127, Culture=neutral, processorArchitecture=AMD64">
       <HintPath>..\References\x64\AStar.dll</HintPath>
@@ -61,6 +63,7 @@
     <Reference Include="MyNW, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\References\MyNW.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.IO.Compression, Version=4.1.2.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
@@ -84,7 +87,8 @@
     <Compile Include="Accessors\AstralAccessors.General.cs" />
     <Compile Include="Accessors\AstralAccessors.Quester.Core.cs" />
     <Compile Include="Logger\EntityToolLogger.cs" />
-    <Compile Include="Quester\AstralAccessors.Quester.Preprocessor.cs" />
+    <Compile Include="Patches\PatchAttribute.cs" />
+    <Compile Include="Quester\QuesterHelper.Preprocessor.cs" />
     <Compile Include="Classes\Credentials\CredAccountExt.cs" />
     <Compile Include="Classes\Credentials\CredentialsExt.cs" />
     <Compile Include="Classes\DiffMatchPatch.cs" />
@@ -136,4 +140,10 @@
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\AMClient\packages\ILRepack.2.0.18\build\ILRepack.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\AMClient\packages\ILRepack.2.0.18\build\ILRepack.props'))" />
+  </Target>
 </Project>

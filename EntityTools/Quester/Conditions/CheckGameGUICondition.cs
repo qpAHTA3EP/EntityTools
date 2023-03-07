@@ -19,12 +19,8 @@ namespace EntityTools.Quester.Conditions
     public class CheckGameGUI : Condition
     {
         #region Опции команды
-#if DEVELOPER
         [Description("The Identifier of the Ingame user interface element")]
         [Editor(typeof(UiIdEditor), typeof(UITypeEditor))]
-#else
-        [Browsable(false)]
-#endif
         public string UiGenID
         {
             get { return _uiGenID; }
@@ -41,9 +37,6 @@ namespace EntityTools.Quester.Conditions
         }
         private string _uiGenID;
 
-#if !DEVELOPER
-        [Browsable(false)]
-#endif
         public UiGenCheckType Tested
         {
             get => _tested; set
@@ -54,13 +47,9 @@ namespace EntityTools.Quester.Conditions
         }
         private UiGenCheckType _tested = UiGenCheckType.IsVisible;
 
-#if DEVELOPER
         [Description("The Name of the GUI element's property which is checked\n" +
                      "Ignored if property 'Tested' is not equals to 'Property'")]
         [Category("GuiProperty")]
-#else
-        [Browsable(false)]
-#endif
         public string UiGenProperty
         {
             get => _uiGenProperty;
@@ -75,13 +64,9 @@ namespace EntityTools.Quester.Conditions
         }
         private string _uiGenProperty;
 
-#if DEVELOPER
         [Description("The Value of the GUI element's property which is checked\n" +
                      "Ignored if property 'Tested' is not equals to 'Property'")]
         [Category("GuiProperty")]
-#else
-        [Browsable(false)]
-#endif
         public string UiGenPropertyValue
         {
             get => _uiGenPropertyValue;
@@ -96,15 +81,11 @@ namespace EntityTools.Quester.Conditions
         }
         private string _uiGenPropertyValue = string.Empty;
 
-#if DEVELOPER
         [Description("Type of and UiGenPropertyValue:\n" +
                      "Simple: Simple text string with a wildcard at the beginning or at the end (char '*' means any symbols)\n" +
                      "Regex: Regular expression\n" +
                      "Ignored if property 'Tested' is not equals to 'Property'")]
         [Category("GuiProperty")]
-#else
-        [Browsable(false)]
-#endif
         public ItemFilterStringType UiGenPropertyValueType
         {
             get => _uiGenPropertyValueType;
@@ -119,11 +100,7 @@ namespace EntityTools.Quester.Conditions
         }
         private ItemFilterStringType _uiGenPropertyValueType = ItemFilterStringType.Simple;
 
-#if DEVELOPER
         [Category("GuiProperty")]
-#else
-        [Browsable(false)]
-#endif
         public Presence PropertySign
         {
             get => _propertySign;
@@ -139,7 +116,7 @@ namespace EntityTools.Quester.Conditions
         private Presence _propertySign = Presence.Equal;
         #endregion
 
-        #region Взаимодействие с ядром EntityTools
+        #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
         
         protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = default)

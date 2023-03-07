@@ -7,7 +7,7 @@ using Astral.Quester.UIEditors;
 using EntityTools.Annotations;
 using EntityTools.Editors;
 using EntityTools.Enums;
-using EntityTools.Patches.Mapper;
+using EntityTools.Quester.Mapper;
 using EntityTools.Tools;
 using EntityTools.Tools.Missions;
 using MyNW.Classes;
@@ -24,6 +24,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Xml.Serialization;
 using Action = Astral.Quester.Classes.Action;
+using EntityTools.Quester.Mapper;
 // ReSharper disable InconsistentNaming
 
 namespace EntityTools.Quester.Actions
@@ -49,14 +50,10 @@ namespace EntityTools.Quester.Actions
 
 
         #region Опции команды
-#if DEVELOPER
         [Description("Identifier of the Mission.\n" +
             "Allows simple mask (*) at the begin and at the end.")]
         [Editor(typeof(MainMissionEditor), typeof(UITypeEditor))]
         [Category("Mission Options")]
-#else
-        [Browsable(false)]
-#endif
         public string MissionId
         {
             get => _missionId;
@@ -72,13 +69,9 @@ namespace EntityTools.Quester.Actions
         }
         private string _missionId = string.Empty;
 
-#if DEVELOPER
         [Editor(typeof(MissionGiverInfoEditor), typeof(UITypeEditor))]
         [Category("Mission Options")]
         [TypeConverter(typeof(ExpandableObjectConverter))]
-#else
-        [Browsable(false)]
-#endif
         [NotifyParentProperty(true)]
         public MissionGiverInfo Giver
         {
@@ -115,12 +108,8 @@ namespace EntityTools.Quester.Actions
             }
         }
 
-#if !DEVELOPER
-        [Browsable(false)]
-#else
         [Description("Remote checking if contact have mission.")]
         [Category("Mission Options")]
-#endif
         public ContactHaveMissionCheckType ContactHaveMission
         {
             get => _contactHaveMission;
@@ -136,12 +125,8 @@ namespace EntityTools.Quester.Actions
 
 
         #region Interaction
-#if DEVELOPER
         [Description("The minimum value is 5.")]
         [Category("Interaction")]
-#else
-        [Browsable(false)]
-#endif
         public float InteractDistance
         {
             get => _interactDistance;
@@ -155,12 +140,8 @@ namespace EntityTools.Quester.Actions
         }
         private float _interactDistance = 10;
 
-#if DEVELOPER
         [Description("The minimum value is 1.")]
         [Category("Interaction")]
-#else
-        [Browsable(false)]
-#endif
         public float InteractZDifference
         {
             get => _interactZDifference;
@@ -174,13 +155,9 @@ namespace EntityTools.Quester.Actions
         }
         private float _interactZDifference = 10;
 
-#if DEVELOPER
         [Description("Answers in dialog which have to be performed before mission picking up.")]
         [Editor(typeof(DialogEditor), typeof(UITypeEditor))]
         [Category("Interaction")]
-#else
-        [Browsable(false)]
-#endif
         public List<string> Dialogs
         {
             get => _dialogs; set
@@ -194,12 +171,8 @@ namespace EntityTools.Quester.Actions
         }
         private List<string> _dialogs = new List<string>();
 
-#if DEVELOPER
         [Description("Skip directly if mission is not available.")]
         [Category("Interaction")]
-#else
-        [Browsable(false)]
-#endif
         public bool SkipOnFail
         {
             get => _skipOnFail;
@@ -215,11 +188,7 @@ namespace EntityTools.Quester.Actions
         }
         private bool _skipOnFail;
 
-#if DEVELOPER
         [Category("Interaction")]
-#else
-        [Browsable(false)]
-#endif
         public bool CloseContactDialog
         {
             get => _closeContactDialog;
@@ -235,12 +204,8 @@ namespace EntityTools.Quester.Actions
 
 
         #region Manage Combat Options
-#if DEVELOPER
         [Description("Ignore the enemies while approaching the " + nameof(Giver) + ".")]
         [Category("Manage Combat Options")]
-#else
-        [Browsable(false)]
-#endif
         public bool IgnoreCombat
         {
             get => _ignoreCombat;
@@ -253,13 +218,9 @@ namespace EntityTools.Quester.Actions
         }
         private bool _ignoreCombat;
 
-#if DEVELOPER
         [Description("Sets the ucc option '" + nameof(IgnoreCombatMinHP) + "' when disabling combat mode.\n" +
                      "Options ignored if the value is -1.")]
         [Category("Manage Combat Options")]
-#else
-        [Browsable(false)]
-#endif
         public int IgnoreCombatMinHP
         {
             get => _ignoreCombatMinHp; set
@@ -277,15 +238,11 @@ namespace EntityTools.Quester.Actions
         }
         private int _ignoreCombatMinHp = -1;
 
-#if DEVELOPER
         [Description("Special check before disabling combat while playing action.\n" +
                      "The condition is checking when option '" + nameof(IgnoreCombat) + "' is active.")]
         [Category("Manage Combat Options")]
         [Editor(typeof(QuesterConditionEditor), typeof(UITypeEditor))]
         [TypeConverter(typeof(ExpandableObjectConverter))]
-#else
-        [Browsable(false)]
-#endif
         public Astral.Quester.Classes.Condition IgnoreCombatCondition
         {
             get => _ignoreCombatCondition;
@@ -303,15 +260,11 @@ namespace EntityTools.Quester.Actions
 
 
         #region Optional
-#if DEVELOPER
         [Editor(typeof(RewardsEditor), typeof(UITypeEditor))]
         [Description("Item that is requered in rewards to " + nameof(PickUpMission) + ".\n" +
                      "Simple wildcard (*) is allowed.\n" +
                      "Mission Offer dialog have to be opened for choosen the " + nameof(RequiredRewardItem) + ".")]
         [Category("Optional")]
-#else
-        [Browsable(false)]
-#endif
         public string RequiredRewardItem
         {
             get => _requiredRewardItem;
@@ -325,13 +278,9 @@ namespace EntityTools.Quester.Actions
         }
         private string _requiredRewardItem = string.Empty;
 
-#if DEVELOPER
         [Description("The Id of the Action executing if the '" + nameof(RequiredRewardItem) + "' would be missing.")]
         [Category("Optional")]
         [DisplayName("TargetActionOnRequiredRewardMissing")]
-#else
-        [Browsable(false)]
-#endif
         public Guid TargetAction
         {
             get => _targetActionId;

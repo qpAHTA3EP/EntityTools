@@ -20,13 +20,9 @@ namespace EntityTools.Quester.Conditions.Deprecated
         private string label = string.Empty;
 
         #region Опции команды
-#if DEVELOPER
         [Description("ID (an untranslated name) of the Entity for the search")]
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
         [Category("Entity")]
-#else
-        [Browsable(false)]
-#endif
         public string EntityID
         {
             get => _entityID; set
@@ -40,14 +36,10 @@ namespace EntityTools.Quester.Conditions.Deprecated
         }
         internal string _entityID = string.Empty;
 
-#if DEVELOPER
         [Description("Type of and EntityID:\n" +
                      "Simple: Simple test string with a mask (char '*' means any chars)\n" +
                      "Regex: Regular expression")]
         [Category("Entity")]
-#else
-        [Browsable(false)]
-#endif
         public ItemFilterStringType EntityIdType
         {
             get => _entityIdType; set
@@ -61,11 +53,7 @@ namespace EntityTools.Quester.Conditions.Deprecated
         }
         internal ItemFilterStringType _entityIdType;
 
-#if DEVELOPER
         [Category("Tested")]
-#else
-        [Browsable(false)]
-#endif
         public float Distance
         {
             get => _distance; set
@@ -79,14 +67,10 @@ namespace EntityTools.Quester.Conditions.Deprecated
         }
         internal float _distance;
 
-#if DEVELOPER
         [Description("Check Entity's Region:\n" +
             "True: Search an Entity only if it located in the same Region as Player\n" +
             "False: Does not consider the region when searching Entities")]
         [Category("Tested")]
-#else
-        [Browsable(false)]
-#endif
         public bool RegionCheck
         {
             get => _regionCheck; set
@@ -100,12 +84,8 @@ namespace EntityTools.Quester.Conditions.Deprecated
         }
         internal bool _regionCheck;
 
-#if DEVELOPER
         [Description("Distance comparison type to the closest Entity")]
         [Category("Tested")]
-#else
-        [Browsable(false)]
-#endif
         public Relation Sign
         {
             get => _sign;

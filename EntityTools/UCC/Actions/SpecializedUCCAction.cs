@@ -29,44 +29,12 @@ namespace EntityTools.UCC.Actions
 #endif
 
         #region Опции команды
-#if DEVELOPER
         [Category("Managed Action")]
         [Editor(typeof(UccActionEditor), typeof(UITypeEditor))]
         [Description("Основная ucc-команда, которой транслируется вызов")]
         [TypeConverter(typeof(ExpandableObjectConverter))]
-#else
-        [Browsable(false)]
-#endif
         public UCCAction ManagedAction { get; set; }
 
-#if CUSTOM_UCC_CONDITION_EDITOR
-#if DEVELOPER
-        [Category("Custom Conditions")]
-        [Description("Список нестандартных условий, реализованных в плагинах")]
-        [Editor(typeof(UccConditionListEditor), typeof(UITypeEditor))]
-#else
-        [Browsable(false)]
-#endif
-        public List<UCCCondition> CustomConditions { get; set; }
-
-#if DEVELOPER
-        [Category("Custom Conditions")]
-        [Description("Отрицание результата проверки условий (логическое НЕ)")]
-#else
-        [Browsable(false)]
-#endif
-        public bool Not { get; set; }
-
-#if DEVELOPER
-        [Category("Custom Conditions")]
-        [Description("Логическое правило проверки набора условий. Logical rule of the Conditions checks\n" +
-            "Conjunction: Все условия должны быть истины. All Conditions have to be True (Logical AND)\n" +
-            "Disjunction: Хотя бы одно условие должно быть истино. At least one of the Conditions have to be True (Logical OR)")]
-#else
-        [Browsable(false)]
-#endif
-        public LogicRule CustomConditionCheck { get; set; } 
-#else
         /// <summary>
         /// Данное свойство необходимо в целях обеспечения совместимости со старой версией <see cref="SpecializedUCCAction"/>,
         /// в которой дополнительные условия содержались в отдельном списке <see cref="CustomConditions"/>.<br/>
@@ -74,7 +42,6 @@ namespace EntityTools.UCC.Actions
         /// а затем добавляет в него десериализованные элементы методом <see cref="ICollection{UCCCondition}.Add"/>.<br/>
         /// В новой версии <see cref="SpecializedUCCAction"/> все условия хранятся в одном списке <see cref="UCCAction.Conditions"/>,
         /// поэтому приходится отслеживать момент добавления условия в список <see cref="CustomConditions"/>, чтобы в этот момент обернуть его в <see cref="UCCConditionPack"/> и добавить его в <see cref="UCCAction.Conditions"/>.<br/>
-        /// 
         /// </summary>
         [Browsable(false)]
         public ObservableCollection<UCCCondition> CustomConditions
@@ -113,6 +80,7 @@ namespace EntityTools.UCC.Actions
                 else _customConditions?.Conditions.Clear();
             }
         }
+       
         /// <summary>
         /// Метод для отследживания момент добавления условия в список <see cref="CustomConditions"/> и добавления в этот момент <see cref="_customConditions"/> в список <see cref="UCCAction.Conditions"/>
         /// </summary>
@@ -152,20 +120,11 @@ namespace EntityTools.UCC.Actions
         public bool ShouldSerializeCustomConditionCheck() => false;
 
         private UCCConditionPack _customConditions;
-#endif
 
-#if DEVELOPER
         [Category("SpecificTimer")]
-#else
-        [Browsable(false)]
-#endif
         public string TimerName { get; set; } = string.Empty;
 
-#if DEVELOPER
         [Category("SpecificTimer")]
-#else
-        [Browsable(false)]
-#endif
         public int Timeout { get; set; } = 0; 
         #endregion
 

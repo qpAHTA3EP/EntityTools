@@ -1,4 +1,6 @@
-﻿using Infrastructure;
+﻿//#define PATCH_LOG
+
+using Infrastructure;
 using AStar;
 using Astral.Logic.Classes.FSM;
 using Astral.Logic.NW;

@@ -15,9 +15,7 @@ using EntityTools.Quester.Actions;
 using EntityTools.Tools;
 using EntityTools.Tools.Entities;
 using EntityTools.UCC.Extensions;
-
 using MyNW.Classes;
-
 using Timeout = Astral.Classes.Timeout;
 
 namespace EntityTools.UCC.Conditions
@@ -25,13 +23,9 @@ namespace EntityTools.UCC.Conditions
     public class UCCEntityCheck : UCCCondition, ICustomUCCCondition, IEntityDescriptor, INotifyPropertyChanged
     {
         #region Опции команды
-#if DEVELOPER
         [Description("ID of the Entity for the search")]
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
         [Category("Entity")]
-#else
-        [Browsable(false)]
-#endif
         public string EntityID
         {
             get => _entityId;
@@ -46,14 +40,10 @@ namespace EntityTools.UCC.Conditions
         }
         private string _entityId = string.Empty;
 
-#if DEVELOPER
         [Description("Type of and EntityID:\n" +
             "Simple: Simple text string with a wildcard at the beginning or at the end (char '*' means any symbols)\n" +
             "Regex: Regular expression")]
         [Category("Entity")]
-#else
-        [Browsable(false)]
-#endif
         public ItemFilterStringType EntityIdType
         {
             get => _entityIdType;
@@ -68,12 +58,8 @@ namespace EntityTools.UCC.Conditions
         }
         private ItemFilterStringType _entityIdType = ItemFilterStringType.Simple;
 
-#if DEVELOPER
         [Description("The switcher of the Entity filed which compared to the property EntityID")]
         [Category("Entity")]
-#else
-        [Browsable(false)]
-#endif
         public EntityNameType EntityNameType
         {
             get => _entityNameType;
@@ -88,22 +74,16 @@ namespace EntityTools.UCC.Conditions
         }
         private EntityNameType _entityNameType = EntityNameType.InternalName;
 
-#if DEVELOPER
         [XmlIgnore]
         [Editor(typeof(EntityTestEditor), typeof(UITypeEditor))]
         [Description("Test the Entity searching.")]
         [Category("Entity")]
         public string EntityTestInfo => "Push button '...' =>";
-#endif
 
-#if DEVELOPER
         [Description("Check Entity's Region:\n" +
             "True: Search an Entity only if it located in the same Region as Player\n" +
             "False: Does not consider the region when searching Entities")]
         [Category("Optional")]
-#else
-        [Browsable(false)]
-#endif
         public bool RegionCheck
         {
             get => _regionCheck;
@@ -118,14 +98,10 @@ namespace EntityTools.UCC.Conditions
         }
         private bool _regionCheck;
 
-#if DEVELOPER
         [Description("Check if Entity's health greater than zero:\n" +
             "True: Only Entities with nonzero health are detected\n" +
             "False: Entity's health does not checked during search")]
         [Category("Optional")]
-#else
-        [Browsable(false)]
-#endif
         public bool HealthCheck
         {
             get => _healthCheck;
@@ -140,13 +116,9 @@ namespace EntityTools.UCC.Conditions
         }
         private bool _healthCheck = true;
 
-#if DEVELOPER
         [Description("The maximum distance from the character within which the Entity is searched\n" +
             "The default value is 0, which disables distance checking")]
         [Category("Optional")]
-#else
-        [Browsable(false)]
-#endif
         public float ReactionRange
         {
             get => _reactionRange;
@@ -161,13 +133,9 @@ namespace EntityTools.UCC.Conditions
         }
         private float _reactionRange;
 
-#if DEVELOPER
         [Description("The maximum ZAxis difference from the withing which the Entity is searched\n" +
             "The default value is 0, which disables ZAxis checking")]
         [Category("Optional")]
-#else
-        [Browsable(false)]
-#endif
         public float ReactionZRange
         {
             get => _reactionZRange;
@@ -182,13 +150,9 @@ namespace EntityTools.UCC.Conditions
         }
         private float _reactionZRange;
 
-#if DEVELOPER
         [Description("Aura which checked on the Entity")]
         [TypeConverter(typeof(ExpandableObjectConverter))]
         [Category("Optional")]
-#else
-        [Browsable(false)]
-#endif
         public AuraOption Aura
         {
             get => _aura; set
@@ -203,9 +167,6 @@ namespace EntityTools.UCC.Conditions
         private AuraOption _aura = new AuraOption();
         public bool ShouldSerializeAura() => !string.IsNullOrEmpty(_aura.AuraName);
 
-#if !DEVELOPER
-        [Browsable(false)]
-#endif
         public EntityPropertyType PropertyType
         {
             get => _propertyType; set
@@ -219,9 +180,6 @@ namespace EntityTools.UCC.Conditions
         }
         private EntityPropertyType _propertyType = EntityPropertyType.Distance;
 
-#if !DEVELOPER
-        [Browsable(false)]
-#endif
         public float PropertyValue
         {
             get => _propertyValue; set

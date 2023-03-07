@@ -13,7 +13,7 @@ using Astral.Logic.Classes.Map;
 using EntityTools.Editors;
 using EntityTools.Editors.TestEditors;
 using EntityTools.Enums;
-using EntityTools.Patches.Mapper;
+using EntityTools.Quester.Mapper;
 using EntityTools.Tools.CustomRegions;
 using EntityTools.Tools.Extensions;
 using EntityTools.Tools.Navigation;
@@ -39,13 +39,9 @@ namespace EntityTools.Quester.Actions
         #endregion
 
         #region General
-#if DEVELOPER
         [Description("The selection of the supported teammate")]
         [Category("General")]
         [TypeConverter(typeof(ExpandableObjectConverter))]
-#else
-        [Browsable(false)]
-#endif
         public TeammateSupport SupportOptions
         {
             get => supportOptions;
@@ -59,25 +55,19 @@ namespace EntityTools.Quester.Actions
         }
         private TeammateSupport supportOptions = new TeammateSupport();
 
-#if DEVELOPER
         [XmlIgnore]
         [Editor(typeof(TargetSelectorTestEditor), typeof(UITypeEditor))]
         [Description("Test the Teammate searching.")]
         [Category("General")]
         public string TestSearch => @"Push button '...' =>";
-#endif 
         #endregion
 
 
         #region ManageCombatOptions
-#if DEVELOPER
         [Description("Distance to the Teammate by which it is necessary to approach.\n" +
                      "Keep in mind that the distance below 5 is too small to display on the Mapper")]
         [Category("Manage Combat Options")]
         [DisplayName("CombatDistance")]
-#else
-        [Browsable(false)]
-#endif
 
         public float Distance
         {
@@ -94,12 +84,8 @@ namespace EntityTools.Quester.Actions
         }
         private float distance = 30;
 
-#if DEVELOPER
         [Description("Enable '" + nameof(IgnoreCombat) + "' profile value while playing action")]
         [Category("Manage Combat Options")]
-#else
-        [Browsable(false)]
-#endif
         public bool IgnoreCombat
         {
             get => ignoreCombat; set
@@ -114,13 +100,9 @@ namespace EntityTools.Quester.Actions
         private bool ignoreCombat = true;
 
 
-#if DEVELOPER
         [Description("Sets the ucc option '" + nameof(IgnoreCombatMinHP) + "' when disabling combat mode.\n" +
                      "Options ignored if the value is -1.")]
         [Category("Manage Combat Options")]
-#else
-        [Browsable(false)]
-#endif
         public int IgnoreCombatMinHP
         {
             get => _ignoreCombatMinHp; 
@@ -138,15 +120,12 @@ namespace EntityTools.Quester.Actions
             }
         }
         private int _ignoreCombatMinHp = -1;
-#if DEVELOPER
+
         [Description("Special check before disabling combat while playing action.\n" +
                      "The condition is checking when option '" + nameof(IgnoreCombat) + "' is active.")]
         [Category("Manage Combat Options")]
         [Editor(typeof(QuesterConditionEditor), typeof(UITypeEditor))]
         [TypeConverter(typeof(ExpandableObjectConverter))]
-#else
-        [Browsable(false)]
-#endif
         public Astral.Quester.Classes.Condition IgnoreCombatCondition
         {
             get => _ignoreCombatCondition;
@@ -161,14 +140,10 @@ namespace EntityTools.Quester.Actions
         }
         private Astral.Quester.Classes.Condition _ignoreCombatCondition;
 
-#if DEVELOPER
         [Description("The battle is aborted outside '" + nameof(AbortCombatDistance) + "' radius from the Teammate.\n" +
                      "The combat is restored within the '" + nameof(Distance) + "' radius.\n" +
                      "However, this is not performed if the value less than '" + nameof(Distance) + "' or '" + nameof(IgnoreCombat) + "' is False.")]
         [Category("Manage Combat Options")]
-#else
-        [Browsable(false)]
-#endif
         public uint AbortCombatDistance
         {
             get => abortCombatDistance; set
@@ -186,13 +161,9 @@ namespace EntityTools.Quester.Actions
         #endregion
 
 
-#if DEVELOPER
         [Description("CustomRegion names collection")]
         [Editor(typeof(CustomRegionCollectionEditor), typeof(UITypeEditor))]
         [Category("Optional")]
-#else
-        [Browsable(false)]
-#endif
         public CustomRegionCollection CustomRegions
         {
             get => customRegions;
@@ -210,13 +181,9 @@ namespace EntityTools.Quester.Actions
 
 
         #region Interruptions
-#if DEVELOPER
         [Description("True: Complete an action when the Teammate is closer than 'Distance'\n" +
                      "False: Follow an Teammate regardless of its distance")]
         [Category("Interruptions")]
-#else
-        [Browsable(false)]
-#endif
         public bool StopOnApproached
         {
             get => stopOnApproached; set
@@ -230,13 +197,9 @@ namespace EntityTools.Quester.Actions
         }
         private bool stopOnApproached;
 
-#if DEVELOPER
         [Description("The command is interrupted upon teammate search timer reaching zero (ms).\n" +
                      "Set zero value to infinite search.")]
         [Category("Interruptions")]
-#else
-        [Browsable(false)]
-#endif
         public uint TeammateSearchTime
         {
             get => teammateSearchTime; 

@@ -2,9 +2,7 @@
 using System.Drawing.Design;
 using System.Runtime.CompilerServices;
 using System.Xml.Serialization;
-
 using Astral.Logic.UCC.Classes;
-
 using EntityTools.Editors;
 using EntityTools.Enums;
 using EntityTools.Tools.Powers;
@@ -14,12 +12,8 @@ namespace EntityTools.UCC.Conditions
     public class CheckPowerState : UCCCondition, ICustomUCCCondition
     {
         #region Опции
-#if DEVELOPER
         [Editor(typeof(PowerIdEditor), typeof(UITypeEditor))]
         [Category("Required")]
-#else
-        [Browsable(false)]
-#endif
         public string PowerId
         {
             get => _powerId;

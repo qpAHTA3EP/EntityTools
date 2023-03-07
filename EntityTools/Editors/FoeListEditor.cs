@@ -8,7 +8,6 @@ using EntityTools.Forms;
 
 namespace EntityTools.Editors
 {
-#if DEVELOPER
     internal class FoeListEditor : UITypeEditor
     {
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
@@ -39,6 +38,5 @@ namespace EntityTools.Editors
             return UITypeEditorEditStyle.Modal;
         }
     }
-#endif
 }
 

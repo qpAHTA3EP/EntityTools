@@ -26,7 +26,6 @@ namespace EntityTools.Forms
         public int clmnInternalNameInd { get => clmnInternalName.DisplayIndex; }
         public int clmnDistanceInd { get => clmnDistance.DisplayIndex; }
 
-        //private Predicate<Entity> entityCheck = null;
         /// <summary>
         /// текущий шаблон
         /// </summary>
@@ -55,11 +54,7 @@ namespace EntityTools.Forms
             //@this.Text = $"{@this.GetType().Name} [{strMatchType}; {nameType}]";
             @this.tbPattern.Text = entPattern;
 
-#if false 
-            @this.FillEntitiesDgv(EntityTools.Tools.Entities.EntityComparer.Get(entPattern, strMatchType, nameType));
-#else
             @this.FillEntitiesDgv(EntityComparer.Get(entPattern, strMatchType, nameType)); 
-#endif
 
             DataGridViewRow currentRow = null;
             if (@this.ShowDialog() == DialogResult.OK
@@ -144,8 +139,6 @@ namespace EntityTools.Forms
 
         private void btnReload_Click(object sender, EventArgs e)
         {
-            //string entityUntrName = dgvEntities?.CurrentRow.Cells[clmnNameUntranslatedInd].Value?.ToString() ?? string.Empty;
-
             // Запоминаем текущую позицию
             Predicate<object> predicate = null;
             if (!(dgvEntities.CurrentRow?.Tag is null))
@@ -157,7 +150,7 @@ namespace EntityTools.Forms
             DataGridViewColumn sortedColumn = dgvEntities.SortedColumn;
             SortOrder sortOrder = dgvEntities.SortOrder;
 
-            FillEntitiesDgv(predicate);//EntityToPatternComparer.Get(entityUntrName, (ItemFilterStringType)cbStrMatch.SelectedItem, (EntityNameType)cbNameType.SelectedItem));
+            FillEntitiesDgv(predicate);
 
             if (sortedColumn != null)
             {

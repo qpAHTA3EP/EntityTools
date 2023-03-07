@@ -9,7 +9,6 @@ using QuesterEditor = EntityTools.Quester.Editor.QuesterEditor;
 
 namespace EntityTools.Editors
 {
-#if DEVELOPER
     internal class CustomRegionCollectionEditor : UITypeEditor
     {
         private PropertyAccessor<PropertyGrid> pgAccessor;
@@ -42,5 +41,4 @@ namespace EntityTools.Editors
             return UITypeEditorEditStyle.Modal;
         }
     }
-#endif
 }

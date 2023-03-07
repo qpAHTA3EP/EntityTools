@@ -2,7 +2,5 @@
 
 namespace EntityTools.Editors
 {
-#if DEVELOPER
     internal class QuesterConditionEditor : AddTypeCommonEditor<QuesterCondition> { }
-#endif
 }

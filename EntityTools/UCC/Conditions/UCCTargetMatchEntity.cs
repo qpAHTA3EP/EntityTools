@@ -3,15 +3,12 @@ using System.Drawing.Design;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Xml.Serialization;
-
 using Astral.Classes.ItemFilter;
 using Astral.Logic.UCC.Classes;
-
 using EntityTools.Editors;
 using EntityTools.Enums;
 using EntityTools.Tools.Entities;
 using EntityTools.UCC.Extensions;
-
 using MyNW.Classes;
 // ReSharper disable InconsistentNaming
 
@@ -20,14 +17,10 @@ namespace EntityTools.UCC.Conditions
     public class UCCTargetMatchEntity : UCCCondition, ICustomUCCCondition, INotifyPropertyChanged
     {
         #region Опции команды
-#if DEVELOPER
         [Description("The ID of the entity that the Target of the ucc-action should match.\n" +
                      "Идентификатор Entity, с которой сопоставляется цель ucc-команды (Target).")]
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
         [Category("Entity")]
-#else
-        [Browsable(false)]
-#endif
         public string EntityID
         {
             get => _entityId;
@@ -43,14 +36,10 @@ namespace EntityTools.UCC.Conditions
         }
         private string _entityId = string.Empty;
 
-#if DEVELOPER
         [Description("Type of and EntityID:\n" +
             "Simple: Simple text string with a wildcard at the beginning or at the end (char '*' means any symbols)\n" +
             "Regex: Regular expression")]
         [Category("Entity")]
-#else
-        [Browsable(false)]
-#endif
         public ItemFilterStringType EntityIdType
         {
             get => _entityIdType;
@@ -66,12 +55,8 @@ namespace EntityTools.UCC.Conditions
         }
         private ItemFilterStringType _entityIdType = ItemFilterStringType.Simple;
 
-#if DEVELOPER
         [Description("The switcher of the Entity filed which compared to the EntityID")]
         [Category("Entity")]
-#else
-        [Browsable(false)]
-#endif
         public EntityNameType EntityNameType
         {
             get => _entityNameType;
@@ -87,21 +72,15 @@ namespace EntityTools.UCC.Conditions
         }
         private EntityNameType _entityNameType = EntityNameType.NameUntranslated;
 
-#if DEVELOPER
         [XmlIgnore]
         [Editor(typeof(EntityTestEditor), typeof(UITypeEditor))]
         [Description("Test the Entity searching.")]
         [Category("Entity")]
         public string EntityTestInfo => "Push button '...' =>";
-#endif
 
-#if DEVELOPER
         [Description("The expected result of the comparison of the Target and EntityID.\n" +
             "Ожидаемый результат сопоставления цели ucc-команды (Target) и заданного EntityID.")]
         [Category("Required")]
-#else
-        [Browsable(false)]
-#endif
         public MatchType Match
         {
             get => _match; set

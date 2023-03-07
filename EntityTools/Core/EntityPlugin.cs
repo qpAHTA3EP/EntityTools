@@ -2,7 +2,6 @@
 using System.Drawing;
 using System.IO;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 using Astral.Addons;
@@ -10,17 +9,12 @@ using Astral.Forms;
 using Astral.Logic.UCC;
 using EntityTools.Core;
 using EntityTools.Patches;
-using EntityTools.Patches.Mapper;
 using EntityTools.Properties;
 using EntityTools.Services;
 using EntityTools.Tools;
 using Infrastructure;
 using Infrastructure.Quester;
-
-[assembly: InternalsVisibleTo("EntityCore")]
-#if !ENCRYPTED_CORE
-[assembly: SuppressIldasm]
-#endif
+using EntityTools.Patches.Quester;
 
 // ReSharper disable once CheckNamespace
 namespace EntityTools
@@ -79,31 +73,8 @@ namespace EntityTools
             if (Config.Logger.Active)
                 ETLogger.Start();
 
-            // Загрузка ядра из ресурса
-#if false
-            Assembly.Load(Properties.Resources.Realms);
-            //if (!File.Exists(@".\Logs\Assemplies.log"))
-            //    File.Create(@".\Logs\Assemplies.log");
-
-            using (StreamWriter file = new StreamWriter(@".\Logs\Assemblies.log", false))
-            {
-                foreach (Assembly a in AppDomain.CurrentDomain.GetAssemblies())
-                {
-                    file.WriteLine("=================================================================");
-                    file.WriteLine(a.FullName);
-                    file.WriteLine("-----------------------------------------------------------------");
-                    foreach (Type t in a.GetTypes())
-                    {
-                        file.Write('\t');
-                        file.WriteLine(t.FullName);
-                    }
-                }
-            } 
-#endif
-
             LoadSettings();
 
-#if PATCH_ASTRAL
             // Применение патчей
             ETPatcher.Apply();
 
@@ -118,7 +89,6 @@ namespace EntityTools
                 ETLogger.WriteLine($"{GetType().Name}: Second try to load ucc-profile '{Astral.Controllers.Settings.Get.LastUCCProfile}'", true);
                 API.LoadProfile(Astral.Controllers.Settings.Get.LastUCCProfile);
             }
-#endif
         }
 
         public override void OnUnload()

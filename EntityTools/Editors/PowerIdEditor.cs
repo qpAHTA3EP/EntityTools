@@ -9,7 +9,6 @@ using EntityTools.Forms;
 
 namespace EntityTools.Editors
 {
-#if DEVELOPER
     class PowerIdEditor : UITypeEditor
     {
         private static List<Tuple<string, string>> powerCache;
@@ -70,5 +69,4 @@ namespace EntityTools.Editors
             return powerId;
         }
     }
-#endif
 }

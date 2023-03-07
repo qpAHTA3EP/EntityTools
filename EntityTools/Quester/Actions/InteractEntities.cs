@@ -51,13 +51,9 @@ namespace EntityTools.Quester.Actions
 #endif
 
         #region Entity
-#if DEVELOPER
         [Description("ID of the Entity for the search")]
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
         [Category("Entity")]
-#else
-        [Browsable(false)]
-#endif
         public string EntityID
         {
             get => _entityId;
@@ -72,14 +68,10 @@ namespace EntityTools.Quester.Actions
         }
         private string _entityId = string.Empty;
 
-#if DEVELOPER
         [Description("Type of the EntityID:\n" +
             "Simple: Simple text string with a wildcard at the beginning or at the end (char '*' means any symbols)\n" +
             "Regex: Regular expression")]
         [Category("Entity")]
-#else
-        [Browsable(false)]
-#endif
         public ItemFilterStringType EntityIdType
         {
             get => _entityIdType;
@@ -94,12 +86,8 @@ namespace EntityTools.Quester.Actions
         }
         private ItemFilterStringType _entityIdType = ItemFilterStringType.Simple;
 
-#if DEVELOPER
         [Description("The switcher of the Entity filed which compared to the property EntityID")]
         [Category("Entity")]
-#else
-        [Browsable(false)]
-#endif
         public EntityNameType EntityNameType
         {
             get => _entityNameType;
@@ -114,14 +102,10 @@ namespace EntityTools.Quester.Actions
         }
         private EntityNameType _entityNameType = EntityNameType.InternalName;
 
-#if DEVELOPER
         [Description("A subset of entities that are searched for a target:\n" +
                      "Contacts: Only interactable Entities\n" +
                      "Complete: All possible Entities")]
         [Category("Entity")]
-#else
-        [Browsable(false)]
-#endif
         public EntitySetType EntitySetType
         {
             get => _entitySetType; set
@@ -136,25 +120,19 @@ namespace EntityTools.Quester.Actions
         }
         private EntitySetType _entitySetType = EntitySetType.Contacts;
 
-#if DEVELOPER
         [XmlIgnore]
         [Editor(typeof(EntityTestEditor), typeof(UITypeEditor))]
         [Description("Test the entity searching.")]
         [Category("Entity")]
         public string TestSearch => @"Push button '...' =>";
-#endif
         #endregion
 
 
         #region EntitySearchOptions
-#if DEVELOPER
         [Description("Check if Entity's health greater than zero:\n" +
             "True: Only Entities with nonzero health are detected\n" +
             "False: Entity's health does not checked during search")]
         [Category("Entity Search Options")]
-#else
-        [Browsable(false)]
-#endif
         public bool HealthCheck
         {
             get => _healthCheck; 
@@ -169,13 +147,9 @@ namespace EntityTools.Quester.Actions
         }
         private bool _healthCheck = true;
 
-#if DEVELOPER
         [Description("True: Do not change the target Entity while it is alive or until the Bot within " + nameof(InteractDistance) + " of it.\n" +
                     "False: Constantly scan an area and target the nearest Entity.")]
         [Category("Entity Search Options")]
-#else
-        [Browsable(false)]
-#endif
         public bool HoldTargetEntity
         {
             get => _holdTargetEntity; 
@@ -190,14 +164,10 @@ namespace EntityTools.Quester.Actions
         }
         private bool _holdTargetEntity = true;
 
-#if DEVELOPER
         [Description("Check if Entity is moving:\n" +
             "True: Only standing Entities are detected\n" +
             "False: Both moving and stationary Entities are detected")]
         [Category("Entity Search Options")]
-#else
-        [Browsable(false)]
-#endif
         public bool SkipMoving
         {
             get => _skipMoving; 
@@ -215,14 +185,10 @@ namespace EntityTools.Quester.Actions
 
 
         #region SearchArea
-#if DEVELOPER
         [Description("Check Entity's Ingame Region (Not CustomRegion):\n" +
             "True: Only Entities located in the same Region as Player are detected;\n" +
             "False: Entity's Region does not checked during search.")]
         [Category("Search Area")]
-#else
-        [Browsable(false)]
-#endif
         public bool RegionCheck
         {
             get => _regionCheck; 
@@ -237,13 +203,9 @@ namespace EntityTools.Quester.Actions
         }
         private bool _regionCheck;
 
-#if DEVELOPER
         [Description("The maximum distance from the character within which the Entity is searched.\n" +
                      "The value equals 0(zero) disables distance checking.")]
         [Category("Search Area")]
-#else
-        [Browsable(false)]
-#endif
         public float ReactionRange
         {
             get => _reactionRange; 
@@ -257,13 +219,10 @@ namespace EntityTools.Quester.Actions
             }
         }
         private float _reactionRange = 150;
-#if DEVELOPER
+
         [Description("The maximum Z-coordiante difference with Player within which the Entity is searched.\n" +
                      "The default value is 0, which disables Z-coordiante checking.")]
         [Category("Search Area")]
-#else
-        [Browsable(false)]
-#endif
         public float ReactionZRange
         {
             get => _reactionZRange; 
@@ -278,14 +237,10 @@ namespace EntityTools.Quester.Actions
         }
         private float _reactionZRange;
 
-#if DEVELOPER
         [Description("CustomRegion names collection")]
         [Editor(typeof(CustomRegionCollectionEditor), typeof(UITypeEditor))]
         [Category("Search Area")]
         [DisplayName("CustomRegions")]
-#else
-        [Browsable(false)]
-#endif
         [NotifyParentProperty(true)]
         public CustomRegionCollection CustomRegionNames
         {
@@ -301,12 +256,8 @@ namespace EntityTools.Quester.Actions
         }
         private CustomRegionCollection _customRegionNames = new CustomRegionCollection();
 
-#if DEVELOPER
         [Description("Checking the Player is in the area, defined by 'CustomRegions'")]
         [Category("Search Area")]
-#else
-        [Browsable(false)]
-#endif
         public bool CustomRegionsPlayerCheck
         {
             get => customRegionsPlayerCheck; 
@@ -321,14 +272,10 @@ namespace EntityTools.Quester.Actions
         }
         private bool customRegionsPlayerCheck;
 
-#if DEVELOPER
         [Description("The name of the Map where current action can be run.\n" +
                      "Ignored if empty.")]
         [Editor(typeof(CurrentMapEdit), typeof(UITypeEditor))]
         [Category("Search Area")]
-#else
-        [Browsable(false)]
-#endif        
         public string CurrentMap
         {
             get => currentMap;
@@ -346,13 +293,9 @@ namespace EntityTools.Quester.Actions
 
 
         #region Manage Combat Options
-#if DEVELOPER
         [Description("Ignore the enemies while approaching the target Entity.\n" +
                      "The minimum value is 5.")]
         [Category("Manage Combat Options")]
-#else
-        [Browsable(false)]
-#endif
         public float CombatDistance
         {
             get => _combatDistance; 
@@ -364,22 +307,14 @@ namespace EntityTools.Quester.Actions
                 if (Math.Abs(_combatDistance - value) > 0.1)
                 {
                     _combatDistance = value;
-#if false
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CombatDistance))); 
-#else
                     NotifyPropertyChanged();
-#endif
                 }
             }
         }
         private float _combatDistance = 30;
 
-#if DEVELOPER
         [Description("Ignore the enemies while approaching the " + nameof(Entity) + ".")]
         [Category("Manage Combat Options")]
-#else
-        [Browsable(false)]
-#endif
         public bool IgnoreCombat
         {
             get => _ignoreCombat;
@@ -393,13 +328,9 @@ namespace EntityTools.Quester.Actions
         }
         private bool _ignoreCombat;
 
-#if DEVELOPER
         [Description("Sets the ucc option '" + nameof(IgnoreCombatMinHP) + "' when disabling combat mode.\n" +
                      "Options ignored if the value is -1.")]
         [Category("Manage Combat Options")]
-#else
-        [Browsable(false)]
-#endif
         public int IgnoreCombatMinHP
         {
             get => _ignoreCombatMinHp; 
@@ -418,15 +349,11 @@ namespace EntityTools.Quester.Actions
         }
         private int _ignoreCombatMinHp = -1;
 
-#if DEVELOPER
         [Description("Special check before disabling combat while playing action.\n" +
                      "The condition is checking when option '" + nameof(IgnoreCombat) + "' is active.")]
         [Category("Manage Combat Options")]
         [Editor(typeof(QuesterConditionEditor), typeof(UITypeEditor))]
         [TypeConverter(typeof(ExpandableObjectConverter))]
-#else
-        [Browsable(false)]
-#endif
         public Astral.Quester.Classes.Condition IgnoreCombatCondition
         {
             get => _ignoreCombatCondition;
@@ -441,14 +368,10 @@ namespace EntityTools.Quester.Actions
         }
         private Astral.Quester.Classes.Condition _ignoreCombatCondition;
 
-#if DEVELOPER
         [Description("The battle is aborted outside '" + nameof(AbortCombatDistance) + "' radius from the target entity.\n" +
                      "The combat is restored within the '" + nameof(InteractDistance) + "' radius.\n" +
                      "However, this is not performed if the value less than '" + nameof(InteractDistance) + "' or '" + nameof(IgnoreCombat) + "' is False.")]
         [Category("Manage Combat Options")]
-#else
-        [Browsable(false)]
-#endif
         public uint AbortCombatDistance
         {
             get => _abortCombatDistance; set
@@ -465,12 +388,8 @@ namespace EntityTools.Quester.Actions
 
 
         #region Interaction
-#if DEVELOPER
         [Category("Interaction")]
         [Description("Only one interaction with Entity is possible in 'InteractingTimeout' period")]
-#else
-        [Browsable(false)]
-#endif
         public bool InteractOnce
         {
             get => _interactOnce; set
@@ -484,13 +403,9 @@ namespace EntityTools.Quester.Actions
         }
         private bool _interactOnce;
 
-#if DEVELOPER
         [Category("Interaction")]
         [Description("Interaction timeout (sec) if InteractitOnce flag is set.")]
         [DisplayName("InteractionTimeout")]
-#else
-        [Browsable(false)]
-#endif
         public int InteractingTimeout
         {
             get => _interactingTimeout; 
@@ -508,12 +423,8 @@ namespace EntityTools.Quester.Actions
         }
         private int _interactingTimeout = 60;
 
-#if DEVELOPER
         [Category("Interaction")]
         [Description("Time to interact (ms)")]
-#else
-        [Browsable(false)]
-#endif
         public int InteractTime
         {
             get => _interactTime;
@@ -528,13 +439,9 @@ namespace EntityTools.Quester.Actions
         }
         private int _interactTime = 2000;
 
-#if DEVELOPER
         [Category("Interaction")]
         [Description("The distance to the Entity within which the interaction is possible.\n" +
                      "Minimum value is 5.")]
-#else
-        [Browsable(false)]
-#endif
         public int InteractDistance
         {
             get => _interactDistance;
@@ -552,13 +459,9 @@ namespace EntityTools.Quester.Actions
         }
         private int _interactDistance = 5;
 
-#if DEVELOPER
         [Category("Interaction")]
         [Description("Answers in dialog while interact with Entity")]
         [Editor(typeof(DialogEditor), typeof(UITypeEditor))]
-#else
-        [Browsable(false)]
-#endif
         public List<string> Dialogs
         {
             get => _dialogs; set
@@ -576,13 +479,9 @@ namespace EntityTools.Quester.Actions
 
         #region Interruptions
 
-#if DEVELOPER
         [Description("The command is interrupted upon entity search timer reaching zero (ms).\n" +
                      "Set zero value to infinite search.")]
         [Category("Interruptions")]
-#else
-        [Browsable(false)]
-#endif
         public int EntitySearchTime
         {
             get => _entitySearchTime;
@@ -600,11 +499,7 @@ namespace EntityTools.Quester.Actions
         private int _entitySearchTime;
         #endregion
 
-#if DEVELOPER
         [Description("Reset current HotSpot after interaction and move to the closest one")]
-#else
-        [Browsable(false)]
-#endif
         public bool ResetCurrentHotSpot
         {
             get => _resetCurrentHotSpot; set

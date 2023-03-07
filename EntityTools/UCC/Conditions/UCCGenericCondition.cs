@@ -33,9 +33,6 @@ namespace EntityTools.UCC.Conditions
             return copy;
         }
 
-#if !DEVELOPER
-        [Browsable(false)]
-#endif
         public string TestInfos(UCCAction refAction)
         {
             if (Target != Astral.Logic.UCC.Ressources.Enums.Unit.Target
@@ -51,11 +48,7 @@ namespace EntityTools.UCC.Conditions
             return $"{Target} [{Tested}] {Sign} '{base.Value}'";
         }
 
-#if DEVELOPER
         [Editor(typeof(UccGenericConditionEditor), typeof(UITypeEditor))]
-#else
-        [Browsable(false)]
-#endif
         public new string Value { get => base.Value; set => base.Value = value; }
     }
 }

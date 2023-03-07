@@ -8,7 +8,7 @@ using EntityTools.Forms;
 using EntityTools.Core.Interfaces;
 using EntityTools.Editors;
 using EntityTools.Enums;
-using EntityTools.Patches.Mapper;
+using EntityTools.Quester.Mapper;
 using EntityTools.Tools.CustomRegions;
 using EntityTools.Tools.Entities;
 using EntityTools.Tools.Extensions;
@@ -33,6 +33,7 @@ namespace EntityTools.Quester.Actions
     [Serializable]
     public class MoveToEntity : Action, INotifyPropertyChanged, IEntityDescriptor
     {
+        //BUG: не находит Entity, если в CustomRegions задан лишь Exclude
         #region вспомогательные Данные 
         private string _idStr = string.Empty;
         private string _label = string.Empty;
@@ -48,13 +49,9 @@ namespace EntityTools.Quester.Actions
 
         #region Опции команды
         #region Entity
-#if DEVELOPER
         [Description("The identifier of the Entity for the search.")]
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
         [Category("Entity")]
-#else
-        [Browsable(false)]
-#endif
         public string EntityID
         {
             get => _entityId;
@@ -73,14 +70,10 @@ namespace EntityTools.Quester.Actions
         }
         private string _entityId = string.Empty;
 
-#if DEVELOPER
         [Description("Type of the Entity identifier:\n" +
             "Simple: Simple text string with a wildcard at the beginning or at the end (char '*' means any symbols),\n" +
             "Regex: Regular expression.")]
         [Category("Entity")]
-#else
-        [Browsable(false)]
-#endif
         public ItemFilterStringType EntityIdType
         {
             get => _entityIdType;
@@ -99,12 +92,8 @@ namespace EntityTools.Quester.Actions
         }
         private ItemFilterStringType _entityIdType = ItemFilterStringType.Simple;
 
-#if DEVELOPER
         [Description("The Entity property that uses as identifier.")]
         [Category("Entity")]
-#else
-        [Browsable(false)]
-#endif
         public EntityNameType EntityNameType
         {
             get => _entityNameType;
@@ -123,31 +112,19 @@ namespace EntityTools.Quester.Actions
         }
         private EntityNameType _entityNameType = EntityNameType.InternalName;
 
-#if DEVELOPER
         [XmlIgnore]
         [Editor(typeof(EntityTestEditor), typeof(UITypeEditor))]
         [Description("Test the Entity searching.")]
         [Category("Entity")]
         public string TestSearch => @"Push button '...' =>";
-#if false
-        [XmlIgnore]
-        [Editor(typeof(EntityTestEditor), typeof(UITypeEditor))]
-        [Description("Нажми на кнопку '...' чтобы увидеть информацию о текущей цели")]
-        public string TargetInfo { get; } = "Нажми на кнопку '...' чтобы увидеть больше =>"; 
-#endif
-#endif
         #endregion
 
 
         #region EntitySearchOptions
-#if DEVELOPER
         [Description("Checking the health of Entity not zero (it's alive):\n" +
             "True: Only Entities with nonzero health are detected,\n" +
             "False: Entity's health does not checked during search.")]
         [Category("Entity Search Options")]
-#else
-        [Browsable(false)]
-#endif
         public bool HealthCheck
         {
             get => _healthCheck; set
@@ -162,14 +139,10 @@ namespace EntityTools.Quester.Actions
         }
         private bool _healthCheck = true;
 
-#if DEVELOPER
         [Description("Checking the distance between target Entity and the Player:\n" +
                      "True: Do not change the target Entity while it is alive or until the Bot within '" + nameof(Distance) + "' of it.\n" +
                      "False: Constantly scan an area and target the nearest Entity.")]
         [Category("Entity Search Options")]
-#else
-        [Browsable(false)]
-#endif
         public bool HoldTargetEntity
         {
             get => _holdTargetEntity; set
@@ -186,13 +159,9 @@ namespace EntityTools.Quester.Actions
 
 
         #region SearchArea
-#if DEVELOPER
         [Description("The maximum distance from the character within which the Entity is searched.\n" +
             "The default value is 0, which disables distance checking.")]
         [Category("Search Area")]
-#else
-        [Browsable(false)]
-#endif
         public float ReactionRange
         {
             get => _reactionRange; set
@@ -209,13 +178,9 @@ namespace EntityTools.Quester.Actions
         }
         private float _reactionRange;
 
-#if DEVELOPER
         [Description("The maximum Z-coordiante difference with Player within which the Entity is searched.\n" +
                      "The default value is 0, which disables Z-coordiante checking.")]
         [Category("Search Area")]
-#else
-        [Browsable(false)]
-#endif
         public float ReactionZRange
         {
             get => _reactionZRange; set
@@ -232,14 +197,10 @@ namespace EntityTools.Quester.Actions
         }
         private float _reactionZRange;
 
-#if DEVELOPER
         [Description("Checking the Entity and the Player is in the same ingame Region (not CustomRegion):\n" +
             "True: Only Entities located in the same Region as Player are detected,\n" +
             "False: Entity's Region does not checked during search.")]
         [Category("Entity Search Options")]
-#else
-        [Browsable(false)]
-#endif
         public bool RegionCheck
         {
             get => _regionCheck; set
@@ -254,13 +215,9 @@ namespace EntityTools.Quester.Actions
         }
         private bool _regionCheck;
 
-#if DEVELOPER
         [Description("The collection of the CustomRegion that define the search area.")]
         [Editor(typeof(CustomRegionCollectionEditor), typeof(UITypeEditor))]
         [Category("Search Area")]
-#else
-        [Browsable(false)]
-#endif
         [XmlElement("CustomRegionNames")]
         [DisplayName("CustomRegions")]
         [NotifyParentProperty(true)]
@@ -279,12 +236,8 @@ namespace EntityTools.Quester.Actions
         }
         private CustomRegionCollection _customRegionNames = new CustomRegionCollection();
 
-#if DEVELOPER
         [Description("Checking the Player is in the area, defined by 'CustomRegions'")]
         [Category("Search Area")]
-#else
-        [Browsable(false)]
-#endif
         public bool CustomRegionsPlayerCheck
         {
             get => customRegionsPlayerCheck; set
@@ -298,14 +251,10 @@ namespace EntityTools.Quester.Actions
         }
         private bool customRegionsPlayerCheck;
 
-#if DEVELOPER
         [Description("The name of the Map where current action can be run.\n" +
                      "Ignored if empty.")]
         [Editor(typeof(CurrentMapEdit), typeof(UITypeEditor))]
         [Category("Search Area")]
-#else
-        [Browsable(false)]
-#endif        
         public string CurrentMap
         {
             get => currentMap;
@@ -323,14 +272,10 @@ namespace EntityTools.Quester.Actions
 
 
         #region ManageCombatOptions
-#if DEVELOPER
         [Description("Distance to the Entity by which it is necessary to approach.\n" +
                      "The minimum value is 5.")]
         [Category("Manage Combat Options")]
         [DisplayName("CombatDistance")]
-#else
-        [Browsable(false)]
-#endif
 
         public float Distance
         {
@@ -348,12 +293,8 @@ namespace EntityTools.Quester.Actions
         }
         private float _distance = 30;
 
-#if DEVELOPER
         [Description("Ignore the enemies while approaching the target Entity.")]
         [Category("Manage Combat Options")]
-#else
-        [Browsable(false)]
-#endif
         public bool IgnoreCombat
         {
             get => _ignoreCombat; set
@@ -367,13 +308,9 @@ namespace EntityTools.Quester.Actions
         }
         private bool _ignoreCombat = true;
 
-#if DEVELOPER
         [Description("Sets the ucc option '" + nameof(IgnoreCombatMinHP) + "' when disabling combat mode.\n" +
                      "Options ignored if the value is -1.")]
         [Category("Manage Combat Options")]
-#else
-        [Browsable(false)]
-#endif
         public int IgnoreCombatMinHP
         {
             get => _ignoreCombatMinHp; set
@@ -391,15 +328,11 @@ namespace EntityTools.Quester.Actions
         }
         private int _ignoreCombatMinHp = -1;
 
-#if DEVELOPER
         [Description("Special check before disabling combat while playing action.\n" +
                      "The condition is checking when option '" + nameof(IgnoreCombat) + "' is active.")]
         [Category("Manage Combat Options")]
         [Editor(typeof(QuesterConditionEditor), typeof(UITypeEditor))]
         [TypeConverter(typeof(ExpandableObjectConverter))]
-#else
-        [Browsable(false)]
-#endif
         public Astral.Quester.Classes.Condition IgnoreCombatCondition
         {
             get => _ignoreCombatCondition;
@@ -414,14 +347,10 @@ namespace EntityTools.Quester.Actions
         }
         private Astral.Quester.Classes.Condition _ignoreCombatCondition;
 
-#if DEVELOPER
         [Description("The battle is aborted outside '" + nameof(AbortCombatDistance) + "' radius from the target entity.\n" +
                      "The combat is restored within the '" + nameof(Distance) + "' radius.\n" +
                      "However, this is not performed if the value less than '" + nameof(Distance) + "' or '" + nameof(IgnoreCombat) + "' is False.")]
         [Category("Manage Combat Options")]
-#else
-        [Browsable(false)]
-#endif
         public uint AbortCombatDistance
         {
             get => _abortCombatDistance; set
@@ -435,13 +364,9 @@ namespace EntityTools.Quester.Actions
         }
         private uint _abortCombatDistance;
 
-#if DEVELOPER
         [Description("The identifier of the skill applying on the target Entity at the first strike.")]
         [Editor(typeof(PowerIdEditor), typeof(UITypeEditor))]
         [Category("Manage Combat Options")]
-#else
-        [Browsable(false)]
-#endif
         public string PowerId
         {
             get => _powerId;
@@ -457,13 +382,9 @@ namespace EntityTools.Quester.Actions
         }
         private string _powerId = string.Empty;
 
-#if DEVELOPER
         [Description("The time needed to activate the skill '" + nameof(PowerId) + "'.")]
         [Category("Manage Combat Options")]
         [DisplayName("PowerCastingTime (ms)")]
-#else
-        [Browsable(false)]
-#endif
         public int CastingTime
         {
             get => _castingTime;
@@ -480,13 +401,9 @@ namespace EntityTools.Quester.Actions
         }
         private int _castingTime;
 
-#if DEVELOPER
         [Description("True: Clear the list of attackers and attack the target Entity when it is approached.\n" +
                      "This option is ignored when '" + nameof(IgnoreCombat) + "' does not set.")]
         [Category("Manage Combat Options")]
-#else
-        [Browsable(false)]
-#endif
         public bool AttackTargetEntity
         {
             get => _attackTargetEntity; set
@@ -503,13 +420,9 @@ namespace EntityTools.Quester.Actions
 
 
         #region Interruptions
-#if DEVELOPER
         [Description("True: Complete an action when the Entity is closer than 'Distance'.\n" +
                      "False: Follow an Entity regardless of its distance.")]
         [Category("Interruptions")]
-#else
-        [Browsable(false)]
-#endif
         public bool StopOnApproached
         {
             get => _stopOnApproached; set
@@ -523,13 +436,9 @@ namespace EntityTools.Quester.Actions
         }
         private bool _stopOnApproached;
 
-#if DEVELOPER
         [Description("The command is interrupted upon entity search timer reaching zero (ms).\n" +
                      "Set zero value to infinite search.")]
         [Category("Interruptions")]
-#else
-        [Browsable(false)]
-#endif
         public int EntitySearchTime
         {
             get => _entitySearchTime;
@@ -549,11 +458,7 @@ namespace EntityTools.Quester.Actions
         #endregion
 
 
-#if DEVELOPER
         [Description("Reset current HotSpot after approaching the target Entity.")]
-#else
-        [Browsable(false)]
-#endif
         public bool ResetCurrentHotSpot
         {
             get => _resetCurrentHotSpot; set

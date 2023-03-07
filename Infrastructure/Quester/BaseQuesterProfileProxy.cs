@@ -61,7 +61,7 @@ namespace Infrastructure.Quester
                             {
                                 return mapsMeshes[mapName];
                             }
-                            else if (Infrastructure.Quester.QuesterHelper.LoadMeshFromZipFile(CurrentProfileZipMeshFile, mapName, out Graph mesh))
+                            else if (QuesterHelper.LoadMeshFromZipFile(CurrentProfileZipMeshFile, mapName, out Graph mesh))
                             {
                                 mapsMeshes.Add(mapName, mesh);
                                 return mesh;
@@ -151,7 +151,7 @@ namespace Infrastructure.Quester
             {
                 if (RealProfile.ExternalMeshFileName != value)
                 {
-                    Infrastructure.Quester.QuesterHelper.LoadAllMeshes(_mapsMeshes, RealProfile.ExternalMeshFileName);
+                    QuesterHelper.LoadAllMeshes(_mapsMeshes, RealProfile.ExternalMeshFileName);
                     OnPropertyChanged();
                     RealProfile.Saved = false;
                     RealProfile.ExternalMeshFileName = value;
@@ -171,7 +171,7 @@ namespace Infrastructure.Quester
         /// </summary>
         [Browsable(false)]
         [NotifyParentProperty(true)]
-        public ActionPack MainActionActions => RealProfile.MainActionPack;
+        public ActionPack MainActionPack => RealProfile.MainActionPack;
 
         /// <summary>
         /// Набор команд quester'a
@@ -189,7 +189,7 @@ namespace Infrastructure.Quester
 
                 var mainActionPack = RealProfile.MainActionPack;
                 mainActionPack.Reset();
-                Infrastructure.Quester.QuesterHelper.ResetActionPlayer(mainActionPack);
+                mainActionPack.ResetActionPlayer();
                 var actions = mainActionPack.Actions;
                 actions.Clear();
                 if (value?.Any() == true)
@@ -348,7 +348,6 @@ namespace Infrastructure.Quester
         #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
 
-        [NotifyPropertyChangedInvocator]
         public virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
@@ -489,7 +488,7 @@ namespace Infrastructure.Quester
             //    || !File.Exists(profilePath))
             //    return false;
 
-            var prof = Infrastructure.Quester.QuesterHelper.Load(ref profilePath);
+            var prof = QuesterHelper.Load(ref profilePath);
             if (prof is null)
                 return false;
 
@@ -507,7 +506,7 @@ namespace Infrastructure.Quester
 
             string newProfileName = ProfilePath;
             string externalMeshes = ExternalMeshFileName;
-            if (Infrastructure.Quester.QuesterHelper.Save(RealProfile, _mapsMeshes, ProfilePath, ref newProfileName))
+            if (QuesterHelper.Save(RealProfile, _mapsMeshes, ProfilePath, ref newProfileName))
             {
                 ProfilePath = newProfileName;
                 if (UseExternalMeshes
@@ -527,7 +526,7 @@ namespace Infrastructure.Quester
 
             string newProfileName = string.Empty;
             string externalMeshes = ExternalMeshFileName;
-            if (Infrastructure.Quester.QuesterHelper.Save(RealProfile, _mapsMeshes, ProfilePath, ref newProfileName))
+            if (QuesterHelper.Save(RealProfile, _mapsMeshes, ProfilePath, ref newProfileName))
             {
                 //TODO Переопределение относительных путей для PushProfileToStackAndLoad и LoadProfile
                 ProfilePath = newProfileName;
@@ -537,6 +536,12 @@ namespace Infrastructure.Quester
                     OnPropertyChanged(nameof(ExternalMeshFileName));
                 }
             }
+        }
+
+        protected void ResetMeshesCache()
+        {
+            _currentProfileZipMeshFile = default;
+            _mapsMeshes.Clear();
         }
         #endregion
     }

@@ -7,7 +7,6 @@ using EntityTools.UCC.Actions;
 
 namespace EntityTools.Editors.TestEditors
 {
-#if DEVELOPER
     public class TargetSelectorTestEditor : UITypeEditor
     {
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
@@ -31,5 +30,4 @@ namespace EntityTools.Editors.TestEditors
             return UITypeEditorEditStyle.Modal;
         }
     }
-#endif
 }

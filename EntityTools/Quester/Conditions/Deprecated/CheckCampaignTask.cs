@@ -20,16 +20,9 @@ namespace EntityTools.Quester.Conditions
     {
         public override void Reset() { }
 
-#if DEVELOPER
         [Editor(typeof(CampaignTaskEditor), typeof(UITypeEditor))]
-#else
-        [Browsable(false)]
-#endif
         public CampaignTask Task { get; set; } = new CampaignTask();
 
-#if !DEVELOPER
-        [Browsable(false)]
-#endif
         public CampaignTaskState Tested { get; set; } = CampaignTaskState.Completed;
 
         public override bool IsValid
@@ -66,9 +59,6 @@ namespace EntityTools.Quester.Conditions
             return $"[Deprecated] {GetType().Name}: Is [{Task.TaskName}] {Tested}?";
         }
 
-#if !DEVELOPER
-        [Browsable(false)]
-#endif
         public override string TestInfos
         {
             get

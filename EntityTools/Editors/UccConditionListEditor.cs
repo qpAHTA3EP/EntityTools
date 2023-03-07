@@ -9,7 +9,6 @@ using ConditionList = System.Collections.ObjectModel.ObservableCollection<Astral
 
 namespace EntityTools.Editors
 {
-#if DEVELOPER
     internal class UccConditionListEditor : UITypeEditor
     {
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
@@ -82,5 +81,4 @@ namespace EntityTools.Editors
             return UITypeEditorEditStyle.Modal;
         }
     }
-#endif
 }

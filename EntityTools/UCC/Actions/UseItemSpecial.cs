@@ -21,12 +21,8 @@ namespace EntityTools.UCC.Actions
     public class UseItemSpecial : UCCAction, INotifyPropertyChanged
     {
         #region Опции команды
-#if DEVELOPER
         [Editor(typeof(ItemIdEditor), typeof(UITypeEditor))]
         [Category("Item")]
-#else
-        [Browsable(false)]
-#endif
         public string ItemId
         {
             get => _itemId;
@@ -41,14 +37,10 @@ namespace EntityTools.UCC.Actions
         }
         private string _itemId = string.Empty;
 
-#if DEVELOPER
         [Description("Type of and ItemId:\n" +
             "Simple: Simple text string with a wildcard at the beginning or at the end (char '*' means any symbols)\n" +
             "Regex: Regular expression")]
         [Category("Item")]
-#else
-        [Browsable(false)]
-#endif
         public ItemFilterStringType ItemIdType
         {
             get => _itemIdType; set
@@ -63,13 +55,9 @@ namespace EntityTools.UCC.Actions
         private ItemFilterStringType _itemIdType = ItemFilterStringType.Simple;
 
 
-#if DEVELOPER
         [Category("Item")]
         [Description("Identificator of the bags where Item would be searched")]
         [Editor(typeof(BagsListEditor), typeof(UITypeEditor))]
-#else
-        [Browsable(false)]
-#endif
         public BagsList Bags
         {
             get => _bags; set
@@ -83,11 +71,7 @@ namespace EntityTools.UCC.Actions
         }
         private BagsList _bags = BagsList.GetPlayerBagsAndPotions();
 
-#if DEVELOPER
         [Category("Optional")]
-#else
-        [Browsable(false)]
-#endif
         public bool CheckItemCooldown
         {
             get => _checkItemCooldown; set
@@ -101,12 +85,8 @@ namespace EntityTools.UCC.Actions
         }
         private bool _checkItemCooldown;
 
-#if DEVELOPER
         [Category("Optional")]
         [Description("Equip an item into the needed slot automatically if it can't be used from the bag")]
-#else
-        [Browsable(false)]
-#endif
         public bool AutoEquip
         {
             get => _autoEquip; set

@@ -26,7 +26,7 @@ using DevExpress.XtraGrid.Views.Grid.ViewInfo;
 using EntityTools.Annotations;
 using EntityTools.Enums;
 using EntityTools.Forms;
-using EntityTools.Patches.Mapper;
+using EntityTools.Quester.Mapper;
 using EntityTools.Quester.Editor.Classes;
 using EntityTools.Quester.Editor.TreeViewCustomization;
 using EntityTools.Tools;
@@ -35,6 +35,7 @@ using MyNW.Internals;
 using MyNW.Patchables.Enums;
 using QuesterAction = Astral.Quester.Classes.Action;
 using QuesterCondition = Astral.Quester.Classes.Condition;
+using EntityTools.Patches.Quester;
 
 namespace EntityTools.Quester.Editor
 {

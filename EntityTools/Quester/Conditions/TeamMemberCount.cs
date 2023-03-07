@@ -6,7 +6,7 @@ using System.Text;
 using Astral.Quester.Classes;
 using EntityTools.Editors;
 using EntityTools.Extensions;
-using EntityTools.Patches.Mapper;
+using EntityTools.Quester.Mapper;
 using EntityTools.Tools.CustomRegions;
 using MyNW.Classes;
 using MyNW.Internals;
@@ -17,14 +17,10 @@ namespace EntityTools.Quester.Conditions
     public class TeamMembersCount : Condition, INotifyPropertyChanged
     {
         #region Опции команды
-#if DEVELOPER
         [Description("CustomRegion names collection")]
         [Editor(typeof(CustomRegionCollectionEditor), typeof(UITypeEditor))]
         [Category("Location")]
         [DisplayName("CustomRegions")]
-#else
-        [Browsable(false)]
-#endif
         public CustomRegionCollection CustomRegionNames
         {
             get => _customRegionNames;
@@ -40,14 +36,10 @@ namespace EntityTools.Quester.Conditions
         }
         private CustomRegionCollection _customRegionNames = new CustomRegionCollection();
 
-#if DEVELOPER
         [Description("The Check of the Team member's location relative to the custom regions\n" +
             "Equals: Count only members located WITHIN the CustomRegions\n" +
             "NotEquals: Count only members located OUTSIDE the CustomRegions")]
         [Category("Location")]
-#else
-        [Browsable(false)]
-#endif
         public Presence CustomRegionCheck
         {
             get => _customRegionCheck; set
@@ -59,12 +51,8 @@ namespace EntityTools.Quester.Conditions
         }
         private Presence _customRegionCheck = Presence.Equal;
 
-#if DEVELOPER
         [Description("The Value which is compared by 'DistanceSign' with the distance between Player and Team member")]
         [Category("Distance")]
-#else
-        [Browsable(false)]
-#endif
         public float Distance
         {
             get => _distance; set
@@ -77,12 +65,8 @@ namespace EntityTools.Quester.Conditions
         }
         private float _distance;
 
-#if DEVELOPER
         [Description("Option specifies the comparison of the distance to the group member")]
         [Category("Distance")]
-#else
-        [Browsable(false)]
-#endif
         public Relation DistanceSign
         {
             get => _distanceSign; set
@@ -94,12 +78,8 @@ namespace EntityTools.Quester.Conditions
         }
         private Relation _distanceSign = Relation.Superior;
 
-#if DEVELOPER
         [Description("The Value which is compared by 'Sign' with the counted Team members")]
         [Category("Members")]
-#else
-        [Browsable(false)]
-#endif
         public uint MemberCount
         {
             get => _memberCount; set
@@ -111,12 +91,8 @@ namespace EntityTools.Quester.Conditions
         }
         private uint _memberCount = 3;
 
-#if DEVELOPER
         [Description("Option specifies the comparison of 'MemberCount' and the counted Team members")]
         [Category("Members")]
-#else
-        [Browsable(false)]
-#endif
         public Relation Sign
         {
             get => _sign; set
@@ -129,14 +105,10 @@ namespace EntityTools.Quester.Conditions
         }
         private Relation _sign = Relation.Inferior;
 
-#if DEVELOPER
         [Description("The Check of the Team member's Region (not CustomRegion)):\n" +
             "True: Count Team member if it is located in the same Region as Player\n" +
             "False: Does not consider the region when counting Team members")]
         [Category("Optional")]
-#else
-        [Browsable(false)]
-#endif
         public bool RegionCheck
         {
             get => _regionCheck; set

@@ -7,33 +7,18 @@ namespace Infrastructure.Quester
 {
     /// <summary>
     /// Синглтон прокси-объекта, опосредующего доступ к активному загруженному профилю Quester'a: <br/>
-    /// <see cref="AstralAccessors.Quester.Core.Profile"/>
+    /// <see cref="Astral.Quester.API.CurrentProfile"/>
     /// </summary>
-    internal class ActiveProfileProxy : BaseQuesterProfileProxy
+    public class ActiveProfileProxy : BaseQuesterProfileProxy
     {
-        private MethodInfo engineSetProfile;
-        
+        private readonly MethodInfo engineSetProfile;
+
         internal ActiveProfileProxy(MethodInfo engineSetProfile)
         {
-            if (engineSetProfile is null)
-                throw new ArgumentNullException(nameof(engineSetProfile));
-            this.engineSetProfile = engineSetProfile;
+            this.engineSetProfile = engineSetProfile
+                                 ?? throw new ArgumentNullException(nameof(engineSetProfile));
         }
-        protected override Profile RealProfile 
-        { 
-            get => Astral.Quester.API.CurrentProfile;
-#if false
-            set
-            {
-                var currentProfile = Astral.Quester.API.CurrentProfile;
-                if (value != null
-                    && !ReferenceEquals(currentProfile, value))
-                {
-                    AstralAccessors.Quester.Core.SetProfileToEngine(value);
-                }
-            } 
-#endif
-        }
+        protected override Profile RealProfile => Astral.Quester.API.CurrentProfile;
 
 #if DEBUG
         [Browsable(true)]
@@ -49,7 +34,7 @@ namespace Infrastructure.Quester
                 if (!string.Equals(Astral.API.CurrentSettings.LastQuesterProfile, value, System.StringComparison.OrdinalIgnoreCase))
                 {
                     Astral.API.CurrentSettings.LastQuesterProfile = value;
-                    OnPropertyChanged(); 
+                    OnPropertyChanged();
                     ResetCachedMeshes();
                 }
             }
@@ -70,6 +55,7 @@ namespace Infrastructure.Quester
             engineSetProfile.Invoke(null, new[] { profile });
             Astral.API.CurrentSettings.LastQuesterProfile = newProfileFilename;
 
+            ResetMeshesCache();
             AssignInternals(profile);
 
             if (AstralAccessors.Controllers.BotComs.BotServer.Server.IsRunning)

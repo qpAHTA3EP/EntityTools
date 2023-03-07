@@ -30,16 +30,12 @@ namespace EntityTools.UCC.Actions
     public class ChangeTarget : UCCAction, INotifyPropertyChanged
     {
         #region Опции команды
-#if DEVELOPER
         [Category("General")]
         [Editor(typeof(UccTargetSelectorEditor), typeof(UITypeEditor))]
         [Description("Target selector algorithm.")]
         [TypeConverter(typeof(ExpandableObjectConverter))]
         [XmlElement(typeof(EntityTarget))]
         [XmlElement(typeof(TeammateSupport))]
-#else
-        [Browsable(false)]
-#endif
         public TargetSelector TargetSelector
         {
             get => targetSelector;
@@ -97,12 +93,10 @@ namespace EntityTools.UCC.Actions
         }
         public bool ShouldSerializeCustomConditions() => false;
 
-#if DEVELOPER && DEBUG_CHANGE_TARGET
         [Category("General")]
         [XmlIgnore]
         [Editor(typeof(TargetSelectorTestEditor), typeof(UITypeEditor))]
         public string TestInfos => @"Push button '...' =>";
-#endif
         #endregion
 
 
@@ -161,7 +155,6 @@ namespace EntityTools.UCC.Actions
         [XmlIgnore]
         [TypeConverter(typeof(ExpandableObjectConverter))]
         public object PlayerTarget => new SimpleEntityWrapper(TargetProcessor.GetTarget());
-#if DEVELOPER && DEBUG_CHANGE_TARGET
 
         [TypeConverter(typeof(ExpandableObjectConverter))]
         public TargetProcessor TargetProcessor
@@ -189,7 +182,7 @@ namespace EntityTools.UCC.Actions
                 return _targetProcessor;
             }
         }
-#endif
+
         [XmlIgnore]
         [NonSerialized]
         private TargetProcessor _targetProcessor;

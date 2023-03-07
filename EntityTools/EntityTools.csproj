@@ -46,8 +46,8 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\..\References\Plugins\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;DEVELOPER, PATCH_ASTRAL, ENTITYTOOLS, NO_PATCH_LOG</DefineConstants>
+    <OutputPath>..\..\References\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x64</PlatformTarget>
@@ -59,8 +59,8 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\References\Plugins\</OutputPath>
-    <DefineConstants>TRACE;DEVELOPER, NOT_ENCRYPTED_CORE, PATCH_ASTRAL, ENTITYTOOLS, NO_PATCH_LOG</DefineConstants>
+    <OutputPath>..\..\References\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x64</PlatformTarget>
@@ -70,35 +70,6 @@
     <DocumentationFile>
     </DocumentationFile>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>..\References\x64\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;DEVELOPER, NOT_ENCRYPTED_CORE, PATCH_ASTRAL, HARMONY, ENTITYTOOLS, NO_PATCH_LOG</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Optimize>false</Optimize>
-    <DocumentationFile>
-    </DocumentationFile>
-    <RunCodeAnalysis>false</RunCodeAnalysis>
-    <CodeAnalysisIgnoreGeneratedCode>false</CodeAnalysisIgnoreGeneratedCode>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <OutputPath>..\References\x64\</OutputPath>
-    <DefineConstants>TRACE;DEVELOPER, NOT_ENCRYPTED_CORE, PATCH_ASTRAL, HARMONY, ENTITYTOOLS, NO_PATCH_LOG</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <DebugSymbols>true</DebugSymbols>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Prefer32Bit>false</Prefer32Bit>
-    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
-  </PropertyGroup>
   <PropertyGroup>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
@@ -106,58 +77,10 @@
     <ApplicationIcon>
     </ApplicationIcon>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Encrypted_Debug|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>..\..\References\Plugins\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;DEVELOPER, ENCRYPTED_CORE, PATCH_ASTRAL, HARMONY, ENTITYTOOLS, NO_PATCH_LOG</DefineConstants>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Encrypted_Debug|x64'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>..\References\x64\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;DEVELOPER, NOT_ENCRYPTED_CORE, PATCH_ASTRAL, HARMONY, ENTITYTOOLS, NO_PATCH_LOG</DefineConstants>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisIgnoreGeneratedCode>false</CodeAnalysisIgnoreGeneratedCode>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Encrypted_Release|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>..\..\References\Plugins\</OutputPath>
-    <DefineConstants>DEVELOPER, ENCRYPTED_CORE, PATCH_ASTRAL, HARMONY, ENTITYTOOLS, NO_PATCH_LOG</DefineConstants>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Optimize>true</Optimize>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Encrypted_Release|x64'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>..\References\x64\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;DEVELOPER, NOT_ENCRYPTED_CORE, PATCH_ASTRAL, HARMONY, ENTITYTOOLS, NO_PATCH_LOG</DefineConstants>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisIgnoreGeneratedCode>false</CodeAnalysisIgnoreGeneratedCode>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
   <ItemGroup>
     <Reference Include="0Harmony, Version=2.2.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Lib.Harmony.2.2.2\lib\net48\0Harmony.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="AStar">
       <HintPath>..\..\References\AStar.dll</HintPath>
@@ -201,9 +124,8 @@
       <HintPath>..\..\References\MyMemory-x64.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="MyNW, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\References\MyNW.dll</HintPath>
+    <Reference Include="MyNW">
+      <HintPath>..\..\References\MyNW.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -340,22 +262,22 @@
     <Compile Include="Patches\ComplexPatch_Navigation.cs" />
     <Compile Include="Patches\QuesterPatchSettings.cs" />
     <Compile Include="Patches\Quester\ComplexPatch_Quester.cs" />
-    <Compile Include="Patches\Mapper\ComplexPatch_Mapper.cs" />
-    <Compile Include="Patches\Mapper\Tools\CustomRegionToolBase.cs" />
-    <Compile Include="Patches\Mapper\Tools\CustomRegionToolForm.cs">
+    <Compile Include="Patches\Quester\ComplexPatch_Mapper.cs" />
+    <Compile Include="Quester\Mapper\Tools\CustomRegionToolBase.cs" />
+    <Compile Include="Quester\Mapper\Tools\CustomRegionToolForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Patches\Mapper\Tools\CustomRegionToolForm.Designer.cs">
+    <Compile Include="Quester\Mapper\Tools\CustomRegionToolForm.Designer.cs">
       <DependentUpon>CustomRegionToolForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Patches\Mapper\Tools\ICustomRegionTool.cs" />
-    <Compile Include="Patches\Mapper\Tools\MapperSettingsForm.cs">
+    <Compile Include="Quester\Mapper\Tools\ICustomRegionTool.cs" />
+    <Compile Include="Quester\Mapper\Tools\MapperSettingsForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Patches\Mapper\Tools\MapperSettingsForm.Designer.cs">
+    <Compile Include="Quester\Mapper\Tools\MapperSettingsForm.Designer.cs">
       <DependentUpon>MapperSettingsForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Patches\Mapper\Tools\AddNodeTool.cs" />
+    <Compile Include="Quester\Mapper\Tools\AddNodeTool.cs" />
     <Compile Include="Patches\Patcher.tt.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -415,32 +337,32 @@
     <Compile Include="Servises\SlideMonitor\MountCostumeDef.cs" />
     <Compile Include="Servises\SlideMonitor\SlideMonitorSettings.cs" />
     <Compile Include="Patches\Logic.General\Astral_Logic_General_GetNearestIndexInPositionList.cs" />
-    <Compile Include="Patches\Mapper\MapperDrawingTools.cs" />
-    <Compile Include="Patches\Mapper\MapperGraphics.cs" />
-    <Compile Include="Patches\Mapper\MapperHelper.cs" />
+    <Compile Include="Quester\Mapper\MapperDrawingTools.cs" />
+    <Compile Include="Quester\Mapper\MapperGraphics.cs" />
+    <Compile Include="Quester\Mapper\MapperHelper.cs" />
     <Compile Include="Forms\ObjectInfoForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\ObjectInfoForm.Designer.cs">
       <DependentUpon>ObjectInfoForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Patches\Mapper\PointHelper.cs" />
-    <Compile Include="Patches\Mapper\Tools\EditCustomRegionTool.cs" />
-    <Compile Include="Patches\Mapper\Tools\AddCustomRegionTool.cs" />
-    <Compile Include="Patches\Mapper\Tools\ObjectInfoTool.cs" />
-    <Compile Include="Patches\Mapper\Tools\MapperMouseEventArgs.cs" />
-    <Compile Include="Patches\Mapper\Tools\MappingTool.cs" />
-    <Compile Include="Patches\Mapper\Tools\DistanceMeasurementTool.cs" />
-    <Compile Include="Patches\Mapper\Tools\NodeSelectTool.cs" />
-    <Compile Include="Patches\Mapper\Tools\IMapperTool.cs" />
-    <Compile Include="Patches\Mapper\Tools\RelocateNodesTool.cs" />
-    <Compile Include="Patches\Mapper\Tools\EditEdgeTool.cs" />
-    <Compile Include="Patches\Mapper\Tools\RemoveNodesTool.cs" />
+    <Compile Include="Quester\Mapper\PointHelper.cs" />
+    <Compile Include="Quester\Mapper\Tools\EditCustomRegionTool.cs" />
+    <Compile Include="Quester\Mapper\Tools\AddCustomRegionTool.cs" />
+    <Compile Include="Quester\Mapper\Tools\ObjectInfoTool.cs" />
+    <Compile Include="Quester\Mapper\Tools\MapperMouseEventArgs.cs" />
+    <Compile Include="Quester\Mapper\Tools\MappingTool.cs" />
+    <Compile Include="Quester\Mapper\Tools\DistanceMeasurementTool.cs" />
+    <Compile Include="Quester\Mapper\Tools\NodeSelectTool.cs" />
+    <Compile Include="Quester\Mapper\Tools\IMapperTool.cs" />
+    <Compile Include="Quester\Mapper\Tools\RelocateNodesTool.cs" />
+    <Compile Include="Quester\Mapper\Tools\EditEdgeTool.cs" />
+    <Compile Include="Quester\Mapper\Tools\RemoveNodesTool.cs" />
     <Compile Include="Patches\Patch_VIP_SealTraderEntity.cs" />
     <Compile Include="Patches\Patch_VIP_ProfessionVendorEntity.cs" />
     <Compile Include="Servises\SlideMonitor\SlideMonitor.cs" />
     <Compile Include="Patches\UCC\Patch_ActionsPlayer_CheckAlly.cs" />
-    <Compile Include="Patches\UCC\Patch_Logic_UCC_Forms_AddClass_Show.cs" />
+    <Compile Include="Patches\UCC\Patch_AddUccAction.cs" />
     <Compile Include="Patches\PatchesSettings.cs" />
     <Compile Include="Quester\Actions\BuySellItemsExt.cs" />
     <Compile Include="Quester\Actions\ChangeInstanceToLeader.cs" />
@@ -473,16 +395,16 @@
     <Compile Include="Editors\UccGenericConditionEditor.cs" />
     <Compile Include="Editors\UccActionEditor.cs" />
     <Compile Include="Editors\UiIdEditor.cs" />
-    <Compile Include="Patches\Mapper\Tools\MappingToolHelper.cs" />
-    <Compile Include="Patches\Mapper\Enums.cs" />
-    <Compile Include="Patches\Mapper\MapperFormExt.cs">
+    <Compile Include="Quester\Mapper\Tools\MappingToolHelper.cs" />
+    <Compile Include="Quester\Mapper\Enums.cs" />
+    <Compile Include="Quester\Mapper\MapperFormExt.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Patches\Mapper\MapperFormExt.Designer.cs">
+    <Compile Include="Quester\Mapper\MapperFormExt.Designer.cs">
       <DependentUpon>MapperFormExt.cs</DependentUpon>
     </Compile>
-    <Compile Include="Patches\Mapper\MapperGraphCache.cs" />
-    <Compile Include="Patches\Mapper\Tools\NodeDetail.cs" />
+    <Compile Include="Quester\Mapper\MapperGraphCache.cs" />
+    <Compile Include="Quester\Mapper\Tools\NodeDetail.cs" />
     <Compile Include="Patches\Patcher.cs" />
     <Compile Include="Patches\Patch.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
@@ -490,7 +412,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="Patches\Mapper\MapperSettings.cs" />
+    <Compile Include="Quester\Mapper\MapperSettings.cs" />
     <Compile Include="Tools\Classes\Range.cs" />
     <Compile Include="Tools\Combats\IgnoredFoes\IgnoredFoesContainer.cs" />
     <Compile Include="Tools\Combats\IgnoredFoes\IgnoredFoesCore.cs" />
@@ -672,16 +594,16 @@
     <EmbeddedResource Include="Forms\UIViewer.resx">
       <DependentUpon>UIViewer.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Patches\Mapper\MapperFormExt.resx">
+    <EmbeddedResource Include="Quester\Mapper\MapperFormExt.resx">
       <DependentUpon>MapperFormExt.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ObjectInfoForm.resx">
       <DependentUpon>ObjectInfoForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Patches\Mapper\Tools\CustomRegionToolForm.resx">
+    <EmbeddedResource Include="Quester\Mapper\Tools\CustomRegionToolForm.resx">
       <DependentUpon>CustomRegionToolForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Patches\Mapper\Tools\MapperSettingsForm.resx">
+    <EmbeddedResource Include="Quester\Mapper\Tools\MapperSettingsForm.resx">
       <DependentUpon>MapperSettingsForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\licenses.licx" />
@@ -806,7 +728,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj">
-      <Project>{fd0c9e2a-5d26-43aa-a227-bddaf9c30705}</Project>
+      <Project>{afcfa9c4-3175-401d-b9b7-c2134905c4dc}</Project>
       <Name>Infrastructure</Name>
     </ProjectReference>
   </ItemGroup>

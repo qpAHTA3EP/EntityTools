@@ -2,12 +2,12 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
-using Infrastructure.Quester;
 using DevExpress.XtraBars.Navigation;
 using DevExpress.XtraEditors;
 using EntityTools.Enums;
-using EntityTools.Patches.Mapper;
+using EntityTools.Patches.Quester;
 using EntityTools.Tools.CustomRegions;
+using Infrastructure.Quester;
 
 namespace EntityTools.Forms
 {

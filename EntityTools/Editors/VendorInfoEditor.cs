@@ -1,20 +1,19 @@
-﻿using Astral.Quester.Forms;
-using DevExpress.XtraEditors;
-using EntityTools.Enums;
-using EntityTools.Tools.Inventory;
-using MyNW.Classes;
-using MyNW.Internals;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Linq;
 using System.Windows.Forms;
+using Astral.Quester.Forms;
+using DevExpress.XtraEditors;
+using EntityTools.Enums;
 using EntityTools.Forms;
 using EntityTools.Tools;
+using EntityTools.Tools.Inventory;
+using MyNW.Classes;
+using MyNW.Internals;
 
 namespace EntityTools.Editors
 {
-#if DEVELOPER
     internal class VendorInfoEditor : UITypeEditor
     {
         private static readonly VendorType[] displayedVendors = { //VendorType.Auto,
@@ -131,5 +130,4 @@ namespace EntityTools.Editors
             return false;
         }
     }
-#endif
 }

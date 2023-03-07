@@ -6,7 +6,7 @@ using Astral.Logic.Classes.Map;
 using Astral.Quester;
 using Astral.Quester.UIEditors;
 using DevExpress.XtraEditors;
-using EntityTools.Patches.Mapper;
+using EntityTools.Quester.Mapper;
 using MyNW.Classes;
 using MyNW.Internals;
 using Action = Astral.Quester.Classes.Action;
