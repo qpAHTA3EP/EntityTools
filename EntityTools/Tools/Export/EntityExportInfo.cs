@@ -1,14 +1,13 @@
-﻿using System;
-using System.Xml.Serialization;
-using AcTp0Tools.Reflection;
+﻿using Infrastructure.Reflection;
 using MyNW.Classes;
+using System;
 
 namespace EntityTools.Tools
 {
     /// <summary>
     /// краткое описание объекта Entity
     /// </summary>
-    public class EntityInfo
+    public class EntityExportInfo
     {
         public Entity entity = Empty.Entity;
         public string Name = string.Empty;

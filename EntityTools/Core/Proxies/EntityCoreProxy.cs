@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Windows.Forms;
 using Astral.Classes.ItemFilter;
 using Astral.Logic.UCC.Classes;
 using Astral.Quester.Classes;
+using DevExpress.Utils;
 using EntityTools.Core.Interfaces;
 using EntityTools.Enums;
+using EntityTools.UCC.Conditions;
 using MyNW.Classes;
 using Action = System.Action;
 
@@ -19,6 +22,11 @@ namespace EntityTools.Core
         internal static void Initialize(ref Action method)
         {
             throw new NotImplementedException(); 
+        }
+
+        public T Get<T>(params object[] args) where T : class
+        {
+            throw new NotImplementedException();
         }
 
         public bool Initialize(object obj)
@@ -46,8 +54,43 @@ namespace EntityTools.Core
             throw new NotImplementedException();
         }
 
+        public bool TryGet<T>(ref T obj, params object[] args) where T : class
+        {
+            throw new NotImplementedException();
+        }
+
+        public object Get(Type type, params object[] args)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Dispose()
+        {
+            throw new NotImplementedException();
+        }
+
 #if DEVELOPER
-        public bool GUIRequest_Item<T>(Func<IEnumerable<T>> source, ref T selectedValue)
+        public bool UserRequest_SelectItem<T>(Func<IEnumerable<T>> source, ref T selectedValue, string displayName = "")
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool UserRequest_SelectItem<T>(Func<IEnumerable<T>> source, ref T selectedValue, ListControlConvertEventHandler itemFormatter)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool UserRequest_SelectItemList<T>(Func<IEnumerable<T>> source, ref IList<T> selectedValue, string caption = "")
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool UserRequest_EditValue(ref string value, string message = "", string caption = "", FormatInfo formatInfo = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool UserRequest_Edit(object obj, params object[] param)
         {
             throw new NotImplementedException();
         }
@@ -57,46 +100,61 @@ namespace EntityTools.Core
             throw new NotImplementedException();
         }
 
-        public bool GUIRequest_AuraId(ref string id)
+        public bool UserRequest_SelectAuraId(ref string id)
         {
             throw new NotImplementedException();
         }
 
-        public bool GUIRequest_CustomRegions(ref List<string> crList)
+        public bool UserRequest_EditCustomRegionList(ref List<string> crList)
         {
             throw new NotImplementedException();
         }
 
-        public bool GUIRequest_EntityId(ref string entPattern, ref ItemFilterStringType strMatchType, ref EntityNameType nameType)
+        public bool UserRequest_EditEntityId(ref string entPattern, ref ItemFilterStringType strMatchType, ref EntityNameType nameType)
         {
             throw new NotImplementedException();
         }
 
-        public bool GUIRequest_NodeLocation(ref Vector3 pos, string caption)
+        public bool UserRequest_GetNodeLocation(ref Vector3 pos, string caption, string message = "")
         {
             throw new NotImplementedException();
         }
 
-        public bool GUIRequest_UCCConditions(ref List<UCCCondition> list)
+        public bool UserRequest_EditUccConditions(ref System.Collections.ObjectModel.ObservableCollection<UCCCondition> list)
         {
             throw new NotImplementedException();
         }
 
-        public bool GUIRequest_UIGenId(ref string id)
+        public bool UserRequest_EditUccConditions(ref System.Collections.ObjectModel.ObservableCollection<UCCCondition> list, ref LogicRule logic, ref bool negation)
+        {
+            throw new NotImplementedException();
+        }
+        
+        public bool UserRequest_SelectUIGenId(ref string id)
         {
             throw new NotImplementedException();
         }
 
-        public bool GUIRequest_EntityToInteract(ref Entity entity)
+        public bool UserRequest_GetPosition(ref Vector3 pos, string caption, string message = "")
         {
             throw new NotImplementedException();
         }
 
-        public bool GUIRequest_UCCAction(out UCCAction action)
+        public bool UserRequest_GetEntityToInteract(ref Entity entity)
         {
             throw new NotImplementedException();
         }
-#if DEBUG
+
+        public bool UserRequest_GetUccAction(out UCCAction action)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Monitor(object monitor)
+        {
+            throw new NotImplementedException();
+        }
+#if false
         public LinkedList<Entity> FindAllEntity(string pattern, ItemFilterStringType matchType = ItemFilterStringType.Simple, EntityNameType nameType = EntityNameType.NameUntranslated, EntitySetType setType = EntitySetType.Complete, bool healthCheck = false, float range = 0, float zRange = 0, bool regionCheck = false, List<CustomRegion> customRegions = null, Predicate<Entity> specialCheck = null)
         {
             throw new NotImplementedException();
@@ -105,11 +163,6 @@ namespace EntityTools.Core
 #endif
 
         public bool CheckCore()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Dispose()
         {
             throw new NotImplementedException();
         }

@@ -1,26 +1,26 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Drawing.Design;
+using System.Linq;
 using System.Windows.Forms;
-using Astral.Logic.NW;
-using Astral.Quester.Classes;
 using Astral.Quester.Forms;
 using DevExpress.XtraEditors;
 using EntityTools.Enums;
-using EntityTools.Tools.BuySellItems;
+using EntityTools.Forms;
+using EntityTools.Tools;
+using EntityTools.Tools.Inventory;
 using MyNW.Classes;
 using MyNW.Internals;
-//using static EntityTools.Reflection.PrivateConsructor;
 
 namespace EntityTools.Editors
 {
-#if DEVELOPER
     internal class VendorInfoEditor : UITypeEditor
     {
         private static readonly VendorType[] displayedVendors = { //VendorType.Auto,
                                                                     VendorType.Normal,
                                                                     VendorType.ArtifactVendor,
                                                                     VendorType.RemoteVendor,
+                                                                    VendorType.Node,
                                                                     VendorType.VIPSealTrader,
                                                                     VendorType.VIPProfessionVendor
                                                                 };
@@ -44,11 +44,12 @@ namespace EntityTools.Editors
         public static bool SetInfos(out VendorInfo vendor)
         {
             vendor = null;
-            VendorType vndType = VendorType.None;
-            VendorInfo vendorInfo = null;
+            var vndType = VendorType.None;
+            var localPlayer = EntityManager.LocalPlayer;
 
-            if (EntityTools.Core.GUIRequest_Item(() => displayedVendors, ref vndType))
+            if (ItemSelectForm.GetAnItem(() => displayedVendors, ref vndType))
             {
+                VendorInfo vendorInfo;
                 switch (vndType)
                 {
                     case VendorType.None:
@@ -58,8 +59,8 @@ namespace EntityTools.Editors
                         return false; 
 #endif
                     case VendorType.Normal:
-                        Entity entity = null;
-                        if (EntityTools.Core.GUIRequest_EntityToInteract(ref entity))
+                        Entity entity = TargetSelectHelper.GetEntityToInteract();
+                        if (entity != null)
                         {
                             vendorInfo = new VendorInfo
                             {
@@ -67,8 +68,8 @@ namespace EntityTools.Editors
                                 CostumeName = entity.CostumeRef.CostumeName,
                                 DisplayName = entity.Name,
                                 Position = entity.Location.Clone(),
-                                MapName = EntityManager.LocalPlayer.MapState.MapName,
-                                RegionName = EntityManager.LocalPlayer.RegionInternalName
+                                MapName = localPlayer.MapState.MapName,
+                                RegionName = localPlayer.RegionInternalName
                             };
                             vendor = vendorInfo;
                             return true;
@@ -85,20 +86,36 @@ namespace EntityTools.Editors
                                 DisplayName = contactName
                             };
                             vendor = vendorInfo;
-                            if ((XtraMessageBox.Show("Call it now ?", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes))
+                            if (XtraMessageBox.Show("Call it now ?", "Confirm", 
+                                    MessageBoxButtons.YesNo, 
+                                    MessageBoxIcon.Question) 
+                                == DialogResult.Yes)
                             {
-                                foreach (RemoteContact remoteContact in EntityManager.LocalPlayer.Player.InteractInfo.RemoteContacts)
+                                var contact = localPlayer.Player.InteractInfo.RemoteContacts.FirstOrDefault(cnt => cnt.ContactDef == contactName);
+                                if (contact != null)
                                 {
-                                    if (remoteContact.ContactDef == contactName)
-                                    {
-                                        vendor.DisplayName = remoteContact.DisplayName;
-                                        remoteContact.Start();
-                                        break;
-                                    }
+                                    vendor.DisplayName = contact.DisplayName;
+                                    contact.Start();
+                                    break;
                                 }
                             }
                         }
                         return !string.IsNullOrEmpty(contactName);
+                    case VendorType.Node:
+                        var position = TargetSelectHelper.GetNodeLocation("Get Vendor", "Get vendor-node location");
+                        if (position.IsValid)
+                        {
+                            vendorInfo = new VendorInfo
+                            {
+                                VendorType = vndType,
+                                Position = position,
+                                MapName = localPlayer.MapState.MapName,
+                                RegionName = localPlayer.RegionInternalName
+                            };
+                            vendor = vendorInfo;
+                            return true;
+                        }
+                        return true;
                     default:
                         vendorInfo = new VendorInfo
                         {
@@ -113,5 +130,4 @@ namespace EntityTools.Editors
             return false;
         }
     }
-#endif
 }

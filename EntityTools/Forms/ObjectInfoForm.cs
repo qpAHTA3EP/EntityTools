@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Windows.Forms;
 using DevExpress.XtraEditors;
 
@@ -8,8 +9,9 @@ namespace EntityTools.Forms
     public partial class ObjectInfoForm : XtraForm
     {
         readonly List<ObjectInfoForm> childForms = new List<ObjectInfoForm>();
+        private int monitoringRefreshTime;
 
-        public ObjectInfoForm(object obj = null)
+        protected ObjectInfoForm(object obj = null)
         {
             InitializeComponent();
             if (obj != null)
@@ -19,12 +21,34 @@ namespace EntityTools.Forms
             }
         }
 
-        public void Show(object obj)
+        protected new void Show(IWin32Window owner)
         {
-            pgObjectInfos.SelectedObject = obj;
+            base.Show(owner);
+            backgroundWorker.RunWorkerAsync();
+        }
 
-            Text = obj?.ToString() ?? string.Empty;
-            Show();
+        public static ObjectInfoForm Show(object obj, int refreshTime = 500, IWin32Window owner = null)
+        {
+            if (obj is null)
+                throw new ArgumentNullException(nameof(obj));
+
+            if (refreshTime <= 0)
+                refreshTime = 500;
+
+            var @this = new ObjectInfoForm
+            {
+                pgObjectInfos = {SelectedObject = obj},
+                monitoringRefreshTime = refreshTime,
+
+                Text = obj.ToString()
+            };
+
+            //if(owner is null)
+            //    base.Show();
+            //else base.
+            @this.Show(owner);
+
+            return @this;
         }
 
         public sealed override string Text
@@ -38,9 +62,7 @@ namespace EntityTools.Forms
             var obj = pgObjectInfos.SelectedGridItem.Value;
             if (obj != null && obj.GetType().IsClass)
             {
-                var form = new ObjectInfoForm(obj);
-                childForms.Add(form);
-                form.Show();
+                childForms.Add(Show(obj, monitoringRefreshTime));
             }
         }
 
@@ -52,6 +74,16 @@ namespace EntityTools.Forms
         private void handler_FormClosed(object sender, FormClosedEventArgs e)
         {
             childForms.ForEach(f => f.Close());
+            backgroundWorker.CancelAsync();
+        }
+
+        private void Refresh(object sender, System.ComponentModel.DoWorkEventArgs e)
+        {
+            while (!IsDisposed && !backgroundWorker.CancellationPending)
+            {
+                pgObjectInfos.Refresh(); 
+                Thread.Sleep(monitoringRefreshTime);
+            }
         }
     }
 }

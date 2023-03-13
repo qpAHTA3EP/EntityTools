@@ -22,17 +22,17 @@ namespace EntityTools.Settings
                 if (navigation != value)
                 {
                     navigation = value;
-                    NotifyPropertyChanged(nameof(Navigation));
+                    NotifyPropertyChanged();
                 }
             }
         }
         private bool navigation = true;
 
         
-            /// <summary>
-            /// Активация или деактивация Патча методов выбора ближайшей точки
-            /// </summary>
-            [Bindable(true)]
+        /// <summary>
+        /// Активация или деактивация Патча методов выбора ближайшей точки
+        /// </summary>
+        [Bindable(true)]
         [Description("Управление патчем, выбора ближайшей точки пути (Logic.General)")]
         public bool GetNearestIndexInPositionList
         {
@@ -42,7 +42,7 @@ namespace EntityTools.Settings
                 if (getNearestIndexInPositionList != value)
                 {
                     getNearestIndexInPositionList = value;
-                    NotifyPropertyChanged(nameof(GetNearestIndexInPositionList));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -61,12 +61,11 @@ namespace EntityTools.Settings
                 if (saveQuesterProfile != value)
                 {
                     saveQuesterProfile = value;
-                    NotifyPropertyChanged(nameof(SaveQuesterProfile));
+                    NotifyPropertyChanged();
                 }
             }
         }
         private bool saveQuesterProfile = true;
-
 
         /// <summary>
         /// Активация или деактивация Патча ProfessionVendorEntity
@@ -81,7 +80,7 @@ namespace EntityTools.Settings
                 if (professionVendorEntity != value)
                 {
                     professionVendorEntity = value;
-                    NotifyPropertyChanged(nameof(VipProfessionVendorEntity));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -101,11 +100,52 @@ namespace EntityTools.Settings
                 if (sealTraderEntity != value)
                 {
                     sealTraderEntity = value;
-                    NotifyPropertyChanged(nameof(VipSealTraderEntity));
+                    NotifyPropertyChanged();
                 }
             }
         }
         private bool sealTraderEntity = true;
+
+        /// <summary>
+        /// Активация или деактивация Патча UccComplextPatch
+        /// </summary>
+        [Bindable(true)]
+        [Description("Управление патчем UccComplextPatch.\n" +
+                     "Обеспечивает функционирования дополнительных UCC-условий.\n" +
+                     "Подменяет редактор UCC-профиля.")]
+        public bool UccComplexPatch
+        {
+            get => uccComplexPatch;
+            set
+            {
+                if (uccComplexPatch != value)
+                {
+                    uccComplexPatch = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        private bool uccComplexPatch = true;
+
+        /// <summary>
+        /// Настройка QuesterPatchSettings
+        /// </summary>
+        [Bindable(true)]
+        [Description("Управление патчами Quester'a")]
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+        public QuesterPatchSettings QuesterPatches
+        {
+            get => questerPatches;
+            set
+            {
+                if (questerPatches != value)
+                {
+                    questerPatches = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+        private QuesterPatchSettings questerPatches = new QuesterPatchSettings();
 
         public override string ToString()
         {
@@ -115,7 +155,8 @@ namespace EntityTools.Settings
             if (professionVendorEntity) num++;
             if (sealTraderEntity) num++;
             if (getNearestIndexInPositionList) num++;
-            return string.Concat('(', num, " of 5)");
+            if (questerPatches.Count > 0) num++;
+            return string.Concat('(', num, " of 6)");
         }
     }
 }

@@ -1,19 +1,22 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Drawing.Design;
+using System.Runtime.CompilerServices;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
 using Astral.Quester.UIEditors;
+using EntityTools.Annotations;
 using EntityTools.Enums;
 using EntityTools.Tools.Extensions;
+using Infrastructure;
 using MyNW.Classes;
 using MyNW.Internals;
 
 namespace EntityTools.Tools.Missions
 {
     [Serializable]
-    public class MissionGiverInfo : IXmlSerializable
+    public class MissionGiverInfo : IXmlSerializable, INotifyPropertyChanged
     {
         public MissionGiverInfo() { }
         public MissionGiverInfo(string id, Vector3 position, string map = "", string region = "")
@@ -30,57 +33,66 @@ namespace EntityTools.Tools.Missions
             _type = MissionGiverType.Remote;
         }
 
+        [NotifyParentProperty(true)]
         public MissionGiverType Type
         {
-            get
-            {
-                return _type;
-            }
-            private set
-            {
+            get => _type;
+            private set 
+            { 
                 _type = value;
+                OnPropertyChanged();
             }
         }
 
         private MissionGiverType _type = MissionGiverType.NPC;
 
+        [NotifyParentProperty(true)]
         public Vector3 Position
         {
             get
             {
-                return (_type == MissionGiverType.NPC)
-                    ? _position : Vector3.Empty;
+                return _type == MissionGiverType.NPC
+                    ? _position 
+                    : Vector3.Empty;
             }
             set
             {
-                if(Type == MissionGiverType.NPC)
+                if (Type == MissionGiverType.NPC)
+                {
                     _position = value;
+                    OnPropertyChanged();
+                }
             }
         }
 
         private Vector3 _position = Vector3.Empty;
 
+        [NotifyParentProperty(true)]
         public double Distance
         {
             get
             {
                 if (_type == MissionGiverType.NPC)
                     return _position.IsValid ? _position.Distance3DFromPlayer : 0;
-                else return double.MaxValue;
+                return double.MaxValue;
             }
         }
 
+        [NotifyParentProperty(true)]
         public string Id
         {
-            get => _id; set
+            get => _id; 
+            set
             {
                 _id = value;
                 _label = string.Empty;
+                OnPropertyChanged();
             }
         }
         private string _id = string.Empty;
 
         [Editor(typeof(CurrentMapEdit), typeof(UITypeEditor))]
+        [NotifyParentProperty(true)]
         public string MapName
         {
             get
@@ -92,11 +104,13 @@ namespace EntityTools.Tools.Missions
             {
                 _mapName = value;
                 _label = string.Empty;
+                OnPropertyChanged();
             }
         }
         private string _mapName = string.Empty;
 
         [Editor(typeof(CurrentRegionEdit), typeof(UITypeEditor))]
+        [NotifyParentProperty(true)]
         public string RegionName
         {
             get
@@ -108,20 +122,17 @@ namespace EntityTools.Tools.Missions
             {
                 _regionName = value;
                 _label = string.Empty;
+                OnPropertyChanged();
             }
         }
         private string _regionName = string.Empty;
 
-#if DEVELOPER
         [Description("The allowed deviation of the NPC from the specified Position. The minimum value is 1.")]
-#else
-        [Browsable(false)]
-#endif
+        [NotifyParentProperty(true)]
         public uint Tolerance
         {
             get
             {
-                
                 return _type == MissionGiverType.NPC 
                     ? _tolerance : uint.MaxValue;
             }
@@ -131,17 +142,18 @@ namespace EntityTools.Tools.Missions
                 value = Math.Max(value, 1);
                 if (_type != MissionGiverType.NPC || _tolerance == value) return;
                 _tolerance = value;
+                OnPropertyChanged();
             }
         }
 
-        private uint _tolerance = 1;
+        private uint _tolerance = 5;
 
         /// <summary>
-        /// <paramref name="entity"/> соответствует патаметрам квестодателя
+        /// <paramref name="entity"/> соответствует параметрам квестодателя
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public bool IsMatching(Entity entity)
+        public bool IsMatch(Entity entity)
         {
             if (_type != MissionGiverType.NPC)
                 return false;
@@ -152,14 +164,16 @@ namespace EntityTools.Tools.Missions
                 return false;
 
             if (entity.Location.Distance3D(_position) > _tolerance
-                || !(entity.CostumeRef.CostumeName.Equals(_id) || entity.InternalName.Equals(_id)))
+                || !(entity.CostumeRef.CostumeName.Equals(_id, StringComparison.Ordinal) 
+                     || entity.InternalName.Equals(_id, StringComparison.Ordinal)))
                 return false;
 
             if (string.IsNullOrEmpty(_mapName))
                 return true;
 
             var player = EntityManager.LocalPlayer;
-            return _mapName.Equals(player.MapState.MapName) && _regionName.Equals(player.RegionInternalName);
+            return _mapName.Equals(player.MapState.MapName, StringComparison.Ordinal) 
+                   && (string.IsNullOrEmpty(_regionName) || _regionName.Equals(player.RegionInternalName, StringComparison.Ordinal));
         }
         /// <summary>
         /// Квестодатель задан корректно
@@ -170,12 +184,12 @@ namespace EntityTools.Tools.Missions
             get
             {
                 return (_type == MissionGiverType.Remote 
-                            || (_type == MissionGiverType.NPC && _position.IsValid))
+                        || _type == MissionGiverType.NPC && _position.IsValid)
                        && !string.IsNullOrEmpty(_id);
             }
         }
         /// <summary>
-        /// Квестодатель зада корректно и к нему можно переместиться для взаимодействия,
+        /// Квестодатель задан корректно и к нему можно переместиться для взаимодействия,
         /// то есть персонаж находится на нужной карте и в том же регионе, что и квестодатель
         /// </summary>
         [Browsable(false)]
@@ -183,13 +197,21 @@ namespace EntityTools.Tools.Missions
         {
             get
             {
-                if (_type == MissionGiverType.NPC)
-                    return !string.IsNullOrEmpty(_id);
+                if (string.IsNullOrEmpty(_id))
+                    return false;
+
+                if(_type == MissionGiverType.Remote)
+                    return true;
+
+                if (_position is null || !_position.IsValid)
+                    return false;
 
                 var player = EntityManager.LocalPlayer;
-                return _position!= null && _position.IsValid
-                       && !string.IsNullOrEmpty(_id)
-                       && (string.IsNullOrEmpty(_mapName) || _mapName.Equals(player.MapState.MapName) && _regionName.Equals(player.RegionInternalName));
+
+                return string.IsNullOrEmpty(_mapName) 
+                       || _mapName.Equals(player.MapState.MapName, StringComparison.Ordinal)
+                          && (string.IsNullOrEmpty(_regionName) 
+                              || _regionName.Equals(player.RegionInternalName, StringComparison.Ordinal));
             }
         }
 
@@ -205,8 +227,8 @@ namespace EntityTools.Tools.Missions
                 else if (string.IsNullOrEmpty(_mapName))
                     _label = _id;
                 else if (string.IsNullOrEmpty(_regionName))
-                    _label = string.Concat(_id, " (", _mapName, ')');
-                else _label = string.Concat(_id, " (", _mapName, '/', _regionName, ')');
+                    _label = $"{_id} ({_mapName})";
+                else _label = $"{_id} ({_mapName}/{_regionName})";
             }
             else _label = "Not set";
             return _label;
@@ -304,5 +326,13 @@ namespace EntityTools.Tools.Missions
             }
         }
         #endregion
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 }

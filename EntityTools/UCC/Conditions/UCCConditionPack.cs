@@ -1,73 +1,61 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Drawing.Design;
+using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
+
 using Astral.Logic.UCC.Classes;
 using EntityTools.Editors;
 using EntityTools.Enums;
 using EntityTools.Tools;
-using ConditionList = System.Collections.Generic.List<Astral.Logic.UCC.Classes.UCCCondition>;
+using ConditionList = System.Collections.ObjectModel.ObservableCollection<Astral.Logic.UCC.Classes.UCCCondition>;
 
 namespace EntityTools.UCC.Conditions
 {
     [Serializable]
+    // ReSharper disable once InconsistentNaming
     public class UCCConditionPack : UCCCondition, ICustomUCCCondition
     {
-#if DEVELOPER
         [Description("Displayed name of the ConditionPack")]
-#else
-        [Browsable(false)]
-#endif
         public string Name { get; set; }
 
-#if DEVELOPER
         [Description("The negation of the result of the ConditionPack")]
-#else
-        [Browsable(false)]
-#endif
         public bool Not { get; set; }
 
-#if DEVELOPER
         [Description("Logical rule of the Conditions checks\n" +
             "Conjunction: All Conditions have to be True (Logical AND)\n" +
             "Disjunction: At least one of the Conditions have to be True (Logical OR)")]
-#else
-        [Browsable(false)]
-#endif
         public LogicRule TestRule { get; set; }
 
-#if DEVELOPER
         [Description("The list of the Conditions")]
         [TypeConverter(typeof(CollectionTypeConverter))]
-        [Editor(typeof(UCCConditionListEditor), typeof(UITypeEditor))]
-#else
-        [Browsable(false)]
-#endif
+        [Editor(typeof(UccConditionListEditor), typeof(UITypeEditor))]
         public ConditionList Conditions { get; set; } = new ConditionList();
 
 #region ICustomUCCCondition
-        bool ICustomUCCCondition.IsOK(UCCAction refAction/* = null*/)
+        public new bool IsOK(UCCAction refAction)
         {
             bool result = true;
-            if (Conditions != null && Conditions.Count > 0)
+            if (Conditions?.Count > 0)
+            {
                 if (TestRule == LogicRule.Disjunction)
                 {
-                    int lockedNum = 0;
+                    int okLockedNum = 0;
                     int okUnlockedNum = 0;
                     bool lockedTrue = true;
                     foreach (UCCCondition c in Conditions)
                     {
                         if (c is ICustomUCCCondition iCond)
                         {
-                            if (iCond.Loked)
+                            if (iCond.Locked)
                             {
                                 if (!iCond.IsOK(refAction))
                                 {
                                     lockedTrue = false;
                                     break;
                                 }
-                                lockedNum++;
+                                okLockedNum++;
                             }
                             else if (iCond.IsOK(refAction))
                                 okUnlockedNum++;
@@ -81,41 +69,62 @@ namespace EntityTools.UCC.Conditions
                                     lockedTrue = false;
                                     break;
                                 }
-                                lockedNum++;
+                                okLockedNum++;
                             }
                             else if (c.IsOK(refAction))
                                 okUnlockedNum++;
                         }
                     }
 
-                    // Если множетство незалоченных условий пустое, тогда условие истино
+                    // Если множество незалоченных условий пустое, тогда условие истино
                     // Если оно НЕ пустое, тогда должно встретиться хотя бы одно истиное
-                    result = lockedTrue && (Conditions.Count == lockedNum || okUnlockedNum > 0);
+                    result = lockedTrue && (Conditions.Count == okLockedNum || okUnlockedNum > 0);
                 }
                 else
                 {
                     // Проверка всех условий
                     foreach (UCCCondition c in Conditions)
+                    {
                         if (c is ICustomUCCCondition iCond)
                         {
-                            if (!iCond.IsOK(refAction))
-                            {
-                                result = false;
-                                break;
-                            }
+                            if (iCond.IsOK(refAction)) continue;
+                            result = false;
+                            break;
                         }
-                        else if (!c.IsOK(refAction))
+                        if (!c.IsOK(refAction))
                         {
                             result = false;
                             break;
                         }
+                    }
                 }
-            return (Not) ? !result : result;
+            }
+            return Not ? !result : result;
         }
 
-        bool ICustomUCCCondition.Loked { get => Locked; set => Locked = value; }
+        public new bool Locked { get => base.Locked; set => base.Locked = value; }
 
-        string ICustomUCCCondition.TestInfos(UCCAction refAction/* = null*/)
+        public new ICustomUCCCondition Clone()
+        {
+            var copy = new UCCConditionPack
+            {
+                Name = Name,
+                Not = Not,
+                TestRule = TestRule,
+                Sign = Sign,
+                Locked = base.Locked,
+                Target = Target,
+                Tested = Tested,
+                Value = Value,
+                Conditions = new ConditionList(Conditions.Select(cnd => cnd is ICustomUCCCondition cstCnd
+                                                                                      ? (UCCCondition)cstCnd.Clone()
+                                                                                      : cnd.Clone()))
+            };
+
+            return copy;
+        }
+
+        public string TestInfos(UCCAction refAction/* = null*/)
         {
             if (Conditions.Count > 0)
             {
@@ -146,7 +155,7 @@ namespace EntityTools.UCC.Conditions
         public override string ToString()
         {
             if (string.IsNullOrEmpty(Name))
-                return "ConditionPack";
+                return $"ConditionPack";
             return $"ConditionPack: {Name}";
         }
 

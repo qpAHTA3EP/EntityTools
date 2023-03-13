@@ -1,28 +1,26 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Drawing.Design;
-using System.Threading;
+using System.Runtime.CompilerServices;
+using System.Text;
 using System.Xml.Serialization;
 using Astral.Classes.ItemFilter;
 using Astral.Logic.UCC.Classes;
-using EntityTools.Core.Interfaces;
-using EntityTools.Core.Proxies;
 using EntityTools.Editors;
 using EntityTools.Enums;
+using EntityTools.Tools.Entities;
+using EntityTools.UCC.Extensions;
+using MyNW.Classes;
+// ReSharper disable InconsistentNaming
 
 namespace EntityTools.UCC.Conditions
 {
-    public class UCCTargetMatchEntity : UCCCondition, ICustomUCCCondition
+    public class UCCTargetMatchEntity : UCCCondition, ICustomUCCCondition, INotifyPropertyChanged
     {
         #region Опции команды
-#if DEVELOPER
         [Description("The ID of the entity that the Target of the ucc-action should match.\n" +
                      "Идентификатор Entity, с которой сопоставляется цель ucc-команды (Target).")]
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
         [Category("Entity")]
-#else
-        [Browsable(false)]
-#endif
         public string EntityID
         {
             get => _entityId;
@@ -31,20 +29,17 @@ namespace EntityTools.UCC.Conditions
                 if (_entityId != value)
                 {
                     _entityId = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityID)));
+                    _key = null;
+                    NotifyPropertyChanged();
                 }
             }
         }
-        internal string _entityId = string.Empty;
+        private string _entityId = string.Empty;
 
-#if DEVELOPER
         [Description("Type of and EntityID:\n" +
             "Simple: Simple text string with a wildcard at the beginning or at the end (char '*' means any symbols)\n" +
             "Regex: Regular expression")]
         [Category("Entity")]
-#else
-        [Browsable(false)]
-#endif
         public ItemFilterStringType EntityIdType
         {
             get => _entityIdType;
@@ -53,18 +48,15 @@ namespace EntityTools.UCC.Conditions
                 if (_entityIdType != value)
                 {
                     _entityIdType = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityIdType)));
+                    _key = null;
+                    NotifyPropertyChanged();
                 }
             }
         }
-        internal ItemFilterStringType _entityIdType = ItemFilterStringType.Simple;
+        private ItemFilterStringType _entityIdType = ItemFilterStringType.Simple;
 
-#if DEVELOPER
         [Description("The switcher of the Entity filed which compared to the EntityID")]
         [Category("Entity")]
-#else
-        [Browsable(false)]
-#endif
         public EntityNameType EntityNameType
         {
             get => _entityNameType;
@@ -73,29 +65,22 @@ namespace EntityTools.UCC.Conditions
                 if (_entityNameType != value)
                 {
                     _entityNameType = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityNameType)));
+                    _key = null;
+                    NotifyPropertyChanged();
                 }
             }
         }
-        internal EntityNameType _entityNameType = EntityNameType.NameUntranslated;
+        private EntityNameType _entityNameType = EntityNameType.NameUntranslated;
 
-#if DEVELOPER
         [XmlIgnore]
         [Editor(typeof(EntityTestEditor), typeof(UITypeEditor))]
-        [Description("Нажми на кнопку '...' чтобы увидеть тестовую информацию")]
-        //[Category("Entity")]
-#else
-        [Browsable(false)]
-#endif
-        public string TestInfo { get; } = "Нажми '...' =>";
+        [Description("Test the Entity searching.")]
+        [Category("Entity")]
+        public string EntityTestInfo => "Push button '...' =>";
 
-#if DEVELOPER
         [Description("The expected result of the comparison of the Target and EntityID.\n" +
             "Ожидаемый результат сопоставления цели ucc-команды (Target) и заданного EntityID.")]
         [Category("Required")]
-#else
-        [Browsable(false)]
-#endif
         public MatchType Match
         {
             get => _match; set
@@ -103,11 +88,11 @@ namespace EntityTools.UCC.Conditions
                 if (_match != value)
                 {
                     _match = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Match)));
+                    NotifyPropertyChanged();
                 }
             }
         }
-        internal MatchType _match = MatchType.Match;
+        private MatchType _match = MatchType.Match;
 
         #region Hide Inherited Properties
         [XmlIgnore]
@@ -128,33 +113,87 @@ namespace EntityTools.UCC.Conditions
         #endregion
         #endregion
 
-        #region Взаимодействие с EntityToolsCore
-        [NonSerialized]
-        internal IUccConditionEngine Engine;
 
+
+
+        #region PropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public UCCTargetMatchEntity()
+        protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = default)
         {
-            Sign = Astral.Logic.UCC.Ressources.Enums.Sign.Superior;
-
-            Engine = new UccConditionProxy(this);
-        }
-        private IUccConditionEngine MakeProxie()
-        {
-            return new UccConditionProxy(this);
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
         #endregion
 
-        #region ICustomUCCCondition
-        bool ICustomUCCCondition.IsOK(UCCAction refAction) => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).IsOK(refAction);
 
-        bool ICustomUCCCondition.Loked { get => Locked; set => Locked = value; }
 
-        string ICustomUCCCondition.TestInfos(UCCAction refAction) => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).TestInfos(refAction);
+
+        public new ICustomUCCCondition Clone()
+        {
+            return new UCCTargetMatchEntity
+            {
+                _entityId = _entityId,
+                _entityIdType = _entityIdType,
+                _entityNameType = _entityNameType,
+                _match = _match,
+                Sign = Sign,
+                Locked = base.Locked,
+                Target = Target,
+                Tested = Tested,
+                Value = Value
+            };
+        }
+
+        
+
+
+        #region Вспомогательные методы
+        public new bool IsOK(UCCAction refAction)
+        {
+            Entity target = refAction?.GetTarget();
+            bool match = EntityKey.IsMatch(target);
+            if (Match == MatchType.Match)
+                return match;
+            return !match;
+        }
+
+        public string TestInfos(UCCAction refAction)
+        {
+            Entity target = refAction?.GetTarget();
+
+            StringBuilder sb = new StringBuilder("Target ");
+            if (target != null)
+            {
+                if (EntityNameType == EntityNameType.InternalName)
+                    sb.Append('[').Append(target.InternalName).Append(']');
+                else sb.Append('[').Append(target.NameUntranslated).Append(']');
+                if (EntityKey.IsMatch(target))
+                    sb.Append(" match");
+                else sb.Append(" does not match");
+                sb.Append(" EntityID [").Append(EntityID).Append(']');
+            }
+            else sb.Append("is NULL");
+
+            return sb.ToString();
+        }
+
+        public override string ToString()
+        {
+            _label = string.IsNullOrEmpty(_label)
+                   ? $"{GetType().Name} [{EntityID}]"
+                   : GetType().Name;
+
+            return _label;
+        }
+        private string _label = string.Empty;
         #endregion
 
-        public override string ToString() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).Label();
-
+        #region Вспомогательные инструменты
+        /// <summary>
+        /// Комплексный (составной) идентификатор, используемый для поиска <see cref="Entity"/> в кэше
+        /// </summary>
+        public EntityCacheRecordKey EntityKey => _key ?? (_key = new EntityCacheRecordKey(EntityID, EntityIdType, EntityNameType));
+        private EntityCacheRecordKey _key;
+        #endregion
     }
 }

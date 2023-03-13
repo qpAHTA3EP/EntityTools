@@ -1,16 +1,10 @@
 ﻿using MyNW.Classes;
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 
 namespace EntityTools.Tools.Extensions
 {
-    public static class Vector3Extentions
+    public static class Vector3Extensions
     {
         public static void ReadXml(this Vector3 vector, XmlReader reader)
         {

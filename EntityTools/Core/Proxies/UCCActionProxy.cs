@@ -2,7 +2,7 @@
 using System.Reflection;
 using Astral.Logic.UCC.Classes;
 using EntityTools.Core.Interfaces;
-using AcTp0Tools.Reflection;
+using ACTP0Tools.Reflection;
 using MyNW.Classes;
 
 namespace EntityTools.Core.Proxies

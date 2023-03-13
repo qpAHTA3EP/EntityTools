@@ -17,7 +17,7 @@ namespace EntityTools.Settings
                 if (_name != value)
                 {
                     _name = value;
-                    NotifyPropertyChanged(nameof(Name));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -33,7 +33,7 @@ namespace EntityTools.Settings
                 if (_displayName != value)
                 {
                     _displayName = value;
-                    NotifyPropertyChanged(nameof(DisplayName));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -48,7 +48,7 @@ namespace EntityTools.Settings
                 if (_uiStringMsg != value)
                 {
                     _uiStringMsg = value;
-                    NotifyPropertyChanged(nameof(UIStringMsg));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -63,7 +63,7 @@ namespace EntityTools.Settings
                 if (_summary != value)
                 {
                     _summary = value;
-                    NotifyPropertyChanged(nameof(Summary));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -78,7 +78,7 @@ namespace EntityTools.Settings
                 if (_relatedMission != value)
                 {
                     _relatedMission = value;
-                    NotifyPropertyChanged(nameof(RelatedMission));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -93,7 +93,7 @@ namespace EntityTools.Settings
                 if (_missionType != value)
                 {
                     _missionType = value;
-                    NotifyPropertyChanged(nameof(MissionType));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -108,7 +108,7 @@ namespace EntityTools.Settings
                 if (_canRepeat != value)
                 {
                     _canRepeat = value;
-                    NotifyPropertyChanged(nameof(CanRepeat));
+                    NotifyPropertyChanged();
                 }
             }
         }

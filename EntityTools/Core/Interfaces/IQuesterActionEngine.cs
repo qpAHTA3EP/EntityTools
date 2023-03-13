@@ -1,7 +1,7 @@
-﻿using Astral.Logic.Classes.Map;
+﻿using System;
+using System.Runtime.CompilerServices;
+using Astral.Logic.Classes.Map;
 using MyNW.Classes;
-using System;
-using System.ComponentModel;
 using static Astral.Quester.Classes.Action;
 using QuesterAction = Astral.Quester.Classes.Action;
 
@@ -24,8 +24,8 @@ namespace EntityTools.Core.Interfaces
         void GatherInfos();
         void OnMapDraw(GraphicsNW graph);
 
-        //void OnPropertyChanged(object sender, PropertyChangedEventArgs e);
-        void OnPropertyChanged(QuesterAction sender, string propertyName);
+        void OnPropertyChanged(QuesterAction sender, [CallerMemberName] string propertyName = "");
+
         bool Rebase(QuesterAction action); 
     }
 }

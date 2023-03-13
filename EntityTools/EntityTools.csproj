@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>EntityTools</RootNamespace>
     <AssemblyName>EntityTools</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <AssemblyVersion>0.21.0423.1129</AssemblyVersion>
@@ -29,13 +29,25 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <ShouldCreateLogs>True</ShouldCreateLogs>
+    <AdvancedSettingsExpanded>False</AdvancedSettingsExpanded>
+    <UpdateAssemblyVersion>False</UpdateAssemblyVersion>
+    <UpdateAssemblyFileVersion>False</UpdateAssemblyFileVersion>
+    <UpdateAssemblyInfoVersion>False</UpdateAssemblyInfoVersion>
+    <AssemblyVersionSettings>
+    </AssemblyVersionSettings>
+    <UpdatePackageVersion>False</UpdatePackageVersion>
+    <AssemblyInfoVersionType>SettingsVersion</AssemblyInfoVersionType>
+    <InheritWinAppVersionFrom>None</InheritWinAppVersionFrom>
+    <AssemblyFileVersionSettings>
+    </AssemblyFileVersionSettings>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\References\x64\Plugins\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;DEVELOPER, NOT_ENCRYPTED_CORE, PATCH_ASTRAL, HARMONY, ENTITYTOOLS, NO_PATCH_LOG</DefineConstants>
+    <OutputPath>..\..\References\</OutputPath>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x64</PlatformTarget>
@@ -47,8 +59,8 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\References\x64\Plugins\</OutputPath>
-    <DefineConstants>TRACE;DEVELOPER, NOT_ENCRYPTED_CORE, CORE_INTERFACES, PATCH_ASTRAL, HARMONY, ENTITYTOOLS, NO_PATCH_LOG</DefineConstants>
+    <OutputPath>..\..\References\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x64</PlatformTarget>
@@ -58,34 +70,6 @@
     <DocumentationFile>
     </DocumentationFile>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>..\References\x64\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;DEVELOPER, NOT_ENCRYPTED_CORE, CORE_INTERFACES, ENTITYTOOLS</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Optimize>false</Optimize>
-    <DocumentationFile>
-    </DocumentationFile>
-    <RunCodeAnalysis>false</RunCodeAnalysis>
-    <CodeAnalysisIgnoreGeneratedCode>false</CodeAnalysisIgnoreGeneratedCode>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <OutputPath>..\References\x64\</OutputPath>
-    <DefineConstants>TRACE;NOT_DEVELOPER, NOT_ENCRYPTED_CORE, CORE_INTERFACES, ENTITYTOOLS</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <DebugSymbols>true</DebugSymbols>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
   <PropertyGroup>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
@@ -93,107 +77,61 @@
     <ApplicationIcon>
     </ApplicationIcon>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Encrypted_Debug|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>..\References\Encrypted\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;DEVELOPER, ENCRYPTED_CORE, CORE_INTERFACES, ENTITYTOOLS</DefineConstants>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Encrypted_Debug|x64'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>..\References\Encrypted\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;DEVELOPER, ENCRYPTED_CORE, CORE_INTERFACES, ENTITYTOOLS</DefineConstants>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisIgnoreGeneratedCode>false</CodeAnalysisIgnoreGeneratedCode>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Encrypted_Release|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>..\References\Encrypted\</OutputPath>
-    <DefineConstants>NOT_DEVELOPER, ENCRYPTED_CORE, CORE_INTERFACES, ENTITYTOOLS</DefineConstants>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Optimize>true</Optimize>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Encrypted_Release|x64'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>..\References\Encrypted\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;NOT_DEVELOPER, ENCRYPTED_CORE, CORE_INTERFACES, ENTITYTOOLS</DefineConstants>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisIgnoreGeneratedCode>false</CodeAnalysisIgnoreGeneratedCode>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AStar, Version=2.20.1028.1229, Culture=neutral, processorArchitecture=AMD64">
+    <Reference Include="0Harmony, Version=2.2.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Lib.Harmony.2.2.2\lib\net48\0Harmony.dll</HintPath>
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\References\x64\AStar.dll</HintPath>
+    </Reference>
+    <Reference Include="AStar">
+      <HintPath>..\..\References\AStar.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Astral_patched, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\References\x64\Astral_patched.exe</HintPath>
-      <Private>False</Private>
+    <Reference Include="Astral">
+      <HintPath>..\..\References\Astral.exe</HintPath>
     </Reference>
-    <Reference Include="DevExpress.Data.v20.2, Version=20.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="DevExpress.Data.Desktop.v20.2, Version=20.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.Data.v21.2, Version=21.2.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
-    <Reference Include="DevExpress.Utils.v20.2, Version=20.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.Data.Desktop.v21.2, Version=21.2.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
-    <Reference Include="DevExpress.XtraBars.v20.2, Version=20.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.Utils.v21.2, Version=21.2.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
-    <Reference Include="DevExpress.XtraEditors.v20.2, Version=20.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.XtraBars.v21.2, Version=21.2.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
-    <Reference Include="DevExpress.XtraGrid.v20.2, Version=20.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.XtraEditors.v21.2, Version=21.2.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
-    <Reference Include="DevExpress.XtraNavBar.v20.2, Version=20.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.XtraGrid.v21.2, Version=21.2.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
-    <Reference Include="DevExpress.XtraVerticalGrid.v20.2, Version=20.2.6.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+    <Reference Include="DevExpress.XtraNavBar.v21.2, Version=21.2.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="DevExpress.XtraVerticalGrid.v21.2, Version=21.2.7.0, Culture=neutral, PublicKeyToken=b88d1754d700e49a, processorArchitecture=MSIL">
       <Private>False</Private>
     </Reference>
     <Reference Include="MyMemory-x64">
-      <HintPath>..\..\..\References\x64\MyMemory-x64.dll</HintPath>
+      <HintPath>..\..\References\MyMemory-x64.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="MyNW">
-      <HintPath>..\..\..\References\x64\MyNW.dll</HintPath>
+      <HintPath>..\..\References\MyNW.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.IO.Compression">
       <HintPath>..\References\x64\System.IO.Compression.dll</HintPath>
@@ -207,13 +145,67 @@
   <ItemGroup>
     <Compile Include="Core\Interfaces\IEntityIdentifier.cs" />
     <Compile Include="Core\Interfaces\IEntityDescriptor.cs" />
+    <Compile Include="Core\Interfaces\IPowerCache.cs" />
+    <Compile Include="Editors\ChangePluginSettingValueEditor.cs" />
     <Compile Include="Editors\CheckedListBoxEditor.cs" />
     <Compile Include="Editors\CustomRegionCollectionEditor.cs" />
+    <Compile Include="Editors\CustomRegionEditor.cs" />
+    <Compile Include="Editors\MissionGiverInfoExtendedEditor.cs" />
+    <Compile Include="Editors\QuesterConditionEditor.cs" />
+    <Compile Include="Editors\PowerIdEditor.cs" />
+    <Compile Include="Editors\MissionGiverInfoEditor.cs" />
+    <Compile Include="Editors\PositionEditor.cs" />
+    <Compile Include="Editors\RelativeMeshesFilePathEditor.cs" />
+    <Compile Include="Editors\RelativeProfileFilePathEditor.cs" />
+    <Compile Include="Editors\ZRangeEditor.cs" />
+    <Compile Include="Editors\TestEditors\TargetSelectorTestEditor.cs" />
+    <Compile Include="Forms\AddUccActionForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\AddUccActionForm.designer.cs">
+      <DependentUpon>AddUccActionForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\AuraViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\AuraViewer.Designer.cs">
+      <DependentUpon>AuraViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\CollectionInfoForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\CollectionInfoForm.Designer.cs">
+      <DependentUpon>CollectionInfoForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\ConditionsListForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ConditionsListForm.designer.cs">
+      <DependentUpon>ConditionsListForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\EntityViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\EntityViewer.Designer.cs">
+      <DependentUpon>EntityViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\InputBox.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\InputBox.Designer.cs">
+      <DependentUpon>InputBox.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\ItemListEditorForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\ItemListEditorForm.Designer.cs">
       <DependentUpon>ItemListEditorForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\ItemSelectForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ItemSelectForm.Designer.cs">
+      <DependentUpon>ItemSelectForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\MissionMonitorForm.cs">
       <SubType>Form</SubType>
@@ -236,76 +228,151 @@
       <DependentUpon>CustomRegionCollectionEditorForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Editors\ItemFilterEntryListEditor.cs" />
-    <Compile Include="Editors\MissionGiverInfoExtendedEditor.cs" />
     <Compile Include="Editors\FoeListEditor.cs" />
     <Compile Include="Editors\VendorInfoEditor.cs" />
-    <Compile Include="Editors\MissionGiverInfoEditor.cs" />
-    <Compile Include="Logger\EntityToolLogger.cs" />
-    <Compile Include="Core\Interfaces\IUCCConditionEngine.cs" />
-    <Compile Include="Core\Interfaces\IUCCActionEngine.cs" />
-    <Compile Include="Core\Proxies\EntityCoreProxy.cs" />
-    <Compile Include="Core\Proxies\QuesterActionProxy.cs" />
-    <Compile Include="Core\Interfaces\IEntityToolsCore.cs" />
-    <Compile Include="Core\Interfaces\IQuesterActionEngine.cs" />
-    <Compile Include="Core\Proxies\QuesterConditionProxy.cs" />
-    <Compile Include="Core\Proxies\UCCActionProxy.cs" />
-    <Compile Include="Core\Proxies\UCCConditionProxy.cs" />
+    <Compile Include="Editors\UccTargetSelectorEditor.cs" />
+    <Compile Include="Forms\MultipleItemSelectForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\MultipleItemSelectForm.Designer.cs">
+      <DependentUpon>MultipleItemSelectForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\TargetSelectForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\TargetSelectForm.Designer.cs">
+      <DependentUpon>TargetSelectForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Quester\Editor\Classes\ConditionPackMetadataType.cs" />
+    <Compile Include="Quester\Editor\EditAct\DeleteQuesterCondition.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Quester\Editor\TreeViewCustomization\ConditionIsInCustomRegionSetTreeNode.cs" />
+    <Compile Include="UCC\Editor\UccEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UCC\Editor\UccEditor.Designer.cs">
+      <DependentUpon>UccEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\UIViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\UIViewer.Designer.cs">
+      <DependentUpon>UIViewer.cs</DependentUpon>
+    </Compile>
     <Compile Include="Patches\ComplexPatch_Navigation.cs" />
-    <Compile Include="Patches\Mapper\ComplexPatch_Mapper.cs" />
+    <Compile Include="Patches\QuesterPatchSettings.cs" />
+    <Compile Include="Patches\Quester\ComplexPatch_Quester.cs" />
+    <Compile Include="Patches\Quester\ComplexPatch_Mapper.cs" />
+    <Compile Include="Quester\Mapper\Tools\CustomRegionToolBase.cs" />
+    <Compile Include="Quester\Mapper\Tools\CustomRegionToolForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Quester\Mapper\Tools\CustomRegionToolForm.Designer.cs">
+      <DependentUpon>CustomRegionToolForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Quester\Mapper\Tools\ICustomRegionTool.cs" />
+    <Compile Include="Quester\Mapper\Tools\MapperSettingsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Quester\Mapper\Tools\MapperSettingsForm.Designer.cs">
+      <DependentUpon>MapperSettingsForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Quester\Mapper\Tools\AddNodeTool.cs" />
+    <Compile Include="Patches\Patcher.tt.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Patcher.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Patches\Patch_AuraDetector.cs" />
+    <Compile Include="Patches\ComplexPatch_Ucc.cs" />
+    <Compile Include="Patches\Quester\ComplexPatch_Quester_Editor.cs" />
     <Compile Include="Patches\Quester\ComplexPatch_Quester_UccEditing.cs" />
+    <Compile Include="Properties\Annotations.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Quester\Actions\ExecutePowerExt.cs" />
+    <Compile Include="Quester\Actions\PromoteTeammate.cs" />
+    <Compile Include="Quester\Actions\UpgradeItem.cs" />
+    <Compile Include="Quester\Actions\MoveToTeammate.cs" />
     <Compile Include="Quester\Actions\RemoveIgnoredFoes.cs" />
     <Compile Include="Quester\Actions\AddIgnoredFoes.cs" />
     <Compile Include="Quester\Actions\TurnInMissionExt.cs" />
+    <Compile Include="Quester\Conditions\EquipmentLevel.cs" />
     <Compile Include="Quester\Conditions\IsInCustomRegionSet.cs" />
+    <Compile Include="Quester\Editor\Classes\IsInCustomRegionMetadataType.cs" />
+    <Compile Include="Quester\Editor\Classes\LoadProfileMetadatType.cs" />
+    <Compile Include="Quester\Editor\Classes\ProfileProxy.cs" />
+    <Compile Include="Quester\Editor\Classes\PushProfileToStackAndLoadMetadataType.cs" />
+    <Compile Include="Quester\Editor\EditAct\DeleteQuesterAction.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Quester\Editor\EditAct\IQEdit.cs" />
+    <Compile Include="Quester\Editor\EditAct\MoveQuesterAction.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Quester\Editor\QuesterEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Quester\Editor\QuesterEditor.Designer.cs">
+      <DependentUpon>QuesterEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Quester\Editor\TreeViewCustomization\ActionBaseTreeNode.cs" />
+    <Compile Include="Quester\Editor\TreeViewCustomization\ActionPackTreeNode.cs" />
+    <Compile Include="Quester\Editor\TreeViewCustomization\ActionPushProfileToStackAndLoadTreeNode.cs" />
+    <Compile Include="Quester\Editor\TreeViewCustomization\ActionTreeNode.cs" />
+    <Compile Include="Quester\Editor\TreeViewCustomization\ConditionBaseTreeNode.cs" />
+    <Compile Include="Quester\Editor\TreeViewCustomization\ConditionIsInCustomRegionTreeNode.cs" />
+    <Compile Include="Quester\Editor\TreeViewCustomization\ConditionPackTreeNode.cs" />
+    <Compile Include="Quester\Editor\TreeViewCustomization\ConditionTreeNode.cs" />
+    <Compile Include="Quester\Editor\TreeViewCustomization\IQuesterAction.cs" />
+    <Compile Include="Quester\Editor\TreeViewCustomization\IQuesterCondition.cs" />
+    <Compile Include="Quester\Editor\TreeViewCustomization\ITreeNode.cs" />
     <Compile Include="Servises\SlideMonitor\CharacterEx.cs" />
     <Compile Include="Servises\SlideMonitor\EntityEx.cs" />
     <Compile Include="Servises\SlideMonitor\Enums.cs" />
     <Compile Include="Servises\SlideMonitor\MountCostumeDef.cs" />
     <Compile Include="Servises\SlideMonitor\SlideMonitorSettings.cs" />
     <Compile Include="Patches\Logic.General\Astral_Logic_General_GetNearestIndexInPositionList.cs" />
-    <Compile Include="Patches\Mapper\MapperDrawingTools.cs" />
-    <Compile Include="Patches\Mapper\MapperGraphics.cs" />
-    <Compile Include="Patches\Mapper\MapperHelper.cs" />
+    <Compile Include="Quester\Mapper\MapperDrawingTools.cs" />
+    <Compile Include="Quester\Mapper\MapperGraphics.cs" />
+    <Compile Include="Quester\Mapper\MapperHelper.cs" />
     <Compile Include="Forms\ObjectInfoForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\ObjectInfoForm.Designer.cs">
       <DependentUpon>ObjectInfoForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Patches\Mapper\PointHelper.cs" />
-    <Compile Include="Patches\Mapper\Tools\EditCustomRegionTool.cs" />
-    <Compile Include="Patches\Mapper\Tools\AddCustomRegionTool.cs" />
-    <Compile Include="Patches\Mapper\Tools\ObjectInfoTool.cs" />
-    <Compile Include="Patches\Mapper\Tools\MapperMouseEventArgs.cs" />
-    <Compile Include="Patches\Mapper\Tools\MappingTool.cs" />
-    <Compile Include="Patches\Mapper\Tools\DistanceMeasurementTool.cs" />
-    <Compile Include="Patches\Mapper\Tools\NodeSelectTool.cs" />
-    <Compile Include="Patches\Mapper\Tools\IMapperTool.cs" />
-    <Compile Include="Patches\Mapper\Tools\RelocateNodesTool.cs" />
-    <Compile Include="Patches\Mapper\Tools\EditEdgeTool.cs" />
-    <Compile Include="Patches\Mapper\Tools\RemoveNodesTool.cs" />
-    <Compile Include="Patches\Quester\Patch_Astral_Quester_Core_Save.cs" />
+    <Compile Include="Quester\Mapper\PointHelper.cs" />
+    <Compile Include="Quester\Mapper\Tools\EditCustomRegionTool.cs" />
+    <Compile Include="Quester\Mapper\Tools\AddCustomRegionTool.cs" />
+    <Compile Include="Quester\Mapper\Tools\ObjectInfoTool.cs" />
+    <Compile Include="Quester\Mapper\Tools\MapperMouseEventArgs.cs" />
+    <Compile Include="Quester\Mapper\Tools\MappingTool.cs" />
+    <Compile Include="Quester\Mapper\Tools\DistanceMeasurementTool.cs" />
+    <Compile Include="Quester\Mapper\Tools\NodeSelectTool.cs" />
+    <Compile Include="Quester\Mapper\Tools\IMapperTool.cs" />
+    <Compile Include="Quester\Mapper\Tools\RelocateNodesTool.cs" />
+    <Compile Include="Quester\Mapper\Tools\EditEdgeTool.cs" />
+    <Compile Include="Quester\Mapper\Tools\RemoveNodesTool.cs" />
     <Compile Include="Patches\Patch_VIP_SealTraderEntity.cs" />
     <Compile Include="Patches\Patch_VIP_ProfessionVendorEntity.cs" />
-    <Compile Include="Servises\SlideMonitor\HarmonyPatch_Astral_Logic_Classes_FSM_Navigation_ChangeWPDist.cs" />
+    <Compile Include="Servises\SlideMonitor\SlideMonitor.cs" />
     <Compile Include="Patches\UCC\Patch_ActionsPlayer_CheckAlly.cs" />
-    <Compile Include="Patches\UCC\Patch_Logic_UCC_Forms_AddClass_Show.cs" />
+    <Compile Include="Patches\UCC\Patch_AddUccAction.cs" />
     <Compile Include="Patches\PatchesSettings.cs" />
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
     <Compile Include="Quester\Actions\BuySellItemsExt.cs" />
     <Compile Include="Quester\Actions\ChangeInstanceToLeader.cs" />
-    <Compile Include="Quester\Actions\Enums.cs" />
+    <Compile Include="Quester\Enums.cs" />
     <Compile Include="Quester\Actions\InsertInsignia.cs" />
     <Compile Include="Quester\Actions\Deprecated\InteractEntity.cs" />
     <Compile Include="Quester\Actions\InteractEntities.cs" />
     <Compile Include="Quester\Actions\ChangePluginSettings.cs" />
-    <Compile Include="Quester\Actions\MoveToLeader.cs" />
+    <Compile Include="Quester\Actions\Deprecated\MoveToLeader.cs" />
     <Compile Include="Quester\Actions\PickUpMissionExt.cs" />
-    <Compile Include="Core\Interfaces\IQuesterConditionEngine.cs" />
     <Compile Include="Quester\Conditions\Deprecated\CheckCampaignTask.cs" />
     <Compile Include="Quester\Conditions\CheckGameGUICondition.cs" />
     <Compile Include="Quester\Conditions\CheckShard.cs" />
@@ -316,7 +383,7 @@
     <Compile Include="Quester\Conditions\TeamMemberCount.cs" />
     <Compile Include="Editors\CampaignTaskEditor.cs" />
     <Compile Include="Editors\AddTypeCommonEditor.cs" />
-    <Compile Include="Editors\ConditionListEditor.cs" />
+    <Compile Include="Editors\UccConditionListEditor.cs" />
     <Compile Include="Core\MainPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -328,16 +395,16 @@
     <Compile Include="Editors\UccGenericConditionEditor.cs" />
     <Compile Include="Editors\UccActionEditor.cs" />
     <Compile Include="Editors\UiIdEditor.cs" />
-    <Compile Include="Patches\Mapper\Tools\MappingToolHelper.cs" />
-    <Compile Include="Patches\Mapper\Enums.cs" />
-    <Compile Include="Patches\Mapper\MapperFormExt.cs">
+    <Compile Include="Quester\Mapper\Tools\MappingToolHelper.cs" />
+    <Compile Include="Quester\Mapper\Enums.cs" />
+    <Compile Include="Quester\Mapper\MapperFormExt.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Patches\Mapper\MapperFormExt.Designer.cs">
+    <Compile Include="Quester\Mapper\MapperFormExt.Designer.cs">
       <DependentUpon>MapperFormExt.cs</DependentUpon>
     </Compile>
-    <Compile Include="Patches\Mapper\MapperGraphCache.cs" />
-    <Compile Include="Patches\Mapper\Tools\NodeDetail.cs" />
+    <Compile Include="Quester\Mapper\MapperGraphCache.cs" />
+    <Compile Include="Quester\Mapper\Tools\NodeDetail.cs" />
     <Compile Include="Patches\Patcher.cs" />
     <Compile Include="Patches\Patch.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
@@ -345,16 +412,36 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="Patches\Mapper\MapperSettings.cs" />
-    <Compile Include="Tools\Combats\IgnoredFoe\IgnoredFoesContainer.cs" />
-    <Compile Include="Tools\Combats\IgnoredFoe\IgnoredFoesCore.cs" />
-    <Compile Include="Tools\Combats\IgnoredFoe\IgnoredFoesEntry.cs" />
+    <Compile Include="Quester\Mapper\MapperSettings.cs" />
+    <Compile Include="Tools\Classes\Range.cs" />
+    <Compile Include="Tools\Combats\IgnoredFoes\IgnoredFoesContainer.cs" />
+    <Compile Include="Tools\Combats\IgnoredFoes\IgnoredFoesCore.cs" />
+    <Compile Include="Tools\Combats\IgnoredFoes\IgnoredFoesEntry.cs" />
     <Compile Include="Tools\CustomRegions\CustomRegionEntry.cs" />
-    <Compile Include="Tools\CustomRegions\CustomRegionExtentions.cs" />
+    <Compile Include="Tools\CustomRegions\CustomRegionExtensions.cs" />
     <Compile Include="Tools\CustomRegions\CustomRegionCollection.cs" />
     <Compile Include="Tools\CustomRegions\Enums.cs" />
+    <Compile Include="Tools\Entities\EntityCache.cs" />
+    <Compile Include="Tools\Entities\EntityCacheRecord.cs" />
+    <Compile Include="Tools\Entities\EntityCacheRecordKey.cs" />
+    <Compile Include="Tools\Entities\EntityComparer.cs" />
+    <Compile Include="Tools\Entities\EntityDiagnosticTools.cs" />
+    <Compile Include="Tools\Entities\Enums.cs" />
+    <Compile Include="Tools\Entities\SearchCached.cs" />
+    <Compile Include="Tools\Entities\SearchDirect.cs" />
+    <Compile Include="Tools\Entities\SearchHelper.cs" />
+    <Compile Include="Tools\Entities\SimpleEntityWrapper.cs" />
+    <Compile Include="Tools\Export\PowerInfo.cs" />
     <Compile Include="Tools\Extensions\CollectionTExtentions.cs" />
+    <Compile Include="Tools\Extensions\EntityExtensions.cs" />
+    <Compile Include="Tools\Extensions\ListBoxItemCollectionExtension.cs" />
     <Compile Include="Tools\Extensions\StringBuilderExtentions.cs" />
+    <Compile Include="Tools\GameHelper.cs" />
+    <Compile Include="Tools\Inventory\InventoryHelper.cs" />
+    <Compile Include="Tools\Inventory\InventorySlotBoundComparer.cs" />
+    <Compile Include="Tools\Inventory\ItemFilterCoreExtension.cs" />
+    <Compile Include="Tools\Extensions\ListExtensions.cs" />
+    <Compile Include="Tools\MissionHelper.cs" />
     <Compile Include="Tools\Missions\Enums.cs" />
     <Compile Include="Tools\Missions\MissionGiverRemote.cs" />
     <Compile Include="Tools\Missions\MissionGiverNPC.cs" />
@@ -363,15 +450,15 @@
     <Compile Include="Servises\UnstuckSpell\UnstuckSpells.cs" />
     <Compile Include="Servises\UnstuckSpell\UnstuckSpellsSettings.cs" />
     <Compile Include="Logger\EntityToolLoggerSettings.cs" />
-    <Compile Include="Tools\AuraOption.cs" />
-    <Compile Include="Tools\BuySellItems\BagsList.cs" />
-    <Compile Include="Tools\BuySellItems\BuyItemEntry.cs" />
-    <Compile Include="Tools\BuySellItems\Enums.cs" />
-    <Compile Include="Tools\BuySellItems\Extensions.cs" />
-    <Compile Include="Tools\BuySellItems\IndexedBags.cs" />
-    <Compile Include="Tools\BuySellItems\ItemStats.cs" />
-    <Compile Include="Tools\BuySellItems\SlotCache.cs" />
-    <Compile Include="Tools\BuySellItems\VendorInfo.cs" />
+    <Compile Include="Tools\Classes\AuraOption.cs" />
+    <Compile Include="Tools\Inventory\BagsList.cs" />
+    <Compile Include="Tools\Inventory\BuyItemEntry.cs" />
+    <Compile Include="Tools\Inventory\Enums.cs" />
+    <Compile Include="Tools\Inventory\Extensions.cs" />
+    <Compile Include="Tools\Inventory\IndexedBags.cs" />
+    <Compile Include="Tools\Inventory\ItemStats.cs" />
+    <Compile Include="Tools\Inventory\SlotCache.cs" />
+    <Compile Include="Tools\Inventory\VendorInfo.cs" />
     <Compile Include="Tools\CollectionTypeConverter.cs" />
     <Compile Include="Servises\EnchantHelper.cs" />
     <Compile Include="Tools\CryptoHelper.cs" />
@@ -387,6 +474,13 @@
     <Compile Include="Tools\Missions\Monitor\MissionMonitorSettings.cs" />
     <Compile Include="Tools\Missions\Monitor\MissionTreeNode.cs" />
     <Compile Include="Tools\Missions\Monitor\MissionTreeNodeSettings.cs" />
+    <Compile Include="Tools\Monitoring.cs" />
+    <Compile Include="Tools\Navigation\NavigationHelper.cs" />
+    <Compile Include="Tools\PlayerTeamHelper.cs" />
+    <Compile Include="Tools\Powers\PowerCache.cs" />
+    <Compile Include="Tools\Powers\PowerHelper.cs" />
+    <Compile Include="Tools\Relogger\ProcessMemoryHelper.cs" />
+    <Compile Include="Tools\Relogger\ReloggerHelper.cs" />
     <Compile Include="Tools\StringToPattern.cs" />
     <Compile Include="Tools\Export\EntityExportInfo.cs" />
     <Compile Include="Tools\Enums.cs" />
@@ -394,7 +488,6 @@
     <Compile Include="Tools\Extensions\ArrayExtensions.cs" />
     <Compile Include="Tools\Extensions\HexConverter.cs" />
     <Compile Include="Tools\Extensions\FormCollectionExtentions.cs" />
-    <Compile Include="Tools\Extensions\ListTExtentions.cs" />
     <Compile Include="Tools\Extensions\StringExtentions.cs" />
     <Compile Include="Tools\FileStreamHelper.cs" />
     <Compile Include="Tools\FileTools.cs" />
@@ -404,14 +497,34 @@
     <Compile Include="Quester\Actions\MoveToEntity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Editors\EntityIdEditor.cs" />
-    <Compile Include="Editors\CustomRegionListEditor.cs" />
     <Compile Include="Editors\ShardEditor.cs" />
     <Compile Include="Tools\Export\MissionsExportInfo.cs" />
-    <Compile Include="Tools\ParagonTools.cs" />
     <Compile Include="Settings\PluginSettingsBase.cs" />
-    <Compile Include="Tools\Classes.cs" />
+    <Compile Include="Tools\Classes\Classes.cs" />
     <Compile Include="Tools\SysInformer.cs" />
+    <Compile Include="Tools\Targeting\EntityTargetProcessor.cs" />
+    <Compile Include="Tools\Targeting\PlayerTeamMonitor.cs" />
+    <Compile Include="Tools\Targeting\TargetProcessor.cs" />
+    <Compile Include="Tools\Targeting\TargetSelector.cs" />
+    <Compile Include="Tools\Targeting\TeammateSupportTargetProcessor.cs" />
+    <Compile Include="Tools\TargetSelectHelper.cs" />
+    <Compile Include="Tools\TreeViewHelper.cs" />
     <Compile Include="Tools\XmlColor.cs" />
+    <Compile Include="UCC\Actions\UCCActionPack.cs" />
+    <Compile Include="UCC\Actions\ChangeTarget.cs" />
+    <Compile Include="Tools\Targeting\Enums.cs" />
+    <Compile Include="Tools\Targeting\TeammateSupport.cs" />
+    <Compile Include="UCC\Actions\PluggedSkill.cs" />
+    <Compile Include="UCC\Editor\TreeViewCustomization\IUccActionTreeNode.cs" />
+    <Compile Include="UCC\Editor\TreeViewCustomization\IUccPriorityTreeNode.cs" />
+    <Compile Include="UCC\Editor\TreeViewCustomization\IUccTreeNode.cs" />
+    <Compile Include="UCC\Editor\TreeViewCustomization\UccActionPackTreeNode.cs" />
+    <Compile Include="UCC\Editor\TreeViewCustomization\UccActionTreeNode.cs" />
+    <Compile Include="UCC\Editor\TreeViewCustomization\UccConditionPackTreeNode.cs" />
+    <Compile Include="UCC\Editor\TreeViewCustomization\UccConditionTreeNode.cs" />
+    <Compile Include="UCC\Conditions\CheckPowerState.cs" />
+    <Compile Include="UCC\IUccConditionPack.cs" />
+    <Compile Include="UCC\Enums.cs" />
     <Compile Include="UCC\Extensions\UCCActionExtention.cs" />
     <Compile Include="Tools\Export\UiExportInfo.cs" />
     <Compile Include="UCC\Conditions\UCCConditionPack.cs" />
@@ -426,12 +539,33 @@
     <Compile Include="UCC\Actions\ExecuteSpecificPower.cs" />
     <Compile Include="UCC\Actions\SpecializedUCCAction.cs" />
     <Compile Include="UCC\Conditions\UCCGenericCondition.cs" />
+    <Compile Include="Tools\Targeting\EntityTarget.cs" />
     <Compile Include="UCC\UCCTools.cs" />
     <Compile Include="UCC\Actions\UseItemSpecial.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Core\MainPanel.resx">
       <DependentUpon>MainPanel.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\AddUccActionForm.resx">
+      <DependentUpon>AddUccActionForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\AuraViewer.resx">
+      <DependentUpon>AuraViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CollectionInfoForm.resx">
+      <DependentUpon>CollectionInfoForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ConditionsListForm.resx">
+      <DependentUpon>ConditionsListForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\EntityViewer.resx">
+      <DependentUpon>EntityViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\InputBox.resx">
+      <DependentUpon>InputBox.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ItemFilterEditorForm.resx">
       <DependentUpon>ItemFilterEditorForm.cs</DependentUpon>
@@ -442,14 +576,35 @@
     <EmbeddedResource Include="Forms\ItemListEditorForm.resx">
       <DependentUpon>ItemListEditorForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ItemSelectForm.resx">
+      <DependentUpon>ItemSelectForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\MissionMonitorForm.resx">
       <DependentUpon>MissionMonitorForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Patches\Mapper\MapperFormExt.resx">
+    <EmbeddedResource Include="Forms\MultipleItemSelectForm.resx">
+      <DependentUpon>MultipleItemSelectForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\TargetSelectForm.resx">
+      <DependentUpon>TargetSelectForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UCC\Editor\UccEditor.resx">
+      <DependentUpon>UccEditor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\UIViewer.resx">
+      <DependentUpon>UIViewer.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Quester\Mapper\MapperFormExt.resx">
       <DependentUpon>MapperFormExt.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ObjectInfoForm.resx">
       <DependentUpon>ObjectInfoForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Quester\Mapper\Tools\CustomRegionToolForm.resx">
+      <DependentUpon>CustomRegionToolForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Quester\Mapper\Tools\MapperSettingsForm.resx">
+      <DependentUpon>MapperSettingsForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\licenses.licx" />
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -457,11 +612,15 @@
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Include="Quester\Editor\QuesterEditor.resx">
+      <DependentUpon>QuesterEditor.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.editorconfig">
       <Link>.editorconfig</Link>
     </None>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -469,81 +628,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\charArrow.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniAdd.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniBiPath.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniCancel.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniClone.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniCopy.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniDelete.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniDistance.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniEllipceCR.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniExport.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniGear.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniLink.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniLinPath.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniNodeDistance.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniRectCR.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniImport.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniStop.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniTarget.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniUniPath.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniValid.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniZdiff.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniRefresh.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Entity_7_40х48.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniExpand.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniReverse.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniPlayAll.png" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.6">
@@ -558,117 +642,98 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\miniSave.png" />
+    <None Include="Resources\NodeTools.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\miniExpand_2.png" />
+    <Content Include="Patches\Patcher.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>Patcher.tt.cs</LastGenOutput>
+    </Content>
+    <None Include="Resources\Quest.png" />
+    <None Include="Resources\Zoom.png" />
+    <None Include="Resources\UniPath.png" />
+    <None Include="Resources\Undo.png" />
+    <None Include="Resources\Target.png" />
+    <None Include="Resources\Stop.png" />
+    <None Include="Resources\Stats.png" />
+    <None Include="Resources\Skip.png" />
+    <None Include="Resources\SaveTo.png" />
+    <None Include="Resources\SaveAs.png" />
+    <None Include="Resources\SaveAll.png" />
+    <None Include="Resources\RulerVertical.png" />
+    <None Include="Resources\RulerHorizontal.png" />
+    <None Include="Resources\RowUp.png" />
+    <None Include="Resources\Road.png" />
+    <None Include="Resources\Reverse.png" />
+    <None Include="Resources\Refresh.png" />
+    <None Include="Resources\Redo.png" />
+    <None Include="Resources\RectCR.png" />
+    <None Include="Resources\PreviewChart.png" />
+    <None Include="Resources\PlayAll.png" />
+    <None Include="Resources\Play.png" />
+    <None Include="Resources\Pen.png" />
+    <None Include="Resources\Paste.png" />
+    <None Include="Resources\PanelVisibility.png" />
+    <None Include="Resources\Open.png" />
+    <None Include="Resources\NodeMove.png" />
+    <None Include="Resources\NodeDistance.png" />
+    <None Include="Resources\NewRef.png" />
+    <None Include="Resources\NewFile.png" />
+    <None Include="Resources\New.png" />
+    <None Include="Resources\Load.png" />
+    <None Include="Resources\LinPath.png" />
+    <None Include="Resources\Link.png" />
+    <None Include="Resources\ImportTo.png" />
+    <None Include="Resources\Import.png" />
+    <None Include="Resources\Grid.png" />
+    <None Include="Resources\Gear.png" />
+    <None Include="Resources\Eye.png" />
+    <None Include="Resources\Export.png" />
+    <None Include="Resources\Expand.png" />
+    <None Include="Resources\ExclamationRed.png" />
+    <None Include="Resources\Exclamation.png" />
+    <None Include="Resources\Empty.png" />
+    <None Include="Resources\EllipceCR.png" />
+    <None Include="Resources\EditEdge.png" />
+    <None Include="Resources\EditCR.png" />
+    <None Include="Resources\Edit.png" />
+    <None Include="Resources\RowDown.png" />
+    <None Include="Resources\Distance.png" />
+    <None Include="Resources\CustomizeGrid.png" />
+    <None Include="Resources\Cursor.png" />
+    <None Include="Resources\CubeRed.png" />
+    <None Include="Resources\Cube.png" />
+    <None Include="Resources\Copy.png" />
+    <None Include="Resources\Clone.png" />
+    <None Include="Resources\charArrowColor.png" />
+    <None Include="Resources\Cancel.png" />
+    <None Include="Resources\BoxRed.png" />
+    <None Include="Resources\BiPath.png" />
+    <None Include="Resources\AddCR.png" />
+    <None Include="Resources\Add.png" />
+    <None Include="Resources\Zdiff.png" />
+    <None Include="Resources\Valid.png" />
+    <None Include="Resources\Wizard.png" />
+    <None Include="Resources\zoomIn.png" />
+    <None Include="Resources\zoomOut.png" />
+    <None Include="Resources\Trashcan.png" />
+    <None Include="Resources\Save.png" />
+    <None Include="Resources\Customization.png" />
+    <None Include="Resources\Compas.png" />
+    <None Include="Resources\Entity.png" />
+    <None Include="Resources\Background.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\miniSave_1.png" />
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\miniPen.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\node_tools.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniNodeMove_1.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniNodeMove.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniEditCR.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniEditEdge.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\previewchart_16x16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniWizard.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniZoom.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniZoomIn.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniZoomOut.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniAddCR.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniAddCR_2.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniAddCR_3.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\customization_16x16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\select_16x16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\navigationbar_16x16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\info_16x16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\rulervertical_16x16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\rulerhorizontal_16x16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\label_16x16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\miniRoad.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\charArrow_16x16..png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\show_16x16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\show_32x32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\zoomin_16x16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\zoomin_32x32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\zoomout_16x16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\zoomout_32x32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\previous_16x16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\next_16x16.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\AMClient\AMClient.csproj">
-      <Project>{FD0C9E2A-5D26-43AA-A227-BDDAF9C30705}</Project>
-      <Name>AMClient</Name>
-      <Private>False</Private>
+    <ProjectReference Include="..\Infrastructure\Infrastructure.csproj">
+      <Project>{afcfa9c4-3175-401d-b9b7-c2134905c4dc}</Project>
+      <Name>Infrastructure</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
+    <PostBuildEvent>$(SolutionDir)packages\ILRepack.2.0.18\tools\ILRepack.exe /out:"$(TargetPath)" "$(TargetPath)" "$(TargetDir)0Harmony.dll" "$(TargetDir)Infrastructure.dll"</PostBuildEvent>
   </PropertyGroup>
 </Project>

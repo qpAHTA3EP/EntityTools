@@ -23,7 +23,7 @@ namespace EntityTools.Settings
                 if (state != value)
                 {
                     state = value;
-                    NotifyPropertyChanged(nameof(State));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -42,7 +42,7 @@ namespace EntityTools.Settings
                 if (timeout != value)
                 {
                     timeout = Math.Max(value, 100);
-                    NotifyPropertyChanged(nameof(Timeout));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -62,7 +62,7 @@ namespace EntityTools.Settings
                 if (boatFilter != value)
                 {
                     boatFilter = Math.Max(value, 40);
-                    NotifyPropertyChanged(nameof(BoatFilter));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -82,7 +82,7 @@ namespace EntityTools.Settings
                 if (infernalMachineFilter != value)
                 {
                     infernalMachineFilter = Math.Max(value, 40);
-                    NotifyPropertyChanged(nameof(InfernalMachineFilter));
+                    NotifyPropertyChanged();
                 }
             }
         }

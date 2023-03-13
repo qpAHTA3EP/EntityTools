@@ -1,4 +1,4 @@
-﻿using AcTp0Tools.Reflection;
+﻿using Infrastructure.Reflection;
 using MyNW.Classes;
 using System;
 using System.Collections.Generic;
@@ -93,6 +93,8 @@ public static int GetNearestIndexInPositionList(List<Vector3> waypoints, Vector3
                             minDist = dist1;
                             result = current;
                         }
+#if false
+                        // Данная оптимизация приводит к некорректному поведению
                         else
                         {
                             // Вычисляем косинус угла между векторами (pos -> wp0) и (pos -> wp1)
@@ -116,7 +118,8 @@ public static int GetNearestIndexInPositionList(List<Vector3> waypoints, Vector3
                                 // поиск завершен на предыдущем шаге
                             }
                             break;
-                        }
+                        } 
+#endif
 
                         current++;
                         // сохраняем информацию о wp1, чтобы не повторять вычисления

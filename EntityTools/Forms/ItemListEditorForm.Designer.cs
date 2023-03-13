@@ -58,10 +58,11 @@ namespace EntityTools.Forms
             // btnAdd
             // 
             this.btnAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnAdd.ImageOptions.Image = global::EntityTools.Properties.Resources.miniAdd;
+            this.btnAdd.ImageOptions.Image = global::EntityTools.Properties.Resources.Add;
             this.btnAdd.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
             this.btnAdd.Location = new System.Drawing.Point(12, 226);
             this.btnAdd.Name = "btnAdd";
+            this.btnAdd.PaintStyle = DevExpress.XtraEditors.Controls.PaintStyles.Light;
             this.btnAdd.Size = new System.Drawing.Size(66, 23);
             this.btnAdd.TabIndex = 1;
             this.btnAdd.Text = "Add";
@@ -71,10 +72,11 @@ namespace EntityTools.Forms
             // btnRemove
             // 
             this.btnRemove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnRemove.ImageOptions.Image = global::EntityTools.Properties.Resources.miniCancel;
+            this.btnRemove.ImageOptions.Image = global::EntityTools.Properties.Resources.Cancel;
             this.btnRemove.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
             this.btnRemove.Location = new System.Drawing.Point(84, 226);
             this.btnRemove.Name = "btnRemove";
+            this.btnRemove.PaintStyle = DevExpress.XtraEditors.Controls.PaintStyles.Light;
             this.btnRemove.Size = new System.Drawing.Size(75, 23);
             this.btnRemove.TabIndex = 2;
             this.btnRemove.Text = "Remove";
@@ -84,10 +86,11 @@ namespace EntityTools.Forms
             // btnDown
             // 
             this.btnDown.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnDown.ImageOptions.Image = global::EntityTools.Properties.Resources.miniNext;
+            this.btnDown.ImageOptions.Image = global::EntityTools.Properties.Resources.RowDown;
             this.btnDown.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
             this.btnDown.Location = new System.Drawing.Point(254, 226);
             this.btnDown.Name = "btnDown";
+            this.btnDown.PaintStyle = DevExpress.XtraEditors.Controls.PaintStyles.Light;
             this.btnDown.Size = new System.Drawing.Size(66, 23);
             this.btnDown.TabIndex = 5;
             this.btnDown.Text = "Down";
@@ -97,10 +100,11 @@ namespace EntityTools.Forms
             // btnUp
             // 
             this.btnUp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnUp.ImageOptions.Image = global::EntityTools.Properties.Resources.miniPrevious;
+            this.btnUp.ImageOptions.Image = global::EntityTools.Properties.Resources.RowUp;
             this.btnUp.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
             this.btnUp.Location = new System.Drawing.Point(182, 226);
             this.btnUp.Name = "btnUp";
+            this.btnUp.PaintStyle = DevExpress.XtraEditors.Controls.PaintStyles.Light;
             this.btnUp.Size = new System.Drawing.Size(66, 23);
             this.btnUp.TabIndex = 4;
             this.btnUp.Text = "Up";
@@ -132,6 +136,7 @@ namespace EntityTools.Forms
             this.Controls.Add(this.btnAdd);
             this.Controls.Add(this.itemList);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.LookAndFeel.UseDefaultLookAndFeel = false;
             this.MinimumSize = new System.Drawing.Size(334, 293);
             this.Name = "ItemListEditorForm";
             this.ShowInTaskbar = false;

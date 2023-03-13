@@ -117,12 +117,109 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <metadata name="btnSelect.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="btnSelect.ImageOptions.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAL
+        DwAACw8BkvkDpQAAABh0RVh0U29mdHdhcmUAcGFpbnQubmV0IDQuMC41ZYUyZQAAAbJJREFUOE+lk88r
+        w3EYx4eS5KJ2WkwObLOQmR/ju9nXEEuyVn6cKIXkP3CTo5QDB+7OHKiVchYuUnKRgwsHoYTM5vV8t8+3
+        jzUnh1ffz+d5P+9nz/f7PHMEGox/YR+m+5dKoGIiOl/Z4Y3GiW3BERzCJphg50GlPJW5FKr7WkdDmC+J
+        Zf/gNNISD5DrlHzxKbPLbBsbxvxcxGSDnu3y9T+RG8FTRswhBarHe2c8nV7zvtCgI2ZyrCf3GygHq4Az
+        5B9YVYnFwPQSCyRi/PqeFl+EXAcczjThF5gz4ZaRhXjXlI/7raadgFWglMObJthIu3S3zWRq2hvDxwX6
+        I1hjLIGvfFDYD3oi05g/aPkiGZlzY17RdMWrfEi1B3eacJ4wZuuN5uHlwWAySLFBYmlNV1xRwKUK7CpB
+        2u5uih1Mmosuzm5iD0rTIWeHAm5VwA9pMatR0fY+sWtJLgT9k+4MuwN5Fz7WujbnPxG9xz+0JmbxWVOQ
+        Cy3XUUT2P1NoUmD+xrwhrydmYrk9AHu3CYYhBe9iyvOGOcU+DGl5VvdSwPpXgYxTfRNBVrWWKdSwRFXF
+        8wzHDyvcOk04j+8hAAAAAElFTkSuQmCC
+</value>
+  </data>
+  <metadata name="btnReload.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="crList.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="spliter.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="tabPane.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="tabUnion.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="textUnion.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="tabIntersection.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="textIntersection.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="tabExclusion.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="textExclusion.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="textUnion.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
   <data name="textUnion.Text" xml:space="preserve">
     <value>Отметьте несколько регионов, ОБЪЕДИНЕНИЕ которых образует допустимую область. Персонаж должен находиться в любом из отмеченных регионов, а также в области INTERSECTION (если она задана). При этом запрещено нахождение в области EXCLUSION.
 </value>
   </data>
+  <metadata name="textIntersection.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
   <data name="textIntersection.Text" xml:space="preserve">
     <value>Отметьте несколько регионов, ПЕРЕСЕЧЕНИЕ которых образует допустимую область. Персонаж должен находиться в каждом из отмеченных регионов, а также в области UNION (если она задана). При этом запрещено нахождение в области EXCLUSION.
 </value>
   </data>
+  <metadata name="textExclusion.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <metadata name="btnItemSelection.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="btnItemSelection.ImageOptions.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAL
+        EQAACxEBf2RfkQAAAatJREFUOE+Fk9sqRVEUhuc6KbU3peUCFzblVC68CcW+cyvJRpRQygu4Ut7AnVIe
+        gHu3Dg8hte1TubKX759rTnvZhb9G4x+Hf8w5G2uZPzCD1bF3bF6J/zAYx9Gk48JKGIZZEAQZfC1P/Y4y
+        jTdxHL/ia8Tb8EcNgGf4lyRJ9uEL1C/g11EUjkpoQaKCoAG1giiKJPJiG7taiz7PN7EcWZYZd/Jnn7hN
+        /D24IH7AxrEf2KC568RtBh6VSqVZfAXbQ9wibwckSXwmgcccVqXhyYk15NRWCmDILq6rG/L+Z3iVPrud
+        et+1O2k6sqhCEeTH2FLd9zFQphWbdwVKqsiwFn5ahSKGh4cmyOu78H3SKLYfSZVrPblkl4HHKhQRBMY+
+        QWKe+wKvYnp+joGB5ARnb0JDhyFH2FSapjOIDsk33Mld+BbWA4UUd48VV6XmJrWmuBP7Gx7gf2Ad8+IP
+        cTVLJF4QW6OvzSpn4Tl0AxK3TL4iXILXyD3CrRiB1rajk+Fv+Dti3bqHcrkcOuqxTKM/eTVPGUM8hSvl
+        UR8uL88dM4ad6yvUnvUp//I7G/MF4jCEpp3/TgUAAAAASUVORK5CYII=
+</value>
+  </data>
+  <metadata name="btnOpenMapper.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
+  <data name="btnOpenMapper.ImageOptions.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAA02lDQ1BpY2MAACjPlZDBCgFRGIXPiJQs
+        LGxI8gCmlJKtFBssBoVsxjWGzIzbvTNp3subKE9gaW3tjGQhFv7bf8/pr++/nQsYS0/4Ot0A/CBUfasz
+        n80XtewVOZSQQRU5W2g5HPcm+Fn3C4xEz2ayC/9Veu1oQT2xW0KqkHpjD46hpDfa9MX9xOrSD+gLvheJ
+        F5u8mneC6ZhaZlfgQsFGjBpWiLCDhxAmNWC+71zjyY1wICN4S9KKhIst2TqnETQc6oZzh8dDnPzRZ3Zp
+        K/udKtVsPgDYazMoCeAw5gAAAAlwSFlzAAALEQAACxEBf2RfkQAAAghJREFUOE+Nk71LW2EUxu+9uUlu
+        Ek3IBzEQTWoGocUpMUMnBxe7iKOFggguLgoK1QuhonWzqCh06eAHXVQUMhVxEBUL1kXFL0rVhi5FwcV/
+        wN+5vrQEa+yBh/Pe9zznOc+53Ks9FvF4XHe73e2mae6SD8jdkUjEpcrlkc1mtVwuZ+TzeV1daX6/P6zr
+        +rZhGHMul2uK84llWfWq/DcCgUAV6p2QPoFxr9fb5PP5UtwNUb5B4CP3Y5yvPR7Pq1gs9meIExTfon4J
+        cZ68Ab6DfXBEbYF8CM6oy90hwr3SA/pxlBIBIdrhcNjEdgrSHuQixQamucl1Yh2ndfA+MPMWzgE45vmz
+        CFyg2pNMJmUd2XsTgeF7f+XBes+pl1ili54+UBKBSS7FRYHGWXhX5DYRC4VCgXQ6fd9N4DBIbUX44JSe
+        BY0XluAwysUGxS/kc/IWkFXWmPIaIVMEMpmMuKiH3w96Wa3WUY5Go0YVAVEmLCpHA5xnOF9gucUhPhVY
+        rKFBPpoesR4MBqsRWUfsvaJUDkxEEdijYQQ3FoLPeP6GyKCiPAyaLCzm2e0ln2wHDT/Bb7BK41cRoP5C
+        0R8G02xIl+AXuOJ5mhXe0DzB+R3CjfwXiv2PgPRDiDQNIFDizTrTCoWCZtu2w6kYNO8wrQiWENiVF6lK
+        /xfs3YzIMg6K7NqaSCTKf5aKoWl3OIpZtQMVdHwAAAAASUVORK5CYII=
+</value>
+  </data>
+  <metadata name="$this.Locked" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>True</value>
+  </metadata>
 </root>

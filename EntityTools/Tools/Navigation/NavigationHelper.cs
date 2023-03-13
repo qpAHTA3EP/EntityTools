@@ -1,18 +1,125 @@
-﻿using Astral.Logic;
-using Astral.Logic.NW;
-using EntityTools.Reflection;
-using MyNW.Classes;
-using MyNW.Internals;
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
+using Infrastructure;
+using AStar;
+using MyNW.Classes;
+using MyNW.Internals;
 using Timeout = Astral.Classes.Timeout;
 
 namespace EntityTools.Tools.Navigation
 {
     public static class NavigationHelper
     {
+        /// <summary>
+        /// Вычисление косинуса угла образованного тремя точками с вершиной в точке <param name="angularPoint"/>
+        /// cos(15)  =  0,9659258262890682867497431997289
+        /// cos(30)  =  0,86602540378443864676372317075294
+        /// cos(45)  =  0,70710678118654752440084436210485
+        /// cos(60)  =  0,5
+        /// cos(75)  =  0,25881904510252076234889883762405
+        /// cos(90)  =  0,0
+        /// cos(105) = -0,25881904510252076234889883762405
+        /// cos(165) = -0,9659258262890682867497431997289
+        /// </summary>
+        /// <param name="squareDistance0">Квадрат расстояния между точками <param name="angularPoint"/> и <param name="point0"/></param>
+        /// <param name="squareDistance1">Квадрат расстояния между точками <param name="angularPoint"/> и <param name="point1"/></param>
+        public static double Cosine(Vector3 angularPoint, Vector3 point0, Vector3 point1, out float squareDistance0, out float squareDistance1)
+        {
+            float x0 = point0.X - angularPoint.X,
+                  y0 = point0.Y - angularPoint.Y,
+                  z0 = point0.Z - angularPoint.Z,
+                  x1 = point1.X - angularPoint.X,
+                  y1 = point1.Y - angularPoint.Y,
+                  z1 = point1.Z - angularPoint.Z;
+
+            squareDistance0 = x0 * x0 + y0 * y0 + z0 * z0;
+            squareDistance1 = x1 * x1 + y1 * y1 + z1 * z1;
+
+            return (x0 * x1 + y0 * y1 + z0 * z1) / Math.Sqrt(squareDistance0 * squareDistance1);
+        }
+
+        /// <summary>
+        /// Вычисление косинуса угла образованного тремя точками с вершиной в точке <param name="angularPoint"/>
+        /// cos(15)  =  0,9659258262890682867497431997289
+        /// cos(30)  =  0,86602540378443864676372317075294
+        /// cos(45)  =  0,70710678118654752440084436210485
+        /// cos(60)  =  0,5
+        /// cos(75)  =  0,25881904510252076234889883762405
+        /// cos(90)  =  0,0
+        /// cos(105) = -0,25881904510252076234889883762405
+        /// cos(165) = -0,9659258262890682867497431997289
+        /// </summary>
+        /// <param name="squareDistance0">Квадрат расстояния между точками <param name="angularPoint"/> и <param name="point0"/></param>
+        /// <param name="squareDistance1">Квадрат расстояния между точками <param name="angularPoint"/> и <param name="point1"/></param>
+        public static double Cosine(Point3D angularPoint, Point3D point0, Point3D point1, out double squareDistance0, out double squareDistance1)
+        {
+            double x0 = point0.X - angularPoint.X,
+                y0 = point0.Y - angularPoint.Y,
+                z0 = point0.Z - angularPoint.Z,
+                x1 = point1.X - angularPoint.X,
+                y1 = point1.Y - angularPoint.Y,
+                z1 = point1.Z - angularPoint.Z;
+
+            squareDistance0 = x0 * x0 + y0 * y0 + z0 * z0;
+            squareDistance1 = x1 * x1 + y1 * y1 + z1 * z1;
+
+            return (x0 * x1 + y0 * y1 + z0 * z1) / Math.Sqrt(squareDistance0 * squareDistance1);
+        }
+
+        /// <summary>
+        /// Вычисление косинуса угла образованного тремя точками с вершиной в точке <param name="angularPointX"/>, <param name="angularPointY"/>, <param name="angularPointZ"/>)
+        /// cos(15)  =  0,9659258262890682867497431997289
+        /// cos(30)  =  0,86602540378443864676372317075294
+        /// cos(45)  =  0,70710678118654752440084436210485
+        /// cos(60)  =  0,5
+        /// cos(75)  =  0,25881904510252076234889883762405
+        /// cos(90)  =  0,0
+        /// cos(105) = -0,25881904510252076234889883762405
+        /// cos(165) = -0,9659258262890682867497431997289
+        /// </summary>
+        /// <param name="squareDistance0">Квадрат расстояния между точками с координатами (<param name="angularPointX"/>, <param name="angularPointY"/>, <param name="angularPointZ"/>) и (<param name="x0"/>, <param name="y0"/>, <param name="z0"/>)</param>
+        /// <param name="squareDistance1">Квадрат расстояния между точками с координатами (<param name="angularPointX"/>, <param name="angularPointY"/>, <param name="angularPointZ"/>) и (<param name="x1"/>, <param name="y1"/>, <param name="z1"/>)</param>
+        public static double Cosine(double angularPointX, double angularPointY, double angularPointZ,
+                                    double x0, double y0, double z0,
+                                    double x1, double y1, double z1,
+                                    out double squareDistance0, out double squareDistance1)
+        {
+            double dx0 = x0 - angularPointX,
+                   dy0 = y0 - angularPointY,
+                   dz0 = z0 - angularPointZ,
+                   dx1 = x1 - angularPointX,
+                   dy1 = y1 - angularPointY,
+                   dz1 = z1 - angularPointZ;
+
+            squareDistance0 = dx0 * dx0 + dy0 * dy0 + dz0 * dz0;
+            squareDistance1 = dx1 * dx1 + dy1 * dy1 + dz1 * dz1;
+
+            return (dx0 * dx1 + dy0 * dy1 + dz0 * dz1) / Math.Sqrt(squareDistance0 * squareDistance1);
+        }
+
+        /// <summary>
+        /// Вычисление квадрата расстояния между точкой с координатами {<param name="x0"/>, <param name="y0"/>, <param name="z0"/>} и точкой с координатами {<param name="x1"/>, <param name="y1"/>, <param name="z1"/>}
+        /// </summary>
+        public static double SquareDistance3D(double x0, double y0, double z0, double x1, double y1, double z1)
+        {
+            double dx = x0 - x1;
+            double dy = y0 - y1;
+            double dz = z0 - z1;
+
+            return dx * dx + dy * dy + dz * dz;
+        }
+
+        /// <summary>
+        /// Вычисление квадрата расстояния между точками <param name="point0"/> и <param name="point1"/>
+        /// </summary>
+
+        public static double SquareDistance3D(Vector3 point0, Vector3 point1)
+        {
+            return SquareDistance3D(point0.X, point0.Y, point0.Z, point1.X, point1.Y, point1.Z);
+        }
+
+#if disabled_2021_04_19
         public static int REGENERATE_PATH_TIME = 3000;
         public static int TARGET_DISTANCE_MEASURE_TIME = 500;
 
@@ -570,7 +677,10 @@ namespace EntityTools.Tools.Navigation
                 dz = wp1.Z - wp2.Z,
                 sqrtDist = dx * dx + dy * dy + dz * dz;
             return sqrtDist;
-        }
+        } 
+#endif
+
+
 
         /// <summary>
         /// Взаимодействие с <paramref name="entity"/> предусматривающее, в случае необходимости ориентацию в направлении <paramref name="entity"/>
@@ -580,9 +690,8 @@ namespace EntityTools.Tools.Navigation
             //TODO: Разворачивать камеру вместе с персонажем
 
             // Полная остановка навигации
-            StopNavigationCompletly();
+            StopNavigationCompletely();
             
-            var mainEngineNavigation = AstralAccessors.Controllers.Engine.MainEngine.Navigation;
             uint refId = entity.RefId;
             interactTime = Math.Max(interactTime, 500);
             var player = EntityManager.LocalPlayer.Player;
@@ -599,7 +708,8 @@ namespace EntityTools.Tools.Navigation
             do
             {
                 interactOption = player.InteractStatus.InteractOptions.FirstOrDefault(o => o.EntityRefId == refId);
-                if (interactOption != null && interactOption.CanInteract()//IsValid
+                if (interactOption != null 
+                    && interactOption.CanInteract()
                     && interactOption.Interact())
                 {
                     interactionWaitTimer.Reset();
@@ -619,7 +729,10 @@ namespace EntityTools.Tools.Navigation
             Interact.ForContactDialog(entity);
 #endif
 
-            if (entity.Location.Distance3DFromPlayer > interactDistance)
+            //TODO: Попробовать отключить, т.к. находясь вплотную к NPC персонаж часто не может с ним взаимодействовать (нужно покрутить камеру)
+#if false
+            if (entity.Location.Distance3DFromPlayer > interactDistance) 
+#endif
             {
                 // Изменение угла камеры к горизонту и попытка взаимодействия
                 GfxCameraController.SetPitch(-0.66f);
@@ -658,7 +771,7 @@ namespace EntityTools.Tools.Navigation
 
                 // Два шага влево и попытка взаимодействия
                 MyNW.Internals.Movements.SetMovementType(MyNW.Internals.Movements.MovementsType.StrafeLeft);
-                Thread.Sleep(400);
+                Thread.Sleep(200);
                 MyNW.Internals.Movements.UnsetMovementType(MyNW.Internals.Movements.MovementsType.StrafeLeft);
                 interactOption = player.InteractStatus.InteractOptions.FirstOrDefault(o => o.EntityRefId == refId);
                 if (interactOption != null && interactOption.CanInteract()//isValid
@@ -677,7 +790,7 @@ namespace EntityTools.Tools.Navigation
                 // Ориентация на целб шаг назад и попытка взаимодействия
                 Thread.Sleep(250);
                 MyNW.Internals.Movements.SetMovementType(MyNW.Internals.Movements.MovementsType.MoveBackward);
-                Thread.Sleep(400);
+                Thread.Sleep(200);
                 entity.Location.FaceYaw();
                 MyNW.Internals.Movements.UnsetMovementType(MyNW.Internals.Movements.MovementsType.MoveBackward);
                 interactOption = player.InteractStatus.InteractOptions.FirstOrDefault(o => o.EntityRefId == refId);
@@ -696,7 +809,7 @@ namespace EntityTools.Tools.Navigation
 
                 // Два шага вперед и попытка взаимодействия
                 MyNW.Internals.Movements.SetMovementType(MyNW.Internals.Movements.MovementsType.MoveForward);
-                Thread.Sleep(800);
+                Thread.Sleep(400);
                 MyNW.Internals.Movements.UnsetMovementType(MyNW.Internals.Movements.MovementsType.MoveForward);
                 entity.Location.FaceYaw();
                 interactOption = player.InteractStatus.InteractOptions.FirstOrDefault(o => o.EntityRefId == refId);
@@ -711,7 +824,7 @@ namespace EntityTools.Tools.Navigation
         /// <summary>
         /// Полная остановка навигации (перемещения)
         /// </summary>
-        private static void StopNavigationCompletly()
+        public static void StopNavigationCompletely()
         {
             // Остановка движка навигации "активной роли"
             var mainEngineNavigation = AstralAccessors.Controllers.Engine.MainEngine.Navigation;

@@ -1,6 +1,5 @@
 ﻿using Astral.Quester.Classes;
 using EntityTools.Enums;
-using MyNW.Classes;
 using System;
 using System.ComponentModel;
 using System.Linq;
@@ -35,7 +34,6 @@ namespace EntityTools.Tools.CustomRegions
                 {
                     var oldName = _name;
                     _customRegion = null;
-                    _label = string.Empty;
                     _name = value;
                     _collection?.EntryChanged(this, oldName, _inclusion);
                 }
@@ -52,7 +50,6 @@ namespace EntityTools.Tools.CustomRegions
             set
             {
                 var oldInclusion = _inclusion;
-                _label = string.Empty;
                 _inclusion = value;
                 _collection?.EntryChanged(this, _name, oldInclusion);
             }
@@ -69,7 +66,11 @@ namespace EntityTools.Tools.CustomRegions
             get
             {
                 if (_customRegion is null || _customRegion.Name != _name)
-                    _customRegion = Astral.Quester.API.CurrentProfile.CustomRegions.FirstOrDefault(cr => cr.Name == _name);
+                {
+                    if(_collection is null)
+                        _customRegion = Astral.Quester.API.CurrentProfile.CustomRegions.FirstOrDefault(cr => cr.Name == _name);
+                    else _customRegion = _collection.DesignContext.CustomRegions.FirstOrDefault(cr => cr.Name == _name);
+                }
 
                 return _customRegion;
             }
@@ -88,10 +89,7 @@ namespace EntityTools.Tools.CustomRegions
         /// </summary>
         [XmlIgnore]
         [Browsable(false)]
-        public CustomRegionCollection Collection
-        {
-            get => _collection;
-        }
+        public CustomRegionCollection Collection => _collection;
         CustomRegionCollection _collection; 
         #endregion
 
@@ -124,26 +122,18 @@ namespace EntityTools.Tools.CustomRegions
                 _collection = null;
                 oldCollection.Remove(this);
             }
+
+            _customRegion = null;
         }
 
         public CustomRegionEntry Clone()
         {
             if(_customRegion is null)
                 return new CustomRegionEntry(_name, _inclusion);
-            else return new CustomRegionEntry(_customRegion, _inclusion);
+            return new CustomRegionEntry(_customRegion, _inclusion);
         }
 
-#if false
-        public override string ToString()
-        {
-            if (string.IsNullOrEmpty(_label))
-                _label = $"[{_inclusion}] {_name}";
-            return _label;
-        } 
-#else
         public override string ToString() => _name;
-#endif
-        string _label;
 
         #region IXmlSerializable
         public XmlSchema GetSchema()
@@ -206,7 +196,7 @@ namespace EntityTools.Tools.CustomRegions
         #endregion
     }
 
-    public static class CustomRegionXmlReaderExtention
+    public static class CustomRegionXmlReaderExtension
     {
         public static CustomRegionEntry ReadContentAsCustomRegionEntry(this XmlReader reader, bool skipIgnored = true)
         {

@@ -1,28 +1,31 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Drawing.Design;
-using System.Threading;
+using System.Runtime.CompilerServices;
+using System.Text;
 using System.Xml.Serialization;
+
 using Astral.Classes.ItemFilter;
 using Astral.Logic.UCC.Classes;
+
 using EntityTools.Core.Interfaces;
-using EntityTools.Core.Proxies;
 using EntityTools.Editors;
 using EntityTools.Enums;
+using EntityTools.Quester.Actions;
 using EntityTools.Tools;
+using EntityTools.Tools.Entities;
+using EntityTools.UCC.Extensions;
+using MyNW.Classes;
+using Timeout = Astral.Classes.Timeout;
 
 namespace EntityTools.UCC.Conditions
 {
-    public class UCCEntityCheck : UCCCondition, ICustomUCCCondition, IEntityDescriptor
+    public class UCCEntityCheck : UCCCondition, ICustomUCCCondition, IEntityDescriptor, INotifyPropertyChanged
     {
         #region Опции команды
-#if DEVELOPER
         [Description("ID of the Entity for the search")]
         [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
         [Category("Entity")]
-#else
-        [Browsable(false)]
-#endif
         public string EntityID
         {
             get => _entityId;
@@ -31,20 +34,16 @@ namespace EntityTools.UCC.Conditions
                 if (_entityId != value)
                 {
                     _entityId = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityID)));
+                    NotifyPropertyChanged();
                 }
             }
         }
-        internal string _entityId = string.Empty;
+        private string _entityId = string.Empty;
 
-#if DEVELOPER
         [Description("Type of and EntityID:\n" +
             "Simple: Simple text string with a wildcard at the beginning or at the end (char '*' means any symbols)\n" +
             "Regex: Regular expression")]
         [Category("Entity")]
-#else
-        [Browsable(false)]
-#endif
         public ItemFilterStringType EntityIdType
         {
             get => _entityIdType;
@@ -53,18 +52,14 @@ namespace EntityTools.UCC.Conditions
                 if (_entityIdType != value)
                 {
                     _entityIdType = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityIdType)));
+                    NotifyPropertyChanged();
                 }
             }
         }
-        internal ItemFilterStringType _entityIdType = ItemFilterStringType.Simple;
+        private ItemFilterStringType _entityIdType = ItemFilterStringType.Simple;
 
-#if DEVELOPER
         [Description("The switcher of the Entity filed which compared to the property EntityID")]
         [Category("Entity")]
-#else
-        [Browsable(false)]
-#endif
         public EntityNameType EntityNameType
         {
             get => _entityNameType;
@@ -73,20 +68,22 @@ namespace EntityTools.UCC.Conditions
                 if (_entityNameType != value)
                 {
                     _entityNameType = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityNameType)));
+                    NotifyPropertyChanged();
                 }
             }
         }
-        internal EntityNameType _entityNameType = EntityNameType.InternalName;
+        private EntityNameType _entityNameType = EntityNameType.InternalName;
 
-#if DEVELOPER
+        [XmlIgnore]
+        [Editor(typeof(EntityTestEditor), typeof(UITypeEditor))]
+        [Description("Test the Entity searching.")]
+        [Category("Entity")]
+        public string EntityTestInfo => "Push button '...' =>";
+
         [Description("Check Entity's Region:\n" +
             "True: Search an Entity only if it located in the same Region as Player\n" +
             "False: Does not consider the region when searching Entities")]
         [Category("Optional")]
-#else
-        [Browsable(false)]
-#endif
         public bool RegionCheck
         {
             get => _regionCheck;
@@ -95,20 +92,16 @@ namespace EntityTools.UCC.Conditions
                 if (_regionCheck != value)
                 {
                     _regionCheck = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RegionCheck)));
+                    NotifyPropertyChanged();
                 }
             }
         }
-        internal bool _regionCheck;
+        private bool _regionCheck;
 
-#if DEVELOPER
         [Description("Check if Entity's health greater than zero:\n" +
             "True: Only Entities with nonzero health are detected\n" +
             "False: Entity's health does not checked during search")]
         [Category("Optional")]
-#else
-        [Browsable(false)]
-#endif
         public bool HealthCheck
         {
             get => _healthCheck;
@@ -117,61 +110,49 @@ namespace EntityTools.UCC.Conditions
                 if (_healthCheck != value)
                 {
                     _healthCheck = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HealthCheck)));
+                    NotifyPropertyChanged();
                 }
             }
         }
-        internal bool _healthCheck = true;
+        private bool _healthCheck = true;
 
-#if DEVELOPER
         [Description("The maximum distance from the character within which the Entity is searched\n" +
             "The default value is 0, which disables distance checking")]
         [Category("Optional")]
-#else
-        [Browsable(false)]
-#endif
         public float ReactionRange
         {
             get => _reactionRange;
             set
             {
-                if (_reactionRange != value)
+                if (Math.Abs(_reactionRange - value) > 0.1)
                 {
                     _reactionRange = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ReactionRange)));
+                    NotifyPropertyChanged();
                 }
             }
         }
-        internal float _reactionRange;
+        private float _reactionRange;
 
-#if DEVELOPER
         [Description("The maximum ZAxis difference from the withing which the Entity is searched\n" +
             "The default value is 0, which disables ZAxis checking")]
         [Category("Optional")]
-#else
-        [Browsable(false)]
-#endif
         public float ReactionZRange
         {
             get => _reactionZRange;
             set
             {
-                if (_reactionZRange != value)
+                if (Math.Abs(_reactionZRange - value) > 0.1)
                 {
                     _reactionZRange = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ReactionZRange)));
+                    NotifyPropertyChanged();
                 }
             }
         }
-        internal float _reactionZRange;
+        private float _reactionZRange;
 
-#if DEVELOPER
         [Description("Aura which checked on the Entity")]
         [TypeConverter(typeof(ExpandableObjectConverter))]
         [Category("Optional")]
-#else
-        [Browsable(false)]
-#endif
         public AuraOption Aura
         {
             get => _aura; set
@@ -179,15 +160,13 @@ namespace EntityTools.UCC.Conditions
                 if (_aura != value)
                 {
                     _aura = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Aura)));
+                    NotifyPropertyChanged();
                 }
             }
         }
-        internal AuraOption _aura = new AuraOption();
+        private AuraOption _aura = new AuraOption();
+        public bool ShouldSerializeAura() => !string.IsNullOrEmpty(_aura.AuraName);
 
-#if !DEVELOPER
-        [Browsable(false)]
-#endif
         public EntityPropertyType PropertyType
         {
             get => _propertyType; set
@@ -195,37 +174,25 @@ namespace EntityTools.UCC.Conditions
                 if (_propertyType != value)
                 {
                     _propertyType = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PropertyType)));
+                    NotifyPropertyChanged();
                 }
             }
         }
-        internal EntityPropertyType _propertyType = EntityPropertyType.Distance;
+        private EntityPropertyType _propertyType = EntityPropertyType.Distance;
 
-#if !DEVELOPER
-        [Browsable(false)]
-#endif
         public float PropertyValue
         {
             get => _propertyValue; set
             {
-                if (_propertyValue != value)
+                if (Math.Abs(_propertyValue - value) > 0.1)
                 {
                     _propertyValue = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PropertyValue)));
+                    NotifyPropertyChanged();
                 }
             }
         }
-        internal float _propertyValue;
+        private float _propertyValue;
 
-#if DEVELOPER
-        [XmlIgnore]
-        [Editor(typeof(EntityTestEditor), typeof(UITypeEditor))]
-        [Description("Нажми на кнопку '...' чтобы увидеть тестовую информацию")]
-        //[Category("Entity")]
-#else
-        [Browsable(false)]
-#endif
-        public string TestInfo { get; } = "Нажми '...' =>";
 
         #region Hide Inherited Properties
         [XmlIgnore]
@@ -242,32 +209,210 @@ namespace EntityTools.UCC.Conditions
         #endregion
         #endregion
 
-        #region Взаимодействие с EntityToolsCore
-        [NonSerialized]
-        internal IUccConditionEngine Engine;
 
+        #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public UCCEntityCheck()
+        protected virtual void NotifyPropertyChanged([CallerMemberName] string memberName = default)
         {
-            Sign = Astral.Logic.UCC.Ressources.Enums.Sign.Superior;
+            _key = null;
+            _specialCheck = null;
+            _label = string.Empty;
+            entity = null;
 
-            Engine = new UccConditionProxy(this);
-        }
-        private IUccConditionEngine MakeProxie()
-        {
-            return new UccConditionProxy(this);
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(memberName)));
         }
         #endregion
 
-        #region ICustomUCCCondition
-        bool ICustomUCCCondition.IsOK(UCCAction refAction) => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).IsOK(refAction);
 
-        bool ICustomUCCCondition.Loked { get => Locked; set => Locked = value; }
 
-        string ICustomUCCCondition.TestInfos(UCCAction refAction) => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).TestInfos(refAction);
+
+        public new ICustomUCCCondition Clone()
+        {
+            var copy = new UCCEntityCheck
+            {
+                _entityId = _entityId,
+                _entityIdType = _entityIdType,
+                _entityNameType = _entityNameType,
+                _regionCheck = _regionCheck,
+                _healthCheck = _healthCheck,
+                _reactionRange = _reactionRange,
+                _reactionZRange = _reactionZRange,
+                _aura = new AuraOption
+                {
+                    AuraName = _aura.AuraName,
+                    AuraNameType = _aura.AuraNameType,
+                    Sign = _aura.Sign,
+                    Stacks = _aura.Stacks
+                },
+                _propertyType = _propertyType,
+                _propertyValue = _propertyValue,
+
+                Sign = Sign,
+                Locked = base.Locked,
+                Target = Target,
+                Tested = Tested,
+                Value = Value
+            };
+            return copy;
+        }
+
+        
+
+
+        #region Данные
+        private Entity entity;
+        private readonly Timeout timeout = new Timeout(0);
+        private string _label = string.Empty;
         #endregion
 
-        public override string ToString() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).Label();
+        
+
+        
+
+        public new bool IsOK(UCCAction refAction)
+        {
+            Entity targetEntity = refAction?.GetTarget();
+
+            var entityKey = EntityKey;
+
+            if (entityKey.Validate(targetEntity))
+                entity = targetEntity;
+            else if (timeout.IsTimedOut)
+            {
+                entity = SearchCached.FindClosestEntity(entityKey, SpecialCheck);
+                timeout.ChangeTime(EntityTools.Config.EntityCache.CombatCacheTime / 2);
+            }
+
+
+            if (entityKey.Validate(entity))
+            {
+                switch (PropertyType)
+                {
+                    case EntityPropertyType.Distance:
+                        switch (Sign)
+                        {
+                            case Astral.Logic.UCC.Ressources.Enums.Sign.Equal:
+                                return Math.Abs(entity.Location.Distance3DFromPlayer - PropertyValue) <= 1;
+                            case Astral.Logic.UCC.Ressources.Enums.Sign.NotEqual:
+                                return Math.Abs(entity.Location.Distance3DFromPlayer - PropertyValue) > 1;
+                            case Astral.Logic.UCC.Ressources.Enums.Sign.Inferior:
+                                return entity.Location.Distance3DFromPlayer < PropertyValue;
+                            case Astral.Logic.UCC.Ressources.Enums.Sign.Superior:
+                                return entity.Location.Distance3DFromPlayer > PropertyValue;
+                        }
+                        break;
+                    case EntityPropertyType.HealthPercent:
+                        switch (Sign)
+                        {
+                            case Astral.Logic.UCC.Ressources.Enums.Sign.Equal:
+                                return Math.Abs(entity.Character.AttribsBasic.HealthPercent - PropertyValue) <= 1;
+                            case Astral.Logic.UCC.Ressources.Enums.Sign.NotEqual:
+                                return Math.Abs(entity.Character.AttribsBasic.HealthPercent - PropertyValue) > 1;
+                            case Astral.Logic.UCC.Ressources.Enums.Sign.Inferior:
+                                return entity.Character.AttribsBasic.HealthPercent < PropertyValue;
+                            case Astral.Logic.UCC.Ressources.Enums.Sign.Superior:
+                                return entity.Character.AttribsBasic.HealthPercent > PropertyValue;
+                        }
+                        break;
+                    case EntityPropertyType.ZAxis:
+                        switch (Sign)
+                        {
+                            case Astral.Logic.UCC.Ressources.Enums.Sign.Equal:
+                                return Math.Abs(entity.Location.Z - PropertyValue) <= 1;
+                            case Astral.Logic.UCC.Ressources.Enums.Sign.NotEqual:
+                                return Math.Abs(entity.Location.Z - PropertyValue) > 1;
+                            case Astral.Logic.UCC.Ressources.Enums.Sign.Inferior:
+                                return entity.Location.Z < PropertyValue;
+                            case Astral.Logic.UCC.Ressources.Enums.Sign.Superior:
+                                return entity.Location.Z > PropertyValue;
+                        }
+                        break;
+                }
+                return false;
+            }
+            // Если Entity не найдено, условие будет истино в единственном случае:
+            return PropertyType == EntityPropertyType.Distance
+                   && Sign == Astral.Logic.UCC.Ressources.Enums.Sign.Superior;
+        }
+
+        public string TestInfos(UCCAction refAction)
+        {
+            Entity closestEntity = refAction?.GetTarget();
+
+            var entityKey = EntityKey;
+
+            if (!entityKey.Validate(closestEntity))
+                closestEntity = SearchCached.FindClosestEntity(entityKey, SpecialCheck);
+
+            if (entityKey.Validate(closestEntity))
+            {
+                StringBuilder sb = new StringBuilder("Found closest Entity");
+                var propType = PropertyType;
+                sb.Append(" [").Append(closestEntity.NameUntranslated).Append(']').Append(" which ").Append(propType).Append(" = ");
+                switch (propType)
+                {
+                    case EntityPropertyType.Distance:
+                        sb.Append(closestEntity.Location.Distance3DFromPlayer);
+                        break;
+                    case EntityPropertyType.ZAxis:
+                        sb.Append(closestEntity.Location.Z);
+                        break;
+                    case EntityPropertyType.HealthPercent:
+                        sb.Append(closestEntity.Character?.AttribsBasic?.HealthPercent);
+                        break;
+                }
+                return sb.ToString();
+            }
+            else
+            {
+                StringBuilder sb = new StringBuilder("No one Entity matched to");
+                sb.Append(" [").Append(EntityID).Append(']').AppendLine();
+                if (PropertyType == EntityPropertyType.Distance)
+                    sb.AppendLine("The distance to the missing Entity is considered equal to infinity.");
+                return sb.ToString();
+            }
+        }
+
+        public string Label()
+        {
+            _label = string.IsNullOrEmpty(_label) 
+                   ? $"{GetType().Name} [{EntityID}]" 
+                   : GetType().Name;
+
+            return _label;
+        }
+
+        #region Вспомогательные инструменты
+        /// <summary>
+        /// Комплексный (составной) идентификатор, используемый для поиска <see cref="Entity"/> в кэше
+        /// </summary>
+        public EntityCacheRecordKey EntityKey =>
+            _key ?? (_key = new EntityCacheRecordKey(EntityID, EntityIdType, EntityNameType));
+
+        private EntityCacheRecordKey _key;
+
+        /// <summary>
+        /// Функтор дополнительной проверки <seealso cref="Entity"/> 
+        /// на предмет нахождения в пределах области, заданной <see cref="InteractEntities.CustomRegionNames"/>
+        /// Использовать самомодифицирующийся предиката, т.к. предикат передается в <seealso cref="SearchCached.FindClosestEntity(EntityCacheRecordKey, Predicate{Entity})"/>
+        /// </summary>        
+        private Predicate<Entity> SpecialCheck
+        {
+            get
+            {
+                if (_specialCheck is null)
+                    _specialCheck = SearchHelper.Construct_EntityAttributePredicate(HealthCheck,
+                                                            ReactionRange,
+                                                            ReactionZRange > 0
+                                                                ? ReactionZRange
+                                                                : Astral.Controllers.Settings.Get.MaxElevationDifference,
+                                                            RegionCheck,
+                                                            Aura.IsMatch);
+                return _specialCheck;
+            }
+        }
+        private Predicate<Entity> _specialCheck;
+        #endregion
     }
 }

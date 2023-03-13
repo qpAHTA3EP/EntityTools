@@ -1,4 +1,6 @@
 ﻿using System;
+using MyNW.Classes;
+using MyNW.Internals;
 
 namespace EntityTools.Enums
 {
@@ -121,12 +123,21 @@ namespace EntityTools.Enums
         Middle
     }
 
+    /// <summary>
+    /// Логические правила для управления набором условий
+    /// </summary>
     [Serializable]
     public enum LogicRule
     {
+        /// <summary>
+        /// Конъюнкция - Логическое И
+        /// </summary>
         Conjunction,
+        /// <summary>
+        /// Дизъюнкция - Логическое ИЛИ
+        /// </summary>
         Disjunction
-    }
+    } 
 
     /// <summary>
     /// список команд для смены настроек бота
@@ -146,8 +157,8 @@ namespace EntityTools.Enums
     [Serializable]
     public enum EntityNameType
     {
-        NameUntranslated,
         InternalName,
+        NameUntranslated,
         Empty
     }
 
@@ -173,7 +184,7 @@ namespace EntityTools.Enums
     }
 
     /// <summary>
-    /// Переключатель множетв Entity в которых производится поиск
+    /// Переключатель множеств Entity в которых производится поиск
     /// </summary>
     [Serializable]
     public enum EntitySetType : uint
@@ -197,7 +208,7 @@ namespace EntityTools.Enums
         /// </summary>
         Contacts = 8,
         /// <summary>
-        /// Все Entity из EntityManager.GetEntities()
+        /// Все <seealso cref="Entity"/> из <seealso cref="EntityManager.GetEntities()"/>
         /// </summary>
         Complete = uint.MaxValue
     }

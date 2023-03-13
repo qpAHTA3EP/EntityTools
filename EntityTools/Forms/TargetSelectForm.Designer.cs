@@ -1,8 +1,4 @@
-﻿using DevExpress.XtraEditors;
-using System.Drawing;
-using System.Windows.Forms;
-
-namespace EntityTools.Editors.Forms
+﻿namespace EntityTools.Forms
 {
     partial class TargetSelectForm
     {
@@ -32,35 +28,50 @@ namespace EntityTools.Editors.Forms
         /// </summary>
         private void InitializeComponent()
         {
-            this.btnOK = new SimpleButton();
-            this.lblMessage = new LabelControl();
-            base.SuspendLayout();
-            this.btnOK.Location = new Point(105, 56);
-            this.btnOK.Name = "simpleButton1";
-            this.btnOK.Size = new Size(75, 23);
+            this.btnOK = new DevExpress.XtraEditors.SimpleButton();
+            this.lblMessage = new DevExpress.XtraEditors.LabelControl();
+            this.SuspendLayout();
+            // 
+            // btnOK
+            // 
+            this.btnOK.DialogResult = System.Windows.Forms.DialogResult.OK;
+            this.btnOK.Location = new System.Drawing.Point(107, 58);
+            this.btnOK.Name = "btnOK";
+            this.btnOK.PaintStyle = DevExpress.XtraEditors.Controls.PaintStyles.Light;
+            this.btnOK.Size = new System.Drawing.Size(75, 23);
             this.btnOK.TabIndex = 0;
             this.btnOK.Text = "OK (F12)";
-            this.btnOK.DialogResult = DialogResult.OK;
-            this.btnOK.Click += this.btnOK_Click;
+            // 
+            // lblMessage
+            // 
+            this.lblMessage.Appearance.Options.UseTextOptions = true;
             this.lblMessage.Appearance.TextOptions.HAlignment = DevExpress.Utils.HorzAlignment.Center;
             this.lblMessage.Appearance.TextOptions.VAlignment = DevExpress.Utils.VertAlignment.Center;
-            this.lblMessage.AutoSizeMode = LabelAutoSizeMode.None;
-            this.lblMessage.Location = new Point(7, 7);
-            this.lblMessage.Name = "message";
-            this.lblMessage.Size = new Size(269, 41);
+            this.lblMessage.Appearance.TextOptions.WordWrap = DevExpress.Utils.WordWrap.Wrap;
+            this.lblMessage.AutoSizeMode = DevExpress.XtraEditors.LabelAutoSizeMode.None;
+            this.lblMessage.Location = new System.Drawing.Point(12, 7);
+            this.lblMessage.Name = "lblMessage";
+            this.lblMessage.Size = new System.Drawing.Size(266, 41);
             this.lblMessage.TabIndex = 1;
             this.lblMessage.Text = "-";
-            base.AutoScaleDimensions = new SizeF(6f, 13f);
-            base.AutoScaleMode = AutoScaleMode.Font;
-            base.ClientSize = new Size(284, 83);
-            base.Controls.Add(this.lblMessage);
-            base.Controls.Add(this.btnOK);
-            base.FormBorderStyle = FormBorderStyle.FixedToolWindow;
-            base.Name = "MessageBoxSpc";
-            base.StartPosition = FormStartPosition.CenterParent;
+            // 
+            // TargetSelectForm
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ClientSize = new System.Drawing.Size(290, 93);
+            this.Controls.Add(this.lblMessage);
+            this.Controls.Add(this.btnOK);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.IconOptions.ShowIcon = false;
+            this.LookAndFeel.UseDefaultLookAndFeel = false;
+            this.Name = "TargetSelectForm";
+            this.ShowInTaskbar = false;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Message";
-            base.TopMost = true;
-            base.ResumeLayout(false);
+            this.TopMost = true;
+            this.ResumeLayout(false);
+
         }
 
         #endregion

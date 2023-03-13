@@ -1,37 +1,30 @@
-﻿using DevExpress.XtraBars.Navigation;
-using DevExpress.XtraEditors;
-using EntityTools.Enums;
-using EntityTools.Tools.CustomRegions;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
+using DevExpress.XtraBars.Navigation;
+using DevExpress.XtraEditors;
+using EntityTools.Enums;
+using EntityTools.Patches.Quester;
+using EntityTools.Tools.CustomRegions;
+using Infrastructure.Quester;
 
 namespace EntityTools.Forms
 {
     public partial class CustomRegionCollectionEditorForm : XtraForm
     {
-        //TODO: Если снять отметки со всех регионов, то возвращается старая коллекция
-        //TODO: Добавить кнопки: отмет все, снять все отметки, отметить все свободные, снять все отмеченные
+        //TODO: Добавить кнопки: отметить все, снять все отметки, отметить все свободные, снять все отмеченные
 
-        private static CustomRegionCollectionEditorForm @this = null;
-
-#if DataSource
-        /// <summary>
-        /// Список регионов
-        /// </summary>
-        BindingList<CustomRegionEntry> customRegions = new BindingList<CustomRegionEntry>();
-
-#endif
-        Action fillList;
+        private static CustomRegionCollectionEditorForm editor;
+        private BaseQuesterProfileProxy profile;
+        private CustomRegionCollection customRegionCollection;
 
         public CustomRegionCollectionEditorForm()
         {
             InitializeComponent();
 
             var culture = System.Globalization.CultureInfo.CurrentCulture;
-            if(culture.TwoLetterISOLanguageName != "ru")
+            if (culture.TwoLetterISOLanguageName != "ru")
             {
                 textUnion.Text = "Select several regions, which will form MERGE  of the regions. The character should be within any marked region, as well as within the INTERSECTION area (if preset). At this time, it is forbidden to be withing the EXCLUSION area.";
                 textIntersection.Text = "Select several regions, which will form INTERSECTION of the regions. The character should be within every marked region, as well as within the UNION region (if preset).At this time, it is forbidden to be withing the EXCLUSION area";
@@ -40,101 +33,65 @@ namespace EntityTools.Forms
         }
 
 
-        public static bool GUIRequiest(ref CustomRegionCollection crCollection)
+        public static bool RequestUser(ref CustomRegionCollection crCollection)
         {
-            if (@this == null || @this.IsDisposed)
-                @this = new CustomRegionCollectionEditorForm();
-            @this.tabPane.SelectedPage = @this.tabUnion;
+            if (editor == null || editor.IsDisposed)
+                editor = new CustomRegionCollectionEditorForm();
+            editor.tabPane.SelectedPage = editor.tabUnion;
 
             // Копирование исходной коллекции для возможности отказа от внесения изменений
-            var originalCrCollection = crCollection;
-            if (crCollection?.Count > 0)
-                @this.fillList = () =>
-                {
-                    var currentPage = @this.tabPane.SelectedPage;
-                    InclusionType inclusion = InclusionType.Ignore;
-                    if (currentPage == @this.tabUnion)
-                        inclusion = InclusionType.Union;
-                    else if (currentPage == @this.tabIntersection)
-                        inclusion = InclusionType.Intersection;
-                    else if (currentPage == @this.tabExclusion)
-                        inclusion = InclusionType.Exclusion;
-
-                    @this.crList.Items.Clear();
-
-                    foreach (var cr in Astral.Quester.API.CurrentProfile.CustomRegions)
-                    {
-                        if (originalCrCollection.TryGetValue(cr.Name, out CustomRegionEntry crEntry))
-                        {
-                            var checkState = CheckState.Unchecked;
-                            if (crEntry.Inclusion == inclusion)
-                                checkState = CheckState.Checked;
-                            else if (crEntry.Inclusion != InclusionType.Ignore)
-                                checkState = CheckState.Indeterminate;
-                            @this.crList.Items.Add(crEntry.Clone(), checkState);
-                        }
-                        // Удаление дубликатов из списка отображаемы CustomRegion'ов
-                        else if(@this.crList.Items.FirstOrDefault(item => ((CustomRegionEntry)item.Value).Name == cr.Name) is null)
-                            @this.crList.Items.Add(new CustomRegionEntry(cr.Name, InclusionType.Ignore), CheckState.Unchecked);
-                    }
-                };
-            else @this.fillList = () =>
+            editor.customRegionCollection = crCollection;
+            editor.profile = crCollection.DesignContext;
+            
+            if (editor.ShowDialog() == DialogResult.OK)
             {
-                @this.crList.Items.Clear();
-                foreach (var cr in Astral.Quester.API.CurrentProfile.CustomRegions)
-                {
-                    @this.crList.Items.Add(new CustomRegionEntry(cr.Name, InclusionType.Ignore), CheckState.Unchecked);
-                }
-            };
-
-            if (@this.ShowDialog() == DialogResult.OK)
-            {
-                var currentPage = @this.tabPane.SelectedPage;
-                InclusionType inclusion = InclusionType.Ignore;
-                if (currentPage == @this.tabUnion)
-                    inclusion = InclusionType.Union;
-                else if (currentPage == @this.tabIntersection)
-                    inclusion = InclusionType.Intersection;
-                if (currentPage == @this.tabExclusion)
-                    inclusion = InclusionType.Exclusion;
-
-                CustomRegionCollection newCrCollection = new CustomRegionCollection();
-
-
-                for (int i = 0; i < @this.crList.ItemCount; i++)
-                {
-                    var item = @this.crList.Items[i];
-                    if (item.Value is CustomRegionEntry crEntry)
-                    {
-                        // сохраняем тип включения
-                        switch (item.CheckState)
-                        {
-                            case CheckState.Checked:
-                                crEntry.Inclusion = inclusion;
-                                break;
-                            case CheckState.Unchecked:
-                                crEntry.Inclusion = InclusionType.Ignore;
-                                break;
-#if false
-                            case CheckState.Indeterminate:
-                                break; 
-#endif
-                        }
-
-                        if (crEntry.Inclusion != InclusionType.Ignore
-                            // Удаление дубликатов из списка добавляемых CustomRegion'ов
-                            && !newCrCollection.Contains(crEntry))
-                        {
-                            newCrCollection.Add(crEntry);
-                        }
-                    }
-                } 
-
-                @this.crList.Items.Clear();
-                crCollection = newCrCollection;
+                crCollection = MakeNewCustomRegionCollection();
                 return true;
             }
             return false;
+        }
+
+        private static CustomRegionCollection MakeNewCustomRegionCollection()
+        {
+            var currentPage = editor.tabPane.SelectedPage;
+            var inclusion = InclusionType.Ignore;
+            if (currentPage == editor.tabUnion)
+                inclusion = InclusionType.Union;
+            else if (currentPage == editor.tabIntersection)
+                inclusion = InclusionType.Intersection;
+            if (currentPage == editor.tabExclusion)
+                inclusion = InclusionType.Exclusion;
+
+            var newCrCollection = new CustomRegionCollection();
+
+            for (int i = 0; i < editor.crList.ItemCount; i++)
+            {
+                var item = editor.crList.Items[i];
+                if (item.Value is CustomRegionEntry crEntry)
+                {
+                    // сохраняем тип включения
+                    switch (item.CheckState)
+                    {
+                        case CheckState.Checked:
+                            crEntry.Inclusion = inclusion;
+                            break;
+                        case CheckState.Unchecked:
+                            crEntry.Inclusion = InclusionType.Ignore;
+                            break;
+                    }
+
+                    if (crEntry.Inclusion != InclusionType.Ignore
+                        // Удаление дубликатов из списка добавляемых CustomRegion'ов
+                        && !newCrCollection.Contains(crEntry))
+                    {
+                        newCrCollection.Add(crEntry);
+                    }
+                }
+            }
+
+            editor.crList.Items.Clear();
+            
+            return newCrCollection;
         }
 
         private void handler_Select(object sender, EventArgs e)
@@ -150,7 +107,32 @@ namespace EntityTools.Forms
         /// <param name="e"></param>
         private void handler_Reload(object sender, EventArgs e)
         {
-            fillList?.Invoke();
+            var currentPage = editor.tabPane.SelectedPage;
+            InclusionType inclusion = InclusionType.Ignore;
+            if (currentPage == editor.tabUnion)
+                inclusion = InclusionType.Union;
+            else if (currentPage == editor.tabIntersection)
+                inclusion = InclusionType.Intersection;
+            else if (currentPage == editor.tabExclusion)
+                inclusion = InclusionType.Exclusion;
+
+            editor.crList.Items.Clear();
+            var customRegions = profile.CustomRegions;
+            foreach (var cr in customRegions)
+            {
+                if (customRegionCollection.TryGetValue(cr.Name, out CustomRegionEntry crEntry))
+                {
+                    var checkState = CheckState.Unchecked;
+                    if (crEntry.Inclusion == inclusion)
+                        checkState = CheckState.Checked;
+                    else if (crEntry.Inclusion != InclusionType.Ignore)
+                        checkState = CheckState.Indeterminate;
+                    editor.crList.Items.Add(crEntry.Clone(), checkState);
+                }
+                // Удаление дубликатов из списка отображаемых CustomRegion'ов
+                else if (editor.crList.Items.FirstOrDefault(item => ((CustomRegionEntry)item.Value).Name == cr.Name) is null)
+                    editor.crList.Items.Add(new CustomRegionEntry(cr.Name, InclusionType.Ignore), CheckState.Unchecked);
+            }
         }
 
         private void handler_SelectedPageChanging(object sender, SelectedPageChangingEventArgs e)
@@ -199,9 +181,14 @@ namespace EntityTools.Forms
             } 
         }
 
-        private void handler_FormShown(object sender, EventArgs e)
+        private void handler_Mapper(object sender, EventArgs e)
         {
-            fillList?.Invoke();
+            ComplexPatch_Mapper.OpenMapper(profile);
+        }
+
+        private void handler_HelpRequested(object sender, HelpEventArgs hlpevent)
+        {
+            Process.Start(@"https://qpahta3ep.github.io/EntityToolsDocs/General/CustomRegionSet-RU.html");
         }
     }
 }

@@ -8,13 +8,13 @@ namespace EntityTools
     public class EntityToolsSettings
     {
         /// <summary>
-        /// Настройки UnstuckSpellTask
+        /// Настройки SpellStuckMonitor
         /// </summary>
-        [Description("Настройки фонового отключения умений (UnstuckSpell)")]
+        [Description("Настройки фонового отключения умений (SpellStuckMonitor)")]
+        [DisplayName("SpellStuckMonitor")]
         [TypeConverter(typeof(ExpandableObjectConverter))]
         public UnstuckSpellsSettings UnstuckSpells { get; set; } = new UnstuckSpellsSettings();
 
-#if DEVELOPER
         /// <summary>
         /// Настройки Mapper'a
         /// </summary>
@@ -22,7 +22,6 @@ namespace EntityTools
         [TypeConverter(typeof(ExpandableObjectConverter))]
         public MapperSettings Mapper { get; set; } = new MapperSettings();
 
-#endif
         /// <summary>
         /// Настройки EntityToolsLogger
         /// </summary>
@@ -57,6 +56,16 @@ namespace EntityTools
         [Description("Настройки монитора миссий")]
         [TypeConverter(typeof(ExpandableObjectConverter))]
         public MissionMonitorSettings MissionMonitor { get; set; } = new MissionMonitorSettings();
+
+#if false
+        /// <summary>
+        /// Настройки предобработки Quester-профиля <see cref="PreprocessingSettings"/>
+        /// </summary>
+        [Description("Настройки предобработки quester-профиля")]
+        [TypeConverter(typeof(ExpandableObjectConverter))]
+        public PreprocessingSettings QuesterProfilePreprocessing { get; set; } = new PreprocessingSettings(); 
+#endif
+
 
 #if false
         #region Сериализация/десериализация статических полей класса статического класса

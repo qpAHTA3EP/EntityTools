@@ -1,195 +1,124 @@
-﻿//#define Test_EntitySelectForm
-//#define DUMP_TEST
-
-using AcTp0Tools;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
+using System.IO.Compression;
+using System.Reflection;
+using System.Text;
+using System.Threading;
+using System.Windows.Forms;
+using System.Xml.Serialization;
+using Infrastructure;
+using Infrastructure.Quester;
+using Infrastructure.Patches;
 using Astral;
 using Astral.Classes.ItemFilter;
 using Astral.Controllers;
 using Astral.Forms;
 using Astral.Logic.Classes.FSM;
+using Astral.Logic.NW;
 using DevExpress.XtraEditors;
 using DevExpress.XtraEditors.Controls;
+using EntityTools.Core.Interfaces;
 using EntityTools.Enums;
 using EntityTools.Forms;
-using EntityTools.Patches.UCC;
 using EntityTools.Services;
+using EntityTools.Servises.SlideMonitor;
 using EntityTools.Tools;
-using MyNW.Classes;
+using EntityTools.Tools.Entities;
+using EntityTools.Tools.Export;
+using EntityTools.Tools.Powers;
+using EntityTools.UCC.Editor;
+using Microsoft.Win32;
 using MyNW.Internals;
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Text;
-using System.Threading;
-using System.Windows.Forms;
-using System.Xml.Serialization;
 using API = Astral.Quester.API;
-using Memory = MyNW.Memory;
+using QuesterEditor = EntityTools.Quester.Editor.QuesterEditor;
 using Task = System.Threading.Tasks.Task;
 
 namespace EntityTools.Core
 {
-    public partial class EntityToolsMainPanel : /* UserControl //*/ BasePanel
+    public partial class EntityToolsMainPanel : BasePanel
     {
         //TODO: Отображать метрики EntityCache и AStar
         public EntityToolsMainPanel() : base("Entity Tools")
         {
             InitializeComponent();
 
-            cbxExportSelector.DataSource = Enum.GetValues(typeof(ExportTypes));
+            var assemblyInfo = Assembly.GetExecutingAssembly().GetName();
+            lblVersion.Text = $"{assemblyInfo.Name} v.{assemblyInfo.Version}";
+
+            cbxExportSelector.Properties.Items.AddRange(Enum.GetValues(typeof(ExportTypes)));
+            cbxExportSelector.SelectedIndex = 0;
 
             ckbSpellStuckMonitor.DataBindings.Add(nameof(ckbSpellStuckMonitor.Checked),
-                                                EntityTools.Config.UnstuckSpells,
-                                                nameof(EntityTools.Config.UnstuckSpells.Active),
-                                                false, DataSourceUpdateMode.OnPropertyChanged);
+                EntityTools.Config.UnstuckSpells,
+                nameof(EntityTools.Config.UnstuckSpells.Active),
+                false, DataSourceUpdateMode.OnPropertyChanged);
 
-#if DEVELOPER
             // Настройки Mapper'a
             ckbMapperPatch.DataBindings.Add(nameof(ckbMapperPatch.Checked),
-                                                EntityTools.Config.Mapper,
-                                                nameof(EntityTools.Config.Mapper.Patch),
-                                                false, DataSourceUpdateMode.OnPropertyChanged);
+                EntityTools.Config.Mapper,
+                nameof(EntityTools.Config.Mapper.Patch),
+                false, DataSourceUpdateMode.OnPropertyChanged);
 
-#if false
-            seMapperWaipointDistance.DataBindings.Add(nameof(seMapperWaipointDistance.Value),
-                                        EntityTools.Config.Mapper,
-                                        nameof(EntityTools.Config.Mapper.WaypointDistance),
-                                        false, DataSourceUpdateMode.OnPropertyChanged);
-            seMapperMaxZDif.DataBindings.Add(nameof(seMapperMaxZDif.Value),
-                                                EntityTools.Config.Mapper,
-                                                nameof(EntityTools.Config.Mapper.MaxElevationDifference),
-                                                false, DataSourceUpdateMode.OnPropertyChanged);
-            seWaypointEquivalenceDistance.DataBindings.Add(nameof(seWaypointEquivalenceDistance.Value),
-                                                EntityTools.Config.Mapper,
-                                                nameof(EntityTools.Config.Mapper.WaypointEquivalenceDistance),
-                                                false, DataSourceUpdateMode.OnPropertyChanged);
-
-            ckbMapperForceLinkingWaypoint.DataBindings.Add(nameof(ckbMapperForceLinkingWaypoint.Checked),
-                                                EntityTools.Config.Mapper,
-                                                nameof(EntityTools.Config.Mapper.ForceLinkingWaypoint),
-                                                false, DataSourceUpdateMode.OnPropertyChanged);
-            ckbMapperLinearPath.DataBindings.Add(nameof(ckbMapperLinearPath.Checked),
-                                                EntityTools.Config.Mapper,
-                                                nameof(EntityTools.Config.Mapper.LinearPath),
-                                                false, DataSourceUpdateMode.OnPropertyChanged); 
-#endif
-
-#if false
-            // Настройки EntityToolsLogger
-            ckbEnableLogger.DataBindings.Add(nameof(ckbEnableLogger.Checked),
-                                                EntityTools.Config.Logger,
-                                                nameof(EntityTools.Config.Logger.Active),
-                                                false, DataSourceUpdateMode.OnPropertyChanged);
-            ckbExtendedActionDebugInfo.DataBindings.Add(nameof(ckbExtendedActionDebugInfo.Checked),
-                                                EntityTools.Config.Logger,
-                                                nameof(EntityTools.Config.Logger.ExtendedActionDebugInfo),
-                                                false, DataSourceUpdateMode.OnPropertyChanged);
-#else
             ckbETLogger.DataBindings.Add(nameof(ckbETLogger.Checked),
-                                            EntityTools.Config.Logger,
-                                            nameof(EntityTools.Config.Logger.Active),
-                                            false, DataSourceUpdateMode.OnPropertyChanged);
-#endif
+                EntityTools.Config.Logger,
+                nameof(EntityTools.Config.Logger.Active),
+                false, DataSourceUpdateMode.OnPropertyChanged);
+
+            #region QuesterProfilePreprocessing
+            ckbEnapleQuesterProfilePreprocessing.DataBindings.Add(nameof(ckbEnapleQuesterProfilePreprocessing.Checked),
+                    QuesterHelper.Preprocessor,
+                    nameof(QuesterHelper.Preprocessor.Active),
+                    false, DataSourceUpdateMode.OnPropertyChanged);
+
+            ckbAutoSavePreprocessedProfile.DataBindings.Add(nameof(ckbAutoSavePreprocessedProfile.Checked),
+                QuesterHelper.Preprocessor,
+                nameof(QuesterHelper.Preprocessor.AutoSave),
+                false, DataSourceUpdateMode.OnPropertyChanged);
+
+            ckbAutoSavePreprocessedProfile.DataBindings.Add(nameof(ckbAutoSavePreprocessedProfile.Enabled),
+                QuesterHelper.Preprocessor,
+                nameof(QuesterHelper.Preprocessor.Active),
+                false, DataSourceUpdateMode.OnPropertyChanged);
 
 
+            gridReplacements.DataSource = QuesterHelper.Preprocessor.Replacement;
 
-#if false
-            // Настройки EntityCache
-            editGlobalCacheTime.DataBindings.Add(nameof(editGlobalCacheTime.Value),
-                                                EntityTools.Config.EntityCache,
-                                                nameof(EntityTools.Config.EntityCache.GlobalCacheTime),
-                                                false, DataSourceUpdateMode.OnPropertyChanged);
-            editLocalCacheTime.DataBindings.Add(nameof(editLocalCacheTime.Value),
-                                                EntityTools.Config.EntityCache,
-                                                nameof(EntityTools.Config.EntityCache.LocalCacheTime),
-                                                false, DataSourceUpdateMode.OnPropertyChanged);
-            editCombatCacheTime.DataBindings.Add(nameof(editCombatCacheTime.Value),
-                                                EntityTools.Config.EntityCache,
-                                                nameof(EntityTools.Config.EntityCache.CombatCacheTime),
-                                                false, DataSourceUpdateMode.OnPropertyChanged);
-
-            // Настройки SlideMonitor
-            cbxSlideMonitor.DataSource = Enum.GetValues(typeof(SlideMonitorState));
-
-            cbxSlideMonitor.DataBindings.Add(nameof(cbxSlideMonitor.SelectedItem),
-                                             EntityTools.Config.SlideMonitor,
-                                             nameof(EntityTools.Config.SlideMonitor.State),
-                                             false, DataSourceUpdateMode.OnPropertyChanged);
-
-            editSlideTimeout.DataBindings.Add(nameof(editSlideTimeout.Value),
-                                                EntityTools.Config.SlideMonitor,
-                                                nameof(EntityTools.Config.SlideMonitor.Timeout),
-                                                false, DataSourceUpdateMode.OnPropertyChanged);
-
-            editSlideFilter.DataBindings.Add(nameof(editSlideFilter.Value),
-                                                EntityTools.Config.SlideMonitor,
-                                                nameof(EntityTools.Config.SlideMonitor.BoatFilter),
-                                                false, DataSourceUpdateMode.OnPropertyChanged); 
-#endif
-
-
-#else
-            btnEntities.Visible = false;
-            btnAuraViewer.Visible = false;
-            btnUiViewer.Visible = false;
-
-            tabOptions.PageVisible = false;
-            tabRelogger.PageVisible = false;
-            tabMapper.PageVisible = false;
-            tabDebug.PageVisible = false;
-#endif
+            gridReplacements.DataBindings.Add(nameof(gridReplacements.Enabled),
+                QuesterHelper.Preprocessor,
+                nameof(QuesterHelper.Preprocessor.Active),
+                false, DataSourceUpdateMode.OnPropertyChanged);
+            #endregion
 
             pgConfigs.SelectedObject = EntityTools.Config;
+
+#if DEBUG
+            tabDebug.PageVisible = true;
+            tabDebug.PageEnabled = true;
+#else
+            tabDebug.PageVisible = false;
+            tabDebug.PageEnabled = false;
+#endif
         }
 
         private void handler_Test_1(object sender, EventArgs e)
         {
-#if false
-            var tester = new SimplePropertyAccessTester();
-            var result = tester.Test();
-
-            XtraMessageBox.Show(result);  
-#endif
-            var sw = new Stopwatch();
-            sw.Start();
-            for (int i = 0; i < 1_000_000; i++)
-            {
-                var g = AstralAccessors.Quester.Core.Meshes;
-            }
-            sw.Stop();
-
-#if false
-            XtraMessageBox.Show(
-                    $"1'000'000 reads of the property 'Astral.Quester.Core.Meshes'\n" +
-                        $"at the map '{EntityManager.LocalPlayer.MapAndRegion}'\n" +
-                        $"using StaticPropertyAccessor<Graph>:\n" +
-                        $"{sw.ElapsedMilliseconds,8} ms {sw.ElapsedTicks,10} ticks"); 
-#else
-            XtraMessageBox.Show(
-                $"1'000'000 reads of the property 'Astral.Quester.Core.Meshes'\n" +
-                $"at the map '{EntityManager.LocalPlayer.MapAndRegion}'\n" +
-                $"using Harmony patches:\n" +
-                $"{sw.ElapsedMilliseconds,8} ms {sw.ElapsedTicks,10} ticks");
-#endif
         }
 
         private void handler_Test_2(object sender, EventArgs e)
         {
-#if false
-            QuesterAssistantAccessors.Classes.Monitoring.Frames.Sleep(1000); 
-#else
-            var info = AstralAccessors.Logic.NW.Combats.AbortCombatCondition_DebugInfo();
-            XtraMessageBox.Show(info);
-#endif
-
         }
+
         private void handler_Test_3(object sender, EventArgs e)
         {
-#if false
-            var tester = new StaticMethodPatchTester();
-            var result = tester.Test();
-            XtraMessageBox.Show(result); 
-#endif
+        }
+        private static readonly List<TypeDescriptionProvider> descriptorProvider = new List<TypeDescriptionProvider>();
+
+        private void handler_Test_4(object sender, EventArgs e)
+        {
+            int hash = "str".GetHashCode();
         }
 
         private void handler_SpellStuckMonitorActivation(object sender, EventArgs e)
@@ -206,87 +135,81 @@ namespace EntityTools.Core
 
         private void handler_OpenUiViewer(object sender, EventArgs e)
         {
-#if DEVELOPER
-            string uiGenId = string.Empty;
-            EntityTools.Core.GUIRequest_UIGenId(ref uiGenId);
+            string uiGenId = UIViewer.GUIRequest(string.Empty);
             if(!string.IsNullOrEmpty(uiGenId))
                 Clipboard.SetText(uiGenId);
-#endif
         }
 
         private void handler_OpenEntitiesViewer(object sender, EventArgs e)
         {
-#if DEVELOPER
             string pattern = string.Empty;
             EntityNameType nameType = EntityNameType.InternalName;
             ItemFilterStringType strMatch = ItemFilterStringType.Simple;
-            EntityTools.Core.GUIRequest_EntityId(ref pattern, ref strMatch, ref nameType);
+            EntityViewer.GUIRequest(ref pattern, ref strMatch, ref nameType);
             if (!string.IsNullOrEmpty(pattern))
                 Clipboard.SetText(pattern);
-#endif
         }
 
         private void handler_OpenMissionMonitor(object sender, EventArgs e)
         {
-#if DEVELOPER
-#if false
-            var missMonitor = new MissionMonitorForm2();
-            missMonitor.Show();  
-#else
             var missMonitor = new MissionMonitorForm();
             missMonitor.Show();
-#endif
-#endif
         }
 
         private void handler_OpenAuraViewer(object sender, EventArgs e)
         {
-#if DEVELOPER
-            string auraId = string.Empty;
-            EntityTools.Core.GUIRequest_AuraId(ref auraId);
+            string auraId = AuraViewer.GUIRequest();
             if (!string.IsNullOrEmpty(auraId))
                 Clipboard.SetText(auraId);
-#endif
-        }
-
-        private void handler_GetMachineId(object sender, EventArgs e)
-        {
-            var machineid = Memory.MMemory.ReadString(Memory.BaseAdress + 0x2640BD0, Encoding.UTF8, 64);
-            lblAccount.Text = $@"Account:   @{EntityManager.LocalPlayer.AccountLoginUsername}";
-            tbMashingId.Text = machineid;
         }
 
         private void handler_ChangeExportingFileName(object sender, ButtonPressedEventArgs e)
         {
             if (cbxExportSelector.SelectedItem is ExportTypes expType)
             {
-                string fileName;
-                if (string.IsNullOrEmpty(tbExportFileSelector.Text))
+                switch (e.Button.Kind)
                 {
-                    fileName = Path.Combine(Directories.LogsPath, expType.ToString(), FileTools.DefaultExportFileName);
-                    fileName = fileName.Replace(Directories.AstralStartupPath, @".\");
+                    case ButtonPredefines.Undo:
+                    {
+                        string fileName = Path.Combine(Directories.LogsPath, expType.ToString(), FileTools.DefaultExportFileName);
+                        fileName = fileName.Replace(Directories.AstralStartupPath, ".");
+                        tbExportFileSelector.Text = fileName;
+                        break;
+                    }
+                    case ButtonPredefines.Ellipsis:
+                    {
+                        string fileName;
+                        if (string.IsNullOrEmpty(tbExportFileSelector.Text))
+                        {
+                            fileName = Path.Combine(Directories.LogsPath, expType.ToString(), FileTools.DefaultExportFileName);
+                            fileName = fileName.Replace(Directories.AstralStartupPath, ".");
+                        }
+                        else fileName = tbExportFileSelector.Text;
+
+                        string directory = Path.GetDirectoryName(fileName);
+                        if (!string.IsNullOrEmpty(directory)
+                            && !Directory.Exists(directory))
+                            Directory.CreateDirectory(directory);
+                        dlgSaveFile.InitialDirectory = directory;
+
+                        dlgSaveFile.FileName = fileName;
+                        if (dlgSaveFile.ShowDialog() == DialogResult.OK)
+                            tbExportFileSelector.Text = dlgSaveFile.FileName;
+                        break;
+                    }
                 }
-                else fileName = tbExportFileSelector.Text;
-
-                string directory = Path.GetDirectoryName(fileName);
-                if (!Directory.Exists(fileName))
-                    Directory.CreateDirectory(directory);
-                dlgSaveFile.InitialDirectory = directory;
-
-                dlgSaveFile.FileName = fileName;
-                if (dlgSaveFile.ShowDialog() == DialogResult.OK)
-                    tbExportFileSelector.Text = dlgSaveFile.FileName;
             }
         }
 
         private void handler_ChangeExportingData(object sender, EventArgs e)
         {
-            if (cbxExportSelector.SelectedItem is ExportTypes expType)
+            if (sender == cbxExportSelector
+                && cbxExportSelector.SelectedItem is ExportTypes expType)
             {
-                string fileName;
-                fileName = Path.Combine(Directories.LogsPath, expType.ToString(), FileTools.DefaultExportFileName);
-                fileName = fileName.Replace(Directories.AstralStartupPath, @".\");
+                string fileName = Path.Combine(Directories.LogsPath, expType.ToString(), FileTools.DefaultExportFileName);
+                fileName = fileName.Replace(Directories.AstralStartupPath, ".");
                 tbExportFileSelector.Text = fileName;
+                cbxExportSelector.SelectedItem = expType;
             }
         }
 
@@ -296,7 +219,7 @@ namespace EntityTools.Core
             {
 
                 string fileName = Path.Combine(Directories.LogsPath, expType.ToString(), FileTools.DefaultExportFileName);
-                fileName = fileName.Replace(Directories.AstralStartupPath, @".\");
+                fileName = fileName.Replace(Directories.AstralStartupPath, ".");
                 tbExportFileSelector.Text = fileName;
             }
         }
@@ -310,9 +233,9 @@ namespace EntityTools.Core
                 if (string.IsNullOrEmpty(fullFileName) || fullFileName.IndexOfAny(Path.GetInvalidPathChars()) != -1)
                 {
                     fullFileName = Path.Combine(Directories.LogsPath, expType.ToString(), FileTools.ReplaceMask(FileTools.DefaultExportFileName));
-                    MessageBox.Show("The specified filename is incorrect.\n" +
-                                    $"{expType} will be saved in the file:\n" +
-                                    fullFileName, "Caution!", MessageBoxButtons.OK);
+                    XtraMessageBox.Show("The specified filename is incorrect.\n" +
+                                        $"{expType} will be saved in the file:\n" +
+                                        fullFileName, "Caution!", MessageBoxButtons.OK);
                 }
 
                 var dirName = Path.GetDirectoryName(fullFileName);
@@ -323,9 +246,9 @@ namespace EntityTools.Core
                 {
                     case ExportTypes.Auras:
                         {
-                            AurasWrapper auras = new AurasWrapper(EntityManager.LocalPlayer.Character);
+                            var auras = new AurasWrapper(EntityManager.LocalPlayer.Character);
 
-                            var serializer = new XmlSerializer(typeof(AurasWrapper));
+                            var serializer = new XmlSerializer(auras.GetType());
                             using (var fileStream = new StreamWriter(fullFileName))
                                 serializer.Serialize(fileStream, auras);
                             break;
@@ -334,16 +257,16 @@ namespace EntityTools.Core
                         {
                             var interfaces = new InterfaceWrapper();
 
-                            var serializer = new XmlSerializer(typeof(InterfaceWrapper));
+                            var serializer = new XmlSerializer(interfaces.GetType());
                             using (var fileStream = new StreamWriter(fullFileName))
                                 serializer.Serialize(fileStream, interfaces);
                             break;
                         }
                     case ExportTypes.Missions:
                         {
-                            MissionsWrapper missions = new MissionsWrapper(EntityManager.LocalPlayer);
+                            var missions = new MissionsWrapper(EntityManager.LocalPlayer);
 
-                            var serializer = new XmlSerializer(typeof(MissionsWrapper));
+                            var serializer = new XmlSerializer(missions.GetType());
                             using (var fileStream = new StreamWriter(fullFileName))
                                 serializer.Serialize(fileStream, missions);
                             break;
@@ -363,10 +286,22 @@ namespace EntityTools.Core
                             }
                             break;
                         }
+                    case ExportTypes.Powers:
+                    {
+                        var powers = new PowersWrapper();
+
+                        var serializer = new XmlSerializer(powers.GetType());
+                        using (var fileStream = new StreamWriter(fullFileName))
+                            serializer.Serialize(fileStream, powers);
+                        break;
+                    }
                 }
 
-                if (MessageBox.Show(this, $"Would you like to open {Path.GetFileName(fullFileName)}?", $"Open {Path.GetFileName(fullFileName)}?", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                if (XtraMessageBox.Show(this, $"Would you like to open {Path.GetFileName(fullFileName)}?",
+                    $"Open {Path.GetFileName(fullFileName)}?", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                {
                     Process.Start(fullFileName);
+                }
             }
         }
 
@@ -382,48 +317,37 @@ namespace EntityTools.Core
             if(File.Exists(ETLogger.LogFilePath))
                 Process.Start(ETLogger.LogFilePath);
         }
-
-        private void handler_Validate(object sender, EventArgs e)
-        {
-            if (EntityTools.Core.CheckCore())
-            {
-
-                XtraMessageBox.Show($"EntityToolsCore is VALID!\n\rCore hash: {EntityTools.CoreHash}");
-                Logger.WriteLine($"EntityToolsCore is VALID! Core hash: {EntityTools.CoreHash}");
-            }
-            else
-            {
-                XtraMessageBox.Show("EntityToolsCore is INVALID!",//\n\rCore hash: {EntityTools.CoreHash}", 
-                                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                Logger.WriteLine($"EntityToolsCore is INVALID!\n\r");
-            }
-        }
-
+        
         private void handler_DebugMonitorActivate(object sender, EventArgs e)
         {
-#if DEVELOPER
-#if true
+#if BLAttackersListMonitor
+            if (ckbDebugMonitor.Checked && BLAttackersList != null)
+                backgroundWorker.RunWorkerAsync();
+            else backgroundWorker.CancelAsync(); 
+#elif true
             if (ckbDebugMonitor.Checked)
-                Patch_Logic_UCC_Classes_ActionsPlayer_CheckAlly.MostInjuredAllyChanged = ShowMostInjuredAlly;
-            else Patch_Logic_UCC_Classes_ActionsPlayer_CheckAlly.MostInjuredAllyChanged = null; 
-#else
-
-#endif
+                backgroundWorker.RunWorkerAsync();
+            else backgroundWorker.CancelAsync();
 #endif
         }
 
-        private void ShowMostInjuredAlly(Entity entity)
+        private void work_PowerSearch(object sender, System.ComponentModel.DoWorkEventArgs e)
         {
-            string info = string.Empty;
-            if(entity != null)
+            IPowerCache powCache = new PowerCache("M19_Instance_Fpower_Summon_Lulu");
+
+            tbDebugMonitorInfo.Text = $"[{DateTime.Now:HH:mm:ss.ffff}] Start searching the power 'M19_Instance_Fpower_Summon_Lulu'\n";
+            while (!backgroundWorker.CancellationPending)
             {
-                info = string.Concat("MostInjuredAlly: ", entity.DebugName, Environment.NewLine, 
-                    "--------------------------------------", Environment.NewLine,
-                    '\t', nameof(entity.IsPlayer), '=', entity.IsPlayer, Environment.NewLine,
-                    '\t', nameof(entity.CombatDistance3), '=', entity.CombatDistance3, Environment.NewLine,
-                    '\t', nameof(entity.Character.AttribsBasic.HealthPercent), '=', entity.Character.AttribsBasic.HealthPercent);
-            }
-            tbDebugMonitorInfo.Text = info;
+                var power = powCache.GetPower();
+
+                string info = string.Concat('[', DateTime.Now.ToString("HH:mm:ss.ffff"), "] Power ",
+                    power != null && power.IsValid
+                        ? power.PowerDef.FullDisplayName + "[Slot=" + power.GetTraySlot() + ", Id=" + power.PowerId + "]"
+                        : "not found", Environment.NewLine);
+                tbDebugMonitorInfo.AppendText(info);
+
+                Thread.Sleep(550);
+            } 
         }
 
         private void handler_Up(object sender, EventArgs e)
@@ -497,6 +421,288 @@ namespace EntityTools.Core
         private void handler_SaveSettings(object sender, EventArgs e)
         {
             EntityTools.SaveSettings();
+        }
+
+        private void handler_GetMachineId(object sender, EventArgs e)
+        {
+            using (var crypticCoreKey = Registry.CurrentUser.OpenSubKey(@"Software\Cryptic\Core"))
+            {
+                if (crypticCoreKey != null)
+                {
+                    var machineId = crypticCoreKey.GetValue("machineId");
+                    tbMashineId.Text = machineId.ToString();
+                }
+            }
+            using (var crypticLauncherKey = Registry.CurrentUser.OpenSubKey(@"Software\Cryptic\Cryptic Launcher"))
+            {
+                if (crypticLauncherKey != null)
+                {
+                    var userName = crypticLauncherKey.GetValue("UserName");
+                    lblAccount.Text = userName.ToString();
+                }
+            }
+        }
+
+        private void handler_SetMachineId(object sender, EventArgs e)
+        {
+
+        }
+
+        private void handler_OpenCredentialManager(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void handler_TeamMonitor(object sender, EventArgs e)
+        {
+            ObjectInfoForm.Show(new PlayerTeamHelper.Monitor());
+        }
+
+        private void handler_AddProcessingItem(object sender, EventArgs e)
+        {
+            var item = new QuesterHelper.ReplacementItem();
+            QuesterHelper.Preprocessor.Replacement.Add(item);
+        }
+
+        private void handler_DeleteProcessingItem(object sender, EventArgs e)
+        {
+            gridViewPreprocessing.DeleteSelectedRows(); 
+        }
+
+        private void handler_ClearProcessingItems(object sender, EventArgs e)
+        {
+            if (XtraMessageBox.Show($"Are you sure to to delete all items ?",
+                                    "Clear Items", MessageBoxButtons.YesNo) ==
+                DialogResult.Yes)
+            {
+                QuesterHelper.Preprocessor.Replacement.Clear();
+            }
+        }
+
+        private void handler_TestProcessingItem(object sender, EventArgs e)
+        {
+            var replacement = QuesterHelper.Preprocessor.Replacement;
+
+            if(replacement.Count == 0)
+                return;
+
+            OpenFileDialog openDialog = Infrastructure.Classes.FileTools.GetOpenDialog( filter: @"Astral mission profile (*.amp.zip)|*.amp.zip",
+                                                                                    defaultExtension: "amp.zip",
+                                                                                    initialDir: Directories.ProfilesPath );
+
+            if (openDialog.ShowDialog() != DialogResult.OK)
+                return;
+
+            var profilePath = openDialog.FileName;
+
+            using (var zipFile = ZipFile.Open(profilePath, ZipArchiveMode.Read))
+            {
+                try
+                {
+                    ZipArchiveEntry zipProfileEntry = zipFile.GetEntry("profile.xml");
+                    if (zipProfileEntry is null)
+                    {
+                        Astral.Logger.Notify($"File '{Path.GetFileName(profilePath)}' does not contain 'profile.xml'");
+                        return;
+                    }
+
+                    using (var stream = zipProfileEntry.Open())
+                    {
+                        ACTP0Serializer.GetExtraTypes(out List<Type> types, 2);
+
+                        int lineNum = -1;
+                        int matchNum = 0;
+                        var report = new StringBuilder($"Reading profile {profilePath}\n");
+                        var modifiedProfile = new StringBuilder();
+
+                        using (var reader = new StreamReader(stream))
+                        {
+                            string inLine;
+                            while ((inLine = reader.ReadLine()) != null)
+                            {
+                                var line = inLine;
+                                lineNum++;
+                                int lineChanges = 0;
+                                foreach (var item in replacement)
+                                {
+                                    if (item.Replace(line, out string outStr))
+                                    {
+                                        matchNum++;
+                                        lineChanges++;
+                                        line = outStr;
+                                    }
+                                }
+
+                                if (lineChanges > 0)
+                                {
+                                    report.AppendFormat("[{0:########}] line '{1}'\n", lineNum, inLine.Trim());
+                                    report.Append("\t=> '").Append(line.Trim()).AppendLine("'");
+                                }
+
+                                modifiedProfile.AppendLine(inLine);
+                            }
+                        }
+                        if (matchNum > 0)
+                        {
+                            report.Append(matchNum).AppendLine(" modifications are done");
+
+                            var reportPath = (profilePath.EndsWith(".amp.zip")
+                                                   ? profilePath.Substring(0, profilePath.Length - 8)
+                                                   : profilePath)
+                                + DateTime.Now.ToString(@"_yyyy-MM-dd_HH-mm\.\l\o\g");
+
+                            File.WriteAllText(reportPath, report.ToString());
+
+                            if (XtraMessageBox.Show($"There are {matchNum} modifications in the profile '{Path.GetFileName(profilePath)}'.\n" +
+                                                    "Would you like to open detail report", "Preprocessing result", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                            {
+                                if (File.Exists(reportPath))
+                                {
+                                    Process.Start(reportPath);
+                                } 
+                            }
+                        }
+                    }
+                }
+                catch (ThreadAbortException)
+                {
+                }
+                catch (Exception ex)
+                {
+                    Logger.Notify(ex.ToString(), true);
+                    //XtraMessageBox.Show(ex.ToString());
+                }
+            }
+        }
+
+        private void handler_Help(object sender, EventArgs e)
+        {
+            XtraMessageBox.Show("Пример:\n" +
+                                "\tType := Regex\n" +
+                                "\tPattern := \\bAdventuring(?!Hands|Trousers|Rings)(?<name>\\w+)\\b\n" +
+                                "\tReplacement := ${name}\n" +
+                                "Регулярное выражение \"Pattern\" интерпретируется следующим образом:\n" +
+                                "Алфавитно цифровая последовательность должна начинаться словом \"Adventuring\",\n" +
+                                "при этом ему должен предшествовать любой символ не относящийся к алфавитно-цифровым.\n" +
+                                "Следом не должны встречаться подстроки \"Hands\", \"Trousers\" или \"Rings\" (без пробелов или иных разделителе).\n" +
+                                "\n" +
+                                "Последовательность должна заканчивается группой из одного и более алфавитно-цифровых символов \"\\w+\",\n" +
+                                "которой присваивается имя 'name'. Эта группа будет использоваться при формировании новой строки.\n" +
+                                "\n" +
+                                "Выражение подстановки \"${name}\" при обработке будет заменено на захваченную именованную группу символов \"name\"\n" +
+                                "\n" +
+                                "Таким образом, выражение \"AdventuringHead\" будет преобразовано в \"Head\",\n" +
+                                "тогда как выражение \"AdventuringTrousers\" останется неизменным, поскольку содержит запрещенную подстроку \"Trousers\"",
+                                "Пример", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void handler_ExportPreprocessingProfile(object sender, EventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                InitialDirectory = Directories.SettingsPath,
+                DefaultExt = "xml",
+                Filter = "Replacements (*.xml)|*.xml",
+                FileName = "Replacements.xml"
+            };
+
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                var items = QuesterHelper.Preprocessor.Replacement;
+                XmlSerializer serializer = new XmlSerializer(items.GetType());
+                using (FileStream file = File.Create(saveFileDialog.FileName))
+                {
+                    serializer.Serialize(file, items);
+                }
+            }
+        }
+
+        private void handler_ImportPreprocessingProfile(object sender, EventArgs e)
+        {
+            OpenFileDialog openDialog = Infrastructure.Classes.FileTools.GetOpenDialog(filter: "Replacements (*.xml)|*.xml",
+                                                                                   defaultExtension: "xml",
+                                                                                   initialDir: Directories.SettingsPath);
+                
+            if (openDialog.ShowDialog() == DialogResult.OK)
+            {
+                List<QuesterHelper.ReplacementItem> items = null;
+
+                XmlSerializer serialiser = new XmlSerializer(typeof(List<QuesterHelper.ReplacementItem>));
+                using (StreamReader fileStream = new StreamReader(openDialog.FileName))
+                {
+                    if (serialiser.Deserialize(fileStream) is List<QuesterHelper.ReplacementItem> list)
+                    {
+                        items = list;
+                    }
+                }
+                if (items?.Count > 0)
+                {
+                    var replacements = QuesterHelper.Preprocessor.Replacement;
+                    gridReplacements.BeginUpdate();
+                    if (replacements.Count > 0)
+                    {
+                        switch (XtraMessageBox.Show($"The 'Preprocessing List' has {replacements.Count} items.\n" +
+                                                    $"\tPress 'Yes' to add item to the existing list\n" +
+                                                    $"\tPress 'No' to replace they.", "Import Preprocessing List", MessageBoxButtons.YesNoCancel))
+                        {
+                            case DialogResult.Yes: // Добавление к существующему списку
+                                foreach (var item in items)
+                                    replacements.Add(item);
+                                return;
+                            case DialogResult.No: // Замена существующего списка
+                                replacements.Clear();
+                                foreach (var item in items)
+                                    if(!replacements.Contains(item))
+                                        replacements.Add(item);
+                                return;
+                            default:
+                                return;
+                        }
+                    }
+
+                    foreach (var item in items)
+                        if (!replacements.Contains(item))
+                            replacements.Add(item);
+                    gridReplacements.EndUpdate();
+                }
+                else
+                {
+                    XtraMessageBox.Show("Empty or file opening error.");
+                }
+            }
+        }
+
+        private void handler_SaveQuesterProfilePreprocessor(object sender, EventArgs e)
+        {
+            QuesterHelper.SavePreprocessor();
+        }
+
+        private void handler_EntityCacheMonitor(object sender, EventArgs e)
+        {
+            CollectionInfoForm.Show(() => SearchCached.EntityCache);
+        }
+
+        private void handler_EditUcc(object sender, EventArgs e)
+        {
+#if true
+            UccEditor.Edit();
+#else
+            UccEditor.Edit(Astral.Logic.UCC.API.CurrentProfile, Astral.API.CurrentSettings.LastUCCProfile);
+#endif
+        }
+
+        private void handler_EditQuester(object sender, EventArgs e)
+        {
+#if true
+            QuesterEditor.Edit();
+#else
+            var profile = Astral.Quester.API.CurrentProfile;
+            var profileName = Astral.API.CurrentSettings.LastQuesterProfile;
+
+            if (profile.Saved && !string.IsNullOrEmpty(profileName))
+                QuesterEditor.Edit(profile, profileName);
+            else QuesterEditor.Edit(profile); 
+#endif
         }
     }
 }

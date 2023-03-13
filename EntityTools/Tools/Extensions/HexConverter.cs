@@ -29,8 +29,6 @@ namespace EntityTools.Extensions
             return Encoding.UTF8.GetBytes(str);
         }
 
-#if ENCRYPTOR || TEST || ENTITYTOOLS
-
         public static void CopyTo(this byte[] from, out byte[] to, long len)
         {
             if(from.Length > 0 && len > 0)
@@ -109,6 +107,5 @@ namespace EntityTools.Extensions
             //Or the two combined, but a bit slower:
             //return val - (val < 58 ? 48 : (val < 97 ? 55 : 87));
         }
-#endif
     }
 }

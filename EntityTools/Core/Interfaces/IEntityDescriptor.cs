@@ -1,4 +1,5 @@
 ﻿using EntityTools.Tools.CustomRegions;
+using MyNW.Classes;
 
 namespace EntityTools.Core.Interfaces
 {

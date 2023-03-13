@@ -1,10 +1,5 @@
-﻿#if ENCRYPTOR
-using Extensions;
-using Encrypter;
-#else
-using EntityTools.Extensions;
+﻿using EntityTools.Extensions;
 using EntityTools.Tools;
-#endif
 using System.Management;
 using System.Text;
 
@@ -15,7 +10,7 @@ namespace SysInfo
     {
         private static readonly string publicKey = "fs5er4z6#'f1dsg3regjuty6k@(";
 
-        internal static string GetMachineId(bool encrypt)
+        internal static string GetMashineID(bool encrypt)
         {
 
             var idBuilder = new StringBuilder();
@@ -99,14 +94,14 @@ namespace SysInfo
                     idBuilder.Append('_').Append(diskInfo);
             }
 
-            mc = new ManagementClass("Win32_NetworkAdapterConfiguration");
-            foreach (var o in mc.GetInstances())
-            {
-                var networkAdapter = (ManagementObject) o;
-                var val = networkAdapter.GetPropertyValue("MACAddress")?.ToString();
-                if (!string.IsNullOrEmpty(val))
-                    idBuilder.Append('_').Append(val);
-            }
+            //mc = new ManagementClass("Win32_NetworkAdapterConfiguration");
+            //foreach (var o in mc.GetInstances())
+            //{
+            //    var networkAdapter = (ManagementObject) o;
+            //    var val = networkAdapter.GetPropertyValue("MACAddress")?.ToString();
+            //    if (!string.IsNullOrEmpty(val))
+            //        idBuilder.Append('_').Append(val);
+            //}
 
             if (idBuilder.Length > 0)
             {
@@ -121,41 +116,5 @@ namespace SysInfo
             }
             return string.Empty;
         }
-
-#if ENCRIPTOR
-        internal static bool MashineIDFromKey(string hexStr, out byte[] decrMachineIdByte, out string decrMachineIdstr)
-        {
-            if (!string.IsNullOrEmpty(hexStr))
-            {
-                if (CryptoHelper.Decrypt_Astral(hexStr.HexToBytes(), publicKey, out decrMachineIdByte))
-                {
-                    decrMachineIdstr = decrMachineIdByte.ToNormalString();
-                    return true;
-                }
-            }
-            decrMachineIdByte = null;
-            decrMachineIdstr = string.Empty;
-            return false;
-        }
-
-        internal static bool MashineIDFromFile(string keyFile, out byte[] decrMachineIdByte, out string decrMachineIdstr)
-        {
-            if (File.Exists(keyFile))
-            {
-                string hexStr = File.ReadAllText(keyFile);
-                if (!string.IsNullOrEmpty(hexStr))
-                {
-                    if (CryptoHelper.Decrypt_Astral(hexStr.HexToBytes(), publicKey, out decrMachineIdByte))
-                    {
-                        decrMachineIdstr = decrMachineIdByte.ToNormalString();
-                        return true;
-                    }
-                }
-            }
-            decrMachineIdByte = null;
-            decrMachineIdstr = string.Empty;
-            return false;
-        } 
-#endif
     }
 }

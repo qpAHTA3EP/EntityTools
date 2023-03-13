@@ -10,7 +10,6 @@ namespace EntityTools.Core.Interfaces
         bool Run();
         Entity UnitRef { get; }
         string Label();
-
         bool Rebase(UCCAction action);
     }
 }

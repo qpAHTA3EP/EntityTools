@@ -23,7 +23,7 @@ namespace EntityTools.Settings
                 if (value < 500)
                     _timeout = 500;
                 else _timeout = value;
-                NotifyPropertyChanged(nameof(UpdateTimeout));
+                NotifyPropertyChanged();
             }
         }
         private int _timeout = 1_000;

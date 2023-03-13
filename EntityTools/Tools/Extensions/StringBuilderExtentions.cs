@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace EntityTools.Tools.Extensions
 {
-    public static class StringBuilderExtentions
+    public static class StringBuilderExtensions
     {
         public static StringBuilder Append<T>(this StringBuilder stringBuilder, IEnumerable<T> collection, string collectionCaption = "", string emptyMessage = "")
         {

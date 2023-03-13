@@ -25,15 +25,15 @@ namespace EntityTools.UCC.Conditions
         [Category("Timer")]
         [Description("Значение (мс), сопоставляемое с периодом времени, заданным 'TestTimer'\n\r" +
             "The value (ms) compared to the period of time setted with 'TestTimer'")]
-        public uint Time { get; set; } = 0;
+        public uint Time { get; set; }
 
         [Category("Timer")]
         [Description("Тип сопоставления 'Time' со периодом времени, заданным 'TestTimer'\n\rComparison type for Time")]
-        public new Astral.Logic.UCC.Ressources.Enums.Sign Sign { get; set; }
+        public new Astral.Logic.UCC.Ressources.Enums.Sign Sign { get => base.Sign; set => base.Sign = value; }
         #endregion
 
         #region ICustomUCCCondition
-        bool ICustomUCCCondition.IsOK(UCCAction refAction/* = null*/)
+        public new bool IsOK(UCCAction refAction/* = null*/)
         {
             //TODO Заменить Environment.TickCount на DateTime.Ticks 
             if (!string.IsNullOrEmpty(TimerName) && UCCTools.SpecialTimers.ContainsKey(TimerName))
@@ -92,9 +92,24 @@ namespace EntityTools.UCC.Conditions
             return false;
         }
 
-        bool ICustomUCCCondition.Loked { get => Locked; set => Locked = value; }
+        public new bool Locked { get => base.Locked; set => base.Locked = value; }
 
-        string ICustomUCCCondition.TestInfos(UCCAction refAction)
+        public new ICustomUCCCondition Clone()
+        {
+            return new UCCCheckTimer
+            {
+                TimerName = TimerName,
+                TestTimer = TestTimer,
+                Time = Time,
+                Sign = Sign,
+                Locked = base.Locked,
+                Target = Target,
+                Tested = Tested,
+                Value = Value
+            };
+        }
+
+        public string TestInfos(UCCAction refAction)
         {
             if (!string.IsNullOrEmpty(TimerName) && UCCTools.SpecialTimers.ContainsKey(TimerName))
             {

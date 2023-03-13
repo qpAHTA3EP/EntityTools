@@ -1,50 +1,77 @@
 ﻿using DevExpress.XtraEditors;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
+using DevExpress.Utils;
 
-namespace EntityTools.Editors.Forms
+namespace EntityTools.Forms
 {
     public partial class InputBox : XtraForm //*/ Form
     {
+        private static InputBox inputBox;
         private InputBox()
         {
             InitializeComponent();
         }
 
-        public static string GetValue(string message)
+        public static string GetValue(string message, string caption = "", FormatInfo formatInfo = null)
         {
-            InputBox inputBox = new InputBox();
+            if(inputBox is null || inputBox.IsDisposed)
+                inputBox = new InputBox();
+
             inputBox.StartPosition = FormStartPosition.CenterParent;
-            inputBox.Message.Text = message;
-            if(inputBox.ShowDialog() == DialogResult.OK)
-                return inputBox.EditedValue;
-            return string.Empty;
+            inputBox.lblMessage.Text = message;
+            inputBox.Text = caption;
+            if (formatInfo != null && !formatInfo.IsEmpty)
+                inputBox.tbValue.Properties.EditFormat.Assign(formatInfo);
+            else inputBox.tbValue.Properties.EditFormat.Reset();
+
+            return inputBox.ShowDialog() == DialogResult.OK 
+                ? inputBox.EditedValue 
+                : string.Empty;
         }
 
-        private void btnOk_Click(object sender, EventArgs e)
+        public static bool EditValue(ref string value, string message, string caption = "", FormatInfo formatInfo = null)
         {
-            EditedValue = value.Text;
-            DialogResult = DialogResult.OK;
-            base.Close();
+            if (inputBox is null || inputBox.IsDisposed)
+                inputBox = new InputBox();
+
+            inputBox.StartPosition = FormStartPosition.CenterParent;
+            inputBox.lblMessage.Text = message;
+            inputBox.Text = caption;
+            inputBox.tbValue.EditValue = value;
+            if (formatInfo != null && !formatInfo.IsEmpty)
+                inputBox.tbValue.Properties.EditFormat.Assign(formatInfo);
+            else inputBox.tbValue.Properties.EditFormat.Reset();
+
+            if (inputBox.ShowDialog() == DialogResult.OK)
+            {
+                value = inputBox.EditedValue;
+                return true;
+            }
+
+            return false;
         }
 
-        private void InputBox_Load(object sender, EventArgs e)
+        private void handler_OK(object sender, EventArgs e)
         {
-            value.Focus();
+            EditedValue = tbValue.Text;
+            DialogResult = string.IsNullOrEmpty(EditedValue) 
+                ? DialogResult.Cancel 
+                : DialogResult.OK;
+            Close();
         }
 
-        private void value_KeyPress(object sender, KeyPressEventArgs e)
+        private void handler_FormLoad(object sender, EventArgs e)
+        {
+            tbValue.Focus();
+        }
+
+        private void handler_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar == '\r')
             {
                 DialogResult = DialogResult.OK;
-                btnOk.PerformClick();
+                btnOK.PerformClick();
             }
         }
     }

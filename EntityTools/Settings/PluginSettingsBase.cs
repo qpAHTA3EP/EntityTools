@@ -1,5 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using Infrastructure.Annotations;
 
 namespace EntityTools.Settings
 {
@@ -8,7 +10,8 @@ namespace EntityTools.Settings
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public void NotifyPropertyChanged(/*[CallerMemberName]*/ string propertyName)
+        [NotifyPropertyChangedInvocator]
+        protected virtual void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

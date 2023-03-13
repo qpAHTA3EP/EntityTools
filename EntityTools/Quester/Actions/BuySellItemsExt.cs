@@ -11,15 +11,14 @@ using Astral;
 using Astral.Classes.ItemFilter;
 using Astral.Logic.Classes.Map;
 using Astral.Logic.NW;
-using Astral.Quester.Classes;
 using Astral.Quester.UIEditors;
 using Astral.Quester.UIEditors.Forms;
 using DevExpress.XtraEditors;
 using EntityTools.Editors;
 using EntityTools.Enums;
 using EntityTools.Extensions;
-using AcTp0Tools.Reflection;
-using EntityTools.Tools.BuySellItems;
+using EntityTools.Tools.Inventory;
+using Infrastructure;
 using MyNW.Classes;
 using MyNW.Internals;
 using MyNW.Patchables.Enums;
@@ -32,37 +31,24 @@ namespace EntityTools.Quester.Actions
     [Serializable]
     public class BuySellItemsExt : Action
     {
-        internal readonly PropertyAccessor<ActionDebug> debug;
         string _idStr;
-        BuySellItemsExt @this => this;
 
         #region Опции команды
-#if DEVELOPER
         [Editor(typeof(VendorInfoEditor), typeof(UITypeEditor))]
+        [TypeConverter(typeof(ExpandableObjectConverter))]
         [Category("Vendor")]
-#else
-        [Browsable(false)]
-#endif
         public VendorInfo Vendor { get => _vendor; set => _vendor = value; }
         internal VendorInfo _vendor = new VendorInfo();
 
-#if DEVELOPER
         [Editor(typeof(DialogEditor), typeof(UITypeEditor))]
         [Description("Specific dialogs before reaching item list.")]
         [Category("Vendor")]
-#else
-        [Browsable(false)]
-#endif
         [XmlElement(typeof(List<string>), ElementName = "BuyMenus")]
         public List<string> VendorMenus { get => _vendorMenus; set => _vendorMenus = value; }
         internal List<string> _vendorMenus = new List<string>();
 
-#if DEVELOPER
         [Editor(typeof(ItemIdFilterEditor), typeof(UITypeEditor))]
         [Category("Setting of selling")]
-#else
-        [Browsable(false)]
-#endif
         public ItemFilterCore SellOptions
         {
             get => _sellOptions;
@@ -77,12 +63,8 @@ namespace EntityTools.Quester.Actions
         }
         internal ItemFilterCore _sellOptions = new ItemFilterCore();
 
-#if DEVELOPER
         [Description("Use options set in general settings to sell")]
         [Category("Setting of selling")]
-#else
-        [Browsable(false)]
-#endif
         public bool UseGeneralSettingsToSell
         {
             get => _useGeneralSettingsToSell; set
@@ -90,19 +72,15 @@ namespace EntityTools.Quester.Actions
                 if (_useGeneralSettingsToSell != value)
                 {
                     _useGeneralSettingsToSell = value;
-                    slots2sellCache = null; 
+                    slots2sellCache = null;
                 }
             }
         }
         internal bool _useGeneralSettingsToSell = true;
 
-#if DEVELOPER
         [Description("Список сумок, предметы из которых могут быть проданы")]
         [Editor(typeof(BagsListEditor), typeof(UITypeEditor))]
         [Category("Setting of selling")]
-#else
-        [Browsable(false)]
-#endif
         public BagsList SellBags
         {
             get => _sellBags;
@@ -110,83 +88,55 @@ namespace EntityTools.Quester.Actions
             {
                 if (!Equals(_sellBags, value))
                 {
-                    _sellBags = CopyHelper.CreateDeepCopy(value);
+                    _sellBags = value;
                     slots2sellCache = null;
                 }
             }
         }
         internal BagsList _sellBags = BagsList.GetPlayerBags();
 
-#if DEVELOPER
         [Editor(typeof(ItemFilterEntryListEditor), typeof(UITypeEditor))]
         [Category("Setting of buying")]
-#else
-        [Browsable(false)]
-#endif
         public List<ItemFilterEntryExt> BuyOptions { get => _buyOptions; set => _buyOptions = value; }
         private List<ItemFilterEntryExt> _buyOptions = new List<ItemFilterEntryExt>();
 
-#if DEVELOPER
         [Description("Use options set in general settings to buy")]
         [Category("Setting of buying")]
-#else
-        [Browsable(false)]
-#endif
         public bool UseGeneralSettingsToBuy { get => _useGeneralSettingsToBuy; set => _useGeneralSettingsToBuy = value; }
         internal bool _useGeneralSettingsToBuy;
 
-#if DEVELOPER
         [Description("Проверять наличие свободных слотов сумки")]
         [Category("Setting of buying")]
-#else
-        [Browsable(false)]
-#endif
         public bool CheckFreeBags { get => _checkFreeBags; set => _checkFreeBags = value; }
         internal bool _checkFreeBags = true;
 
-#if DEVELOPER
         [Description("True: Закрывать диалоговое окно после покупки\n\r" +
             "False: Оставлять диалоговое окно открытым (значение по умолчанию)")]
-#else
-        [Browsable(false)]
-#endif
         public bool CloseContactDialog { get => _closeContactDialog; set => _closeContactDialog = value; }
         internal bool _closeContactDialog;
 
-#if DEVELOPER
         [Description("Список сумок, в которых производится поиск предметов для сравнения с предлагаемыми в магазине")]
         [Editor(typeof(BagsListEditor), typeof(UITypeEditor))]
         [Category("Setting of buying")]
-#else
-        [Browsable(false)]
-#endif
         public BagsList Bags
         {
             get => _buyBags;
             set
             {
-                if(!Equals(_buyBags, value))
+                if (!Equals(_buyBags, value))
                 {
-                    _buyBags = CopyHelper.CreateDeepCopy(value);
+                    _buyBags = value;
                 }
             }
         }
         internal BagsList _buyBags = BagsList.GetFullPlayerInventory();
 
-#if DEVELOPER
         [Description("Продолжительно торговой операции (покупки 1 предмета)")]
         [Category("Setting of buying")]
-#else
-        [Browsable(false)]
-#endif
         public uint Timer { get => _timer; set => _timer = value; }
         internal uint _timer = 10000;
 
-#if DEVELOPER
         [Description("Количество попыток инициировать торговую сессию")]
-#else
-        [Browsable(false)]
-#endif
         public uint Tries
         {
             get => _tries;
@@ -203,8 +153,7 @@ namespace EntityTools.Quester.Actions
         public BuySellItemsExt()
         {
             tryNum = _tries;
-            debug = this.GetProperty<ActionDebug>("Debug");
-            _idStr = string.Concat(@this.GetType().Name, '[', @this.ActionID, ']');
+            _idStr = $"{GetType().Name}[{ActionID}]";
         }
 
         /// <summary>
@@ -220,64 +169,76 @@ namespace EntityTools.Quester.Actions
         {
             get
             {
-                if (!@this._vendor.IsAvailable)
+                if (!_vendor.IsAvailable)
                     return false;
 
-                if (@this._useGeneralSettingsToSell)
+                if (_useGeneralSettingsToSell)
                 {
                     if (_sellBags.GetItems(Astral.Controllers.Settings.Get.SellFilter, out List<InventorySlot> slots, true))
                         slots2sellCache = slots;
                 }
 
-                if (@this._sellOptions != null && @this._sellOptions.Entries.Count > 0)
+                if (_sellOptions != null && _sellOptions.Entries.Count > 0)
                 {
-                    if (_sellBags.GetItems(@this._sellOptions, out List<InventorySlot> slots, true))
+                    if (_sellBags.GetItems(_sellOptions, out List<InventorySlot> slots, true))
                         if (slots2sellCache != null)
                             slots2sellCache.AddRange(slots);
                         else slots2sellCache = slots;
                 }
 
-                return slots2sellCache?.Count > 0 
-                    || @this._useGeneralSettingsToBuy && Astral.Controllers.Settings.Get.SellFilter.Entries.Count > 0 
-                    || @this._buyOptions.Count > 0;
+                return slots2sellCache?.Count > 0
+                    || _useGeneralSettingsToBuy && Astral.Controllers.Settings.Get.SellFilter.Entries.Count > 0
+                    || _buyOptions.Count > 0;
             }
         }
-        protected override Vector3 InternalDestination => Vendor.Position;
+        protected override Vector3 InternalDestination => _vendor.Position;
         public override void GatherInfos()
         {
-#if DEVELOPER
             if (VendorInfoEditor.SetInfos(out VendorInfo vndInfo))
             {
-                Vendor = vndInfo;
+                _vendor = vndInfo;
                 if (XtraMessageBox.Show("Add a dialog ? (open the dialog window before)", "Confirm", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {
-                    switch (@this._vendor.VendorType)
+                    var player = EntityManager.LocalPlayer.Player;
+                    switch (_vendor.VendorType)
                     {
                         case VendorType.ArtifactVendor:
                             SpecialVendor.UseItem();
-                            //Thread.Sleep(3000);
                             Interact.WaitForInteraction();
                             break;
                         case VendorType.VIPSealTrader:
                             VIP.SummonSealTrader();
-                            //Thread.Sleep(3000);
                             Interact.WaitForInteraction();
                             break;
                         case VendorType.VIPProfessionVendor:
                             VIP.SummonProfessionVendor();
-                            //Thread.Sleep(3000);
                             Interact.WaitForInteraction();
                             break;
                         case VendorType.RemoteVendor:
-                            RemoteContact remoteContact = EntityManager.LocalPlayer.Player.InteractInfo.RemoteContacts.Find(ct => ct.ContactDef == Vendor.CostumeName);
+                            RemoteContact remoteContact = player.InteractInfo.RemoteContacts.Find(ct => ct.ContactDef == _vendor.CostumeName);
                             if (remoteContact != null)
                             {
                                 remoteContact.Start();
                                 Interact.WaitForInteraction();
                             }
                             break;
+                        case VendorType.Node:
+                            foreach (TargetableNode targetableNode in player.InteractStatus.TargetableNodes)
+                            {
+                                if (_vendor.IsMatch(targetableNode.WorldInteractionNode))
+                                {
+                                    var currentNode = new Interact.DynaNode(targetableNode.WorldInteractionNode.Key);
+
+                                                                        if (!currentNode.Node.WorldInteractionNode.Interact())
+                                    {
+                                        break;
+                                    }
+                                    Interact.WaitForInteraction();
+                                }
+                            }
+                            break;
                         default:
-                            ContactInfo contactInfo = EntityManager.LocalPlayer.Player.InteractInfo.NearbyContacts.Find(ct => ct.Entity.IsValid && Vendor.IsMatch(ct.Entity));
+                            ContactInfo contactInfo = player.InteractInfo.NearbyContacts.Find(ct => ct.Entity.IsValid && Vendor.IsMatch(ct.Entity));
                             if (contactInfo != null)
                             {
                                 Interact.Vendor(contactInfo.Entity);
@@ -285,26 +246,37 @@ namespace EntityTools.Quester.Actions
                             }
                             break;
                     }
-                    DialogEdit.Show(VendorMenus);
+
+                    var screenType = player.InteractInfo.ContactDialog.ScreenType;
+                    if (screenType == ScreenType.List
+                        || screenType == ScreenType.Buttons
+                        || screenType == ScreenType.Store
+                        || screenType == ScreenType.StoreCollection)
+                    {
+                        DialogEdit.Show(VendorMenus);
+                    }
                 }
             }
-#endif
         }
         public override void InternalReset()
         {
             tryNum = _tries;
             slots2sellCache = null;
         }
-        public override void OnMapDraw(GraphicsNW graph) { }
+
+        public override void OnMapDraw(GraphicsNW graph)
+        {
+            //TODO: Отрисовывать вендора-NPC/Node
+        }
         protected override ActionValidity InternalValidity
         {
             get
             {
-                if (!@this._vendor.IsValid)
+                if (!_vendor.IsValid)
                     return new ActionValidity("Vendor does not set");
 
-                if (!(@this._useGeneralSettingsToBuy || (@this._buyOptions != null && @this._buyOptions.Count > 0)
-                    || @this._useGeneralSettingsToSell || (@this._sellOptions != null && @this._sellOptions.Entries.Count > 0)))
+                if (!(_useGeneralSettingsToBuy || (_buyOptions != null && _buyOptions.Count > 0)
+                    || _useGeneralSettingsToSell || (_sellOptions != null && _sellOptions.Entries.Count > 0)))
                     return new ActionValidity("The items to buy or sell are not specified!");
 
                 return new ActionValidity();
@@ -312,21 +284,23 @@ namespace EntityTools.Quester.Actions
         }
         #endregion
 
-        public override bool NeedToRun => @this._vendor.Distance < 25 && @this._vendor.IsAvailable;
+        public override bool NeedToRun => _vendor.Distance < 25 && _vendor.IsAvailable;
 
         public override ActionResult Run()
         {
-            bool extendedDebugInfo  = EntityTools.Config.Logger.QuesterActions.DebugMoveToEntity;
-            Entity theVendor = null;
-            string methodName = extendedDebugInfo ? string.Concat(MethodBase.GetCurrentMethod().Name) : string.Empty;
+            bool extendedDebugInfo = ExtendedDebugInfo;
+            Entity theVendor;
+            string methodName = extendedDebugInfo ? _idStr + "." + MethodBase.GetCurrentMethod().Name : string.Empty;
             if (tryNum > 0)
             {
+                var player = EntityManager.LocalPlayer.Player;
+
                 tryNum--;
-                switch (@this._vendor.VendorType)
+                switch (_vendor.VendorType)
                 {
                     case VendorType.None:
                         if (extendedDebugInfo)
-                            debug.Value.AddInfo(string.Concat(methodName, ": Vendor not specified. Fail"));
+                            ETLogger.WriteLine(LogType.Debug, $"{methodName}: Vendor not specified. Fail");
                         return ActionResult.Fail;
                     case VendorType.ArtifactVendor:
                         theVendor = SpecialVendor.VendorEntity;
@@ -335,90 +309,136 @@ namespace EntityTools.Quester.Actions
                             if (SpecialVendor.IsAvailable())
                             {
                                 if (extendedDebugInfo)
-                                    debug.Value.AddInfo(string.Concat(methodName, ": Summon 'ArtifactVendor'"));
+                                    ETLogger.WriteLine(LogType.Debug, $"{methodName}: Summon 'ArtifactVendor'");
                                 SpecialVendor.UseItem();
                                 Thread.Sleep(3000);
                                 theVendor = SpecialVendor.VendorEntity;
                                 if (extendedDebugInfo)
                                 {
                                     if (theVendor != null)
-                                        debug.Value.AddInfo(string.Concat(methodName, ": Vendor '", theVendor.InternalName, "' was successfully summoned"));
-                                    else debug.Value.AddInfo(string.Concat(methodName, ": Summoning failed"));
+                                        ETLogger.WriteLine(LogType.Debug,
+                                            $"{methodName}: Vendor '{theVendor.InternalName}' was successfully summoned");
+                                    else ETLogger.WriteLine(LogType.Debug, $"{methodName}: Summoning failed");
                                 }
                             }
                             else
                             {
                                 if (extendedDebugInfo)
-                                    debug.Value.AddInfo(string.Concat(methodName, ": 'ArtifactVendor' does not available. Failed"));
+                                    ETLogger.WriteLine(LogType.Debug,
+                                        $"{methodName}: 'ArtifactVendor' does not available. Failed");
                                 return ActionResult.Fail;
                             }
                         }
                         else if (extendedDebugInfo)
-                            debug.Value.AddInfo(string.Concat(methodName, ": Vendor '", theVendor.InternalName, "' already summoned"));
+                            ETLogger.WriteLine(LogType.Debug,
+                                $"{methodName}: Vendor '{theVendor.InternalName}' already summoned");
                         return Traiding(theVendor);
                     case VendorType.VIPSealTrader:
                         theVendor = VIP.SealTraderEntity;
                         if (theVendor is null || !theVendor.IsValid)
                         {
                             if (extendedDebugInfo)
-                                debug.Value.AddInfo(string.Concat(methodName, ": Summon 'VIPSealTrader'"));
+                                ETLogger.WriteLine(LogType.Debug, $"{methodName}: Summon 'VIPSealTrader'");
                             VIP.SummonSealTrader();
                             Thread.Sleep(3000);
                             theVendor = VIP.SealTraderEntity;
                             if (extendedDebugInfo)
                             {
                                 if (theVendor != null)
-                                    debug.Value.AddInfo(string.Concat(methodName, ": Vendor '", theVendor.InternalName, "' was successfully summoned"));
-                                else debug.Value.AddInfo(string.Concat(methodName, ": Summoning failed"));
+                                    ETLogger.WriteLine(LogType.Debug,
+                                        $"{methodName}: Vendor '{theVendor.InternalName}' was successfully summoned");
+                                else ETLogger.WriteLine(LogType.Debug, $"{methodName}: Summoning failed");
                             }
                         }
                         else if (extendedDebugInfo)
-                            debug.Value.AddInfo(string.Concat(methodName, ": Vendor '", theVendor.InternalName, "' already summoned"));
+                            ETLogger.WriteLine(LogType.Debug,
+                                $"{methodName}: Vendor '{theVendor.InternalName}' already summoned");
                         return Traiding(theVendor);
                     case VendorType.VIPProfessionVendor:
                         theVendor = VIP.ProfessionVendorEntity;
                         if (theVendor is null || !theVendor.IsValid)
                         {
                             if (extendedDebugInfo)
-                                debug.Value.AddInfo(string.Concat(methodName, ": Summon 'VIPProfessionVendor'"));
+                                ETLogger.WriteLine(LogType.Debug, $"{methodName}: Summon 'VIPProfessionVendor'");
                             VIP.SummonProfessionVendor();
                             Thread.Sleep(3000);
                             theVendor = VIP.ProfessionVendorEntity;
                             if (extendedDebugInfo)
                             {
                                 if (theVendor != null)
-                                    debug.Value.AddInfo(string.Concat(methodName, ": Vendor '", theVendor.InternalName, "' was successfully summoned"));
-                                else debug.Value.AddInfo(string.Concat(methodName, ": Summoning failed"));
+                                    ETLogger.WriteLine(LogType.Debug,
+                                        $"{methodName}: Vendor '{theVendor.InternalName}' was successfully summoned");
+                                else ETLogger.WriteLine(LogType.Debug, $"{methodName}: Summoning failed");
                             }
                         }
                         else if (extendedDebugInfo)
-                            debug.Value.AddInfo(string.Concat(methodName, ": Vendor '", theVendor.InternalName, "' already summoned"));
-#if true
-                        return Traiding(theVendor); 
-#else
-                        Entity professionsVendor = VIP_GetNearestEntityByCostume?.Invoke("Vip_Professions_Vendor");
-                        if (professionsVendor != null)
-                            return Traiding(professionsVendor);
-                        else return ActionResult.Running;
-#endif
+                            ETLogger.WriteLine(LogType.Debug,
+                                $"{methodName}: Vendor '{theVendor.InternalName}' already summoned");
+                        return Traiding(theVendor);
                     case VendorType.RemoteVendor:
+                        // TODO для вызова RemoteVendor, которые не видные в окне выбора, нужно реализовать торговлю как в QuesterAssistant через Injection.cmdwrapper_contact_StartRemoteContact(this.RemoteContact);
                         if (extendedDebugInfo)
-                            debug.Value.AddInfo(string.Concat(methodName, ": Call 'RemoteVendor'"));
-                        RemoteContact remoteContact = EntityManager.LocalPlayer.Player.InteractInfo.RemoteContacts.Find(ct => ct.ContactDef == _vendor.CostumeName);
+                            ETLogger.WriteLine(LogType.Debug, $"{methodName}: Call 'RemoteVendor'");
+                        RemoteContact remoteContact = player.InteractInfo.RemoteContacts.Find(ct => ct.ContactDef == _vendor.CostumeName);
                         if (extendedDebugInfo)
                         {
                             if (remoteContact != null && remoteContact.IsValid)
-                                debug.Value.AddInfo(string.Concat(methodName, ": Vendor '", remoteContact.ContactDef, "' was called successfully"));
-                            else debug.Value.AddInfo(string.Concat(methodName, ": Calling failed"));
+                                ETLogger.WriteLine(LogType.Debug,
+                                    $"{methodName}: Vendor '{remoteContact.ContactDef}' was called successfully");
+                            else ETLogger.WriteLine(LogType.Debug, $"{methodName}: Calling failed");
                         }
                         return RemoteTraiding(remoteContact);
+                    case VendorType.Node:
+                        if (extendedDebugInfo)
+                            ETLogger.WriteLine(LogType.Debug, $"{methodName}: Search '{_vendor}'");
+
+                        WorldInteractionNode targetNode = null;
+                        foreach (TargetableNode targetableNode in player.InteractStatus.TargetableNodes)
+                        {
+                            var worldIntNode = targetableNode.WorldInteractionNode;
+                            if (_vendor.IsMatch(worldIntNode))
+                            {
+                                targetNode = worldIntNode;
+                                break;
+                            }
+                        }
+
+                        if (targetNode != null)
+                        {
+                            if (extendedDebugInfo)
+                            {
+                                var pos = targetNode.Location;
+                                ETLogger.WriteLine(LogType.Debug,
+                                    $"{methodName}: Vendor-Node <{pos.X:N1}, {pos.Y:N1}, {pos.Z:N1}>  was successfully found at the Distance = {pos.Distance3DFromPlayer:N1}");
+                            }
+                            return Traiding(targetNode);
+                        }
+                        else
+                        {
+                            if (tryNum < _tries)
+                            {
+                                if (extendedDebugInfo)
+                                    ETLogger.WriteLine(LogType.Debug,
+                                        $"{methodName}: Vendor-Node not found. Approach Position to retry");
+
+                                Approach.PostionByDistance(_vendor.Position, 5);
+
+                                Thread.Sleep(1000);
+                                tryNum++;
+                                return ActionResult.Running;
+                            }
+                            if (extendedDebugInfo)
+                                ETLogger.WriteLine(LogType.Debug,
+                                    $"{methodName}: Vendor-Node not found. Tries are exhausted.");
+                        }
+                        break;
                     default:
                         if (extendedDebugInfo)
-                            debug.Value.AddInfo(string.Concat(methodName, ": Search '", _vendor.CostumeName, '\''));
+                            ETLogger.WriteLine(LogType.Debug, $"{methodName}: Search '{_vendor.CostumeName}'");
                         // ищем ближайший "контакт" совпадающий с Vendor
                         double dist = double.MaxValue;
                         ContactInfo contactInfo = null;
-                        foreach (var cntInfo in EntityManager.LocalPlayer.Player.InteractInfo.NearbyContacts)
+                        foreach (var cntInfo in player.InteractInfo.NearbyContacts)
                         {
                             double curDist = cntInfo.Entity.Location.Distance3DFromPlayer;
                             if (curDist < dist && _vendor.IsMatch(cntInfo.Entity))
@@ -430,10 +450,14 @@ namespace EntityTools.Quester.Actions
                         if (contactInfo != null && contactInfo.IsValid)
                         {
                             if (extendedDebugInfo)
-                                debug.Value.AddInfo(string.Concat(methodName, ": Vendor '", contactInfo.Entity.Name, '[', contactInfo.Entity.InternalName, "]' was successfully found at the Distance = ", dist));
+                                ETLogger.WriteLine(LogType.Debug,
+                                    $"{methodName}: Vendor '{contactInfo.Entity.Name}[{contactInfo.Entity.InternalName}]' was successfully found at the Distance = {dist}");
                             return Traiding(contactInfo.Entity);
                         }
-                        else debug.Value.AddInfo(string.Concat(methodName, ": Search failed"));
+
+                        if (extendedDebugInfo)
+                            ETLogger.WriteLine(LogType.Debug, $"{methodName}: Search failed");
+
                         break;
                 }
             }
@@ -448,12 +472,14 @@ namespace EntityTools.Quester.Actions
         /// <returns></returns>
         private ActionResult RemoteTraiding(RemoteContact remoteContact)
         {
-            bool extendedDebugInfo = EntityTools.Config.Logger.QuesterActions.DebugMoveToEntity;
-            string methodName = MethodBase.GetCurrentMethod().Name;
+            bool extendedDebugInfo = ExtendedDebugInfo;
+            string methodName = extendedDebugInfo
+                ? $"{_idStr}.{MethodBase.GetCurrentMethod().Name}"
+                : string.Empty;
             if (remoteContact != null)
             {
                 if (extendedDebugInfo)
-                    debug.Value.AddInfo(string.Concat(methodName, ": Begins"));
+                    ETLogger.WriteLine(LogType.Debug, $"{methodName}: Begins");
 
                 remoteContact.Start();
                 Interact.WaitForInteraction();
@@ -463,7 +489,7 @@ namespace EntityTools.Quester.Actions
                 if (contactDialog.IsValid && (screenType == ScreenType.List || screenType == ScreenType.Store || screenType == ScreenType.StoreCollection))
                 {
                     // взаимодействие с вендором для открытия окна магазина
-                    if (@this._vendorMenus.Count > 0)
+                    if (_vendorMenus.Count > 0)
                     {
 #if false
                         Astral.Classes.Timeout timeout = new Astral.Classes.Timeout(5000);
@@ -490,11 +516,11 @@ namespace EntityTools.Quester.Actions
                         else if (Check_ReadyToTraid(screenType))
                         {   // Открыто витрина магазина (список товаров)
                             // необходимо переключиться на нужную вкладку
-                            string key = @this._vendorMenus.Last();
+                            string key = _vendorMenus.Last();
                             if (contactDialog.HasOptionByKey(key))
                                 contactDialog.SelectOptionByKey(key);
                         }
-                        if (@this._closeContactDialog)
+                        if (_closeContactDialog)
                             contactDialog.Close();
 #endif
                     }
@@ -509,7 +535,7 @@ namespace EntityTools.Quester.Actions
                         ActionResult result = BuyItems();
 
                         // Закрытие диалогового окна
-                        if (@this._closeContactDialog)
+                        if (_closeContactDialog)
                             EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Close();
 
                         return result;
@@ -520,21 +546,21 @@ namespace EntityTools.Quester.Actions
         }
 
         /// <summary>
-        /// Торговая сессия с вендором-NPC, включая призываемых
+        /// Торговая сессия с вендором-NPC <param name="vendorEntity"/>
         /// </summary>
-        /// <param name="vendorEntity"></param>
-        /// <returns></returns>
         private ActionResult Traiding(Entity vendorEntity)
         {
-            bool extendedDebugInfo = EntityTools.Config.Logger.QuesterActions.DebugMoveToEntity;
-            string methodName = MethodBase.GetCurrentMethod().Name;
-            if (vendorEntity != null)
+            bool extendedDebugInfo = ExtendedDebugInfo;
+            string methodName = extendedDebugInfo 
+                              ? $"{_idStr}.{MethodBase.GetCurrentMethod().Name}" 
+                              : string.Empty;
+            if (vendorEntity != null && vendorEntity.IsValid)
             {
                 if (extendedDebugInfo)
-                    debug.Value.AddInfo(string.Concat(methodName, ": Begins"));
+                    ETLogger.WriteLine(LogType.Debug, $"{methodName}: Begins");
 
                 // взаимодействие с вендором для открытия окна магазина
-                if (ApproachAndInteractToVendor(vendorEntity))
+                if (ApproachAndInteractVendor(vendorEntity))
                 {
 #if false
                     // ApproachAndInteractToVendor гарантирует, что торговец может совершать сделки
@@ -551,10 +577,57 @@ namespace EntityTools.Quester.Actions
                         ActionResult result = BuyItems();
 
                         // Закрытие диалогового окна
-                        if (@this._closeContactDialog)
+                        if (_closeContactDialog)
                         {
                             if (extendedDebugInfo)
-                                debug.Value.AddInfo(string.Concat(methodName, ": CloseContactDialog"));
+                                ETLogger.WriteLine(LogType.Debug, $"{methodName}: CloseContactDialog");
+
+                            EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Close();
+                        }
+                        return result;
+                    }
+                }
+            }
+            return ActionResult.Running;
+        }
+
+        /// <summary>
+        /// Торговая сессия с вендором <param name="vendorNode"/>
+        /// </summary>
+        private ActionResult Traiding(WorldInteractionNode vendorNode)
+        {
+            bool extendedDebugInfo = ExtendedDebugInfo;
+            string methodName = extendedDebugInfo
+                ? $"{_idStr}.{MethodBase.GetCurrentMethod().Name}"
+                : string.Empty;
+
+            if (vendorNode != null && vendorNode.IsValid)
+            {
+                if (extendedDebugInfo)
+                    ETLogger.WriteLine(LogType.Debug, $"{methodName}: Begins");
+
+                // взаимодействие с вендором для открытия окна магазина
+                if (ApproachAndInteractNode(vendorNode))
+                {
+#if false
+                    // ApproachAndInteractNode гарантирует, что торговец может совершать сделки
+                    // дополнительная проверка не нужна
+                    ScreenType screenType = EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.ScreenType;
+                    if (/*screenType == ScreenType.List || */screenType == ScreenType.Store || screenType == ScreenType.StoreCollection)
+
+#endif
+                    {
+                        // Продажа предметов
+                        SellItems();
+
+                        // Покупка предметов
+                        ActionResult result = BuyItems();
+
+                        // Закрытие диалогового окна
+                        if (_closeContactDialog)
+                        {
+                            if (extendedDebugInfo)
+                                ETLogger.WriteLine(LogType.Debug, $"{methodName}: CloseContactDialog");
 
                             EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.Close();
                         }
@@ -572,102 +645,220 @@ namespace EntityTools.Quester.Actions
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
-        private bool ApproachAndInteractToVendor(Entity entity)
+        private bool ApproachAndInteractVendor(Entity entity)
         {
-            bool extendedDebugInfo = EntityTools.Config.Logger.QuesterActions.DebugMoveToEntity;
-            string methodName = MethodBase.GetCurrentMethod().Name;
+            bool extendedDebugInfo = ExtendedDebugInfo;
+            string methodName = extendedDebugInfo
+                ? $"{_idStr}.{MethodBase.GetCurrentMethod().Name}"
+                : string.Empty;
 
             if (extendedDebugInfo)
-                debug.Value.AddInfo(string.Concat(methodName, ": Begins"));
-            bool ready = false;
+                ETLogger.WriteLine(LogType.Debug, $"{methodName}: Begins");
 
             // Проверяем соответствие 
-            if (@this._vendor.IsMatch(entity)) 
+            if (_vendor.IsMatch(entity))
             {
                 if (extendedDebugInfo)
-                    debug.Value.AddInfo(string.Concat(methodName, ": VendorEntity is ok"));
+                    ETLogger.WriteLine(LogType.Debug, $"{methodName}: VendorEntity is ok");
 
                 ContactDialog contactDialog = EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog;
+                bool ready;
                 if (contactDialog.IsValid)
                 {
                     ScreenType screenType = contactDialog.ScreenType;
 
                     if (extendedDebugInfo)
-                        debug.Value.AddInfo(string.Concat(methodName, ": ContactDialog is valid. ScreenType = ", screenType));
- 
+                        ETLogger.WriteLine(LogType.Debug,
+                            $"{methodName}: ContactDialog is valid. ScreenType = {screenType}");
+
                     // Открыто диалоговое окно
                     if (screenType == ScreenType.List || screenType == ScreenType.Buttons)
                     {
                         // Открыто диалоговое окно продавца
-                        if (@this._vendorMenus.Count > 0)
+                        if (_vendorMenus.Count > 0)
                         {
                             if (extendedDebugInfo)
-                                debug.Value.AddInfo(string.Concat(methodName, ": Call Interact.DoDialog(..)"));
+                                ETLogger.WriteLine(LogType.Debug, $"{methodName}: Call Interact.DoDialog(..)");
                             Interact.DoDialog(_vendorMenus);
                         }
                         ready = Check_ReadyToTraid(contactDialog.ScreenType);
                         if (extendedDebugInfo)
-                            debug.Value.AddInfo(string.Concat(methodName, ": ReadyToTraid = ", ready));
+                            ETLogger.WriteLine(LogType.Debug, $"{methodName}: ReadyToTraid = {ready}");
 
                         return ready;
                     }
 
                     if (screenType == ScreenType.Store || screenType == ScreenType.StoreCollection)
-                        // Открыто витрина магазина (список товаров)
-                        // необходимо переключиться на нужную вкладку
+                    // Открыто витрина магазина (список товаров)
+                    // необходимо переключиться на нужную вкладку
                     {
-                        if (@this._vendorMenus.Count > 0)
+                        if (_vendorMenus.Count > 0)
                         {
-                            string key = @this._vendorMenus.Last();
+                            string key = _vendorMenus.Last();
                             if (contactDialog.HasOptionByKey(key))
                             {
                                 if (extendedDebugInfo)
-                                    debug.Value.AddInfo(string.Concat(methodName, ": Select Shop-Tab"));
+                                    ETLogger.WriteLine(LogType.Debug, $"{methodName}: Select Shop-Tab");
 
                                 contactDialog.SelectOptionByKey(key);
                             }
                         }
                         ready = Check_ReadyToTraid(contactDialog.ScreenType);
                         if (extendedDebugInfo)
-                            debug.Value.AddInfo(string.Concat(methodName, ": ReadyToTraid = ", ready));
+                            ETLogger.WriteLine(LogType.Debug, $"{methodName}: ReadyToTraid = {ready}");
 
                         return ready;
                     }
-                    if (@this._closeContactDialog)
+                    if (_closeContactDialog)
                     {
                         if (extendedDebugInfo)
-                            debug.Value.AddInfo(string.Concat(methodName, ": CloseContactDialog"));
+                            ETLogger.WriteLine(LogType.Debug, $"{methodName}: CloseContactDialog");
                         contactDialog.Close();
                     }
                 }
                 else if (extendedDebugInfo)
-                    debug.Value.AddInfo(string.Concat(methodName, ": ContactDialog is invalid"));
+                    ETLogger.WriteLine(LogType.Debug, $"{methodName}: ContactDialog is invalid");
 
                 double dist = entity.Location.Distance3DFromPlayer;
                 if (!contactDialog.IsValid || dist > 10)
                 {
                     // Расстояние до продавца больше 10
                     if (extendedDebugInfo)
-                        debug.Value.AddInfo(string.Concat(methodName, ": Distance to the Vendor = ", dist, ". Call Interact.VendorWithDialogs(..)"));
-                        
+                        ETLogger.WriteLine(LogType.Debug,
+                            $"{methodName}: Distance to the Vendor = {dist}. Call Interact.VendorWithDialogs(..)");
+
                     bool interactResult = Interact.VendorWithDialogs(entity, _vendorMenus);
 
                     ready = Check_ReadyToTraid(EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.ScreenType);
                     if (extendedDebugInfo)
                     {
-                        debug.Value.AddInfo(string.Concat(methodName, ": InteractionResult = ", interactResult, ", ReadyToTraid = ", ready));
+                        ETLogger.WriteLine(LogType.Debug,
+                            $"{methodName}: InteractionResult = {interactResult}, ReadyToTraid = {ready}");
                     }
                     return interactResult && ready;
                 }
                 ready = Check_ReadyToTraid(contactDialog.ScreenType);
                 if (extendedDebugInfo)
-                    debug.Value.AddInfo(string.Concat(methodName, ": ReadyToTraid = ", ready));
+                    ETLogger.WriteLine(LogType.Debug, $"{methodName}: ReadyToTraid = {ready}");
 
                 return ready;
             }
 
             if (extendedDebugInfo)
-                debug.Value.AddInfo(string.Concat(methodName, ": VendorEntity checks failed"));
+                ETLogger.WriteLine(LogType.Debug, $"{methodName}: VendorEntity checks failed");
+
+            return false;
+        }
+
+        private bool ApproachAndInteractNode(WorldInteractionNode node)
+        {
+            bool extendedDebugInfo = ExtendedDebugInfo;
+            string methodName = extendedDebugInfo
+                ? $"{_idStr}.{MethodBase.GetCurrentMethod().Name}"
+                : string.Empty;
+
+            if (extendedDebugInfo)
+                ETLogger.WriteLine(LogType.Debug, $"{methodName}: Begins");
+
+            if (_vendor.IsMatch(node))
+            {
+                if (extendedDebugInfo)
+                    ETLogger.WriteLine(LogType.Debug, $"{methodName}: Vendor-Node is ok");
+
+                ContactDialog contactDialog = EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog;
+                bool ready;
+                if (contactDialog.IsValid)
+                {
+                    ScreenType screenType = contactDialog.ScreenType;
+
+                    if (extendedDebugInfo)
+                        ETLogger.WriteLine(LogType.Debug,
+                            $"{methodName}: ContactDialog is valid. ScreenType = {screenType}");
+
+                    // Открыто диалоговое окно
+                    if (screenType == ScreenType.List || screenType == ScreenType.Buttons)
+                    {
+                        // Открыто диалоговое окно продавца
+                        if (_vendorMenus.Count > 0)
+                        {
+                            if (extendedDebugInfo)
+                                ETLogger.WriteLine(LogType.Debug, $"{methodName}: Call Interact.DoDialog(..)");
+                            Interact.DoDialog(_vendorMenus);
+                        }
+                        ready = Check_ReadyToTraid(contactDialog.ScreenType);
+                        if (extendedDebugInfo)
+                            ETLogger.WriteLine(LogType.Debug, $"{methodName}: ReadyToTraid = {ready}");
+
+                        return ready;
+                    }
+
+                    if (screenType == ScreenType.Store || screenType == ScreenType.StoreCollection)
+                    // Открыто витрина магазина (список товаров)
+                    // необходимо переключиться на нужную вкладку
+                    {
+                        if (_vendorMenus.Count > 0)
+                        {
+                            string key = _vendorMenus.Last();
+                            if (contactDialog.HasOptionByKey(key))
+                            {
+                                if (extendedDebugInfo)
+                                    ETLogger.WriteLine(LogType.Debug, $"{methodName}: Select Shop-Tab");
+
+                                contactDialog.SelectOptionByKey(key);
+                            }
+                        }
+                        ready = Check_ReadyToTraid(contactDialog.ScreenType);
+                        if (extendedDebugInfo)
+                            ETLogger.WriteLine(LogType.Debug, $"{methodName}: ReadyToTraid = {ready}");
+
+                        return ready;
+                    }
+                    if (_closeContactDialog)
+                    {
+                        if (extendedDebugInfo)
+                            ETLogger.WriteLine(LogType.Debug, $"{methodName}: CloseContactDialog");
+                        contactDialog.Close();
+                    }
+                }
+                else if (extendedDebugInfo)
+                    ETLogger.WriteLine(LogType.Debug, $"{methodName}: ContactDialog is invalid");
+
+                double dist = node.Location.Distance3DFromPlayer;
+                if (!contactDialog.IsValid || dist > 10)
+                {
+                    // Расстояние до продавца больше 10
+                    if (extendedDebugInfo)
+                        ETLogger.WriteLine(LogType.Debug,
+                            $"{methodName}: Distance to the Vendor-Node = {dist}. Interact with Node");
+
+                    var dynaNode = new Interact.DynaNode(node.Key);
+                    Approach.NodeForInteraction(dynaNode);
+                    bool interactResult = dynaNode.Node.WorldInteractionNode.Interact();
+                    Interact.WaitForInteraction();
+
+                    if (_vendorMenus.Count > 0)
+                        Interact.DoDialog(_vendorMenus);
+
+                    Thread.Sleep(500);
+
+                    var screenType = EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.ScreenType;
+                    ready = Check_ReadyToTraid(screenType);
+                    if (extendedDebugInfo)
+                    {
+                        ETLogger.WriteLine(LogType.Debug,
+                            $"{methodName}: InteractionResult = {interactResult}, ReadyToTraid = {ready}ScreenType = {screenType}");
+                    }
+                    return interactResult && ready;
+                }
+                ready = Check_ReadyToTraid(contactDialog.ScreenType);
+                if (extendedDebugInfo)
+                    ETLogger.WriteLine(LogType.Debug, $"{methodName}: ReadyToTraid = {ready}");
+
+                return ready;
+            }
+
+            if (extendedDebugInfo)
+                ETLogger.WriteLine(LogType.Debug, $"{methodName}: Vendor-Node checks failed");
 
             return false;
         }
@@ -678,17 +869,20 @@ namespace EntityTools.Quester.Actions
         /// <returns></returns>
         private ActionResult BuyItems()
         {
-            bool extendedDebugInfo = EntityTools.Config.Logger.QuesterActions.DebugMoveToEntity;
-            string methodName = MethodBase.GetCurrentMethod().Name;
+            bool extendedDebugInfo = ExtendedDebugInfo;
+            string methodName = extendedDebugInfo
+                ? $"{_idStr}.{MethodBase.GetCurrentMethod().Name}"
+                : string.Empty;
+
             if (extendedDebugInfo)
-                debug.Value.AddInfo(string.Concat(methodName, ": Begins"));
+                ETLogger.WriteLine(LogType.Debug, $"{methodName}: Begins");
 
             if (!_checkFreeBags || Check_FreeSlots(_buyBags))
             {
                 if (_useGeneralSettingsToBuy)
                 {
                     if (extendedDebugInfo)
-                        debug.Value.AddInfo(string.Concat(methodName, ": Processing GeneralSettingsToBuy"));
+                        ETLogger.WriteLine(LogType.Debug, $"{methodName}: Processing GeneralSettingsToBuy");
 
                     Interact.BuyItems();
                     if (Astral.Controllers.Settings.Get.QuesterOptions.RestockPotions)
@@ -704,7 +898,7 @@ namespace EntityTools.Quester.Actions
 #if direct_item_search_in_bags
                 if (_buyOptions.Count > 0)
                 {
-                    foreach (ItemFilterEntryExt item2buy in @this._buyOptions)
+                    foreach (ItemFilterEntryExt item2buy in _buyOptions)
                     {
 #if false
                         // Подсчет общего количества предметов
@@ -756,23 +950,26 @@ namespace EntityTools.Quester.Actions
                 {
                     if (extendedDebugInfo)
                     {
-                        debug.Value.AddInfo(string.Concat(methodName, ": Begins the processing of ", nameof(@this.BuyOptions)));
-                        debug.Value.AddInfo(string.Concat(methodName, ": Indexing selected Bags"));
+                        ETLogger.WriteLine(LogType.Debug,
+                            $"{methodName}: Begins the processing of {nameof(BuyOptions)}");
+                        ETLogger.WriteLine(LogType.Debug, $"{methodName}: Indexing selected Bags");
                     }
                     // Анализируем содержимое сумок
-                    IndexedBags indexedBags = new IndexedBags(@this._buyOptions, @this._buyBags);
+                    IndexedBags indexedBags = new IndexedBags(_buyOptions, _buyBags);
 
                     foreach (var filterEntry in indexedBags.Filters)
                     {
                         if (extendedDebugInfo)
-                            debug.Value.AddInfo(string.Concat(methodName, ": Processing FilterEntry: ", filterEntry.ToString()));
+                            ETLogger.WriteLine(LogType.Debug, $"{methodName}: Processing FilterEntry: {filterEntry}");
 
                         var slotCache = indexedBags[filterEntry];
                         List<ItemDef> boughtItems = null;
-                        BuyItemResult buyItemResult = (slotCache is null) ? BuyAnItem(filterEntry, ref boughtItems) : BuyAnItem(filterEntry, slotCache, ref boughtItems);
+                        BuyItemResult buyItemResult = slotCache is null
+                            ? BuyAnItem(filterEntry, ref boughtItems)
+                            : BuyAnItem(filterEntry, slotCache, ref boughtItems);
 
                         if (extendedDebugInfo)
-                            debug.Value.AddInfo(string.Concat(methodName, ": Result: ", buyItemResult));
+                            ETLogger.WriteLine(LogType.Debug, $"{methodName}: Result: {buyItemResult}");
                         // Обработка результата покупки
                         // Если результат не позволяет продолжать покупку - прерываем выполнение команды
                         switch (buyItemResult)
@@ -784,7 +981,7 @@ namespace EntityTools.Quester.Actions
                                     {
                                         foreach (ItemDef item in boughtItems)
                                         {
-                                            // Здесь не учитывается возможно приобретения и экипировки нескольких вещений (например, колец)
+                                            // Здесь не учитывается возможность приобретения и экипировки нескольких вещей (например, колец)
 
                                             InventorySlot slot = _buyBags.Find(item);
                                             if (slot != null)
@@ -806,7 +1003,7 @@ namespace EntityTools.Quester.Actions
             }
 
             if (extendedDebugInfo)
-                debug.Value.AddInfo(string.Concat(methodName, ": Bags is full. Skip"));
+                ETLogger.WriteLine(LogType.Debug, $"{methodName}: Bags is full. Skip");
 
             return ActionResult.Skip;
         }
@@ -815,11 +1012,14 @@ namespace EntityTools.Quester.Actions
         /// Обработка одной позиции списка покупок
         /// </summary>
         /// <param name="item2buy"></param>
+        /// <param name="boughtItems"></param>
         /// <returns></returns>
         private BuyItemResult BuyAnItem(ItemFilterEntryExt item2buy, ref List<ItemDef> boughtItems)
         {
-            bool extendedDebugInfo = EntityTools.Config.Logger.QuesterActions.DebugMoveToEntity;
-            string methodName = MethodBase.GetCurrentMethod().Name;
+            bool extendedDebugInfo = ExtendedDebugInfo;
+            string methodName = extendedDebugInfo
+                ? $"{_idStr}.{MethodBase.GetCurrentMethod().Name}"
+                : string.Empty;
 
             BuyItemResult result = BuyItemResult.Completed;
             if (boughtItems == null)
@@ -838,7 +1038,7 @@ namespace EntityTools.Quester.Actions
                             if (!item2buy.CheckEquipmentLevel || _buyBags.ContainsBetterItemEquipmentLevel(storeItemInfo))
                             {
                                 bool succeeded = false;
-                                Timeout timeout = new Timeout(@this._timer > 0 ? (int)@this._timer : int.MaxValue);
+                                Timeout timeout = new Timeout(_timer > 0 ? (int)_timer : int.MaxValue);
 
                                 if (!_checkFreeBags || Check_FreeSlots(_buyBags))
                                 {
@@ -853,13 +1053,12 @@ namespace EntityTools.Quester.Actions
                                         // 0 - одна штука
                                         uint mayBuyInBulk = storeItemInfo.Item.ItemDef.MayBuyInBulk;
 
-                                        //if (!item2buy.BuyByOne)
                                         if (mayBuyInBulk > toBuyNum)
                                         {
                                             // Единовременная покупка нужного количества предметов
                                             string str = $"Buy {toBuyNum} {storeItemInfo.Item.DisplayName}[{storeItemInfo.Item.ItemDef.InternalName}] ...";
                                             if (extendedDebugInfo)
-                                                debug.Value.AddInfo(string.Concat(methodName, str));
+                                                ETLogger.WriteLine(LogType.Debug, string.Concat(methodName, str));
                                             Logger.WriteLine(str);
 
                                             storeItemInfo.BuyItem(toBuyNum);
@@ -874,10 +1073,10 @@ namespace EntityTools.Quester.Actions
                                             string str = $"Buy total {toBuyNum} {storeItemInfo.Item.DisplayName}[{storeItemInfo.Item.ItemDef.InternalName}] by one item...";
                                             Logger.WriteLine(str);
                                             if (extendedDebugInfo)
-                                                debug.Value.AddInfo(str);
+                                                ETLogger.WriteLine(LogType.Debug, str);
 
-                                            uint totalPurchasedNum = 0;
-                                            for (totalPurchasedNum = 0; totalPurchasedNum < toBuyNum; totalPurchasedNum++)
+                                            uint totalPurchasedNum;
+                                            for (totalPurchasedNum = 0; totalPurchasedNum <= toBuyNum; totalPurchasedNum++)
                                             {
                                                 storeItemInfo.BuyItem(1);
                                                 Thread.Sleep(250);
@@ -886,7 +1085,7 @@ namespace EntityTools.Quester.Actions
                                                     str = $"Buying time is out. Bought only {totalPurchasedNum} of {toBuyNum} {storeItemInfo.Item.DisplayName}[{storeItemInfo.Item.ItemDef.InternalName}] was bought ...";
                                                     Logger.WriteLine(str);
                                                     if (extendedDebugInfo)
-                                                        debug.Value.AddInfo(string.Concat(methodName, str));
+                                                        ETLogger.WriteLine(LogType.Debug, string.Concat(methodName, str));
                                                     break;
                                                 }
                                                 if (_checkFreeBags && !Check_FreeSlots(_buyBags))
@@ -896,8 +1095,8 @@ namespace EntityTools.Quester.Actions
                                                     str = $"Bags are full. Bought only {totalPurchasedNum} of {toBuyNum} {storeItemInfo.Item.DisplayName}[{storeItemInfo.Item.ItemDef.InternalName}] ...";
                                                     Logger.WriteLine(str);
                                                     if (extendedDebugInfo)
-                                                        debug.Value.AddInfo(string.Concat(methodName, str));
-                                                    return result = BuyItemResult.FullBag;
+                                                        ETLogger.WriteLine(LogType.Debug, string.Concat(methodName, str));
+                                                    return BuyItemResult.FullBag;
                                                 }
                                             }
 
@@ -908,10 +1107,10 @@ namespace EntityTools.Quester.Actions
                                 else
                                 {
                                     if (extendedDebugInfo)
-                                        debug.Value.AddInfo("Bags are full, skip ...");
+                                        ETLogger.WriteLine(LogType.Debug, "Bags are full, skip ...");
 
                                     Logger.WriteLine("Bags are full, skip ...");
-                                    return result = BuyItemResult.FullBag;
+                                    return BuyItemResult.FullBag;
                                 }
 
                                 if (succeeded)
@@ -922,20 +1121,17 @@ namespace EntityTools.Quester.Actions
                             }
                         }
                     }
-                    //else return BuyItemResult.Skiped;
                 }
-                //else return BuyItemResult.Error;
             }
             return result;
         }
-#if ReadOnlyItemFilterEntryExt
-        private BuyItemResult BuyAnItem(KeyValuePair<ReadOnlyItemFilterEntryExt, SlotCache> filterEntryCache, ref List<ItemDef> boughtItems)
-#else
+
         private BuyItemResult BuyAnItem(ItemFilterEntryExt filterEntry, SlotCache slotCache, ref List<ItemDef> boughtItems)
-#endif
         {
-            bool extendedDebugInfo = EntityTools.Config.Logger.QuesterActions.DebugMoveToEntity;
-            string methodName = MethodBase.GetCurrentMethod().Name;
+            bool extendedDebugInfo = ExtendedDebugInfo;
+            string methodName = extendedDebugInfo
+                ? $"{_idStr}.{MethodBase.GetCurrentMethod().Name}"
+                : string.Empty;
 
             BuyItemResult result = BuyItemResult.Completed;
             if (boughtItems == null)
@@ -955,12 +1151,12 @@ namespace EntityTools.Quester.Actions
                         if (!filterEntry.CheckPlayerLevel || storeItemInfo.FitsPlayerLevel())
                         {
                             // Проверка уровня предмета
-                            if (!filterEntry.CheckEquipmentLevel 
+                            if (!filterEntry.CheckEquipmentLevel
                                 //|| filterEntryCache.Value.MaxItemLevel <= storeItemInfo.Item.ItemDef.Level)
                                 || slotCache.HasWorseThen(storeItemInfo))
                             {
                                 bool succeeded = false;
-                                Timeout timeout = new Timeout(@this._timer > 0 ? (int)@this._timer : int.MaxValue);
+                                Timeout timeout = new Timeout(_timer > 0 ? (int)_timer : int.MaxValue);
 
                                 if (!_checkFreeBags || Check_FreeSlots(_buyBags))
                                 {
@@ -975,7 +1171,7 @@ namespace EntityTools.Quester.Actions
                                             // Покупка предмета в необходимом количество за один раз
                                             string str = $"Buy {toBuyNum} {storeItemInfo.Item.DisplayName}[{storeItemInfo.Item.ItemDef.InternalName}] ...";
                                             if (extendedDebugInfo)
-                                                debug.Value.AddInfo(string.Concat(methodName, str));
+                                                ETLogger.WriteLine(LogType.Debug, $"{methodName}: {str}");
                                             Logger.WriteLine(str);
 
 
@@ -991,11 +1187,11 @@ namespace EntityTools.Quester.Actions
                                             // производим покупку в цикле
                                             string str = $"Buy total {toBuyNum} {storeItemInfo.Item.DisplayName}[{storeItemInfo.Item.ItemDef.InternalName}] by one item...";
                                             if (extendedDebugInfo)
-                                                debug.Value.AddInfo(string.Concat(methodName, str));
+                                                ETLogger.WriteLine(LogType.Debug, $"{methodName}: {str}");
                                             Logger.WriteLine(str);
 
                                             uint totalPurchasedNum = 0;
-                                            for (totalPurchasedNum = 0; totalPurchasedNum < toBuyNum; totalPurchasedNum++)
+                                            for (totalPurchasedNum = 0; totalPurchasedNum <= toBuyNum; totalPurchasedNum++)
                                             {
                                                 storeItemInfo.BuyItem(1);
                                                 Thread.Sleep(250);
@@ -1003,20 +1199,20 @@ namespace EntityTools.Quester.Actions
                                                 {
                                                     str = $"Buying time is out. Bought only {totalPurchasedNum} of {toBuyNum} {storeItemInfo.Item.DisplayName}[{storeItemInfo.Item.ItemDef.InternalName}] was bought ...";
                                                     if (extendedDebugInfo)
-                                                        debug.Value.AddInfo(string.Concat(methodName, str));
+                                                        ETLogger.WriteLine(LogType.Debug, $"{methodName}: {str}");
                                                     Logger.WriteLine(str);
                                                     break;
                                                 }
-                                                if(storeItemInfo.CanBuyError != 0u)
+                                                if (storeItemInfo.CanBuyError != 0u)
                                                 {
                                                     boughtItems.Add(storeItemInfo.Item.ItemDef);
 
                                                     str = $"Buying is impossible now. Error code '{storeItemInfo.CanBuyError}'. Bought only {totalPurchasedNum} of {toBuyNum} {storeItemInfo.Item.DisplayName}[{storeItemInfo.Item.ItemDef.InternalName}] ...";
                                                     if (extendedDebugInfo)
-                                                        debug.Value.AddInfo(string.Concat(methodName, str));
+                                                        ETLogger.WriteLine(LogType.Debug, $"{methodName}: {str}");
                                                     Logger.WriteLine(str);
 
-                                                    return result = BuyItemResult.NotEnoughCurrency;
+                                                    return BuyItemResult.NotEnoughCurrency;
                                                 }
                                                 if (_checkFreeBags && !Check_FreeSlots(_buyBags))
                                                 {
@@ -1024,9 +1220,9 @@ namespace EntityTools.Quester.Actions
 
                                                     str = $"Bags are full. Bought only {totalPurchasedNum} of {toBuyNum} {storeItemInfo.Item.DisplayName}[{storeItemInfo.Item.ItemDef.InternalName}] ...";
                                                     if (extendedDebugInfo)
-                                                        debug.Value.AddInfo(string.Concat(methodName, str));
+                                                        ETLogger.WriteLine(LogType.Debug, $"{methodName}: {str}");
                                                     Logger.WriteLine(str);
-                                                    return result = BuyItemResult.FullBag;
+                                                    return BuyItemResult.FullBag;
                                                 }
                                             }
 
@@ -1037,9 +1233,9 @@ namespace EntityTools.Quester.Actions
                                 else
                                 {
                                     if (extendedDebugInfo)
-                                        debug.Value.AddInfo(string.Concat(methodName, "Bags are full, skip ..."));
+                                        ETLogger.WriteLine(LogType.Debug, $"{methodName}: Bags are full, skip ...");
                                     Logger.WriteLine("Bags are full, skip ...");
-                                    return result = BuyItemResult.FullBag;
+                                    return BuyItemResult.FullBag;
                                 }
 
                                 if (succeeded)
@@ -1050,15 +1246,7 @@ namespace EntityTools.Quester.Actions
                             }
                         }
                     }
-#if false
-                    else if (debugInfoEnabled)
-                        debug.Value.AddInfo(string.Concat(methodName, ); 
-#endif
                 }
-#if false
-                else if (debugInfoEnabled)
-                    debug.Value.AddInfo(string.Concat(methodName, "Buying failed. ErrorCode = ", storeItemInfo.CanBuyError)); 
-#endif
             }
             return result;
         }
@@ -1070,7 +1258,7 @@ namespace EntityTools.Quester.Actions
         {
             if (EntityManager.LocalPlayer.Player.InteractInfo.ContactDialog.SellEnabled)
             {
-                if (@this._useGeneralSettingsToSell && slots2sellCache == null && Astral.Controllers.Settings.Get.SellFilter.Entries.Count > 0)
+                if (_useGeneralSettingsToSell && slots2sellCache == null && Astral.Controllers.Settings.Get.SellFilter.Entries.Count > 0)
                 {
                     // необходимо использовать глобальный список продажи, а slots2sellCache не сформирован
 #if false
@@ -1078,38 +1266,41 @@ namespace EntityTools.Quester.Actions
 #else
                     // Производим поиск и продажу предметов, подходящих под глобальный фильтр продажи
                     if (_sellBags.GetItems(Astral.Controllers.Settings.Get.SellFilter, out List<InventorySlot> generalSellSlotsCache, true))
-                        foreach(InventorySlot slot in generalSellSlotsCache)
+                        foreach (InventorySlot slot in generalSellSlotsCache)
                             if (Inventory.CanSell(slot.Item))
                             {
-                                Logger.WriteLine(string.Concat("Sell : ", slot.Item.DisplayName, '[', slot.Item.ItemDef.InternalName, "] x ", slot.Item.Count));
+                                Logger.WriteLine(
+                                    $"Sell : {slot.Item.DisplayName}[{slot.Item.ItemDef.InternalName}] x {slot.Item.Count}");
                                 slot.StoreSellItem();
                                 Thread.Sleep(250);
                             }
 #endif
                 }
-                if (@this._sellOptions.Entries.Count > 0)
+                if (_sellOptions.Entries.Count > 0)
                 {
                     // Задан локальный фильтр продажи
-                    if(slots2sellCache?.Count > 0)
+                    if (slots2sellCache?.Count > 0)
                     {
                         // lots2sellCache сформирован, дополнительный происк производить не нужно
                         foreach (InventorySlot slot in slots2sellCache)
                             if (Inventory.CanSell(slot.Item))
                             {
-                                Logger.WriteLine(string.Concat("Sell : ", slot.Item.DisplayName, '[', slot.Item.ItemDef.InternalName, "] x ", slot.Item.Count));
+                                Logger.WriteLine(
+                                    $"Sell : {slot.Item.DisplayName}[{slot.Item.ItemDef.InternalName}] x {slot.Item.Count}");
                                 slot.StoreSellItem();
                                 Thread.Sleep(250);
                             }
                     }
-                    else if(_sellBags.GetItems(@this._sellOptions, out List<InventorySlot> slots2sell, true))
-                        foreach(InventorySlot slot in slots2sell)
+                    else if (_sellBags.GetItems(_sellOptions, out List<InventorySlot> slots2sell, true))
+                        foreach (InventorySlot slot in slots2sell)
                             if (Inventory.CanSell(slot.Item))
                             {
-                                Logger.WriteLine(string.Concat("Sell : ", slot.Item.DisplayName, '[', slot.Item.ItemDef.InternalName, "] x ", slot.Item.Count));
+                                Logger.WriteLine(
+                                    $"Sell : {slot.Item.DisplayName}[{slot.Item.ItemDef.InternalName}] x {slot.Item.Count}");
                                 slot.StoreSellItem();
                                 Thread.Sleep(250);
                             }
-                    else Logger.WriteLine("Nothing to sell !");
+                            else Logger.WriteLine("Nothing to sell !");
                 }
             }
             else Logger.WriteLine("Can't sell to this vendor !");
@@ -1178,6 +1369,18 @@ namespace EntityTools.Quester.Actions
         private static bool Check_ReadyToTraid(ScreenType screenType)
         {
             return screenType == ScreenType.Store || screenType == ScreenType.StoreCollection;
+        }
+
+        /// <summary>
+        /// Флаг настроек вывода расширенной отлаточной информации
+        /// </summary>
+        private bool ExtendedDebugInfo
+        {
+            get
+            {
+                var logConf = EntityTools.Config.Logger;
+                return logConf.QuesterActions.DebugBuySellItems && logConf.Active;
+            }
         }
     }
 }

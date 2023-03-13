@@ -18,7 +18,7 @@ namespace EntityTools.Settings
                 if (_missionName != value)
                 {
                     _missionName = value;
-                    NotifyPropertyChanged(nameof(MissionName));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -33,7 +33,7 @@ namespace EntityTools.Settings
                 if (_uiStringMsg != value)
                 {
                     _uiStringMsg = value;
-                    NotifyPropertyChanged(nameof(UIStringMsg));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -48,7 +48,7 @@ namespace EntityTools.Settings
                 if (_hidden != value)
                 {
                     _hidden = value;
-                    NotifyPropertyChanged(nameof(Hidden));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -63,7 +63,7 @@ namespace EntityTools.Settings
                 if (_missionNameOverride != value)
                 {
                     _missionNameOverride = value;
-                    NotifyPropertyChanged(nameof(MissionNameOverride));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -78,7 +78,7 @@ namespace EntityTools.Settings
                 if (_rootDefOverride != value)
                 {
                     _rootDefOverride = value;
-                    NotifyPropertyChanged(nameof(RootDefOverride));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -93,7 +93,7 @@ namespace EntityTools.Settings
                 if (_startTime != value)
                 {
                     _startTime = value;
-                    NotifyPropertyChanged(nameof(StartTime));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -108,7 +108,7 @@ namespace EntityTools.Settings
                 if (_expirationTime != value)
                 {
                     _expirationTime = value;
-                    NotifyPropertyChanged(nameof(ExpirationTime));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -123,7 +123,7 @@ namespace EntityTools.Settings
                 if (_state != value)
                 {
                     _state = value;
-                    NotifyPropertyChanged(nameof(State));
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -138,7 +138,7 @@ namespace EntityTools.Settings
                 if (_missionDef != value)
                 {
                     _missionDef = value;
-                    NotifyPropertyChanged(nameof(MissionDef));
+                    NotifyPropertyChanged();
                 }
             }
         }

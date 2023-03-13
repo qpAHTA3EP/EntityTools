@@ -2,7 +2,7 @@
 
 namespace EntityTools.Extensions
 {
-    public static class StringExtentions
+    public static class StringExtensions
     {
         /// <summary>
         /// Определяем местоположение простого шаблона matchText в идентификаторе pattern

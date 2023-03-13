@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Drawing.Design;
 using System.Xml.Serialization;
+using Infrastructure.Reflection;
 using Astral.Logic.UCC.Classes;
 using EntityTools.Editors;
 using QuesterCondition = Astral.Quester.Classes.Condition;
@@ -9,26 +10,36 @@ namespace EntityTools.UCC.Conditions
 {
     public class UCCQuesterCheck : UCCCondition, ICustomUCCCondition
     {
-#if DEVELOPER
-        internal class QuesterConditionEditor : AddTypeCommonEditor<QuesterCondition> { }
-
         [Editor(typeof(QuesterConditionEditor), typeof(UITypeEditor))]
         [TypeConverter(typeof(ExpandableObjectConverter))]
         [XmlElement("QuesterCondition", typeof(QuesterCondition))]
-#else
-        [Browsable(false)]
-#endif
         public QuesterCondition Condition { get; set; }
 
-#region ICustomUCCCondition
-        bool ICustomUCCCondition.IsOK(UCCAction refAction/* = null*/)
+        #region ICustomUCCCondition
+        public new bool IsOK(UCCAction refAction/* = null*/)
         {
             return Condition?.IsValid == true;
         }
 
-        bool ICustomUCCCondition.Loked { get => Locked; set => Locked = value; }
+        public new bool Locked { get => base.Locked; set => base.Locked = value; }
 
-        string ICustomUCCCondition.TestInfos(UCCAction refAction)
+        public new ICustomUCCCondition Clone()
+        {
+            var copy = new UCCQuesterCheck
+            {
+                Sign = Sign,
+                Locked = base.Locked,
+                Target = Target,
+                Tested = Tested,
+                Value = Value,
+            };
+            if (Condition != null)
+                copy.Condition = Condition.CreateXmlCopy();
+
+            return copy;
+        }
+
+        public string TestInfos(UCCAction refAction)
         {
             if (Condition != null)
                 return Condition.TestInfos;

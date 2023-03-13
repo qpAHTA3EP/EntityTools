@@ -2,16 +2,18 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using AStar.Tools;
 using Astral.Classes;
 using Astral.Logic;
 using Astral.Logic.Classes.FSM;
 using Astral.Logic.NW;
+using EntityTools;
 using EntityTools.Servises.SlideMonitor;
 using MyNW.Classes;
 using MyNW.Internals;
 using MyNW.Patchables.Enums;
 
-namespace EntityTools.Tools.Navigation
+namespace EntityCore.Tools.Navigation
 {
     /// <summary>
     /// Полная копия класса
@@ -89,7 +91,7 @@ namespace EntityTools.Tools.Navigation
                 }
                 if (flag)
                 {
-                    Vector3 vector2 = new Vector3();
+                    Vector3 vector2 = Vector3.Empty;
                     if (!PathFinding.CheckDirection(EntityManager.LocalPlayer.Location, nextWp, ref vector2)
                         || vector2.Distance3DFromPlayer > 25.0)
                     {
@@ -196,7 +198,7 @@ namespace EntityTools.Tools.Navigation
                     }
                     catch
                     {
-                        result = new Vector3();
+                        result = Vector3.Empty;
                     }
                 }
                 return result;
@@ -232,7 +234,7 @@ namespace EntityTools.Tools.Navigation
                 {
                     return Road.Waypoints[Road.Waypoints.Count - 1];
                 }
-                return new Vector3();
+                return Vector3.Empty;
             }
         }
 

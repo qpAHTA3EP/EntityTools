@@ -61,7 +61,7 @@
             // btnSelectMission
             // 
             this.btnSelectMission.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSelectMission.ImageOptions.Image = global::EntityTools.Properties.Resources.miniShow;
+            this.btnSelectMission.ImageOptions.Image = global::EntityTools.Properties.Resources.Quest;
             this.btnSelectMission.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
             this.btnSelectMission.ImageOptions.ImageToTextIndent = 6;
             this.btnSelectMission.Location = new System.Drawing.Point(525, 333);
@@ -75,7 +75,7 @@
             // btnStop
             // 
             this.btnStop.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnStop.ImageOptions.Image = global::EntityTools.Properties.Resources.miniStop;
+            this.btnStop.ImageOptions.Image = global::EntityTools.Properties.Resources.Stop;
             this.btnStop.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
             this.btnStop.Location = new System.Drawing.Point(459, 333);
             this.btnStop.Name = "btnStop";
@@ -88,7 +88,7 @@
             // btnSave
             // 
             this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSave.ImageOptions.Image = global::EntityTools.Properties.Resources.miniSave;
+            this.btnSave.ImageOptions.Image = global::EntityTools.Properties.Resources.Save;
             this.btnSave.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
             this.btnSave.Location = new System.Drawing.Point(393, 333);
             this.btnSave.Name = "btnSave";
@@ -176,6 +176,7 @@
             this.pgSettings.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pgSettings.Location = new System.Drawing.Point(0, 0);
             this.pgSettings.Name = "pgSettings";
+            this.pgSettings.OptionsView.AllowReadOnlyRowAppearance = DevExpress.Utils.DefaultBoolean.True;
             this.pgSettings.Size = new System.Drawing.Size(548, 307);
             this.pgSettings.TabIndex = 0;
             // 
@@ -221,6 +222,7 @@
             this.Controls.Add(this.btnSelectMission);
             this.Controls.Add(this.tabControl);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
+            this.LookAndFeel.UseDefaultLookAndFeel = false;
             this.MinimumSize = new System.Drawing.Size(400, 300);
             this.Name = "MissionMonitorForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;

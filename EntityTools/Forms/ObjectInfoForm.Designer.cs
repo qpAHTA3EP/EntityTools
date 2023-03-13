@@ -32,6 +32,7 @@
             this.pgObjectInfos = new System.Windows.Forms.PropertyGrid();
             this.contextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.miDetail = new System.Windows.Forms.ToolStripMenuItem();
+            this.backgroundWorker = new System.ComponentModel.BackgroundWorker();
             this.contextMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -62,6 +63,11 @@
             this.miDetail.Text = "Detail";
             this.miDetail.Click += new System.EventHandler(this.handler_ItemDetail);
             // 
+            // backgroundWorker
+            // 
+            this.backgroundWorker.WorkerSupportsCancellation = true;
+            this.backgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.Refresh);
+            // 
             // ObjectInfoForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -69,11 +75,10 @@
             this.ClientSize = new System.Drawing.Size(334, 312);
             this.Controls.Add(this.pgObjectInfos);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
-            this.LookAndFeel.SkinName = "Office 2013 Dark Gray";
+            this.IconOptions.ShowIcon = false;
             this.LookAndFeel.UseDefaultLookAndFeel = false;
             this.Name = "ObjectInfoForm";
             this.Padding = new System.Windows.Forms.Padding(1);
-            this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "ObjectInfoForm";
@@ -89,5 +94,6 @@
         private System.Windows.Forms.PropertyGrid pgObjectInfos;
         private System.Windows.Forms.ContextMenuStrip contextMenu;
         private System.Windows.Forms.ToolStripMenuItem miDetail;
+        private System.ComponentModel.BackgroundWorker backgroundWorker;
     }
 }

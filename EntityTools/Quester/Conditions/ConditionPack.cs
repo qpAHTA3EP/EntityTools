@@ -1,21 +1,20 @@
-﻿using Astral.Quester.Classes;
-using EntityTools.Tools;
-using EntityTools.Editors;
-using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Drawing.Design;
 using System.Text;
+using Astral.Quester.Classes;
+using EntityTools.Enums;
+using EntityTools.Tools;
 using ConditionList = System.Collections.Generic.List<Astral.Quester.Classes.Condition>;
 
-namespace EntityTools.Conditions
+namespace EntityTools.Quester.Conditions
 {
-
-
-    [Serializable]
-    public class ConditionPack : Astral.Quester.Classes.Condition
+    public class ConditionPack : Condition
     {
         [Description("Displayed name of the ConditionPack")]
         public string Name { get; set; }
+
+        [Description("Minimum count 'true' for Disjunction logic")]
+        public uint MinCount { get; set; } = 1;
 
         [Description("The negation of the result of the ConditionPack")]
         public bool Not { get; set; }
@@ -23,11 +22,12 @@ namespace EntityTools.Conditions
         [Description("Logical rule of the Conditions checks\n" +
             "Conjunction: All Conditions have to be True (Logical AND)\n" +
             "Disjunction: At least one of the Conditions have to be True (Logical OR)")]
-        public ConditionCheck Tested { get; set; }
+        public LogicRule Tested { get; set; }
 
+        [Browsable(false)]
         [Description("The list of the Conditions")]
         [TypeConverter(typeof(CollectionTypeConverter))]
-        [Editor(typeof(ConditionListEditor), typeof(UITypeEditor))]
+        //[Editor(typeof(ConditionListEditor), typeof(UITypeEditor))]
         public ConditionList Conditions { get; set; } = new ConditionList();
 
         public override bool IsValid
@@ -37,9 +37,9 @@ namespace EntityTools.Conditions
                 if (Conditions.Count == 0)
                     return false;
 
-                bool result = (Tested == ConditionCheck.Conjunction);
+                bool result = Tested == LogicRule.Conjunction;
 
-                if (Tested == ConditionCheck.Conjunction)
+                if (Tested == LogicRule.Conjunction)
                 {
                     foreach (Condition cond in Conditions)
                         if (!cond.IsValid)
@@ -59,7 +59,7 @@ namespace EntityTools.Conditions
                         if (cond.IsValid)
                         {
                             if (cond.Locked)
-                            { trueNumLock++;}
+                                trueNumLock++;
                             else trueNumUnlock++;
                         }
                         else
@@ -71,11 +71,9 @@ namespace EntityTools.Conditions
                             }
                         }
                     }
-
-                    result = lockTrue && (Conditions.Count == trueNumLock || trueNumUnlock > 0);
+                    result = lockTrue && (Conditions.Count == trueNumLock || trueNumUnlock > MinCount - 1);
                 }
-                
-                return (Not)? !result : result;
+                return Not ^ result;
             }
         }
 
@@ -102,14 +100,13 @@ namespace EntityTools.Conditions
                         if (cond.Locked)
                             sb.Append("\t[L] ");
                         else sb.Append("\t[U] ");
-                        sb.Append(cond.ToString()).Append(" | Result: ").Append(cond.IsValid).AppendLine();
+                        sb.Append(cond).Append(" | Result: ").Append(cond.IsValid).AppendLine();
                     }
                     sb.Append("Negation flag (Not): ").Append(Not).AppendLine();
                     return sb.ToString();
                 }
-                else return "The list 'Conditions' is empty";
+                return "The list 'Conditions' is empty";
             }
         }
-
     }
 }

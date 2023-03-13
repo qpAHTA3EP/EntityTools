@@ -9,7 +9,7 @@ namespace EntityTools.UCC.Conditions
     public class UCCGenericCondition : UCCCondition, ICustomUCCCondition
     {
         #region ICustomUCCCondition
-        bool ICustomUCCCondition.IsOK(UCCAction refAction/* = null*/)
+        public new bool IsOK(UCCAction refAction/* = null*/)
         {
             if (Target != Astral.Logic.UCC.Ressources.Enums.Unit.Target
                 || EntityManager.LocalPlayer.Character.CurrentTarget.IsValid)
@@ -17,31 +17,38 @@ namespace EntityTools.UCC.Conditions
             return false;
         }
 
-        bool ICustomUCCCondition.Loked { get => Locked; set => Locked = value; }
+        public new bool Locked { get => base.Locked; set => base.Locked = value; }
 
-#if !DEVELOPER
-        [Browsable(false)]
-#endif
-        string ICustomUCCCondition.TestInfos(UCCAction refAction)
+        public new ICustomUCCCondition Clone()
+        {
+            var copy = new UCCGenericCondition
+            {
+                Sign = Sign,
+                Locked = base.Locked,
+                Target = Target,
+                Tested = Tested,
+                Value = Value
+            };
+
+            return copy;
+        }
+
+        public string TestInfos(UCCAction refAction)
         {
             if (Target != Astral.Logic.UCC.Ressources.Enums.Unit.Target
                 || EntityManager.LocalPlayer.Character.CurrentTarget.IsValid)
                 return $"{Target} {Tested} : {getRefValue(refAction, out ConditionType t)}";
             return "There is no valid Target to test the Condition:\n\r" +
-                   $"{GetType().Name}: {Target} {Tested} {base.Value}";
+                   $"{GetType().Name}:{Target} [{Tested}] {Sign} '{base.Value}'";
         }
         #endregion
 
         public override string ToString()
         {
-            return $"{GetType().Name}: {Target} {Tested} {base.Value}";
+            return $"{Target} [{Tested}] {Sign} '{base.Value}'";
         }
 
-#if DEVELOPER
         [Editor(typeof(UccGenericConditionEditor), typeof(UITypeEditor))]
-#else
-        [Browsable(false)]
-#endif
         public new string Value { get => base.Value; set => base.Value = value; }
     }
 }

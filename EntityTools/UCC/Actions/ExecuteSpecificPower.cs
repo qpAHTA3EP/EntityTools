@@ -1,35 +1,30 @@
-﻿#if DEBUG
-#define DEBUG_ExecuteSpecificPower
-#endif
-#define REFLECTION_ACCESS
-
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Drawing.Design;
-using System.Threading;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Xml.Serialization;
-using Astral.Classes.ItemFilter;
+
+using Astral.Logic.NW;
 using Astral.Logic.UCC.Classes;
-using Astral.Quester.UIEditors;
-using EntityTools.Core.Interfaces;
-using EntityTools.Core.Proxies;
+
 using EntityTools.Editors;
-using EntityTools.Enums;
-using EntityTools.Tools;
+using EntityTools.Tools.Powers;
+using EntityTools.UCC.Conditions;
+using Infrastructure;
 using MyNW.Classes;
+using MyNW.Internals;
+
+using Unit = Astral.Logic.UCC.Ressources.Enums.Unit;
 
 namespace EntityTools.UCC.Actions
 {
     [Serializable]
-    public class ExecuteSpecificPower : UCCAction, IEntityIdentifier
+    public class ExecuteSpecificPower : UCCAction, INotifyPropertyChanged
     {
         #region Опции команды
-#if DEVELOPER
-        [Editor(typeof(PowerAllIdEditor), typeof(UITypeEditor))]
-        [Category("Required")]
-#else
-        [Browsable(false)]
-#endif
+        [Editor(typeof(PowerIdEditor), typeof(UITypeEditor))]
+        [Category("Power")]
         public string PowerId
         {
             get => _powerId;
@@ -38,56 +33,16 @@ namespace EntityTools.UCC.Actions
                 if (_powerId != value)
                 {
                     _powerId = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PowerId)));
+                    _label = string.Empty;
+                    powerCache.PowerIdPattern = _powerId;
+                    NotifyPropertyChanged();
                 }
             }
         }
-        internal string _powerId = string.Empty;
+        private string _powerId = string.Empty;
 
-#if DEVELOPER
-        [Category("Optional")]
-#else
-        [Browsable(false)]
-#endif
-        public bool CheckPowerCooldown
-        {
-            get => _checkPowerCooldown;
-            set
-            {
-                if (_checkPowerCooldown != value)
-                {
-                    _checkPowerCooldown = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CheckPowerCooldown)));
-                }
-            }
-        }
-        internal bool _checkPowerCooldown;
-
-#if DEVELOPER
-        [Category("Optional")]
-#else
-        [Browsable(false)]
-#endif
-        public bool CheckInTray
-        {
-            get => _checkInTray;
-            set
-            {
-                if (_checkInTray != value)
-                {
-                    _checkInTray = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CheckInTray)));
-                }
-            }
-        }
-        internal bool _checkInTray;
-
-#if DEVELOPER
-        [Category("Optional")]
+        [Category("Power")]
         [DisplayName("CastingTime (ms)")]
-#else
-        [Browsable(false)]
-#endif
         public int CastingTime
         {
             get => _castingTime;
@@ -96,17 +51,13 @@ namespace EntityTools.UCC.Actions
                 if (_castingTime != value)
                 {
                     _castingTime = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CastingTime)));
+                    NotifyPropertyChanged();
                 }
             }
         }
-        internal int _castingTime;
+        private int _castingTime;
 
-#if DEVELOPER
-        [Category("Optional")]
-#else
-        [Browsable(false)]
-#endif
+        [Category("Power")]
         public bool ForceMaintain
         {
             get => _forceMaintain;
@@ -115,190 +66,59 @@ namespace EntityTools.UCC.Actions
                 if (_forceMaintain != value)
                 {
                     _forceMaintain = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ForceMaintain)));
+                    NotifyPropertyChanged();
                 }
             }
         }
-        internal bool _forceMaintain;
+        private bool _forceMaintain;
 
-#if DEVELOPER
-        [Description("ID of the Entity that is preferred to attack\n" +
-            "If Entity does not exist or EntityID is empty then the Target option is used")]
-        [Editor(typeof(EntityIdEditor), typeof(UITypeEditor))]
-        [Category("TargetEntity")]
-#else
-        [Browsable(false)]
-#endif
-        public string EntityID
+        [Category("Optional")]
+        public bool CheckPowerCooldown
         {
-            get => _entityId;
+            get => _checkPowerCooldown;
             set
             {
-                if (_entityId != value)
+                if (_checkPowerCooldown != value)
                 {
-                    _entityId = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityID)));
+                    _checkPowerCooldown = value;
+                    NotifyPropertyChanged();
                 }
             }
         }
-        internal string _entityId = string.Empty;
+        private bool _checkPowerCooldown;
 
-#if DEVELOPER
-        [Description("Type of and EntityID:\n" +
-            "Simple: Simple text string with a wildcard at the beginning or at the end (char '*' means any symbols)\n" +
-            "Regex: Regular expression")]
-        [Category("TargetEntity")]
-#else
-        [Browsable(false)]
-#endif
-        public ItemFilterStringType EntityIdType
+        [Category("Optional")]
+        public bool CheckInTray
         {
-            get => _entityIdType;
+            get => _checkInTray;
             set
             {
-                if (_entityIdType != value)
+                if (_checkInTray != value)
                 {
-                    _entityIdType = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityIdType)));
+                    _checkInTray = value;
+                    NotifyPropertyChanged();
                 }
             }
         }
-        internal ItemFilterStringType _entityIdType = ItemFilterStringType.Simple;
-
-#if DEVELOPER
-        [Description("The switcher of the Entity filed which compared to the property EntityID")]
-        [Category("TargetEntity")]
-#else
+        private bool _checkInTray;
+        
+        /// <summary>
+        /// Объявление <see cref="CustomConditions"/> для обратной совместимости.
+        /// Старый список условий объединен со встроенным <see cref="UCCAction.Conditions"/>.
+        /// </summary>
         [Browsable(false)]
-#endif
-        public EntityNameType EntityNameType
+        public UCCConditionPack CustomConditions
         {
-            get => _entityNameType;
+            get => null;
             set
             {
-                if (_entityNameType != value)
+                if (value != null)
                 {
-                    _entityNameType = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(EntityNameType)));
+                    Conditions.Add(value);
                 }
             }
         }
-        internal EntityNameType _entityNameType = EntityNameType.InternalName;
-
-#if DEVELOPER
-        [Description("Check Entity's Ingame Region (Not CustomRegion):\n" +
-            "True: Only Entities located in the same Region as Player are detected\n" +
-            "False: Entity's Region does not checked during search")]
-        [Category("TargetEntity (Optional)")]
-#else
-        [Browsable(false)]
-#endif
-        public bool RegionCheck
-        {
-            get => _regionCheck;
-            set
-            {
-                if (_regionCheck != value)
-                {
-                    _regionCheck = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RegionCheck)));
-                }
-            }
-        }
-        internal bool _regionCheck = true;
-
-#if DEVELOPER
-        [Description("Check if Entity's health greater than zero:\n" +
-            "True: Only Entities with nonzero health are detected\n" +
-            "False: Entity's health does not checked during search")]
-        [Category("TargetEntity (Optional)")]
-#else
-        [Browsable(false)]
-#endif
-        public bool HealthCheck
-        {
-            get => _healthCheck;
-            set
-            {
-                if (_healthCheck != value)
-                {
-                    _healthCheck = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HealthCheck)));
-                }
-            }
-        }
-        internal bool _healthCheck = true;
-
-#if DEVELOPER
-        [Description("Aura which checked on the Entity")]
-        [TypeConverter(typeof(ExpandableObjectConverter))]
-        [Category("TargetEntity (Optional)")]
-#else
-        [Browsable(false)]
-#endif
-        public AuraOption Aura
-        {
-            get => _aura;
-            set
-            {
-                if (_aura != value)
-                {
-                    _aura = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Aura)));
-                }
-            }
-        }
-        internal AuraOption _aura = new AuraOption();
-
-#if DEVELOPER
-        [Description("The maximum distance from the character within which the Entity is searched\n" +
-            "The default value is 0, which disables distance checking")]
-        [Category("TargetEntity (Optional)")]
-#else
-        [Browsable(false)]
-#endif
-        public float ReactionRange
-        {
-            get => _reactionRange;
-            set
-            {
-                if (_reactionRange != value)
-                {
-                    _reactionRange = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ReactionRange)));
-                }
-            }
-        }
-        internal float _reactionRange = 60;
-
-#if DEVELOPER
-        [Description("The maximum ZAxis difference from the withing which the Entity is searched\n" +
-            "The default value is 0, which disables ZAxis checking")]
-        [Category("TargetEntity (Optional)")]
-#else
-        [Browsable(false)]
-#endif
-        public float ReactionZRange
-        {
-            get => _reactionZRange;
-            set
-            {
-                if (_reactionZRange != value)
-                {
-                    _reactionZRange = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ReactionZRange)));
-                }
-            }
-        }
-        internal float _reactionZRange;
-
-#if DEVELOPER
-        [XmlIgnore]
-        [Editor(typeof(EntityTestEditor), typeof(UITypeEditor))]
-        [Description("Нажми на кнопку '...' чтобы увидеть тестовую информацию")]
-        //[Category("Entity")]
-        public string TestInfo { get; } = "Нажми '...' =>";
-#endif
+        public bool ShouldSerializeCustomConditions() => false;
 
         #region Hide Inherited Properties
         [XmlIgnore]
@@ -307,54 +127,259 @@ namespace EntityTools.UCC.Actions
         #endregion
         #endregion
 
-        #region Взаимодействие с EntityToolsCore
-        [NonSerialized]
-        internal IUccActionEngine Engine;
 
+
+
+        #region INotifyPropertyChanged
         public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+        #endregion
+
+
 
         public ExecuteSpecificPower()
         {
-            Target = Astral.Logic.UCC.Ressources.Enums.Unit.Target;
-            Engine = new UccActionProxy(this);
-        }
-        private IUccActionEngine MakeProxie()
-        {
-            return new UccActionProxy(this);
-        }
-        #endregion
+            _idStr = $"{GetType().Name}[{GetHashCode():X2}]";
 
-        #region Интерфейс команды
-        public override bool NeedToRun => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).NeedToRun;
-        public override bool Run() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).Run();
-        [XmlIgnore]
-        [Browsable(false)]
-        public Entity UnitRef => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).UnitRef;
-        public override string ToString() => LazyInitializer.EnsureInitialized(ref Engine, MakeProxie).Label();
-        #endregion
-
+        }
         public override UCCAction Clone()
         {
-            return BaseClone(new ExecuteSpecificPower
-            {
+            return BaseClone(new ExecuteSpecificPower {
                 _powerId = _powerId,
                 _checkPowerCooldown = _checkPowerCooldown,
                 _checkInTray = _checkInTray,
                 _castingTime = _castingTime,
                 _forceMaintain = _forceMaintain,
-                _entityId = _entityId,
-                _entityIdType = _entityIdType,
-                _entityNameType = _entityNameType,
-                _regionCheck = _regionCheck,
-                _healthCheck = _healthCheck,
-                _aura = new AuraOption
-                {
-                    AuraName = _aura.AuraName,
-                    AuraNameType = _aura.AuraNameType,
-                    Sign = _aura.Sign,
-                    Stacks = _aura.Stacks
-                }
             });
         }
+
+        #region Данные
+        private string _label = string.Empty;
+        private string _idStr;
+        private readonly PowerCache powerCache = new PowerCache(string.Empty);
+        #endregion
+        
+
+
+
+        #region IUCCActionEngine
+        public override bool NeedToRun
+        {
+            get
+            {
+                bool debugInfo = global::EntityTools.EntityTools.Config.Logger.UccActions.DebugExecuteSpecificPower;
+
+                string actionIdStr = debugInfo
+                    ? $"{_idStr}.{MethodBase.GetCurrentMethod()?.Name ?? nameof(NeedToRun)}"
+                    : string.Empty;
+
+                var pwr = powerCache.GetPower();
+
+                if (pwr is null)
+                {
+                    if (debugInfo)
+                        ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: Power does not found.");
+                    return false;
+                }
+
+                if (CheckInTray && !pwr.IsInTray)
+                {
+                    if (debugInfo)
+                        ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: Power is not Slotted.");
+                    return false;
+                }
+
+                if (CheckPowerCooldown && pwr.IsOnCooldown())
+                {
+                    if (debugInfo)
+                        ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: Power is on Cooldown.");
+                    return false;
+                }
+
+#if CUSTOM_UCC_CONDITION_EDITOR
+                if (debugInfo)
+                {
+                    var conditions = CustomConditions.Conditions;
+                    var sb = new StringBuilder();
+                    bool result = true;
+                    if (conditions.Count > 0)
+                    {
+                        if (CustomConditions.TestRule == LogicRule.Disjunction)
+                        {
+                            int lockedNum = 0;
+                            int okUnlockedNum = 0;
+                            bool lockedTrue = true;
+                            foreach (var cond in conditions)
+                            {
+                                if (cond.Locked)
+                                    sb.Append("\t[L] ");
+                                else sb.Append("\t[U] ");
+                                sb.Append(cond).Append(" | Result: ");
+                                bool ok;
+                                if (cond is ICustomUCCCondition iCond)
+                                {
+                                    ok = iCond.IsOK(@this);
+                                    if (iCond.Locked)
+                                    {
+                                        if (!ok)
+                                        {
+                                            lockedTrue = false;
+                                        }
+                                        lockedNum++;
+                                    }
+                                    else if (ok)
+                                        okUnlockedNum++;
+                                }
+                                else
+                                {
+                                    ok = cond.IsOK(@this);
+                                    if (cond.Locked)
+                                    {
+                                        if (!ok)
+                                        {
+                                            lockedTrue = false;
+                                        }
+                                        lockedNum++;
+                                    }
+                                    else if (ok)
+                                        okUnlockedNum++;
+                                }
+                                sb.AppendLine(ok.ToString());
+                            }
+                            result = lockedTrue && (conditions.Count == lockedNum || okUnlockedNum > 0);
+                        }
+                        else
+                        {
+                            foreach (UCCCondition cond in conditions)
+                            {
+                                if (cond.Locked)
+                                    sb.Append("\t[L] ");
+                                else sb.Append("\t[U] ");
+                                sb.Append(cond).Append(" | Result: ");
+                                bool ok;
+                                if (cond is ICustomUCCCondition iCond)
+                                {
+                                    ok = iCond.IsOK(@this);
+                                    if (!ok)
+                                    {
+                                        result = false;
+                                    }
+                                }
+                                else
+                                {
+                                    ok = cond.IsOK(@this);
+                                    if (!ok)
+                                    {
+                                        result = false;
+                                    }
+                                }
+                                sb.AppendLine(ok.ToString());
+                            }
+                        }
+                    }
+                    sb.Append("Negation flag (Not): ").AppendLine(CustomConditions.Not.ToString());
+
+                    ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: CustomConditions are {result}:\n{sb}");
+                    return result;
+                }
+
+                return CustomConditions.IsOK(@this); 
+#else
+                return true;
+#endif
+            }
+        }
+
+        public override bool Run()
+        {
+            bool debugInfo = global::EntityTools.EntityTools.Config.Logger.UccActions.DebugExecuteSpecificPower;
+
+            string actionIdStr = debugInfo
+                    ? $"{_idStr}.{MethodBase.GetCurrentMethod()?.Name ?? nameof(Run)}"
+                    : string.Empty;
+
+            if (debugInfo)
+                ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: starts");
+
+            var pwr = powerCache.GetPower();
+
+            if (pwr is null)
+            {
+                if (debugInfo)
+                    ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: Fail to get Power '{PowerId}' by 'PowerId'");
+
+                return false;
+            }
+
+            var targetEntity = UnitRef;
+
+            var powResult = pwr.ExecutePower(targetEntity, CastingTime, Range, ForceMaintain, debugInfo);
+
+            switch (powResult)
+            {
+                case PowerResult.Succeed:
+                    if (debugInfo)
+                        ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: Result => {powResult}");
+                    return true;
+                default:
+                    if (debugInfo)
+                        ETLogger.WriteLine(LogType.Debug, $"{actionIdStr}: Result => {powResult}");
+                    return false;
+            }
+        }
+
+        public Entity UnitRef
+        {
+            get
+            {
+                switch (Target)
+                {
+                    case Unit.Player:
+                        return EntityManager.LocalPlayer;
+                    case Unit.MostInjuredAlly:
+                        return ActionsPlayer.MostInjuredAlly;
+                    case Unit.StrongestAdd:
+                        return ActionsPlayer.AnAdd;
+                    case Unit.StrongestTeamMember:
+                        return ActionsPlayer.StrongestTeamMember;
+                    default:
+                        return Astral.Logic.UCC.Core.CurrentTarget;
+                }
+            }
+        }
+
+        public override string ToString()
+        {
+            var pwrId = PowerId;
+            if (string.IsNullOrEmpty(pwrId))
+                _label = $"{nameof(PowerId)} not defined";
+            else if (string.IsNullOrEmpty(_label))
+            {
+                var pwr = powerCache.GetPower();
+
+                if (pwr != null)
+                {
+                    var powDef = pwr.PowerDef;
+                    if (powDef != null && powDef.IsValid)
+                        _label = string.Concat(CheckInTray && pwr.IsInTray ? "[Slotted] " : string.Empty,
+                                              string.IsNullOrEmpty(powDef.DisplayName) ? powDef.InternalName : $"{powDef.DisplayName} [{powDef.InternalName}]");
+                }
+                else
+                {
+                    var powerDefByPowerId = Powers.GetPowerDefByPowerId(pwrId);
+                    if (powerDefByPowerId.IsValid)
+                        _label = string.Concat(powerDefByPowerId.DisplayName, " (Unknown Power)");
+                }
+                if (string.IsNullOrEmpty(_label))
+                    _label = $"{pwrId} (Unknown Power)";
+            }
+
+            return _label;
+        }
+        #endregion
     }
 }

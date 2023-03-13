@@ -1,7 +1,8 @@
 ﻿using System;
 using Astral.Quester.Classes;
 using EntityTools.Quester.Conditions;
-using AcTp0Tools.Reflection;
+using ACTP0Tools.Reflection;
+using EntityTools.Core.Interfaces;
 
 namespace EntityTools.Core.Proxies
 {
