@@ -243,6 +243,7 @@
     <Compile Include="Forms\TargetSelectForm.Designer.cs">
       <DependentUpon>TargetSelectForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Quester\Editor\Classes\ConditionPackMetadataType.cs" />
     <Compile Include="Quester\Editor\EditAct\DeleteQuesterCondition.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -300,7 +301,6 @@
     <Compile Include="Quester\Actions\RemoveIgnoredFoes.cs" />
     <Compile Include="Quester\Actions\AddIgnoredFoes.cs" />
     <Compile Include="Quester\Actions\TurnInMissionExt.cs" />
-    <Compile Include="Quester\Conditions\ConditionPack.cs" />
     <Compile Include="Quester\Conditions\EquipmentLevel.cs" />
     <Compile Include="Quester\Conditions\IsInCustomRegionSet.cs" />
     <Compile Include="Quester\Editor\Classes\IsInCustomRegionMetadataType.cs" />
@@ -734,7 +734,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
+    <PostBuildEvent>$(SolutionDir)packages\ILRepack.2.0.18\tools\ILRepack.exe /out:"$(TargetPath)" "$(TargetPath)" "$(TargetDir)0Harmony.dll" "$(TargetDir)Infrastructure.dll"</PostBuildEvent>
   </PropertyGroup>
 </Project>

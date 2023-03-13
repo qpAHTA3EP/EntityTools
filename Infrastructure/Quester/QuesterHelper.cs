@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
 using System.Windows.Forms;
@@ -29,9 +30,9 @@ namespace Infrastructure.Quester
             if (actionPack is null)
                 return;
             actionPack.Reset();
-            SetStartPointInternal(actionPack, searchedActionId);
+            _setStartPointInternal(actionPack, searchedActionId);
         }
-        private static QuesterAction SetStartPointInternal(ActionPack actionPack, Guid searchedActionId)
+        private static QuesterAction _setStartPointInternal(ActionPack actionPack, Guid searchedActionId)
         {
             /*
                 private Action SetStartPoint(ActionPack pack, Action startAction)
@@ -78,7 +79,7 @@ namespace Infrastructure.Quester
 
                 if (action is ActionPack innerActionPack)
                 {
-                    var foundedAction = SetStartPointInternal(innerActionPack, searchedActionId);
+                    var foundedAction = _setStartPointInternal(innerActionPack, searchedActionId);
                     if (foundedAction != null)
                     {
                         playingActionList.Add(action);
@@ -151,7 +152,9 @@ namespace Infrastructure.Quester
         {
             var zipFileName = meshesFileName;
             int result = 0;
-            if (string.IsNullOrEmpty(meshesFileName) || !File.Exists(zipFileName)) return result;
+            if (string.IsNullOrEmpty(meshesFileName) 
+                || !File.Exists(zipFileName)) 
+                return result;
 
             try
             {
@@ -192,6 +195,9 @@ namespace Infrastructure.Quester
             }
         }
 
+
+
+
         /// <summary>
         /// Сохранение quester-профиля.<br/>
         /// Аналог <seealso cref="Astral.Quester.Core.Save(bool)"/>.
@@ -206,15 +212,48 @@ namespace Infrastructure.Quester
             if (profile is null)
                 return false;
 
-            bool needLoadAllInternalMeshes = false;
-            if (string.IsNullOrEmpty(currentProfileName) || string.IsNullOrEmpty(newProfileName))
+            string targetProfileName = _getProfileTargetFileName(currentProfileName, newProfileName);
+            if (string.IsNullOrEmpty(targetProfileName))
+                return false;
+
+            
+            string targetMeshesFileName = _getMeshesTargetFileName(profile, currentProfileName, targetProfileName);
+            if (string.IsNullOrEmpty(targetMeshesFileName))
             {
-                newProfileName = RequestUserForNewProfileFileName(currentProfileName);
-                if (string.IsNullOrEmpty(newProfileName))
-                    return false;
-                needLoadAllInternalMeshes = currentProfileName != newProfileName;
+                Logger.Notify($"Error of calculating filename for meshes.", true);
+                return false;
             }
 
+            if (!_saveMeshes(profileMeshes, targetMeshesFileName))
+            {
+                return false;
+            }
+
+            string meshesCurrentFileName = _getMeshesCurrentFileName(profile, currentProfileName);
+            if (!string.IsNullOrEmpty(meshesCurrentFileName)
+                && currentProfileName != targetProfileName
+                && meshesCurrentFileName != targetMeshesFileName)
+            {
+                _copyMeshes(meshesCurrentFileName,
+                            targetMeshesFileName,
+                            name => !profileMeshes.ContainsKey(name));
+            }
+
+            if (!_saveProfile(profile, targetProfileName, targetMeshesFileName))
+            {
+                profile.Saved = false;
+                return false;
+            }
+
+            Logger.Notify($"Profile '{targetProfileName}' saved");
+
+            if (profile.Saved)
+            {
+                newProfileName = targetProfileName;
+                return true;
+            }
+
+#if disabled_2023_03_13
             bool useExternalMeshes = profile.UseExternalMeshFile
                                   && profile.ExternalMeshFileName.Length >= ".mesh.bin".Length + 1;
 
@@ -230,10 +269,10 @@ namespace Infrastructure.Quester
                 externalMeshesFullFilePath = Path.GetFullPath(Path.Combine(currentDir, profile.ExternalMeshFileName));
 
                 // изменяем путь к файлу внешних мешей, поскольку новое имя файла профиля отличается от текущего
-                if (currentProfileName != newProfileName)
+                if (currentProfileName != targetProfileName)
                 {
                     var newRelativeExternalMeshesFilePath =
-                        newProfileName.GetRelativePathTo(externalMeshesFullFilePath);
+                        targetProfileName.GetRelativePathTo(externalMeshesFullFilePath);
                     if (!string.IsNullOrEmpty(newRelativeExternalMeshesFilePath))
                         profile.ExternalMeshFileName = newRelativeExternalMeshesFilePath;
                 }
@@ -245,17 +284,12 @@ namespace Infrastructure.Quester
             try
             {
                 // Открываем архивный файл профиля
-                zipFile = ZipFile.Open(newProfileName, File.Exists(newProfileName) ? ZipArchiveMode.Update : ZipArchiveMode.Create);
+                zipFile = ZipFile.Open(targetProfileName, File.Exists(targetProfileName) ? ZipArchiveMode.Update : ZipArchiveMode.Create);
 
                 // Сохраняем в архив файл профиля "profile.xml"
-                lock (profile)
+                if (!_saveProfile(profile, zipFile))
                 {
-                    profile.Saved = true;
-                    if (!SaveProfile(profile, zipFile))
-                    {
-                        profile.Saved = false;
-                        return false;
-                    }
+                    return false;
                 }
 
                 var binaryFormatter = new BinaryFormatter();
@@ -269,81 +303,54 @@ namespace Infrastructure.Quester
                             File.Exists(externalMeshesFullFilePath) ? ZipArchiveMode.Update : ZipArchiveMode.Create))
                         {
                             // сохраняем все загруженные меши во внешний архивный файл
-                            SaveAllMeshes(externalMeshesZipFile, profileMeshes, binaryFormatter);
+                            _saveAllMeshes(externalMeshesZipFile, profileMeshes, binaryFormatter);
 
                             // Копируем файлы мешей из файла профиля во внешний архив
-                            if (zipFile.Mode != ZipArchiveMode.Create)
-                            {
-                                // 1/ Нельзя обращаться к zipFile.Entries в режиме ZipArchiveMode.Create
-                                // 2/ Нельзя использовать итератор (foreach) для удаления мешей из исходного архива
-                                for (int i = 0; i < zipFile.Entries.Count;)
-                                {
-                                    var entry = zipFile.Entries[i];
-
-                                    // Если используется внешние меши, в файле профиля нужно удалить все "лишние" файлы
-                                    var entryName = entry.Name;
-                                    if (!entryName.Equals("profile.xml", StringComparison.OrdinalIgnoreCase)
-                                        && entryName.EndsWith(".bin"))
-                                    {
-                                        var meshName = entryName.Substring(0, entryName.Length - ".bin".Length);
-                                        if (!profileMeshes.ContainsKey(meshName))
-                                        {
-                                            // Меш карты, соответствующей entry, ОТСУТСТВУЕТ в currentProfileMeshes 
-                                            // и не был сохранен во внешний архивный файл
-                                            ZipArchiveEntry externalMeshEntry = null;
-                                            if (externalMeshesZipFile.Mode == ZipArchiveMode.Update)
-                                                externalMeshEntry = externalMeshesZipFile.GetEntry(entryName);
-                                            if (externalMeshEntry is null)
-                                                externalMeshEntry = externalMeshesZipFile.CreateEntry(entryName);
-
-                                            // копирование меша из архива профиля во внешний архив 
-                                            using (var internalMeshStream = entry.Open())
-                                            using (var externalMeshStream = externalMeshEntry.Open())
-                                            {
-                                                internalMeshStream.CopyTo(externalMeshStream);
-                                            }
-                                        }
-
-                                        // Удаление скопированного (дублирующегося) меша из архива профиля
-                                        if (zipFile.Mode == ZipArchiveMode.Update)
-                                        {
-                                            entry.Delete();
-                                            continue;
-                                        }
-                                    }
-                                    i++;
-                                }
-                            }
+                            _copyIntoExternMeshes(profileMeshes, zipFile, externalMeshesZipFile);
                         }
                     }
                     else
                     {
                         // сохраняем путевые графы (меши) в архив профиля
-                        SaveAllMeshes(zipFile, profileMeshes, binaryFormatter);
+                        _saveAllMeshes(zipFile, profileMeshes, binaryFormatter);
                     }
                 }
 
-                Logger.Notify($"Profile '{newProfileName}' saved");
+                _removeProfileBackups(zipFile);
 
-                return profile.Saved;
+                Logger.Notify($"Profile '{targetProfileName}' saved");
+
+                if (profile.Saved)
+                {
+                    newProfileName = targetProfileName;
+                    return true;
+                }
             }
             catch (Exception exc)
             {
+                profile.Saved = false;
                 Logger.Notify($"Catch an exception while saving profile '{newProfileName}':\n{exc}", true);
             }
             finally
             {
                 zipFile?.Dispose();
             }
+#endif
 
-            return false;
+            return false; 
         }
 
 
-        private static string RequestUserForNewProfileFileName(string currentProfileName)
+
+
+        private static string _getProfileTargetFileName(string currentProfileName, string newProfileName)
         {
-            string profileNameWithoutExtension = currentProfileName;
-            if (string.IsNullOrEmpty(profileNameWithoutExtension))
+            if (!string.IsNullOrEmpty(newProfileName))
+                return newProfileName;
+
+            string profileNameWithoutExtension;
+            if (string.IsNullOrEmpty(currentProfileName)
+                || !File.Exists(currentProfileName))
             {
                 profileNameWithoutExtension = EntityManager.LocalPlayer.MapState.MapName;
             }
@@ -365,7 +372,214 @@ namespace Infrastructure.Quester
                 return string.Empty;
             return saveDialog.FileName;
         }
-        private static void SaveAllMeshes(ZipArchive zipArchive, IDictionary<string, Graph> meshes, BinaryFormatter binFormatter)
+
+        private static string _getMeshesCurrentFileName(Profile profile, string currentProfileName)
+        {
+            string currentProfileZipMeshFile;
+            if (!string.IsNullOrEmpty(currentProfileName))
+            {
+                if (profile.UseExternalMeshFile && !string.IsNullOrEmpty(profile.ExternalMeshFileName))
+                    currentProfileZipMeshFile = Path.Combine(Path.GetDirectoryName(currentProfileName) ?? string.Empty,
+                        profile.ExternalMeshFileName);
+                else currentProfileZipMeshFile = currentProfileName;
+                if (!File.Exists(currentProfileZipMeshFile))
+                    currentProfileZipMeshFile = string.Empty;
+            }
+            else currentProfileZipMeshFile = string.Empty;
+
+            return currentProfileZipMeshFile;
+        }
+
+        private static string _getMeshesTargetFileName(Profile profile, string currentProfileName, string targetProfileName)
+        {
+            bool useExternalMeshes = profile.UseExternalMeshFile
+                                  && profile.ExternalMeshFileName.Length >= ".mesh.bin".Length + 1;
+
+            string meshesTargetFilePath = string.Empty;
+            if (useExternalMeshes)
+            {
+                string currentDir = string.Empty;
+                if (!string.IsNullOrEmpty(currentProfileName))
+                    currentDir = Path.GetDirectoryName(currentProfileName);
+                if (string.IsNullOrEmpty(currentDir))
+                    currentDir = Astral.Controllers.Directories.ProfilesPath;
+
+                meshesTargetFilePath = Path.GetFullPath(Path.Combine(currentDir, profile.ExternalMeshFileName));
+
+#if false
+                // изменяем путь к файлу внешних мешей, поскольку новое имя файла профиля отличается от текущего
+                if (currentProfileName != targetProfileName)
+                {
+                    var newRelativeExternalMeshesFilePath =
+                        targetProfileName.GetRelativePathTo(meshesTargetFilePath);
+                    if (!string.IsNullOrEmpty(newRelativeExternalMeshesFilePath))
+                        profile.ExternalMeshFileName = newRelativeExternalMeshesFilePath;
+                } 
+#endif
+            }
+            else meshesTargetFilePath = targetProfileName;
+
+            return meshesTargetFilePath;
+        }
+
+        private static bool _saveMeshes(IDictionary<string, Graph> profileMeshes, string targetMeshesFileName)
+        {
+            var count = profileMeshes?.Count ?? 0;
+            if (count == 0)
+                return true;
+
+            try
+            {
+                lock (profileMeshes)
+                {
+                    var binaryFormatter = new BinaryFormatter();
+                    using (var meshesZipFile = ZipFile.Open(targetMeshesFileName,
+                                File.Exists(targetMeshesFileName) ? ZipArchiveMode.Update : ZipArchiveMode.Create))
+                    {
+                        int savedNum = 0;
+                        foreach (var mesh in profileMeshes)
+                        {
+                            // удаляем мусор (скрытые вершины и ребра)
+                            mesh.Value.RemoveUnpassable();
+
+                            string meshName = mesh.Key + ".bin";
+
+                            if (!_saveMesh(meshesZipFile, meshName, mesh.Value, binaryFormatter))
+                            {
+                                ETLogger.WriteLine(LogType.Error, $"Error saving meshes '{meshName}' into file '{targetMeshesFileName}'.", true);
+                                return false;
+                            }
+                            savedNum++;
+                        }
+                        if (savedNum == count)
+                            return true;
+
+                        ETLogger.WriteLine(LogType.Error, $"Only {savedNum} meshes are saved into file '{targetMeshesFileName}' than is less then expected {count}.", true);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                ETLogger.WriteLine(LogType.Error, $"Catch an exception while saving meshes:\n{e}.", true);
+
+                throw;
+            }
+            return false;
+        }
+
+#if disabled_2023_03_13
+        /// <summary>
+        /// Копируем файлы мешей из файла профиля во внешний архив
+        /// </summary>
+        /// <param name="profileMeshes"></param>
+        /// <param name="zipFile"></param>
+        /// <param name="externalMeshesZipFile"></param>
+        private static void _copyIntoExternMeshes(IDictionary<string, Graph> profileMeshes, ZipArchive zipFile, ZipArchive externalMeshesZipFile)
+        {
+            if (zipFile.Mode != ZipArchiveMode.Create)
+            {
+                // 1/ Нельзя обращаться к zipFile.Entries в режиме ZipArchiveMode.Create
+                // 2/ Нельзя использовать итератор (foreach) для удаления мешей из исходного архива
+                for (int i = 0; i < zipFile.Entries.Count;)
+                {
+                    var entry = zipFile.Entries[i];
+
+                    // Если используется внешние меши, в файле профиля нужно удалить все "лишние" файлы
+                    var entryName = entry.Name;
+                    if (!entryName.Equals("profile.xml", StringComparison.OrdinalIgnoreCase)
+                        && entryName.EndsWith(".bin"))
+                    {
+                        var meshName = entryName.Substring(0, entryName.Length - ".bin".Length);
+                        if (!profileMeshes.ContainsKey(meshName))
+                        {
+                            // Меш карты, соответствующей entry, ОТСУТСТВУЕТ в currentProfileMeshes 
+                            // и не был сохранен во внешний архивный файл
+                            ZipArchiveEntry externalMeshEntry = null;
+                            if (externalMeshesZipFile.Mode == ZipArchiveMode.Update)
+                                externalMeshEntry = externalMeshesZipFile.GetEntry(entryName);
+                            if (externalMeshEntry is null)
+                                externalMeshEntry = externalMeshesZipFile.CreateEntry(entryName);
+
+                            // копирование меша из архива профиля во внешний архив 
+                            using (var internalMeshStream = entry.Open())
+                            using (var externalMeshStream = externalMeshEntry.Open())
+                            {
+                                internalMeshStream.CopyTo(externalMeshStream);
+                            }
+                        }
+
+                        // Удаление скопированного (дублирующегося) меша из архива профиля
+                        if (zipFile.Mode == ZipArchiveMode.Update)
+                        {
+                            entry.Delete();
+                            continue;
+                        }
+                    }
+                    i++;
+                }
+            }
+        } 
+#endif
+
+        private static bool _copyMeshes(string fromFileName, string targetFileName, Predicate<string> shouldCopy, bool shouldDeleteFromSource = false)
+        {
+            if (!File.Exists(fromFileName))
+                return true;
+
+            using (var fromZipFile = ZipFile.Open(fromFileName,
+                shouldDeleteFromSource ? ZipArchiveMode.Update : ZipArchiveMode.Read))
+            {
+                using (var targetZipFile = ZipFile.Open(targetFileName,
+                                    File.Exists(targetFileName) ? ZipArchiveMode.Update : ZipArchiveMode.Create))
+                {
+                    // 1/ Нельзя обращаться к zipFile.Entries в режиме ZipArchiveMode.Create
+                    // 2/ Нельзя использовать итератор (foreach) для удаления мешей из исходного архива
+                    for (int i = 0; i < fromZipFile.Entries.Count;)
+                    {
+                        var entry = fromZipFile.Entries[i];
+
+                        var entryName = entry.Name;
+                        if (!entryName.Equals("profile.xml", StringComparison.OrdinalIgnoreCase)
+                            && entryName.EndsWith(".bin"))
+                        {
+                            var meshName = entryName.Substring(0, entryName.Length - ".bin".Length);
+                            if (shouldCopy(meshName))
+                            {
+                                // Меш карты, соответствующей entry, ОТСУТСТВУЕТ в currentProfileMeshes 
+                                // и не был сохранен во внешний архивный файл
+                                ZipArchiveEntry externalMeshEntry = null;
+                                if (targetZipFile.Mode == ZipArchiveMode.Update)
+                                    externalMeshEntry = targetZipFile.GetEntry(entryName);
+                                if (externalMeshEntry is null)
+                                    externalMeshEntry = targetZipFile.CreateEntry(entryName);
+
+                                // копирование меша из архива профиля во внешний архив 
+                                using (var internalMeshStream = entry.Open())
+                                {
+                                    using (var externalMeshStream = externalMeshEntry.Open())
+                                    {
+                                        internalMeshStream.CopyTo(externalMeshStream);
+                                    }
+                                }
+                            }
+
+                            // Удаление скопированного (дублирующегося) меша из архива профиля
+                            if (shouldDeleteFromSource)
+                            {
+                                entry.Delete();
+                                continue;
+                            }
+                        }
+                        i++;
+                    }
+                } 
+            }
+
+            return false;
+        }
+
+#if disabled_2023_03_13
+        private static void _saveAllMeshes(ZipArchive zipArchive, IDictionary<string, Graph> meshes, BinaryFormatter binFormatter)
         {
             foreach (var mesh in meshes)
             {
@@ -374,14 +588,15 @@ namespace Infrastructure.Quester
 
                 string meshName = mesh.Key + ".bin";
 
-                SaveMesh(zipArchive, meshName, mesh.Value, binFormatter);
+                _saveMesh(zipArchive, meshName, mesh.Value, binFormatter);
             }
-        }
+        } 
+#endif
 
         /// <summary>
         /// Сохранение мешей <paramref name="mesh"/> в архивный файл <paramref name="zipFile"/> под именем <paramref name="meshName"/>
         /// </summary>
-        private static bool SaveMesh(ZipArchive zipFile, string meshName, Graph mesh, BinaryFormatter binaryFormatter = null)
+        private static bool _saveMesh(ZipArchive zipFile, string meshName, Graph mesh, BinaryFormatter binaryFormatter = null)
         {
             if (zipFile is null)
                 return false;
@@ -431,65 +646,140 @@ namespace Infrastructure.Quester
         /// <summary>
         /// Сохранение профиля в архивный файл <paramref name="zipFile"/>
         /// </summary>
-        internal static bool SaveProfile(Profile profile, ZipArchive zipFile)
+        private static bool _saveProfile(Profile profile, ZipArchive zipFile)
         {
             if (zipFile.Mode != ZipArchiveMode.Update
                 && zipFile.Mode != ZipArchiveMode.Create)
                 return false;
-
-            using (var memStream = new MemoryStream())
+            
+            lock (profile)
             {
-                try
+                using (var memStream = new MemoryStream())
                 {
-                    profile.Saved = true;
-                    ACTP0Serializer.QuesterProfileSerializer.Serialize(memStream, profile);
-
-                    ZipArchiveEntry zipProfileEntry = null;
-
-                    bool upgrading = true;
-                    if (zipFile.Mode == ZipArchiveMode.Update)
-                        zipProfileEntry = zipFile.GetEntry("profile.xml");
-                    if (zipProfileEntry is null)
+                    try
                     {
-                        zipProfileEntry = zipFile.CreateEntry("profile.xml");
-                        upgrading = false;
-                    }
+                        profile.Saved = true;
+                        ACTP0Serializer.QuesterProfileSerializer.Serialize(memStream, profile);
 
-                    using (var zipProfileStream = zipProfileEntry.Open())
-                    {
-                        if (upgrading)
+                        ZipArchiveEntry zipProfileEntry = null;
+
+                        bool upgrading = true;
+                        if (zipFile.Mode == ZipArchiveMode.Update)
+                            zipProfileEntry = zipFile.GetEntry("profile.xml");
+                        if (zipProfileEntry is null)
                         {
-                            MakeProfileBackup(zipFile, zipProfileStream);
-                            zipProfileStream.Seek(0, SeekOrigin.Begin);
-                            zipProfileStream.SetLength(memStream.Length);
+                            zipProfileEntry = zipFile.CreateEntry("profile.xml");
+                            upgrading = false;
                         }
-                        memStream.WriteTo(zipProfileStream);
 
-                        RemoveProfileBackups(zipFile);
-                        return true;
+                        using (var zipProfileStream = zipProfileEntry.Open())
+                        {
+                            if (upgrading)
+                            {
+                                _makeProfileBackup(zipFile, zipProfileStream);
+                                zipProfileStream.Seek(0, SeekOrigin.Begin);
+                                zipProfileStream.SetLength(memStream.Length);
+                            }
+                            memStream.WriteTo(zipProfileStream);
+
+                            return true;
+                        }
                     }
-                }
-                catch (Exception e)
-                {
-                    profile.Saved = false;
-                    Logger.WriteLine(Logger.LogType.Debug, e.ToString());
+                    catch (Exception e)
+                    {
+                        profile.Saved = false;
+                        Logger.WriteLine(Logger.LogType.Debug, e.ToString());
+                    }
                 }
             }
             return false;
         }
 
-        private static void MakeProfileBackup(ZipArchive zipFile, Stream zipProfileStream)
+        private static bool _saveProfile(Profile profile, string targetProfileName, string targetMeshesFileName)
+        {
+            if (profile is null
+                || string.IsNullOrEmpty(targetProfileName))
+                return false;
+
+
+            using (var zipFile = ZipFile.Open(targetProfileName, 
+                File.Exists(targetProfileName) ? ZipArchiveMode.Update : ZipArchiveMode.Create))
+            {
+                lock (profile)
+                {
+                    using (var memStream = new MemoryStream())
+                    {
+                        var backupExternalMeshFileName = profile.ExternalMeshFileName;
+
+                        try
+                        {
+                            profile.Saved = true;
+
+                            // изменяем путь к файлу внешних мешей, поскольку новое имя файла профиля отличается от текущего
+                            if (profile.UseExternalMeshFile)
+                            {
+                                var newRelativeExternalMeshesFilePath =
+                                    targetProfileName.GetRelativePathTo(targetMeshesFileName);
+                                if (!string.IsNullOrEmpty(newRelativeExternalMeshesFilePath))
+                                    profile.ExternalMeshFileName = newRelativeExternalMeshesFilePath;
+                            }
+
+                            ACTP0Serializer.QuesterProfileSerializer.Serialize(memStream, profile);
+
+                            ZipArchiveEntry zipProfileEntry = null;
+
+                            bool upgrading = true;
+                            if (zipFile.Mode == ZipArchiveMode.Update)
+                                zipProfileEntry = zipFile.GetEntry("profile.xml");
+                            if (zipProfileEntry is null)
+                            {
+                                zipProfileEntry = zipFile.CreateEntry("profile.xml");
+                                upgrading = false;
+                            }
+
+                            using (var zipProfileStream = zipProfileEntry.Open())
+                            {
+                                if (upgrading)
+                                {
+                                    _makeProfileBackup(zipFile, zipProfileStream);
+                                    zipProfileStream.Seek(0, SeekOrigin.Begin);
+                                    zipProfileStream.SetLength(memStream.Length);
+                                }
+                                memStream.WriteTo(zipProfileStream);
+
+                            }
+
+                            _removeProfileBackups(zipFile);
+
+                            return true;
+                        }
+                        catch (Exception e)
+                        {
+                            profile.Saved = false;
+                            profile.ExternalMeshFileName = backupExternalMeshFileName;
+                            Logger.WriteLine(Logger.LogType.Debug, e.ToString());
+                        }
+                    }
+                } 
+            }
+            return false;
+        }
+
+        private static void _makeProfileBackup(ZipArchive zipFile, Stream zipProfileStream)
         {
             var zipProfileBackup = zipFile.CreateEntry($"profile_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.xml");
             using (var zipProfileBackupStream = zipProfileBackup.Open())
             {
                 zipProfileStream.CopyTo(zipProfileBackupStream);
-
             }
         }
 
-        private static void RemoveProfileBackups(ZipArchive zipFile)
+        private static void _removeProfileBackups(ZipArchive zipFile)
         {
+            if (zipFile is null
+                || zipFile.Mode != ZipArchiveMode.Update)
+                return;
+
             var trunkateDate = DateTime.Now.AddDays(-7);
             var oldBackups = new List<ZipArchiveEntry>();
             foreach (var entry in zipFile.Entries)
@@ -572,7 +862,7 @@ namespace Infrastructure.Quester
                         // Сохраняем преобразованный файл профиля
                         using (var zipFile = ZipFile.Open(profilePath, ZipArchiveMode.Update))
                         {
-                            QuesterHelper.SaveProfile(profile, zipFile);
+                            QuesterHelper._saveProfile(profile, zipFile);
                         }
                     }
                     return profile;

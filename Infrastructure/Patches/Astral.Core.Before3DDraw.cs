@@ -25,6 +25,7 @@ namespace Infrastructure.Patches
         private static MethodInfo original_Before3DDraw;
         private static MethodInfo finalizer;
 
+        private static bool Patched = false;
 
         // ReSharper disable once InconsistentNaming
         static Exception Finalizer(Exception __exception)
@@ -64,47 +65,52 @@ namespace Infrastructure.Patches
 
         internal static void ApplyPatches()
         {
-            tBefore3DDrawWrapper = ReflectionHelper.GetTypeByName(TypeWrapperName, true);
-
-            if (tBefore3DDrawWrapper is null)
+            if (!Patched)
             {
-                Logger.WriteLine(Logger.LogType.Debug, $@"Patch of the '{nameof(Astral_Core_Before3DDraw)}' failed. Type '{TypeWrapperName}' not found");
-                return;
-            }
+                tBefore3DDrawWrapper = ReflectionHelper.GetTypeByName(TypeWrapperName, true);
 
-            var tPatch = typeof(Astral_Core_Before3DDraw);
+                if (tBefore3DDrawWrapper is null)
+                {
+                    Logger.WriteLine(Logger.LogType.Debug, $@"Patch of the '{nameof(Astral_Core_Before3DDraw)}' failed. Type '{TypeWrapperName}' not found");
+                    return;
+                }
 
-            finalizer = AccessTools.Method(tPatch, nameof(Finalizer));
-            if (finalizer is null)
-            {
-                Logger.WriteLine(Logger.LogType.Debug, $@"Patch '{nameof(Astral_Core_Before3DDraw)}' failed. Method '{nameof(Finalizer)}' not found");
-                return;
-            }
+                var tPatch = typeof(Astral_Core_Before3DDraw);
 
-            original_Before3DDraw = AccessTools.Method(tBefore3DDrawWrapper, "\u0001");
-            if (original_Before3DDraw is null)
-            {
-                Logger.WriteLine(Logger.LogType.Debug, $@"Patch '{nameof(Astral_Core_Before3DDraw)}' failed. Method method not found.");
-                return;
-            }
+                finalizer = AccessTools.Method(tPatch, nameof(Finalizer));
+                if (finalizer is null)
+                {
+                    Logger.WriteLine(Logger.LogType.Debug, $@"Patch '{nameof(Astral_Core_Before3DDraw)}' failed. Method '{nameof(Finalizer)}' not found");
+                    return;
+                }
 
-            Action unPatch = null;
-            try
-            {
-                var harPatch = new HarmonyMethod(finalizer);
-                //unPatch = () =>
-                //{
-                //    Logger.WriteLine(Logger.LogType.Debug, $@"Unpatch '{nameof(Astral_Core_Before3DDraw)}'");
-                //    ACTP0Patcher.Harmony.Unpatch(original_Before3DDraw, finalizer);
-                //};
-                ACTP0Patcher.Harmony.Patch(original_Before3DDraw, null, null, null, harPatch);
-                Logger.WriteLine(Logger.LogType.Debug, $@"Patch '{nameof(Astral_Core_Before3DDraw)}' succeeded.");
-            }
-            catch (Exception e)
-            {
-                unPatch?.Invoke();
-                Logger.WriteLine(Logger.LogType.Debug, $"Patch '{nameof(Astral_Core_Before3DDraw)}' failed.\n{e}");
-                throw;
+                original_Before3DDraw = AccessTools.Method(tBefore3DDrawWrapper, "\u0001");
+                if (original_Before3DDraw is null)
+                {
+                    Logger.WriteLine(Logger.LogType.Debug, $@"Patch '{nameof(Astral_Core_Before3DDraw)}' failed. Method method not found.");
+                    return;
+                }
+
+                Action unPatch = null;
+                try
+                {
+                    var harPatch = new HarmonyMethod(finalizer);
+                    //unPatch = () =>
+                    //{
+                    //    Logger.WriteLine(Logger.LogType.Debug, $@"Unpatch '{nameof(Astral_Core_Before3DDraw)}'");
+                    //    ACTP0Patcher.Harmony.Unpatch(original_Before3DDraw, finalizer);
+                    //};
+                    ACTP0Patcher.Harmony.Patch(original_Before3DDraw, null, null, null, harPatch);
+                    Logger.WriteLine(Logger.LogType.Debug, $@"Patch '{nameof(Astral_Core_Before3DDraw)}' succeeded.");
+
+                    Patched = true;
+                }
+                catch (Exception e)
+                {
+                    unPatch?.Invoke();
+                    Logger.WriteLine(Logger.LogType.Debug, $"Patch '{nameof(Astral_Core_Before3DDraw)}' failed.\n{e}");
+                    throw;
+                } 
             }
         }
     }

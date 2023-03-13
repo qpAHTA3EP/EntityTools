@@ -30,7 +30,7 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
 
         public override bool UseHotSpots => action.UseHotSpots;
 
-        public override List<Vector3> HotSpots => action.HotSpots;
+        public override List<Vector3> HotSpots => action.UseHotSpots ? action.HotSpots : null;
 
         public override QuesterAction.ActionValidity IsValid => action.IsValid;
 

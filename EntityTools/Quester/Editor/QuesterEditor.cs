@@ -91,7 +91,9 @@ namespace EntityTools.Quester.Editor
         public QuesterEditor(Profile profile, string fileName, Guid actionId)
         {
             InitializeComponent();
-
+#if true
+            SetTypeAssociations();
+#endif
             this.profile = profile is null 
                          ? new ProfileProxy()
                          : new ProfileProxy(profile, fileName);
@@ -212,15 +214,12 @@ namespace EntityTools.Quester.Editor
             if (profile is null
                 || string.IsNullOrEmpty(profile.ProfilePath))
                 Text = "* New profile";
-            else Text = (profile.Saved ? string.Empty : "* ")
+            else Text = (profile .Saved ? string.Empty : "* ")
                        + profile.ProfilePath;
         }
 
         private void handler_Form_Load(object sender, EventArgs e)
         {
-#if false
-            SetTypeAssociations(); 
-#endif
 
             UI_fill();
 
@@ -235,29 +234,45 @@ namespace EntityTools.Quester.Editor
             }
         }
 
+#if true // см ComplexPatch_Quester_Editor.SetTypeAssociations(..)
+        private static bool isAssociated = false;
         private static void SetTypeAssociations()
         {
-            // Подмена метаданных для IsInCustomRegion
-            // https://stackoverflow.com/questions/46099675/can-you-how-to-specify-editor-at-runtime-for-propertygrid-for-pcl
-            var provider = new AssociatedMetadataTypeTypeDescriptionProvider(
-                typeof(IsInCustomRegion),
-                typeof(IsInCustomRegionMetadataType));
-            TypeDescriptor.AddProvider(provider, typeof(IsInCustomRegion));
-
-            provider = new AssociatedMetadataTypeTypeDescriptionProvider(
-                typeof(LoadProfile),
-                typeof(LoadProfileMetadataType));
-            TypeDescriptor.AddProvider(provider, typeof(LoadProfile));
-
-            var tPushProfileToStackAndLoad = ACTP0Serializer.PushProfileToStackAndLoad;
-            if (tPushProfileToStackAndLoad != null)
+            if (!isAssociated)
             {
+                // Подмена метаданных для IsInCustomRegion
+                // https://stackoverflow.com/questions/46099675/can-you-how-to-specify-editor-at-runtime-for-propertygrid-for-pcl
+                var provider = new AssociatedMetadataTypeTypeDescriptionProvider(
+                    typeof(IsInCustomRegion),
+                    typeof(IsInCustomRegionMetadataType));
+                TypeDescriptor.AddProvider(provider, typeof(IsInCustomRegion));
+
                 provider = new AssociatedMetadataTypeTypeDescriptionProvider(
-                    tPushProfileToStackAndLoad,
-                    typeof(PushProfileToStackAndLoadMetadataType));
-                TypeDescriptor.AddProvider(provider, tPushProfileToStackAndLoad);
+                    typeof(LoadProfile),
+                    typeof(LoadProfileMetadataType));
+                TypeDescriptor.AddProvider(provider, typeof(LoadProfile));
+
+                var tPushProfileToStackAndLoad = ACTP0Serializer.PushProfileToStackAndLoad;
+                if (tPushProfileToStackAndLoad != null)
+                {
+                    provider = new AssociatedMetadataTypeTypeDescriptionProvider(
+                        tPushProfileToStackAndLoad,
+                        typeof(PushProfileToStackAndLoadMetadataType));
+                    TypeDescriptor.AddProvider(provider, tPushProfileToStackAndLoad);
+                }
+
+                var tConditionPack = ACTP0Serializer.QuesterConditionPack;
+                if (tConditionPack != null)
+                {
+                    provider = new AssociatedMetadataTypeTypeDescriptionProvider(
+                        tConditionPack,
+                        typeof(ConditionPackMetadataType));
+                    TypeDescriptor.AddProvider(provider, tConditionPack);
+                }
+                isAssociated = true;
             }
-        }
+        } 
+#endif
 
         private void handler_Form_Activated(object sender, EventArgs e)
         {

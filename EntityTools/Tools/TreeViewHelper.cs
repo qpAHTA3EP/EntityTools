@@ -22,14 +22,13 @@ namespace EntityTools.Tools
     public static class TreeViewHelper
     {
         #region QuesterAssistant.ConditionPack access and manipulation
-        /// <summary>
-        /// Тип группирующего quester-условия ConditionPack, реализованного в плагине QuesterAssistant
-        /// </summary>
-        public static readonly Type QuesterConditionPackType;
+
+#if QuesterConditionPackItemsAccessor
         /// <summary>
         /// Функтор доступа к свойству Conditions объекта
         /// </summary>
-        private static readonly PropertyAccessor<List<QuesterCondition>> QuesterConditionPackItemsAccessor;
+        private static readonly PropertyAccessor<List<QuesterCondition>> QuesterConditionPackItemsAccessor; 
+#endif
 
         /// <summary>
         /// Проверка соответствия <paramref name="condition"/> типу ConditionPack
@@ -37,10 +36,11 @@ namespace EntityTools.Tools
         /// <param name="condition"></param>
         /// <returns></returns>
         public static bool IsConditionPack(this QuesterCondition condition) =>
-            condition.GetType() == QuesterConditionPackType;
+            condition.GetType() == ACTP0Serializer.QuesterConditionPack;
         public static bool IsConditionPack(this object obj) =>
-            obj.GetType() == QuesterConditionPackType;
+            obj.GetType() == ACTP0Serializer.QuesterConditionPack;
 
+#if QuesterConditionPackItemsAccessor
         /// <summary>
         /// Получение значение свойствя Conditions объекта <paramref name="conditionPack"/>
         /// </summary>
@@ -55,7 +55,7 @@ namespace EntityTools.Tools
             }
 
             return new List<QuesterCondition>();
-        }
+        } 
         /// <summary>
         /// Присвоение свойству Conditions объекта <paramref name="conditionPack"/> значения <paramref name="conditions"/>
         /// </summary>
@@ -73,19 +73,22 @@ namespace EntityTools.Tools
 
             return false;
         } 
+#endif
         #endregion
 
         public static bool IsPushProfileToStackAndLoad(this QuesterAction action) =>
             action.GetType() == ACTP0Serializer.PushProfileToStackAndLoad;
 
 
+#if QuesterConditionPackItemsAccessor
         static TreeViewHelper()
         {
             QuesterConditionPackType = ACTP0Serializer.QuesterConditionPack;
 
             if (QuesterConditionPackType != null)
                 QuesterConditionPackItemsAccessor = QuesterConditionPackType.GetProperty<List<QuesterCondition>>("Conditions");
-        }
+        } 
+#endif
 
         /// <summary>
         /// Конструирование коллекции узлов дерева для отображения списка ucc-команд <paramref name="uccActionList"/>
@@ -268,13 +271,18 @@ namespace EntityTools.Tools
 
             switch (condition)
             {
+#if false
                 case ConditionPack conditionPack:
-                    return new ConditionPackTreeNode(profile, conditionPack);
+                    return new ConditionPackTreeNode(profile, conditionPack); 
+#endif
                 case IsInCustomRegion isInCustomRegion:
                     return new ConditionIsInCustomRegionTreeNode(profile, isInCustomRegion);
                 case IsInCustomRegionSet isInCustomRegionSet:
                     return new ConditionIsInCustomRegionSetTreeNode(profile, isInCustomRegionSet);
                 default:
+                    if(condition.IsConditionPack())
+                        return new ConditionPackTreeNode(profile, condition);
+
                     return new ConditionTreeNode(profile, condition);
             }
         }

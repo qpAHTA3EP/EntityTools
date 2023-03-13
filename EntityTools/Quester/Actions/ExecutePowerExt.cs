@@ -1,6 +1,5 @@
 ﻿#define DEBUG_INSERTINSIGNIA
 
-using Infrastructure;
 using Astral.Logic.Classes.Map;
 using Astral.Quester.UIEditors;
 using EntityTools.Editors;
@@ -10,6 +9,7 @@ using EntityTools.Tools.Classes;
 using EntityTools.Tools.CustomRegions;
 using EntityTools.Tools.Navigation;
 using EntityTools.Tools.Powers;
+using Infrastructure;
 using MyNW.Classes;
 using MyNW.Internals;
 using System;
@@ -23,7 +23,6 @@ using System.Windows.Forms;
 using System.Xml.Serialization;
 using Action = Astral.Quester.Classes.Action;
 using PositionEditor = EntityTools.Editors.PositionEditor;
-using EntityTools.Quester.Mapper;
 // ReSharper disable InconsistentNaming
 
 namespace EntityTools.Quester.Actions

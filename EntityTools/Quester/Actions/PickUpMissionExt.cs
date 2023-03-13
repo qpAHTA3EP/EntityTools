@@ -1,5 +1,4 @@
-﻿using Infrastructure;
-using Astral.Logic.Classes.Map;
+﻿using Astral.Logic.Classes.Map;
 using Astral.Logic.NW;
 using Astral.Quester.Classes.Actions;
 using Astral.Quester.Forms;
@@ -10,6 +9,7 @@ using EntityTools.Enums;
 using EntityTools.Quester.Mapper;
 using EntityTools.Tools;
 using EntityTools.Tools.Missions;
+using Infrastructure;
 using MyNW.Classes;
 using MyNW.Internals;
 using MyNW.Patchables.Enums;
@@ -24,7 +24,6 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Xml.Serialization;
 using Action = Astral.Quester.Classes.Action;
-using EntityTools.Quester.Mapper;
 // ReSharper disable InconsistentNaming
 
 namespace EntityTools.Quester.Actions

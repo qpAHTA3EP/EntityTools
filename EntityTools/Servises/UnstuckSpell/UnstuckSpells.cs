@@ -3,16 +3,15 @@
 #endif
 
 #define UnstuckSpell_Tasks
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Astral;
 using Astral.Logic.NW;
 using Infrastructure;
 using MyNW.Classes;
 using MyNW.Internals;
 using MyNW.Patchables.Enums;
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using API = Astral.Logic.UCC.API;
 
 namespace EntityTools.Services

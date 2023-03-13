@@ -58,6 +58,7 @@ namespace EntityTools.Patches.Quester
             return true;
         }
 
+#if false
         private static void SetTypeAssociations()
         {
             // Подмена метаданных для IsInCustomRegion
@@ -80,7 +81,16 @@ namespace EntityTools.Patches.Quester
                     typeof(PushProfileToStackAndLoadMetadataType));
                 TypeDescriptor.AddProvider(provider, tPushProfileToStackAndLoad);
             }
-        }
+            var tConditionPack = ACTP0Serializer.QuesterConditionPack;
+            if (tConditionPack != null)
+            {
+                provider = new AssociatedMetadataTypeTypeDescriptionProvider(
+                    tConditionPack,
+                    typeof(ConditionPackMetadataType));
+                TypeDescriptor.AddProvider(provider, tConditionPack);
+            }
+        } 
+#endif
 
         public static void Apply()
         {
@@ -127,7 +137,9 @@ namespace EntityTools.Patches.Quester
 
                 ETLogger.WriteLine($@"Patch '{nameof(ComplexPatch_Quester_Editor)}' succeeded", true);
 
-                SetTypeAssociations();
+#if false
+                SetTypeAssociations(); 
+#endif
                 PatchesWasApplied = true;
             }
             catch (Exception e)

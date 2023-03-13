@@ -6,6 +6,9 @@ using EntityTools.Tools;
 using EntityTools.Enums;
 using EntityTools.Quester.Conditions;
 using QuesterCondition = Astral.Quester.Classes.Condition;
+using EntityTools.Patches;
+using Infrastructure.Patches;
+using System;
 
 namespace EntityTools.Quester.Editor.TreeViewCustomization
 {
@@ -14,13 +17,25 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
     /// </summary>
     internal sealed class ConditionPackTreeNode : ConditionBaseTreeNode
     {
-        private readonly ConditionPack conditionPack;
+        private readonly QuesterCondition conditionPack;
+        private readonly PropertyAccessor<List<QuesterCondition>> conditionAccessor;//= ACTP0Serializer.QuesterConditionPack.GetProperty<List<QuesterCondition>>("Conditions");
+        private readonly PropertyAccessor<bool> notAccessor;//= ACTP0Serializer.QuesterConditionPack.GetProperty<bool>("Not");
+        private readonly PropertyAccessor<uint> minCountAccessor;//= ACTP0Serializer.QuesterConditionPack.GetProperty<uint>("MinCount");
+        private readonly PropertyAccessor testedAccessor;//= ACTP0Serializer.QuesterConditionPack.GetProperty("Tested");
 
-        public ConditionPackTreeNode(BaseQuesterProfileProxy profile, ConditionPack conditionPack) : base(profile)
+        public ConditionPackTreeNode(BaseQuesterProfileProxy profile, QuesterCondition conditionPack) : base(profile)
         {
+            if (!conditionPack.IsConditionPack())
+                throw new ArgumentException("Type of condition should be 'ConditionType'");
             Tag = conditionPack;
             this.conditionPack = conditionPack;
-            var conditions = conditionPack.Conditions;
+
+            conditionAccessor = this.conditionPack.GetProperty<List<QuesterCondition>>("Conditions");
+            notAccessor = this.conditionPack.GetProperty<bool>("Not");
+            minCountAccessor = this.conditionPack.GetProperty<uint>("MinCount");
+            testedAccessor = this.conditionPack.GetProperty("Tested");
+
+            var conditions = conditionAccessor[conditionPack];
             if (conditions?.Count > 0)
                 Nodes.AddRange(conditions.ToTreeNodes(Owner));
             UpdateView();
@@ -33,9 +48,10 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
             if (Nodes.Count == 0)
                 return false;
 
-            bool result = conditionPack.Tested == LogicRule.Conjunction;
+            var tested = testedAccessor.Value.ToString();
+            bool result = tested == "Conjunction";
 
-            if (conditionPack.Tested == LogicRule.Conjunction)
+            if (result)
             {
                 foreach (ConditionBaseTreeNode node in Nodes)
                     if (!node.IsValid())
@@ -64,9 +80,9 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
                         break;
                     }
                 }
-                result = lockTrue && (Nodes.Count == trueNumLock || trueNumUnlock > conditionPack.MinCount - 1);
+                result = lockTrue && (Nodes.Count == trueNumLock || trueNumUnlock > minCountAccessor - 1);
             }
-            return conditionPack.Not ^ result;
+            return notAccessor ^ result;
         }
 
         public override string TestInfo()
@@ -81,7 +97,7 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
                     sb.Append(node.Checked ? "\t[L] " : "\t[U] ");
                     sb.Append(node).Append(" | Result: ").Append(node.IsValid()).AppendLine();
                 }
-                sb.Append("Negation flag (Not): ").Append(conditionPack.Not).AppendLine();
+                sb.Append("Negation flag (Not): ").Append(notAccessor).AppendLine();
                 return sb.ToString();
             }
             return "The list 'Conditions' is empty";
@@ -91,14 +107,14 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
 
         public override object Clone()
         {
-            var copy = ((QuesterCondition)conditionPack).CreateXmlCopy();
-            return new ConditionPackTreeNode(Owner, (ConditionPack)copy);
+            var copy = conditionPack.CreateXmlCopy();
+            return new ConditionPackTreeNode(Owner, copy);
         }
 
         public override QuesterCondition ReconstructInternal()
         {
             conditionPack.Locked = Checked;
-            conditionPack.Conditions = Nodes.ToQuesterConditionCollection<List<QuesterCondition>>();
+            conditionAccessor[conditionPack] = Nodes.ToQuesterConditionCollection<List<QuesterCondition>>();
             return conditionPack;
         }
 

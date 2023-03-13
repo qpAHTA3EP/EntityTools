@@ -9,6 +9,6 @@ namespace EntityTools.Patches
 {
     internal partial class ETPatcher
     {
-        private static readonly Version requiredAStar = new Version("<# Write(Assembly.ReflectionOnlyLoadFrom(@"D:\Source\EntityAddon\References\x64\AStar.dll").GetName().Version.ToString()); #>");
+        private static readonly Version requiredAStar = new Version("<# Write(Assembly.ReflectionOnlyLoadFrom(@"d:\Source\References\AStar.dll").GetName().Version.ToString()); #>");
     }
 }

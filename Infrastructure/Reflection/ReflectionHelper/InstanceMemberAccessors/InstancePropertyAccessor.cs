@@ -8,7 +8,6 @@ namespace Infrastructure.Reflection
     public static partial class ReflectionHelper
     {
         //TODO Добавить нетипизированную перегрузку PropertyAccessor<object> GetProperty(this object instance, string propertyName, Type propertyType, BindingFlags flags = BindingFlags.Default)
-        //TODO Добавить нетипизированную перегрузку PropertyAccessor<object> GetProperty(this Type containerType, string propertyName, BindingFlags flags = BindingFlags.Default)
         /// <summary>
         /// Конструирование нетипизированного функтора для доступа к свойству <paramref name="propertyName"/> объекту типа <paramref name="propertyType"/>
         /// </summary>
@@ -28,7 +27,26 @@ namespace Infrastructure.Reflection
                 accessor = new PropertyAccessorStub(onFail);
             return accessor;
         }
-        
+
+        /// <summary>
+        /// Конструирование нетипизированного функтора для доступа к свойству <paramref name="propertyName"/> объекта <paramref name="instance"/>
+        /// </summary>
+        /// <param name="flags"></param>
+        /// <param name="onFail">Действие, выполняемое если производится попытка чтения/записи свойства, доступ к которому не был получен</param>
+        /// <param name="instance"></param>
+        /// <param name="propertyName"></param>
+        /// <remarks>Следует иметь в виду, что доступ к виртуальным свойствам дочерних классов через делегат,
+        /// полученный с использованием родительского класса, НЕВОЗМОЖЕН.
+        /// Для доступа к виртуальным свойствам объекта, функтор должен быть построен для объекта конкретного типа</remarks>
+        public static PropertyAccessor GetProperty(this object instance, string propertyName, BindingFlags flags = BindingFlags.Default, Action<object, MethodBase> onFail = null)
+        {
+            var accessor = new PropertyAccessor(instance, propertyName, flags);
+            if (onFail != null
+                && !accessor.IsValid)
+                accessor = new PropertyAccessorStub(onFail);
+            return accessor;
+        }
+
         /// <summary>
         /// Доступ к свойству <paramref name="propertyName"/> экземпляра объекта <paramref name="instance"/> типа <typeparamref name="TInstance"/>
         /// </summary>
@@ -248,7 +266,7 @@ namespace Infrastructure.Reflection
             if (instanceType is null)
                 return false;
 
-            PropertyInfo propInfo = (propertyType is null)
+            PropertyInfo propInfo = (propertyType is null) || propertyType == typeof(object)
                 ? instanceType.GetProperty(propertyName, flags)
                 : instanceType.GetProperty(propertyName, flags, null, propertyType, ReflectionHelper.EmptyTypeArray, null); 
             if (Initialize(propInfo))

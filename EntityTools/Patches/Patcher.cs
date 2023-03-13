@@ -4,6 +4,7 @@ using EntityTools.Patches.UCC;
 using System.Reflection;
 using EntityTools.Servises.SlideMonitor;
 using Infrastructure;
+using Infrastructure.Patches;
 
 // ReSharper disable UnusedMember.Local
 // ReSharper disable InconsistentNaming
@@ -26,11 +27,13 @@ namespace EntityTools.Patches
         private static readonly Astral_Logic_General_GetNearestIndexInPositionList Astral_Logic_General_GetNearestIndexInPositionList = new Astral_Logic_General_GetNearestIndexInPositionList();
 
 
-        static bool _applied;
+        private static bool Patched;
         public static void Apply()
         {
-            if (!_applied)
+            if (!Patched)
             {
+                ACTP0Patcher.Apply();
+
                 foreach (var field in typeof(ETPatcher).GetFields(BindingFlags.NonPublic | BindingFlags.Static))
                 {
                     if (field.GetValue(null) is Patch patch)
@@ -72,7 +75,7 @@ namespace EntityTools.Patches
                 {
                     ETLogger.WriteLine(LogType.Error, "Harmony patches are failed!",true);
                 }
-                _applied = true;
+                Patched = true;
             }
         }
     }

@@ -137,7 +137,7 @@ namespace EntityTools.Enums
         /// Дизъюнкция - Логическое ИЛИ
         /// </summary>
         Disjunction
-    }
+    } 
 
     /// <summary>
     /// список команд для смены настроек бота
