@@ -1,10 +1,12 @@
 ﻿
 using Astral;
+using Astral.Addons;
 using Astral.Classes.SkillTrain;
 using Astral.Logic.UCC.Classes;
 using Astral.MultiTasks.Classes;
 using Astral.Quester.Classes;
 using HarmonyLib;
+using Infrastructure.Reflection;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -25,6 +27,8 @@ namespace Infrastructure.Patches
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public static class ACTP0Serializer
     {
+        private static readonly Type tPlugins;
+        private static readonly Type tPatch;
         public static List<Type> UccTypes
         {
             get
@@ -125,7 +129,7 @@ namespace Infrastructure.Patches
             // До загрузки сборок плагинов в домен приложения (см. Plugins.InitAssemblies) кэшировать списки типов не имеет смысла
             // поэтому постфикс-патч AfterInitAssemblies устанавливает флаг _pluginsAssembliesLoaded,
             // указывающий на то, что сборки плагинов загружены
-            if (!_pluginsAssembliesLoaded)
+            if (!ArePluginsLoaded())
             {
                 __result = emptyTypeList;
                 // Следующий вызов приводит к переполнению стека
@@ -229,18 +233,25 @@ namespace Infrastructure.Patches
             }
         }
 
+#if disabled_2023_03_13
         /// <summary>
         /// Отслеживание момента загрузки плагинов, после чего можно кэшировать списки типов
         /// </summary>
         private static void AfterInitAssemblies()
         {
             _pluginsAssembliesLoaded = true;
-        }
-
+        } 
         /// <summary>
         /// Флаг, указывающий на загрузку плагинов
         /// </summary>
         private static bool _pluginsAssembliesLoaded;
+#endif
+
+        private static bool ArePluginsLoaded()
+        {
+            return AstralAccessors.Controllers.Plugins.Assemblies?.Count > 0;//.Contains(tPatch.Assembly);
+        }
+
 
         private static readonly Type tQuesterProfile = typeof(Profile);
         private static readonly Type tQuesterAction = typeof(Action);
@@ -356,8 +367,9 @@ namespace Infrastructure.Patches
 
         static ACTP0Serializer()
         {
-            var tPlugins = typeof(Astral.Controllers.Plugins);
-            var tPatch = typeof(ACTP0Serializer);
+            tPlugins = typeof(Astral.Controllers.Plugins);
+            tPatch = typeof(ACTP0Serializer);
+#if disabled_2023_03_13
             var originalInitAssemblies = AccessTools.Method(tPlugins, "InitAssemblies");
             var postfixInitAssemblies = AccessTools.Method(tPatch, nameof(AfterInitAssemblies));
 
@@ -368,7 +380,8 @@ namespace Infrastructure.Patches
                     new HarmonyMethod(postfixInitAssemblies));
                 Logger.WriteLine(Logger.LogType.Debug, $"Patch of 'Astral.Controllers.Plugins.InitAssemblies()' succeeded");
             }
-            else Logger.WriteLine(Logger.LogType.Debug, $"Patch of 'Astral.Controllers.Plugins.InitAssemblies()' failed");
+            else Logger.WriteLine(Logger.LogType.Debug, $"Patch of 'Astral.Controllers.Plugins.InitAssemblies()' failed"); 
+#endif
 
             var tXmlSerializer = typeof(Astral.Functions.XmlSerializer);
             var originalGetExtraTypes = AccessTools.Method(tXmlSerializer, nameof(GetExtraTypes));
