@@ -332,6 +332,9 @@ namespace EntityTools.Tools.Inventory
                                     && _mapName == player.MapState.MapName
                                     && _regionName == player.RegionInternalName;
                         break;
+                    case VendorType.RemoteVendor:
+                        available = true; 
+                        break;
                 }
 
                 return available;

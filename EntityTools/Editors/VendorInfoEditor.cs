@@ -96,7 +96,6 @@ namespace EntityTools.Editors
                                 {
                                     vendor.DisplayName = contact.DisplayName;
                                     contact.Start();
-                                    break;
                                 }
                             }
                         }
