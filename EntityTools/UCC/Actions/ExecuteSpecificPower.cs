@@ -144,23 +144,25 @@ namespace EntityTools.UCC.Actions
         public ExecuteSpecificPower()
         {
             _idStr = $"{GetType().Name}[{GetHashCode():X2}]";
-
+            powerCache = new PowerCache(string.Empty,
+                                        _idStr,
+                                        () => EntityTools.Config.Logger.UccActions.DebugExecuteSpecificPower);
         }
         public override UCCAction Clone()
         {
             return BaseClone(new ExecuteSpecificPower {
-                _powerId = _powerId,
-                _checkPowerCooldown = _checkPowerCooldown,
-                _checkInTray = _checkInTray,
-                _castingTime = _castingTime,
-                _forceMaintain = _forceMaintain,
+                PowerId = _powerId,
+                CheckPowerCooldown = this._checkPowerCooldown,
+                CheckInTray = _checkInTray,
+                CastingTime = _castingTime,
+                ForceMaintain = _forceMaintain,
             });
         }
 
         #region Данные
         private string _label = string.Empty;
         private string _idStr;
-        private readonly PowerCache powerCache = new PowerCache(string.Empty);
+        private readonly PowerCache powerCache;
         #endregion
         
 
@@ -171,7 +173,7 @@ namespace EntityTools.UCC.Actions
         {
             get
             {
-                bool debugInfo = global::EntityTools.EntityTools.Config.Logger.UccActions.DebugExecuteSpecificPower;
+                bool debugInfo = EntityTools.Config.Logger.UccActions.DebugExecuteSpecificPower;
 
                 string actionIdStr = debugInfo
                     ? $"{_idStr}.{MethodBase.GetCurrentMethod()?.Name ?? nameof(NeedToRun)}"

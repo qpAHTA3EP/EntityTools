@@ -41,8 +41,16 @@ namespace EntityTools.Quester.Actions
         private Entity closestEntity;
         private readonly Timeout internalCacheTimer = new Timeout(0);
         private Timeout entityAbsenceTimer;
-        private readonly PowerCache powerCache = new PowerCache(string.Empty);
+        private readonly PowerCache powerCache;
         #endregion
+
+        public MoveToEntity()
+        {
+            _idStr = $"{GetType().Name}[{ActionID}]";
+            powerCache = new PowerCache(string.Empty,
+                                        _idStr,
+                                        () => ExtendedDebugInfo);
+        }
 
 
 

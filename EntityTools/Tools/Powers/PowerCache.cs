@@ -1,5 +1,5 @@
-﻿#define DEBUG_POWERCACHE
-using System;
+﻿using System;
+using System.Reflection;
 using EntityTools.Core.Interfaces;
 using Infrastructure;
 using MyNW.Internals;
@@ -11,20 +11,42 @@ namespace EntityTools.Tools.Powers
     /// </summary>
     public class PowerCache : IPowerCache
     {
-        public PowerCache(string powId)
+        public PowerCache(string powId, string ownerId = default, Func<bool> doLog = null)
         {
+            if (doLog is null)
+                this.doLog = () => false;
+            else this.doLog = doLog;
+            var extendedDebugInfo = this.doLog();
+
             powerIdPattern = powId;
+            if (!string.IsNullOrEmpty(ownerId))
+            {
+                debugIdStr = string.Concat(ownerId, '.', nameof(PowerCache));
+            }
+            else
+            {
+                debugIdStr = nameof(PowerCache);
+            }
             if (string.IsNullOrEmpty(powId))
             {
-                initialized = false;
+                //initialized = false;
                 checker = (p) => false;
+
+                if (extendedDebugInfo)
+                    ETLogger.WriteLine(LogType.Debug, $"{debugIdStr}: Initialize {nameof(PowerIdPattern)} to 'Empty'.");
             }
             else
             {
                 checker = powId.GetComparer();
-                initialized = true;
+
+                if (extendedDebugInfo)
+                    ETLogger.WriteLine(LogType.Debug, $"{debugIdStr}: Initialize {nameof(PowerIdPattern)} to '{powerIdPattern}'.");
+                //initialized = true;
             }
         }
+
+        private readonly string debugIdStr;
+        private Func<bool> doLog;
 
         /// <summary>
         /// Идентификатор игрового клиента для отслеживания актуальности кэша
@@ -51,7 +73,7 @@ namespace EntityTools.Tools.Powers
         /// Корректности инициализации параметров кэша.
         /// Эквивалентно проверке <code>string.IsNullOfEmpty(<see cref="PowerIdPattern"/>)</code>
         /// </summary>
-        public bool IsInitialized => initialized;
+        public bool IsInitialized => !string.IsNullOrEmpty(powerIdPattern);//initialized;
         private bool initialized;
 
 #if false
@@ -84,18 +106,28 @@ namespace EntityTools.Tools.Powers
             get => powerIdPattern;
             set
             {
+                var extendedDebugInfo = doLog();
+                string currentMethodName = extendedDebugInfo
+                                         ? $"{debugIdStr}.{MethodBase.GetCurrentMethod()?.Name ?? nameof(GetPower)}"
+                                         : string.Empty;
                 if (powerIdPattern != value)
                 {
                     powerIdPattern = value;
                     if (string.IsNullOrEmpty(powerIdPattern))
                     {
+
+
+                        if (doLog())
+                            ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: Set {nameof(PowerIdPattern)} to 'Empty'.");
                         checker = (p) => false;
-                        initialized = false;
+                        //initialized = false;
                     }
                     else
                     {
                         checker = powerIdPattern.GetComparer();
-                        initialized = true;
+                        //initialized = true;
+                        if (doLog())
+                            ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: Initialize {nameof(PowerIdPattern)} to '{powerIdPattern}'.");
                     }
                 }
             }
@@ -107,18 +139,34 @@ namespace EntityTools.Tools.Powers
         /// </summary>
         public MyNW.Classes.Power Power => GetPower();
 
-        public void Reset(string powerPattern = default) => PowerIdPattern = powerPattern;
+        public void Reset(string powerPattern = default)
+        {
+            var extendedDebugInfo = doLog();
+            string currentMethodName = extendedDebugInfo
+                                     ? $"{debugIdStr}.{MethodBase.GetCurrentMethod()?.Name ?? nameof(GetPower)}"
+                                     : string.Empty;
+
+            if (extendedDebugInfo)
+                ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: Reset {nameof(PowerIdPattern)} to '{powerPattern}'.");
+
+            PowerIdPattern = powerPattern;
+        }
 
         /// <summary>
         /// Кэшированное <see cref="MyNW.Classes.Power"/>
         /// </summary>
         public MyNW.Classes.Power GetPower()
         {
-            if (!initialized)
+            var extendedDebugInfo = doLog();
+            string currentMethodName = extendedDebugInfo
+                                     ? $"{debugIdStr}.{MethodBase.GetCurrentMethod()?.Name ?? nameof(GetPower)}"
+                                     : string.Empty;
+
+            if (!IsInitialized)
             {
-#if DEBUG_POWERCACHE
-                ETLogger.WriteLine(LogType.Debug, $"{nameof(PowerCache)}: Not initialized.");
-#endif
+                if (extendedDebugInfo)
+                    ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: Not initialized.");
+
                 return null;
             }
 
@@ -132,34 +180,34 @@ namespace EntityTools.Tools.Powers
                       || checker(cachedPower.PowerDef.InternalName)
                       || checker(cachedPower.EffectivePowerDef().InternalName))))
             {
-#if DEBUG_POWERCACHE
-                ETLogger.WriteLine(LogType.Debug, $"{nameof(PowerCache)}: Regen cache.");
-#endif
+                if (extendedDebugInfo)
+                    ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: Regen cache.");
+
                 //power = Powers.GetPowerByInternalName(powId);
                 cachedPower = SearchPower();
                 if (cachedPower != null)
                 {
-#if DEBUG_POWERCACHE
-                    ETLogger.WriteLine(LogType.Debug, $"{nameof(PowerCache)}: Found Power {cachedPower.PowerDef.FullDisplayName}[{cachedPower.Pointer:X8}].");
-#endif
+                    if (extendedDebugInfo)
+                        ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: Found Power {cachedPower.PowerDef.FullDisplayName}[{cachedPower.Pointer:X8}].");
+
                     cachedPowerId = cachedPower.PowerId;
                     cachedAttachedGameProcessId = processId;
                     cachedCharacterContainerId = player.ContainerId;
                 }
                 else
                 {
-#if DEBUG_POWERCACHE
-                    ETLogger.WriteLine(LogType.Debug, $"{nameof(PowerCache)}: No Power {powerIdPattern} was found.");
-#endif
+
+                    if (extendedDebugInfo) 
+                        ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: No Power {powerIdPattern} was found.");
+
                     cachedPowerId = 0;
                     cachedAttachedGameProcessId = 0;
                     cachedCharacterContainerId = 0;
                 }
             }
-#if DEBUG_POWERCACHE
-            else
-                ETLogger.WriteLine(LogType.Debug, $"{nameof(PowerCache)}: Using cached Power {cachedPower.PowerDef.FullDisplayName}[{cachedPower.Pointer:X8}].");
-#endif
+
+            else if (extendedDebugInfo) 
+                ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: Using cached Power {cachedPower.PowerDef.FullDisplayName}[{cachedPower.Pointer:X8}].");
 
             return cachedPower;
         }

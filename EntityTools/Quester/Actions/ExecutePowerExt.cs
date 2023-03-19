@@ -48,7 +48,7 @@ namespace EntityTools.Quester.Actions
             }
         }
         private string powerId = string.Empty;
-        private readonly PowerCache powerCache = new PowerCache(string.Empty);
+        private readonly PowerCache powerCache;
 
         [Description("Time to cast the power. Minimum is 500 ms")]
         [Category("Power")]
@@ -338,6 +338,10 @@ namespace EntityTools.Quester.Actions
                 powerId = _lastPowerId;
             if (_targetRad > 0)
                 TargetRadius = _targetRad;
+            actionIDstr = string.Concat(GetType().Name, '[', ActionID, ']');
+            powerCache = new PowerCache(string.Empty, 
+                                        actionIDstr,
+                                        () => EntityTools.Config.Logger.QuesterActions.DebugExecutePowerExt);
             InternalReset();
         }
 
@@ -575,11 +579,14 @@ namespace EntityTools.Quester.Actions
 
         public override void InternalReset()
         {
-            powerCache.Reset(PowerId);
-            label = string.Empty;
+            bool debugInfo = EntityTools.Config.Logger.QuesterActions.DebugExecutePowerExt;
+            string currentMethodName = debugInfo ? string.Concat(actionIDstr, '.', MethodBase.GetCurrentMethod()?.Name ?? nameof(Run)) : string.Empty;
+            if (debugInfo)
+                ETLogger.WriteLine(LogType.Debug, $"{currentMethodName}: {nameof(powerCache)} reset to {powerId}.");
 
+            powerCache.Reset(powerId);
+            label = string.Empty;
             internalCheck = initialize_internalCheck;
-            actionIDstr = string.Concat(GetType().Name, '[', ActionID, ']');
         }
 
         public override void OnMapDraw(GraphicsNW graphics)

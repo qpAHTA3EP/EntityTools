@@ -6,6 +6,8 @@ using EntityTools.Tools.Navigation;
 using MyNW.Classes;
 using MyNW.Internals;
 using MyNW.Patchables.Enums;
+using EntityTools.Enums;
+using EntityTools.Tools.Extensions;
 
 namespace EntityTools.Tools.Powers
 {
@@ -40,44 +42,53 @@ namespace EntityTools.Tools.Powers
             var entActivatedPower = power.EntGetActivatedPower();
             var powerDef = entActivatedPower.EntGetActivatedPower().EffectivePowerDef();
 
-            // Перемещаем персонажа к targetPosition для возможности применения 
-            if (range > 1 && targetPosition.Distance3DFromPlayer > range)
+            try
             {
-                // Вычисляем эффективный радиус действия команды
-                int effectiveRange = Math.Max(Astral.Logic.NW.Powers.getEffectiveRange(powerDef), range);
-
-                if (effectiveRange < 7)
+                // Перемещаем персонажа к targetPosition для возможности применения 
+                if (range > 1 && targetPosition.Distance3DFromPlayer > range)
                 {
-                    effectiveRange = 7;
+                    // Вычисляем эффективный радиус действия команды
+                    int effectiveRange = Math.Max(Astral.Logic.NW.Powers.getEffectiveRange(powerDef), range);
+
+                    if (effectiveRange < 7)
+                    {
+                        effectiveRange = 7;
+                    }
+
+                    AstralAccessors.Logic.UCC.Controllers.Movements.RequireRange = effectiveRange - 2;
+
+                    // Пытаемся приблизиться к цели
+                    // Запуск Astral.Logic.UCC.Controllers.Movements.Start()
+                    // выполняется перед вызовом метода Run() текущей команды в 
+                    // Astral.Logic.UCC.Classes.ActionsPlayer.playActionList()
+                    var movingTimeout = new Astral.Classes.Timeout(1050);
+                    while (!AstralAccessors.Logic.UCC.Controllers.Movements.RangeIsOk)
+                    {
+                        if (movingTimeout.IsTimedOut)
+                        {
+                            // Завершаем команду, если попытка приблизиться к targetPosition неудачна
+                            return PowerResult.Skip;
+                        }
+                        Thread.Sleep(100);
+                    }
                 }
 
-                AstralAccessors.Logic.UCC.Controllers.Movements.RequireRange = effectiveRange - 2;
-
-                // Пытаемся приблизиться к цели
-                // Запуск Astral.Logic.UCC.Controllers.Movements.Start()
-                // выполняется перед вызовом метода Run() текущей команды в 
-                // Astral.Logic.UCC.Classes.ActionsPlayer.playActionList()
-                var movingTimeout = new Astral.Classes.Timeout(1050);
-                while (!AstralAccessors.Logic.UCC.Controllers.Movements.RangeIsOk)
+                if (targetPosition.IsInYawFace)
                 {
-                    if (movingTimeout.IsTimedOut)
+                    targetPosition.Face();
+                    var timeout = new Astral.Classes.Timeout(750);
+                    while (!targetPosition.IsInYawFace && !timeout.IsTimedOut)
                     {
-                        // Завершаем команду, если попытка приблизиться к targetPosition неудачна
-                        return PowerResult.Skip;
+                        Thread.Sleep(20);
                     }
                     Thread.Sleep(100);
                 }
             }
-
-            if (targetPosition.IsInYawFace)
+            catch (Exception)
             {
-                targetPosition.Face();
-                var timeout = new Astral.Classes.Timeout(750);
-                while (!targetPosition.IsInYawFace && !timeout.IsTimedOut)
-                {
-                    Thread.Sleep(20);
-                }
-                Thread.Sleep(100);
+                if (debugInfo)
+                    ETLogger.WriteLine(LogType.Debug, $"{methodName}: Catch an exception trying to approach position <{targetPosition.X:N2}, {targetPosition.Y:N2}, {targetPosition.Z:N2}>");
+                return PowerResult.Fail;
             }
 
             castingTime = Math.Max(Astral.Logic.NW.Powers.getEffectiveTimeCharge(powerDef), castingTime);
@@ -88,7 +99,7 @@ namespace EntityTools.Tools.Powers
             {
                 targetPosition.Face();
                 if (debugInfo)
-                    ETLogger.WriteLine(LogType.Debug, $"{methodName}: Activating ExecPower '{power.PowerDef.InternalName}' on targetEntity <{targetPosition.X:N2}, {targetPosition.Y:N2}, {targetPosition.Z:N2}>");
+                    ETLogger.WriteLine(LogType.Debug, $"{methodName}: Activating ExecPower '{power.PowerDef.InternalName}' on targetPosition <{targetPosition.X:N2}, {targetPosition.Y:N2}, {targetPosition.Z:N2}>");
                 Astral.Logic.NW.Powers.ExecPower(power, targetPosition, true);
                 powerActivated = true;
                 if (debugInfo)
@@ -162,39 +173,48 @@ namespace EntityTools.Tools.Powers
 
             var player = EntityManager.LocalPlayer;
 
-            // Устанавливаем цель для перемещения персонажа к ней
-            if (targetEntity.ContainerId != player.ContainerId)
+            try
             {
-                // Вычисляем эффективный радиус действия команды
-                int effectiveRange = Astral.Logic.NW.Powers.getEffectiveRange(powerDef);
-
-                if (range > 0)
-                    effectiveRange = range;
-
-                if (effectiveRange > 1)
+                // Устанавливаем цель для перемещения персонажа к ней
+                if (targetEntity.ContainerId != player.ContainerId)
                 {
-                    if (effectiveRange < 7)
-                    {
-                        effectiveRange = 7;
-                    }
+                    // Вычисляем эффективный радиус действия команды
+                    int effectiveRange = Astral.Logic.NW.Powers.getEffectiveRange(powerDef);
 
-                    AstralAccessors.Logic.UCC.Controllers.Movements.RequireRange = effectiveRange - 2;
+                    if (range > 0)
+                        effectiveRange = range;
 
-                    // Пытаемся приблизиться к цели
-                    // Запуск Astral.Logic.UCC.Controllers.Movements.Start()
-                    // выполняется перед вызовом метода Run() текущей команды в 
-                    // Astral.Logic.UCC.Classes.ActionsPlayer.playActionList()
-                    var movingTimeout = new Astral.Classes.Timeout(1050);
-                    while (!AstralAccessors.Logic.UCC.Controllers.Movements.RangeIsOk)
+                    if (effectiveRange > 1)
                     {
-                        if (Astral.Logic.UCC.Core.CurrentTarget.IsDead || movingTimeout.IsTimedOut)
+                        if (effectiveRange < 7)
                         {
-                            // Завершаем команду, если цель мертва, или попытка приблизиться к ней неудачна
-                            return PowerResult.Skip;
+                            effectiveRange = 7;
                         }
-                        Thread.Sleep(100);
+
+                        AstralAccessors.Logic.UCC.Controllers.Movements.RequireRange = effectiveRange - 2;
+
+                        // Пытаемся приблизиться к цели
+                        // Запуск Astral.Logic.UCC.Controllers.Movements.Start()
+                        // выполняется перед вызовом метода Run() текущей команды в 
+                        // Astral.Logic.UCC.Classes.ActionsPlayer.playActionList()
+                        var movingTimeout = new Astral.Classes.Timeout(1050);
+                        while (!AstralAccessors.Logic.UCC.Controllers.Movements.RangeIsOk)
+                        {
+                            if (Astral.Logic.UCC.Core.CurrentTarget.IsDead || movingTimeout.IsTimedOut)
+                            {
+                                // Завершаем команду, если цель мертва, или попытка приблизиться к ней неудачна
+                                return PowerResult.Skip;
+                            }
+                            Thread.Sleep(100);
+                        }
                     }
                 }
+            }
+            catch (Exception e)
+            {
+                if (debugInfo)
+                    ETLogger.WriteLine(LogType.Debug, $"{methodName}: Catch an exception trying to approach '{targetEntity.GetDebugString(EntityNameType.NameUntranslated, "Target", EntityDetail.Pointer | EntityDetail.RelationToPlayer)}'\n\r {e.Message}");
+                return PowerResult.Fail;
             }
 
             castingTime = castingTime > 0
@@ -220,7 +240,7 @@ namespace EntityTools.Tools.Powers
                 {
                     targetEntity.Location.Face();
                     if (debugInfo)
-                        ETLogger.WriteLine(LogType.Debug, $"{methodName}: Activate ExecPower '{power.PowerDef.InternalName}' on targetEntity {targetEntity.Name}[{targetEntity.InternalName}]");
+                        ETLogger.WriteLine(LogType.Debug, $"{methodName}: Activate ExecPower '{power.PowerDef.InternalName}' on {targetEntity.GetDebugString(EntityNameType.NameUntranslated, "Target", EntityDetail.Pointer | EntityDetail.RelationToPlayer)}");
 
                     Astral.Logic.NW.Powers.ExecPower(power, targetEntity, true);
                     powerActivated = true;
@@ -231,7 +251,7 @@ namespace EntityTools.Tools.Powers
                     location.Z += 3f;
                     location.Face();
                     if (debugInfo)
-                        ETLogger.WriteLine(LogType.Debug, $"{methodName}: Activate ExecPower '{power.PowerDef.InternalName}' on location <{location.X.ToString("0,4:N2")}, {location.Y.ToString("0,4:N2")}, {location.Z.ToString("0,4:N2")}>");
+                        ETLogger.WriteLine(LogType.Debug, $"{methodName}: Activate ExecPower '{power.PowerDef.InternalName}' on location <{location.X:0,4:N2}, {location.Y:0,4:N2}, {location.Z:0,4:N2}>");
                     Astral.Logic.NW.Powers.ExecPower(power, location, true);
                     powerActivated = true;
                 }
@@ -260,7 +280,7 @@ namespace EntityTools.Tools.Powers
                 if (powerActivated)
                 {
                     if (debugInfo)
-                        ETLogger.WriteLine(LogType.Debug, $"{methodName}: Deactivate ExecPower '{power.PowerDef.InternalName}' on targetEntity {targetEntity.Name}[{targetEntity.InternalName}]");
+                        ETLogger.WriteLine(LogType.Debug, $"{methodName}: Deactivate ExecPower '{power.PowerDef.InternalName}' on targetEntity {targetEntity.GetDebugString(EntityNameType.NameUntranslated, "Entity", EntityDetail.Pointer | EntityDetail.RelationToPlayer)}");
                     try
                     {
                         Astral.Logic.NW.Powers.ExecPower(power, targetEntity, false);

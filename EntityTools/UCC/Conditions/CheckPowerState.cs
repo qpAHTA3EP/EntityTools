@@ -66,12 +66,19 @@ namespace EntityTools.UCC.Conditions
 
 
 
+        public CheckPowerState()
+        {
+            var _idStr = $"{GetType().Name}[{GetHashCode():X}]";
+            powerCache = new PowerCache(string.Empty, 
+                                        _idStr);
+        }
+
         public new ICustomUCCCondition Clone()
         {
             return new CheckPowerState
             {
-                _powerId = _powerId,
-                checkState = checkState,
+                PowerId = _powerId,
+                CheckState = checkState,
                 Sign = Sign,
                 Locked = base.Locked,
                 Target = Target,
@@ -91,7 +98,7 @@ namespace EntityTools.UCC.Conditions
 
 
         #region Данные
-        private readonly PowerCache powerCache = new PowerCache(string.Empty);
+        private readonly PowerCache powerCache;
         #endregion
 
         

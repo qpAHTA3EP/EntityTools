@@ -12,10 +12,10 @@ namespace EntityTools.Tools.Extensions
         /// </summary>
         public static string GetDebugString(this Entity entity, EntityNameType nameType = EntityNameType.InternalName, string entityLabel = "", EntityDetail detail = EntityDetail.Nope)
         {
-            //if (entity is null)
-            //    return entityLabel + "[NULL]";
-            //if (!entity.IsValid)
-            //    return entityLabel + "[INVALID]";
+            if (entity is null)
+                return entityLabel + "[NULL]";
+            if (!entity.IsValid)
+                return entityLabel + "[INVALID]";
             return string.Concat(entityLabel, "[",
                     (detail & EntityDetail.Pointer) > 0 ? entity.ContainerId + "; " : string.Empty,
                     nameType == EntityNameType.InternalName ? entity.InternalName : entity.NameUntranslated,
