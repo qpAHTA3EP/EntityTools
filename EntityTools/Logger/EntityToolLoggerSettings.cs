@@ -51,7 +51,7 @@ namespace EntityTools.Settings
                 if(_logFilePath != value)
                 {
                     _logFilePath = value.Replace(Directories.AstralStartupPath, ".");
-                    ETLogger.LogFilePath = _logFilePath;
+                    ETLogger.LogPath = _logFilePath;
                     NotifyPropertyChanged();
                 }
             }

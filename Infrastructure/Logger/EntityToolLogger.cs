@@ -8,7 +8,7 @@ using Astral;
 
 namespace Infrastructure
 {
-    public class ETLogger
+    public static class ETLogger
     {
         private static readonly object Locker = new object();
         private static readonly StringBuilder LogCache = new StringBuilder();
@@ -40,21 +40,48 @@ namespace Infrastructure
         /// Путь сохранения файла логирования
         /// </summary>
         [Bindable(true)]
-        [Description("Путь сохранения файла логирования")]
-        public static string LogFilePath { get; set; }
-
-
-        public static void Start()
+        [Description("Путь дирректории (папки) для сохранения файлов логирования")]
+        public static string LogPath 
         {
-            if (loggerTask?.Status == TaskStatus.Running || !Active) return;
-
-            LogFilePath = string.Concat(
-                                    LogFilePath, 
+            get
+            {
+                if (string.IsNullOrEmpty(_logPath))
+                {
+                    _logPath = Path.Combine(Astral.Controllers.Directories.LogsPath, "EntityTools");                    
+                }
+                return _logPath;
+            }
+            set => _logPath = value;
+        }
+        private static string _logPath;
+        /// <summary>
+        /// Активный файл логов
+        /// </summary>
+        public static string LogFile 
+        { 
+            get
+            {
+                if (string.IsNullOrEmpty(_logFile))
+                {
+                    _logFile = string.Concat(
+                                    LogPath,
+                                    Path.DirectorySeparatorChar,
                                     DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss"),
                                     ".log"
                                 );
-            if (!Directory.Exists(LogFilePath))
-                Directory.CreateDirectory(LogFilePath);
+                }    
+                return _logFile;
+            } 
+        }
+        private static string _logFile;
+
+        public static void Start()
+        {
+            _active = true;
+            if (loggerTask?.Status == TaskStatus.Running || !Active) return;
+            
+            if (!Directory.Exists(LogPath))
+                Directory.CreateDirectory(LogPath);
 
             cancellationTokenSource = new CancellationTokenSource();
             loggerTask = Task.Factory.StartNew(() => Run(cancellationTokenSource.Token), cancellationTokenSource.Token);
@@ -62,6 +89,8 @@ namespace Infrastructure
 
         public static void Stop()
         {
+            _active = false;
+            _logFile = string.Empty;
             cancellationTokenSource.Cancel();
         }
 
@@ -97,7 +126,7 @@ namespace Infrastructure
                 }
                 catch(Exception e)
                 {
-                    File.AppendAllText(LogFilePath, DateTime.Now.ToString("[HH:mm:ss] [ERR]") + e);
+                    File.AppendAllText(LogFile, DateTime.Now.ToString("[HH:mm:ss] [ERR]") + e);
                 }
             }
             if (toAstral)
@@ -108,7 +137,7 @@ namespace Infrastructure
 
         private static void Run(CancellationToken token)
         {
-            if (!string.IsNullOrEmpty(LogFilePath))
+            if (!string.IsNullOrEmpty(LogFile))
             {
                 while (Active
                        && !token.IsCancellationRequested)
@@ -119,7 +148,7 @@ namespace Infrastructure
                         {
                             if (LogCache.Length > 0)
                             {
-                                File.AppendAllText(LogFilePath, LogCache.ToString());
+                                File.AppendAllText(LogFile, LogCache.ToString());
                                 LogCache.Clear();
                             } 
                         }

@@ -70,10 +70,11 @@ namespace EntityTools
                 AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
                 _assemblyResolveDelegateBinded = true;
             }
-            if (Config.Logger.Active)
-                ETLogger.Start();
 
             LoadSettings();
+
+            if (Config.Logger.Active)
+                ETLogger.Start();
 
             // Применение патчей
             ETPatcher.Apply();

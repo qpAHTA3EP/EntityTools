@@ -68,6 +68,7 @@ namespace EntityTools.Core
             this.btnExport = new System.Windows.Forms.Button();
             this.ckbMapperPatch = new System.Windows.Forms.CheckBox();
             this.tabSettings = new DevExpress.XtraTab.XtraTabPage();
+            this.lblVersion = new System.Windows.Forms.Label();
             this.btnSave = new DevExpress.XtraEditors.SimpleButton();
             this.pgConfigs = new System.Windows.Forms.PropertyGrid();
             this.tabRelogger = new DevExpress.XtraTab.XtraTabPage();
@@ -111,7 +112,6 @@ namespace EntityTools.Core
             this.dlgSaveFile = new System.Windows.Forms.SaveFileDialog();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.backgroundWorker = new System.ComponentModel.BackgroundWorker();
-            this.lblVersion = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.tbclMain)).BeginInit();
             this.tbclMain.SuspendLayout();
             this.tabUtilities.SuspendLayout();
@@ -220,6 +220,7 @@ namespace EntityTools.Core
             // btnTest
             // 
             this.btnTest.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnTest.Enabled = false;
             this.btnTest.FlatAppearance.BorderColor = System.Drawing.SystemColors.ButtonShadow;
             this.btnTest.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnTest.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
@@ -229,6 +230,7 @@ namespace EntityTools.Core
             this.btnTest.TabIndex = 0;
             this.btnTest.Text = "TEST";
             this.btnTest.UseVisualStyleBackColor = true;
+            this.btnTest.Visible = false;
             this.btnTest.Click += new System.EventHandler(this.handler_Test_1);
             // 
             // btnTeamMonitor
@@ -431,6 +433,14 @@ namespace EntityTools.Core
             this.tabSettings.Padding = new System.Windows.Forms.Padding(6);
             this.tabSettings.Size = new System.Drawing.Size(368, 391);
             this.tabSettings.Text = "Settings";
+            // 
+            // lblVersion
+            // 
+            this.lblVersion.Location = new System.Drawing.Point(9, 359);
+            this.lblVersion.Name = "lblVersion";
+            this.lblVersion.Size = new System.Drawing.Size(293, 23);
+            this.lblVersion.TabIndex = 15;
+            this.lblVersion.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // btnSave
             // 
@@ -974,14 +984,6 @@ namespace EntityTools.Core
             // 
             this.backgroundWorker.WorkerSupportsCancellation = true;
             this.backgroundWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.work_PowerSearch);
-            // 
-            // lblVersion
-            // 
-            this.lblVersion.Location = new System.Drawing.Point(9, 359);
-            this.lblVersion.Name = "lblVersion";
-            this.lblVersion.Size = new System.Drawing.Size(293, 23);
-            this.lblVersion.TabIndex = 15;
-            this.lblVersion.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // EntityToolsMainPanel
             // 

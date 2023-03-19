@@ -308,14 +308,17 @@ namespace EntityTools.Core
         private void handler_EnableLogger(object sender, EventArgs e)
         {
             if (ckbETLogger.Checked)
+            {
+                ETLogger.LogPath = EntityTools.Config.Logger.LogsPath;
                 ETLogger.Start();
+            }
             else ETLogger.Stop();
         }
 
         private void handler_OpenLogFile(object sender, EventArgs e)
         {
-            if(File.Exists(ETLogger.LogFilePath))
-                Process.Start(ETLogger.LogFilePath);
+            if(File.Exists(ETLogger.LogFile))
+                Process.Start(ETLogger.LogFile);
         }
         
         private void handler_DebugMonitorActivate(object sender, EventArgs e)
