@@ -1,8 +1,6 @@
-﻿using System;
-using System.Reflection;
-using Infrastructure.Patches;
-using HarmonyLib;
+﻿using Astral.Quester.Forms.UserControls;
 using Infrastructure.Reflection;
+using System;
 
 // ReSharper disable InconsistentNaming
 
@@ -119,9 +117,14 @@ namespace Infrastructure
                         || mainPanel.IsDisposed)
                         return;
 
-                    Astral.Controllers.Forms.InvokeOnMainThread(() => questerMainPanelRefreshActionAccessor(mainPanel));
+                    Astral.Controllers.Forms.InvokeOnMainThread(() => {
+                        questerMainPanelRefreshActionAccessor(mainPanel);
+                        mainPanelActionsView.GetValueFrom(mainPanel)?.Refresh();
+                        //mainPanel.Refresh();
+                    });                    
                 }
                 private static readonly StaticFieldAccessor<Astral.Quester.Forms.Main> questerMainPanel;
+                private static readonly FieldAccessor<DbTreeView> mainPanelActionsView;
                 private static readonly Action<object> questerMainPanelRefreshActionAccessor;
 
                 static Entrypoint()
@@ -129,6 +132,7 @@ namespace Infrastructure
                     var tEntrypoint = typeof(Astral.Quester.Entrypoint);
 
                     questerMainPanel = tEntrypoint.GetStaticField<Astral.Quester.Forms.Main>("lastMain");
+                    mainPanelActionsView = typeof(Astral.Quester.Forms.Main).GetField<DbTreeView>("actionsView");
                     questerMainPanelRefreshActionAccessor = typeof(Astral.Quester.Forms.Main).GetAction("refreshActions");
 #if LoadRoleEvent
                     var tPatch = typeof(Entrypoint);

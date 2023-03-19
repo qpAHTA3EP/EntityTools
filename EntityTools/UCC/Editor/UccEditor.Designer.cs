@@ -526,15 +526,15 @@ namespace EntityTools.UCC.Editor
             this.imageList.Images.SetKeyName(12, "List");
             this.imageList.Images.SetKeyName(13, "Cancel");
             this.imageList.Images.SetKeyName(14, "Dodge");
-            this.imageList.Images.SetKeyName(15, "miniBoxedArrow.png");
+            this.imageList.Images.SetKeyName(15, "miniBoxedArrow");
             this.imageList.Images.SetKeyName(16, "Gear");
             this.imageList.Images.SetKeyName(17, "Recycle");
             this.imageList.Images.SetKeyName(18, "Target");
             this.imageList.Images.SetKeyName(19, "Condition");
             this.imageList.Images.SetKeyName(20, "ConditionList");
             this.imageList.Images.SetKeyName(21, "Power");
-            this.imageList.Images.SetKeyName(22, "Art.png");
-            this.imageList.Images.SetKeyName(23, "Gem.png");
+            this.imageList.Images.SetKeyName(22, "Art");
+            this.imageList.Images.SetKeyName(23, "Gem");
             // 
             // panProperties
             // 

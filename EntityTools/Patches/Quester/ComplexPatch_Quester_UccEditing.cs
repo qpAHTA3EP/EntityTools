@@ -363,7 +363,7 @@ namespace EntityTools.Patches.Quester
                     if (EntityTools.Config.Patches.QuesterPatches.ReplaceEditorForAddUccActions)
                     {
                         // Вызов собственного ucc-редактора
-                        __result = UccEditor.Edit(uccProfile, Astral.API.CurrentSettings.LastUCCProfile, true) 
+                        __result = UccEditor.Edit(uccProfile, "", true) 
                                  ? uccProfile 
                                  : __2;
                         return false;

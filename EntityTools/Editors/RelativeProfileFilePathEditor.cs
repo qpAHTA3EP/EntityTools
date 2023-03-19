@@ -74,9 +74,26 @@ namespace EntityTools.Editors
                                                           defaultExtension: "amp.zip");
                 if (openDialog.ShowDialog() == DialogResult.OK)
                 {
-                    if (string.IsNullOrEmpty(fullProfilePath))
-                        return PathHelper.GetRelativePathTo(Path.Combine(astralProfileDir, "profile"), openDialog.FileName);
-                    return PathHelper.GetRelativePathTo(fullProfilePath, openDialog.FileName);
+
+                    string result = string.IsNullOrEmpty(fullProfilePath)
+                                  ? PathHelper.GetRelativePathTo(Path.Combine(astralProfileDir, "profile"), openDialog.FileName)
+                                  : PathHelper.GetRelativePathTo(fullProfilePath, openDialog.FileName);
+
+                    if (!string.IsNullOrEmpty(result)
+                        && result.Length > ".amp.zip".Length + 1)
+                    {
+                        if (result[0] == '.'
+                            && (result[1] == Path.DirectorySeparatorChar
+                                || result[1] == Path.AltDirectorySeparatorChar)
+                                || result[1] == '.' 
+                                   && (result[2] == Path.DirectorySeparatorChar
+                                       || result[2] == Path.AltDirectorySeparatorChar))
+                        {
+                            // result начинается с '../' или './'
+                            return result;
+                        }
+                        return result;
+                    }
                 }
             }
 

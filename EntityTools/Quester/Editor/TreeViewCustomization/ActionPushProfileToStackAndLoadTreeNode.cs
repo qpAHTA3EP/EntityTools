@@ -9,7 +9,7 @@ using EntityTools.Tools;
 using MyNW.Classes;
 using QuesterAction = Astral.Quester.Classes.Action;
 using QuesterCondition = Astral.Quester.Classes.Condition;
-
+using System.IO;
 
 namespace EntityTools.Quester.Editor.TreeViewCustomization
 {
@@ -21,8 +21,9 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
     {
         private readonly QuesterAction action;
 
-        private static readonly PropertyAccessor<string> DesignProfilePathAccessor =
-            ACTP0Serializer.PushProfileToStackAndLoad.GetProperty<string>("DesignProfilePath");
+        private static readonly PropertyAccessor<string> profileNameAccessor =
+            ACTP0Serializer.PushProfileToStackAndLoad.GetProperty<string>("ProfileName");
+
         public ActionPushProfileToStackAndLoadTreeNode(BaseQuesterProfileProxy profile, QuesterAction action, bool clone = false) : base(profile)
         {
             if (!action.IsPushProfileToStackAndLoad())
@@ -40,7 +41,25 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
 
         public override List<Vector3> HotSpots => null;
 
-        public override QuesterAction.ActionValidity IsValid => action.IsValid;
+        public override QuesterAction.ActionValidity IsValid
+        {
+            get
+            {
+                var ownerProfileName = Owner.ProfilePath;
+                if (!File.Exists(ownerProfileName))
+                    return new QuesterAction.ActionValidity("The quester-profile being edited has not been saved.");
+
+                var profileName = profileNameAccessor.GetValueFrom(action);
+                if (string.IsNullOrEmpty(profileName))
+                    return new QuesterAction.ActionValidity("The 'ProfileName' did not set.");
+
+                var profileFilePath = Path.Combine(Path.GetDirectoryName(ownerProfileName), profileName);
+                if (!File.Exists(profileFilePath))
+                    return new QuesterAction.ActionValidity($"Profile '{profileName}' not found.");
+
+                return Empty.ActionValidity;
+            }
+        }
 
         public override bool AllowChildren => false;
 
@@ -48,8 +67,6 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
 
         public override void UpdateView()
         {
-            DesignProfilePathAccessor[action] = Owner.ProfilePath;
-
             if (Parent is ActionBaseTreeNode parentPackNode)
                 parentPackNode.UpdateView();
 
@@ -65,7 +82,7 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
         }
         private void SelectIcon()
         {
-            var actionIsValid = action.IsValid;
+            var actionIsValid = IsValid;
             if (actionIsValid.IsValid)
             {
                 ImageKey = "Cube";

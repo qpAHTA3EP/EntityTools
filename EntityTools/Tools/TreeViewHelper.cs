@@ -134,6 +134,8 @@ namespace EntityTools.Tools
 
                     if (action is ActionPack actPack)
                         return new ActionPackTreeNode(profile, actPack);
+                    if (action.IsPushProfileToStackAndLoad())
+                        return new ActionPushProfileToStackAndLoadTreeNode(profile, action);
                     return new ActionTreeNode(profile, action);
                 }
 
