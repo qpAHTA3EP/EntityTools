@@ -180,10 +180,10 @@ namespace EntityTools.Patches.Quester
 
             if (mapperForm is null || mapperForm.IsDisposed)
             {
-                mapperForm = new MapperFormExt();
+                mapperForm = new MapperFormExt(AstralAccessors.Quester.Core.CurrentProfile);
                 mapperForm.OnDraw += DrawRunningRole;
             }
-            mapperForm.Show();
+            mapperForm.ImmutableShow();
             return false;
         }
         internal static void OpenMapper(BaseQuesterProfileProxy profile)
@@ -195,7 +195,7 @@ namespace EntityTools.Patches.Quester
                 return;
             }
             var mapper = new MapperFormExt(profile);
-            mapper.Show();
+            mapper.ImmutableShow();
         }
 
         internal static void CloseMapper()

@@ -93,6 +93,7 @@ namespace EntityTools.Quester.Mapper
         #region Инициализация формы
         IGraph GetGraph() => _profile.CurrentMesh;
 
+#if false
         internal MapperFormExt()
         {
             InitializeComponent();
@@ -103,43 +104,44 @@ namespace EntityTools.Quester.Mapper
 
             var mapperConfig = EntityTools.Config.Mapper;
             var mapperFormConfig = mapperConfig.MapperForm;
+#if false
             barMapping.Visible = mapperFormConfig.MappingBarVisible;
+            barMapping.OptionsBar.Hidden = false;
             barGraphTools.Visible = mapperFormConfig.MeshesBarVisible;
+            barGraphTools.OptionsBar.Hidden = false;
             barGraphEditTools.Visible = mapperFormConfig.NodeToolsBarVisible;
+            barGraphEditTools.OptionsBar.Hidden = false;
             barCustomRegions.Visible = mapperFormConfig.CustomRegionBarVisible;
+            barCustomRegions.OptionsBar.Hidden = false;
             barStatus.Visible = mapperFormConfig.StatusBarVisible;
 
-            btnShowStatBar.Visible = !barStatus.Visible 
-                                  && !barMapping.Visible 
-                                  && !barGraphTools.Visible 
-                                  && !barGraphEditTools.Visible 
-                                  && !barCustomRegions.Visible;
+            btnPanelVisibility.Visibility = BarItemVisibility.Always;
+            btnSettings.Visibility = BarItemVisibility.Always;
+            btnSaveMeshes.Visibility = BarItemVisibility.Always;
+
+            btnShowStatBar.Visible = !barStatus.Visible
+                                  && !barMapping.Visible
+                                  && !barGraphTools.Visible
+                                  && !barGraphEditTools.Visible
+                                  && !barCustomRegions.Visible; 
+#endif
 
             Location = mapperFormConfig.Location;
 
-            BindingControls();
-
-            _mappingTool = new MappingTool(GetGraph) {
+            _mappingTool = new MappingTool(GetGraph)
+            {
                 Linear = mapperConfig.LinearPath,
                 ForceLink = mapperConfig.ForceLinkingWaypoint
             };
 
             _graphics = new MapperGraphics(360, 360);
 
-            _graphCache = new MapperGraphCache(GetGraph, mapperConfig.CacheActive) {
+            _graphCache = new MapperGraphCache(GetGraph, mapperConfig.CacheActive)
+            {
                 CacheDistanceZ = mapperFormConfig.LayerDepth
             };
-
-#if DrawMapper_Measuring
-            lblPlayerPos.Visibility = BarItemVisibility.Always;
-            lblDrawInfo.Visibility = BarItemVisibility.Always;
-            lblMousePos.Visibility = BarItemVisibility.Always;
-#else
-            lblDrawInfo.Visibility = BarItemVisibility.Never;
-            lblMousePos.Visibility = BarItemVisibility.Never;
+        } 
 #endif
-            lblPlayerPos.Visibility = BarItemVisibility.Always;
-        }
 
         internal MapperFormExt(BaseQuesterProfileProxy profile)
         {
@@ -154,6 +156,7 @@ namespace EntityTools.Quester.Mapper
 
             var mapperConfig = EntityTools.Config.Mapper;
             var mapperFormConfig = mapperConfig.MapperForm;
+#if false
             barMapping.Visible = mapperFormConfig.MappingBarVisible;
             barGraphTools.Visible = mapperFormConfig.MeshesBarVisible;
             barGraphEditTools.Visible = mapperFormConfig.NodeToolsBarVisible;
@@ -164,11 +167,9 @@ namespace EntityTools.Quester.Mapper
                                   && !barMapping.Visible
                                   && !barGraphTools.Visible
                                   && !barGraphEditTools.Visible
-                                  && !barCustomRegions.Visible;
+                                  && !barCustomRegions.Visible; 
+#endif
             Location = mapperFormConfig.Location;
-
-            BindingControls();
-
 
             _mappingTool = new MappingTool(GetGraph) {
                 Linear = mapperConfig.LinearPath,
@@ -180,17 +181,15 @@ namespace EntityTools.Quester.Mapper
             _graphCache = new MapperGraphCache(GetGraph, mapperConfig.CacheActive) {
                 CacheDistanceZ = mapperFormConfig.LayerDepth
             };
-
-#if DrawMapper_Measuring
-            lblPlayerPos.Visibility = BarItemVisibility.Always;
-            lblDrawInfo.Visibility = BarItemVisibility.Always;
-            lblMousePos.Visibility = BarItemVisibility.Always;
-#else
-            lblDrawInfo.Visibility = BarItemVisibility.Never;
-            lblMousePos.Visibility = BarItemVisibility.Never;
-#endif
-            lblPlayerPos.Visibility = BarItemVisibility.Always;
         }
+
+        internal void ImmutableShow()
+        {
+            isImmutable = true;
+
+            base.Show();
+        }
+        private bool isImmutable = false;
 
         /// <summary>
         /// Привязка элементов управления к данным
@@ -252,13 +251,62 @@ namespace EntityTools.Quester.Mapper
         {
             Binds.RemoveShiftAction(Keys.M);
 
-            barMapping.Visible = EntityTools.Config.Mapper.MapperForm.MappingBarVisible;
-            barGraphTools.Visible = EntityTools.Config.Mapper.MapperForm.MeshesBarVisible;
-            barGraphEditTools.Visible = EntityTools.Config.Mapper.MapperForm.NodeToolsBarVisible;
-            barCustomRegions.Visible = EntityTools.Config.Mapper.MapperForm.CustomRegionBarVisible;
-            barStatus.Visible = EntityTools.Config.Mapper.MapperForm.StatusBarVisible;
+            if (isImmutable)
+            {
+                barMapping.Visible = false;
+                barMapping.OptionsBar.Hidden = true;
+                barGraphTools.Visible = false;
+                barGraphTools.OptionsBar.Hidden = true;
+                barGraphEditTools.Visible = false;
+                barGraphEditTools.OptionsBar.Hidden = true;
+                barCustomRegions.Visible = false;
+                barCustomRegions.OptionsBar.Hidden = true;
+                barStatus.Visible = true;
 
-            btnShowStatBar.Visible = !barStatus.Visible && !barMapping.Visible && !barGraphTools.Visible && !barGraphEditTools.Visible && !barCustomRegions.Visible;
+                btnPanelVisibility.Visibility = BarItemVisibility.Never;
+                btnSettings.Visibility = BarItemVisibility.Never;
+                btnSaveMeshes.Visibility = BarItemVisibility.Never;
+                btnUndo.Visibility = BarItemVisibility.Never;
+
+                btnShowStatBar.Visible = !barStatus.Visible;
+            }
+            else
+            {
+                BindingControls();
+
+                var mapperConfig = EntityTools.Config.Mapper;
+                var mapperFormConfig = mapperConfig.MapperForm;
+                barMapping.Visible = mapperFormConfig.MappingBarVisible;
+                barMapping.OptionsBar.Hidden = false;
+                barGraphTools.Visible = mapperFormConfig.MeshesBarVisible;
+                barGraphTools.OptionsBar.Hidden = false;
+                barGraphEditTools.Visible = mapperFormConfig.NodeToolsBarVisible;
+                barGraphEditTools.OptionsBar.Hidden = false;
+                barCustomRegions.Visible = mapperFormConfig.CustomRegionBarVisible;
+                barCustomRegions.OptionsBar.Hidden = false;
+                barStatus.Visible = mapperFormConfig.StatusBarVisible;
+
+                btnPanelVisibility.Visibility = BarItemVisibility.Always;
+                btnSettings.Visibility = BarItemVisibility.Always;
+                btnSaveMeshes.Visibility = BarItemVisibility.Always;
+                btnUndo.Visibility = BarItemVisibility.Always;
+
+                btnShowStatBar.Visible = !barStatus.Visible 
+                                      && !barMapping.Visible 
+                                      && !barGraphTools.Visible 
+                                      && !barGraphEditTools.Visible 
+                                      && !barCustomRegions.Visible; 
+            }
+#if DrawMapper_Measuring
+            lblPlayerPos.Visibility = BarItemVisibility.Always;
+            lblDrawInfo.Visibility = BarItemVisibility.Always;
+            lblMousePos.Visibility = BarItemVisibility.Always;
+#else
+            lblDrawInfo.Visibility = BarItemVisibility.Never;
+            lblMousePos.Visibility = BarItemVisibility.Never;
+#endif
+            lblPlayerPos.Visibility = BarItemVisibility.Always;
+
             Location = EntityTools.Config.Mapper.MapperForm.Location;
             Size = EntityTools.Config.Mapper.MapperForm.Size;
             backgroundWorker.RunWorkerAsync();
@@ -687,14 +735,22 @@ namespace EntityTools.Quester.Mapper
         /// </summary>
         private IMapperTool CurrentTool
         {
-            get => _currentTool;
+            get
+            {
+                return isImmutable 
+                     ? null 
+                     : _currentTool;
+            }
             set
             {
+                if (isImmutable)
+                    return;
+
                 if (_currentTool != null)
                 {
-                    if(ReferenceEquals(_currentTool, value))
+                    if (ReferenceEquals(_currentTool, value))
                         return;
-                    
+
                     if (_currentTool.Applied)
                         _undoStack.Push(_currentTool);
                 }
@@ -704,10 +760,10 @@ namespace EntityTools.Quester.Mapper
                 else
                 {
                     _selectedNodes.Clear();
-                    MapperEditMode mode = _mappingTool.MappingMode != MappingMode.Stopped 
-                        ? MapperEditMode.Mapping 
+                    MapperEditMode mode = _mappingTool.MappingMode != MappingMode.Stopped
+                        ? MapperEditMode.Mapping
                         : MapperEditMode.None;
-                    InterruptAllModifications(mode); 
+                    InterruptAllModifications(mode);
                 }
             }
         }
@@ -1381,28 +1437,14 @@ namespace EntityTools.Quester.Mapper
         #endregion
 
         #region Добавление и изменение CustomRegion'ов
-#if false
-        /// <summary>
-        /// Флаг, указывающий, что CustomRegion'ы в профиле были изменены, и его необходимо "сохранить"
-        /// </summary>
-        bool CurrentProfileNeedSave
-        {
-            get => !string.IsNullOrEmpty(currentProfileName) && _profile.FileName == currentProfileName;
-            set
-            {
-                if (value)
-                    currentProfileName = _profile.FileName;
-                else currentProfileName = string.Empty;
-            }
-        }
-        string currentProfileName = string.Empty; 
-#endif
-
         /// <summary>
         /// Запуск процедуры добавления CustomRegion'а
         /// </summary>
         private void handler_StartAddingCustomRegion(object sender, ItemClickEventArgs e)
         {
+            if (isImmutable)
+                return;
+
             if (CurrentTool is AddCustomRegionTool addTool)
             {
                 addTool.Close();
@@ -1432,6 +1474,9 @@ namespace EntityTools.Quester.Mapper
         /// </summary>
         private void handler_StartEditingCustomRegion(object sender, ItemClickEventArgs e)
         {
+            if (isImmutable)
+                return;
+
             if (CurrentTool is EditCustomRegionTool editTool)
             {
                 editTool.Close();
@@ -1482,11 +1527,25 @@ namespace EntityTools.Quester.Mapper
 
         private void handler_BarVisibleChanged(object sender, EventArgs e)
         {
-            btnShowStatBar.Visible = !barStatus.Visible && !barMapping.Visible && !barGraphTools.Visible && !barGraphEditTools.Visible && !barCustomRegions.Visible;
+            if (isImmutable)
+            {
+                btnShowStatBar.Visible = !barStatus.Visible;
+            }
+            else
+            {
+                btnShowStatBar.Visible = !barStatus.Visible 
+                                      && !barMapping.Visible 
+                                      && !barGraphTools.Visible 
+                                      && !barGraphEditTools.Visible 
+                                      && !barCustomRegions.Visible;
+            }
         }
 
         private void handler_ShowSettingsTab(object sender, ItemClickEventArgs e)
         {
+            if (isImmutable)
+                return;
+
             if (settingsForm is null || settingsForm.IsDisposed)
             {
                 settingsForm = new MapperSettingsForm();
@@ -1902,6 +1961,9 @@ namespace EntityTools.Quester.Mapper
         /// </summary>
         private void handler_Undo(object sender, ItemClickEventArgs e)
         {
+            if (isImmutable)
+                return;
+
             // TODO: добавить перемещение карты к координатам, в которых было совершено изменение
             // TODO: Добавить hint к кнопке отката, указывающий на изменения, которые будут отменены
             IMapperTool tool = CurrentTool;
@@ -1927,6 +1989,9 @@ namespace EntityTools.Quester.Mapper
 
         private void handler_Mapping_BidirectionalPath(object sender, ItemClickEventArgs e)
         {
+            if (isImmutable)
+                return;
+
             if (btnMappingBidirectional.Checked)
             {
                 _profile.Saved = false;
@@ -1937,6 +2002,9 @@ namespace EntityTools.Quester.Mapper
 
         private void handler_Mapping_UnidirectionalPath(object sender, ItemClickEventArgs e)
         {
+            if (isImmutable)
+                return;
+
             if (btnMappingUnidirectional.Checked)
             {
                 _profile.Saved = false;
@@ -1947,6 +2015,9 @@ namespace EntityTools.Quester.Mapper
 
         private void handler_Mapping_Stop(object sender = null, ItemClickEventArgs e = null)
         {
+            if (isImmutable)
+                return;
+
             if (btnMappingStop.Checked)
             {
                 _mappingTool.MappingMode = MappingMode.Stopped;
@@ -1967,6 +2038,9 @@ namespace EntityTools.Quester.Mapper
 
         private void handler_DistanceMeasurement_ModeChanged(object sender, ItemClickEventArgs e)
         {
+            if (isImmutable)
+                return;
+
             DistanceMeasurementTool measurementTool = CurrentTool as DistanceMeasurementTool;
             if (btnDistanceMeasurement.Checked)
             {
@@ -1980,6 +2054,9 @@ namespace EntityTools.Quester.Mapper
 
         private void handler_ObjectInfo(object sender, ItemClickEventArgs e)
         {
+            if (isImmutable)
+                return;
+
             ObjectInfoTool infoTool = CurrentTool as ObjectInfoTool;
             if (btnObjectInfo.Checked)
             {
@@ -1993,6 +2070,9 @@ namespace EntityTools.Quester.Mapper
 
         private void handler_Change_PanelVisibility(object sender, ItemClickEventArgs e)
         {
+            if (isImmutable)
+                return;
+
             if (!barMapping.Visible
                 || !barGraphTools.Visible
                 || !barGraphEditTools.Visible
