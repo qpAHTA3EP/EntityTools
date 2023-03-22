@@ -290,6 +290,25 @@ namespace EntityTools.Settings
             }
             private bool _debugExecutePowerExt;
 
+            /// <summary>
+            /// Активация расширенной отладочной информации по <seealso cref="Quester.Actions.Jumping"/>
+            /// </summary>
+            [Bindable(true)]
+            [Description("Активация расширенной отладочной информации по команде " + nameof(Jumping))]
+            public bool DebugJumping
+            {
+                get => _debugJumpin;
+                set
+                {
+                    if (_debugJumpin != value)
+                    {
+                        _debugJumpin = value;
+                        NotifyPropertyChanged();
+                    }
+                }
+            }
+            private bool _debugJumpin;
+
             public override string ToString()
             {
                 int total = 0;

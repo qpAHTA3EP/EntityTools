@@ -243,6 +243,7 @@
     <Compile Include="Forms\TargetSelectForm.Designer.cs">
       <DependentUpon>TargetSelectForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Quester\Actions\Jumping.cs" />
     <Compile Include="Quester\Editor\Classes\ConditionPackMetadataType.cs" />
     <Compile Include="Quester\Editor\EditAct\DeleteQuesterCondition.cs">
       <SubType>Form</SubType>

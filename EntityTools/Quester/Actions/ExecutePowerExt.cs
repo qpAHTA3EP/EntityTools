@@ -212,7 +212,7 @@ namespace EntityTools.Quester.Actions
         [Description("The radius of target area centered on '" + nameof(TargetPosition) + "'.\n" +
                      "After executing the '" + nameof(PowerId) + "' the character must be closer to the '" + nameof(TargetPosition) + "' than the '" + nameof(TargetRadius) + "' to complete action.\n" +
                      "The action will be continued if the character is farther from the '" + nameof(TargetPosition) + "' than the specified '" + nameof(TargetRadius) + "'.\n" +
-                     "If value is zero the action completed after power executed.")]
+                     "If value is zero then the action would be completed after power executed.")]
         [Category("Target")]
         public uint TargetRadius
         {
@@ -315,7 +315,7 @@ namespace EntityTools.Quester.Actions
                      "Min = " + nameof(InitialPosition) + "." + nameof(Vector3.Z) + " - " + nameof(ZDeviation) + "\n" +
                      "Max = " + nameof(InitialPosition) + "." + nameof(Vector3.Z) + " + " + nameof(ZDeviation))]
         [Category("Default Option")]
-        [DisplayName("ZDeviation")]
+        [DisplayName(nameof(ZRange) + " Radius")]
         [XmlIgnore]
         public uint ZDeviation
         {
