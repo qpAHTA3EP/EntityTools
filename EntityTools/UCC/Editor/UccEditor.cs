@@ -531,7 +531,7 @@ namespace EntityTools.UCC.Editor
                     uccProfile.EnableTargetPriorities = checkerTacticActivator.Checked;
                     if(editBasePriority.EditValue is Astral.Logic.UCC.Ressources.Enums.TargetPriorityBase targetPriorityBase)
                         uccProfile.TargetPriority = targetPriorityBase;
-                    else if(Enum.TryParse(editBasePriority.EditValue.ToString(), out targetPriorityBase))
+                    else if(Enum.TryParse(editBasePriority.EditValue?.ToString(), out targetPriorityBase))
                         uccProfile.TargetPriority = targetPriorityBase;
                     uccProfile.TargetChangeCD = Convert.ToInt32(editChangeCooldown.Value);
                     uccProfile.TargetPriorityRange = Convert.ToInt32(editBasePriorityRange.Value);

@@ -13,7 +13,9 @@ namespace EntityTools.Editors
 {
     internal class RelativeProfileFilePathEditor : UITypeEditor
     {
-        private static PropertyAccessor<PropertyGrid> pgAccessor;
+#if pgAccessor
+        private static PropertyAccessor<PropertyGrid> pgAccessor; 
+#endif
 
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
@@ -24,6 +26,7 @@ namespace EntityTools.Editors
             {
                 string profileFile = string.Empty;
 
+#if pgAccessor
                 if (pgAccessor is null)
                     pgAccessor = context.GetProperty<PropertyGrid>("OwnerGrid");
 
@@ -31,9 +34,12 @@ namespace EntityTools.Editors
                 {
                     if (pgAccessor.Value?.ParentForm is QuesterEditor questerEditor)
                     {
-                        profileFile = questerEditor.Profile.ProfilePath;   
+                        profileFile = questerEditor.Profile.ProfilePath;
                     }
-                }
+                } 
+#else
+                profileFile = context.GetQuesterProfile()?.ProfilePath;
+#endif
 
                 string astralProfileDir = Astral.Controllers.Directories.ProfilesPath;
                 string relativeTargetProfilePath = value?.ToString() ?? string.Empty;

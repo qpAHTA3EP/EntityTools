@@ -151,6 +151,7 @@
     <Compile Include="Editors\CustomRegionCollectionEditor.cs" />
     <Compile Include="Editors\CustomRegionEditor.cs" />
     <Compile Include="Editors\MissionGiverInfoExtendedEditor.cs" />
+    <Compile Include="Editors\PropertyEditorHelper.cs" />
     <Compile Include="Editors\QuesterConditionEditor.cs" />
     <Compile Include="Editors\PowerIdEditor.cs" />
     <Compile Include="Editors\MissionGiverInfoEditor.cs" />

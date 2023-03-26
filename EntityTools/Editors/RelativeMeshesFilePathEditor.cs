@@ -11,12 +11,15 @@ namespace EntityTools.Editors
 {
     internal class RelativeMeshesFilePathEditor : UITypeEditor
     {
-        private PropertyAccessor<PropertyGrid> pgAccessor;
+#if pgAccessor
+        private PropertyAccessor<PropertyGrid> pgAccessor; 
+#endif
 
         public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
         {
             string profileFile = string.Empty;
 
+#if pgAccessor
             if (pgAccessor is null)
                 pgAccessor = context.GetProperty<PropertyGrid>("OwnerGrid");
 
@@ -26,7 +29,10 @@ namespace EntityTools.Editors
                 {
                     profileFile = questerEditor.Profile.ProfilePath;
                 }
-            }
+            } 
+#else
+            profileFile = context.GetQuesterProfile()?.ProfilePath;
+#endif
 
             string astralProfileDir = Astral.Controllers.Directories.ProfilesPath;
             string relativeTargetProfilePath = value?.ToString() ?? string.Empty;
