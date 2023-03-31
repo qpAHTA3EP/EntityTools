@@ -31,10 +31,22 @@ namespace Infrastructure.Classes.Threading
             public void Dispose() => @lock.ExitReadLock();
         }
 
+        public struct UpgradeableReadLockToken : IDisposable
+        {
+            private readonly ReaderWriterLockSlim @lock;
+            public UpgradeableReadLockToken(ReaderWriterLockSlim @lock)
+            {
+                this.@lock = @lock;
+                @lock.EnterUpgradeableReadLock();
+            }
+            public void Dispose() => @lock.ExitUpgradeableReadLock();
+        }
+
         private readonly ReaderWriterLockSlim @lock = new ReaderWriterLockSlim();
 
         public ReadLockToken ReadLock() => new ReadLockToken(@lock);
         public WriteLockToken WriteLock() => new WriteLockToken(@lock);
+        public UpgradeableReadLockToken UpgradeableReadLock() => new UpgradeableReadLockToken(@lock);
 
         public void Dispose() => @lock.Dispose();
     }

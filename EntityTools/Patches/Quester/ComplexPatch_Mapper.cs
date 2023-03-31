@@ -186,6 +186,7 @@ namespace EntityTools.Patches.Quester
             mapperForm.ImmutableShow();
             return false;
         }
+#if false
         internal static void OpenMapper(BaseQuesterProfileProxy profile)
         {
             if (!EntityTools.Config.Mapper.Patch
@@ -196,7 +197,8 @@ namespace EntityTools.Patches.Quester
             }
             var mapper = new MapperFormExt(profile);
             mapper.ImmutableShow();
-        }
+        } 
+#endif
 
         internal static void CloseMapper()
         {

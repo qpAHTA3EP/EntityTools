@@ -43,10 +43,11 @@ namespace Infrastructure.Quester
         public override void SetProfile(Profile profile, string newProfileFilename)
         {
             var currentProfile = Astral.Quester.API.CurrentProfile;
+#if false
             if (profile is null
-                || ReferenceEquals(currentProfile, profile))
-                return;
-
+                    || ReferenceEquals(currentProfile, profile))
+                return; 
+#endif
 #if false
             if (AstralAccessors.Controllers.Roles.IsRunning)
                 AstralAccessors.Controllers.Roles.ToggleRole(true); 

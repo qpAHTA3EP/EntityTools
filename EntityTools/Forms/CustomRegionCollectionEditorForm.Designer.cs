@@ -73,7 +73,7 @@
             this.btnReload.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnReload.ImageOptions.Image = global::EntityTools.Properties.Resources.Refresh;
             this.btnReload.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
-            this.btnReload.Location = new System.Drawing.Point(88, 374);
+            this.btnReload.Location = new System.Drawing.Point(12, 374);
             this.btnReload.Name = "btnReload";
             this.btnReload.PaintStyle = DevExpress.XtraEditors.Controls.PaintStyles.Light;
             this.btnReload.Size = new System.Drawing.Size(70, 23);
@@ -87,7 +87,6 @@
             this.crList.CheckOnClick = true;
             this.crList.Dock = System.Windows.Forms.DockStyle.Fill;
             this.crList.Location = new System.Drawing.Point(0, 0);
-            this.crList.MultiColumn = true;
             this.crList.Name = "crList";
             this.crList.Size = new System.Drawing.Size(314, 248);
             this.crList.SortOrder = System.Windows.Forms.SortOrder.Ascending;
@@ -223,15 +222,17 @@
             // btnOpenMapper
             // 
             this.btnOpenMapper.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnOpenMapper.Enabled = false;
             this.btnOpenMapper.ImageOptions.Image = ((System.Drawing.Image)(resources.GetObject("btnOpenMapper.ImageOptions.Image")));
             this.btnOpenMapper.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
-            this.btnOpenMapper.Location = new System.Drawing.Point(12, 374);
+            this.btnOpenMapper.Location = new System.Drawing.Point(88, 374);
             this.btnOpenMapper.Name = "btnOpenMapper";
             this.btnOpenMapper.PaintStyle = DevExpress.XtraEditors.Controls.PaintStyles.Light;
             this.btnOpenMapper.Size = new System.Drawing.Size(70, 23);
             this.btnOpenMapper.TabIndex = 1;
             this.btnOpenMapper.Text = "Mapper";
             this.btnOpenMapper.ToolTip = "Open Mapper";
+            this.btnOpenMapper.Visible = false;
             this.btnOpenMapper.Click += new System.EventHandler(this.handler_Mapper);
             // 
             // CustomRegionCollectionEditorForm

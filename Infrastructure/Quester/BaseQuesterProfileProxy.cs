@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
 using AStar;
 using Astral.Quester.Classes;
 using Infrastructure.Annotations;
@@ -253,6 +254,18 @@ namespace Infrastructure.Quester
         {
             RealProfile.Saved = false;
             _customRegionsChangeNum++;
+#if false
+            if (e.ListChangedType == ListChangedType.ItemDeleted)
+            {
+                var stack = new System.Diagnostics.StackTrace(true);
+                var sb = new StringBuilder($"{e.ListChangedType} CustomRegion[{e.NewIndex}] from profile '{ProfilePath}'.\n");
+                foreach (var frame in stack.GetFrames())
+                {
+                    sb.AppendLine(frame.ToString());
+                }
+                ETLogger.WriteLine(LogType.Debug, sb.ToString());
+            } 
+#endif
         }
 
 
@@ -403,10 +416,12 @@ namespace Infrastructure.Quester
         {
             if (profile != null)
             {
+                if (ReferenceEquals(RealProfile, profile))
+                    return; 
                 if (_customRegions != null)
                 {
                     _customRegions.ListChanged -= CustomRegions_Changed;
-                    var newCustomRegions = profile.CustomRegions;
+                    var newCustomRegions = profile.CustomRegions.ToList();
                     _customRegions.Clear();
                     foreach (var cr in newCustomRegions)
                         _customRegions.Add(cr);
@@ -417,7 +432,7 @@ namespace Infrastructure.Quester
                 if (_blackList != null)
                 {
                     _blackList.ListChanged -= BlackList_Changed;
-                    var newBlackList = profile.BlackList;
+                    var newBlackList = profile.BlackList.ToList();
                     _blackList.Clear();
                     foreach (var bl in newBlackList)
                         _blackList.Add(bl);
@@ -429,7 +444,7 @@ namespace Infrastructure.Quester
                 if (_vendors != null)
                 {
                     _vendors.ListChanged -= Vendors_Changed;
-                    var newVendors = profile.Vendors;
+                    var newVendors = profile.Vendors.ToList();
                     _vendors.Clear();
                     foreach (var vendor in newVendors)
                         _vendors.AddUnique(vendor);

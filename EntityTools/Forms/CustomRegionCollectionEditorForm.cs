@@ -183,7 +183,9 @@ namespace EntityTools.Forms
 
         private void handler_Mapper(object sender, EventArgs e)
         {
-            ComplexPatch_Mapper.OpenMapper(profile);
+#if false
+            ComplexPatch_Mapper.OpenMapper(profile); 
+#endif
         }
 
         private void handler_HelpRequested(object sender, HelpEventArgs hlpevent)

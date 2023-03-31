@@ -186,7 +186,7 @@ namespace EntityTools.Quester.Mapper
         internal void ImmutableShow()
         {
             isImmutable = true;
-
+            WindowState = FormWindowState.Normal;
             base.Show();
         }
         private bool isImmutable = false;
@@ -1435,6 +1435,8 @@ namespace EntityTools.Quester.Mapper
             }
         }
         #endregion
+
+
 
         #region Добавление и изменение CustomRegion'ов
         /// <summary>

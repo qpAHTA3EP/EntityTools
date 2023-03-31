@@ -19,6 +19,10 @@ namespace EntityTools.Quester.Editor
                 components.Dispose();
             }
             base.Dispose(disposing);
+            using (var loker = _editorsLocker.WriteLock())
+            {
+                _editors.Remove(this);
+            }
         }
 
         #region Windows Form Designer generated code

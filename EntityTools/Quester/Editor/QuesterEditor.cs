@@ -36,19 +36,73 @@ using MyNW.Patchables.Enums;
 using QuesterAction = Astral.Quester.Classes.Action;
 using QuesterCondition = Astral.Quester.Classes.Condition;
 using EntityTools.Patches.Quester;
+using Infrastructure.Classes.Threading;
 
 namespace EntityTools.Quester.Editor
 {
     public partial class QuesterEditor : XtraForm
     {
-        //TODO Отслеживать изменение CustomRegion в Mapper'e и изменять PropertyGrid
+        private static readonly LinkedList<QuesterEditor> _editors = new LinkedList<QuesterEditor>();
+        private static readonly RWLocker _editorsLocker = new RWLocker();
+        private static QuesterEditor GetEditor(Profile profile, string fileName, Guid actionId)
+        {
+            QuesterEditor editor = null;
+            if (!string.IsNullOrEmpty(fileName))
+            {
+                var fileInfo = new FileInfo(fileName);
+                var fullName = fileInfo.FullName;
+
+                using (var locker = _editorsLocker.UpgradeableReadLock())
+                {
+                    LinkedListNode<QuesterEditor> current = _editors.First;
+                    while (current != null)
+                    {
+                        var edtr = current.Value;
+                        if (edtr is null
+                            || edtr.IsDisposed)
+                        {
+                            var nextNode = current.Next;
+                            using (var writeLocker = _editorsLocker.ReadLock())
+                            {
+                                _editors.Remove(current); 
+                            }
+                            current = nextNode;
+                            continue;
+                        }
+
+                        var currentProfile = edtr.profile;
+
+                        if (string.Equals(currentProfile?.ProfilePath, fullName, StringComparison.OrdinalIgnoreCase))
+                        {
+                            editor = edtr;
+                        }
+                        current = current.Next;
+                    } 
+                }
+            }
+            if (editor is null)
+            {
+                editor = new QuesterEditor(profile, fileName, actionId);
+                using (var writeLocker = _editorsLocker.ReadLock())
+                {
+                    _editors.AddLast(editor); 
+                }
+            }
+            return editor;
+        }
+
+
+
 
         /// <summary>
         /// Редактируемый Quester-профиль (<see cref="BaseQuesterProfileProxy"/>)
         /// </summary>
         public BaseQuesterProfileProxy Profile => profile;
         private readonly ProfileProxy profile;
-        private readonly Guid startActionId;
+        private Guid startActionId;
+
+
+
 
         /// <summary>
         /// Стэк команд для отмены манипуляций с Quester-профилем
@@ -88,12 +142,12 @@ namespace EntityTools.Quester.Editor
         /// </summary>
         private MapperFormExt mapperForm;
 
-        public QuesterEditor(Profile profile, string fileName, Guid actionId)
+        private QuesterEditor(Profile profile, string fileName, Guid actionId)
         {
             InitializeComponent();
-#if true
+
             SetTypeAssociations();
-#endif
+
             this.profile = profile is null 
                          ? new ProfileProxy()
                          : new ProfileProxy(profile, fileName);
@@ -117,10 +171,12 @@ namespace EntityTools.Quester.Editor
         /// <param name="param">Дополнительные аргументы:<br/>
         /// - адресная строка файла редактируемого профиля;<br/>
         /// - флаг модального режима</param>
-        public static bool Edit(Profile profile = null, params object[] param)
+        public static void Edit(Profile profile = null, params object[] param)
         {
             string profileName = string.Empty;
-            bool modal = false;
+#if modal
+            bool modal = false; 
+#endif
             Guid actionId = Guid.Empty;
             if (param != null)
             {
@@ -131,9 +187,11 @@ namespace EntityTools.Quester.Editor
                         case string str:
                             profileName = str;
                             break;
+#if modal
                         case bool b:
                             modal = b;
-                            break;
+                            break; 
+#endif
                         case QuesterAction action:
                             actionId = action.ActionID;
                             break;
@@ -144,11 +202,18 @@ namespace EntityTools.Quester.Editor
                 }
             }
 
-            var editor = new QuesterEditor(profile, profileName, actionId);
+            var editor = GetEditor(profile, profileName, actionId);
+#if modal
             if (modal)
-                return editor.ShowDialog() == DialogResult.OK;
+            {
+                editor.ShowDialog();
+            }
+            editor.Show(); 
+#else
+            editor.WindowState = FormWindowState.Normal;
+            //editor.TopLevel = true;
             editor.Show();
-            return true;
+#endif
         }
 
         /// <summary>
@@ -914,7 +979,10 @@ namespace EntityTools.Quester.Editor
             InvokeActionCallback();
 
             if (treeActions.SelectedNode is ActionBaseTreeNode actionNode)
+            { 
                 actionNode.GatherActionInfo(profile);
+                profile.Saved = false;
+            }
         }
 
         private void CopyAction(object sender, EventArgs e = null)
@@ -1217,6 +1285,8 @@ namespace EntityTools.Quester.Editor
         {
             if (SaveProfile())
             {
+                UploadProfileToEngine();
+
                 txtLog.AppendText(string.Concat("[", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
                     "] Profile",
                     string.IsNullOrEmpty(profile.ProfilePath)
@@ -1232,6 +1302,8 @@ namespace EntityTools.Quester.Editor
         {
             if (SaveProfile(true))
             {
+                UploadProfileToEngine();
+
                 txtLog.AppendText(string.Concat("[", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
                     "] Profile",
                     string.IsNullOrEmpty(profile.ProfilePath)
@@ -1243,15 +1315,26 @@ namespace EntityTools.Quester.Editor
             }
         }
 
+        private void UploadProfileToEngine(bool @override = false, Guid actionId = default)
+        {
+            var currentEngineProfile = AstralAccessors.Quester.Core.CurrentProfile;
+            if (@override || profile.ProfilePath == currentEngineProfile.ProfilePath)
+            {
+                AstralAccessors.Controllers.Roles.StopPlaingRole();
+                //TODO: устанавливать, по возможности. текущее действие currentEngineProfile в качестве активного после установки профиля
+                currentEngineProfile.SetProfile(profile.GetProfile(), profile.ProfilePath);
+
+                if (actionId != default)
+                    AstralAccessors.Quester.Core.CurrentProfile.MainActionPack.SetStartPoint(actionId);
+            }
+        }
+
         private void handler_Profile_Upload(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
         {
             var saved = profile.Saved;
             if (saved || SaveProfile())
             {
-                var actualProfile = profile.GetProfile();
-
-                AstralAccessors.Controllers.Roles.StopPlaingRole();
-                AstralAccessors.Quester.Core.CurrentProfile.SetProfile(actualProfile, profile.ProfilePath);
+                UploadProfileToEngine(true);
 
                 txtLog.AppendText(
                     string.Concat("[", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
@@ -1276,14 +1359,11 @@ namespace EntityTools.Quester.Editor
             var saved = profile.Saved;
             if (saved || SaveProfile())
             {
-                var actualProfile = profile.GetProfile();
                 var actionId = treeActions.SelectedNode is ActionBaseTreeNode selectedNode
                                  ? selectedNode.Content.ActionID
                                  : Guid.Empty;
 
-                AstralAccessors.Controllers.Roles.StopPlaingRole();
-                AstralAccessors.Quester.Core.CurrentProfile.SetProfile(actualProfile, profile.ProfilePath);
-                actualProfile.MainActionPack.SetStartPoint(actionId);
+                UploadProfileToEngine(true, actionId);
 
                 txtLog.AppendText(string.Concat("[", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
                     "] Profile",
@@ -1673,6 +1753,7 @@ namespace EntityTools.Quester.Editor
                 mapperForm.OnDraw += DrawSelectedAction;
             }
 
+            mapperForm.WindowState = FormWindowState.Normal;
             mapperForm.Show();
             mapperForm.Focus();
         }
