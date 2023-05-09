@@ -10,7 +10,11 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
     /// </summary>
     internal sealed class ConditionIsInCustomRegionSetTreeNode : ConditionBaseTreeNode
     {
-        public ConditionIsInCustomRegionSetTreeNode(BaseQuesterProfileProxy profile, IsInCustomRegionSet condition) : base (profile)
+        public ConditionIsInCustomRegionSetTreeNode(
+            BaseQuesterProfileProxy profile, 
+            //ActionBaseTreeNode ownedAction, 
+            IsInCustomRegionSet condition
+        ) : base (profile/*, ownedAction*/)
         {
             Tag = condition;
             this.condition = condition;
@@ -45,8 +49,8 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
             Text = txt;
             if (Checked != condition.Locked)
                 Checked = condition.Locked;
-            ImageKey = "Condition";
-            SelectedImageKey = "Condition";
+            ImageKey = @"Condition";
+            SelectedImageKey = @"Condition";
         }
 
         public override QuesterCondition ReconstructInternal()
@@ -58,7 +62,7 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
         public override object Clone()
         {
             var copy = condition.CreateXmlCopy();
-            return new ConditionIsInCustomRegionSetTreeNode(Owner, (IsInCustomRegionSet)copy);
+            return new ConditionIsInCustomRegionSetTreeNode(Owner, /*OwnedAction,*/ (IsInCustomRegionSet)copy);
         }
     }
 }

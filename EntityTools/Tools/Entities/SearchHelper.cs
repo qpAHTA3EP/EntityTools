@@ -414,7 +414,7 @@ namespace EntityTools.Tools.Entities
                                 if (zRange > 0)
                                     predicate = (Entity e) => Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < zRange
                                             && customRegions.Outside(e);
-                                else predicate = (Entity e) => customRegions.Outside(e);
+                                else predicate = customRegions.Outside;
                             }
                         }
                     }
@@ -521,7 +521,7 @@ namespace EntityTools.Tools.Entities
                                 if (zRange > 0)
                                     predicate = (Entity e) => Astral.Logic.General.ZAxisDiffFromPlayer(e.Location) < zRange
                                             && customRegions.Within(e);
-                                else predicate = (Entity e) => customRegions.Within(e);
+                                else predicate = customRegions.Within;
                             }
                         }
                     }

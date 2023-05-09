@@ -7,6 +7,7 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
     public abstract class ConditionBaseTreeNode : TreeNode, ITreeNode<QuesterCondition>
     {
         protected readonly BaseQuesterProfileProxy Owner;
+        protected readonly ActionBaseTreeNode OwnedAction;
 
         public abstract QuesterCondition Content { get; }
 
@@ -21,9 +22,10 @@ namespace EntityTools.Quester.Editor.TreeViewCustomization
             }
         }
 
-        protected ConditionBaseTreeNode(BaseQuesterProfileProxy profile)
+        protected ConditionBaseTreeNode(BaseQuesterProfileProxy profile/*, ActionBaseTreeNode ownedAction*/)
         {
             Owner = profile;
+            //OwnedAction = ownedAction;
         }
 
         public abstract bool IsValid();

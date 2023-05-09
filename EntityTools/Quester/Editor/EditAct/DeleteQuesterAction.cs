@@ -23,11 +23,14 @@ namespace EntityTools.Quester.Editor
                 this.onRedo = onRedo;
             }
 
-            public void Apply()
+            public bool Prepare(QuesterEditor editorForm) => deletingNode.TreeView != null;
+
+            public void Apply(QuesterEditor editorForm)
             {
                 if (!Applied)
                 {
-                    treeViewOwner = deletingNode.TreeView ?? throw new InvalidOperationException($"Node '{deletingNode.Text}' does not attached to the TreeView.");
+                    treeViewOwner = deletingNode.TreeView 
+                                 ?? throw new InvalidOperationException($"Node '{deletingNode.Text}' does not attached to the TreeView.");
 
                     parentNodeBeforeDeleting = deletingNode.Parent as ActionPackTreeNode;
                     nodeIndexBeforeDeleting = deletingNode.Index;
@@ -41,7 +44,7 @@ namespace EntityTools.Quester.Editor
                 }
             }
 
-            public void Undo()
+            public void Undo(QuesterEditor editorForm)
             {
                 if (Applied
                     && treeViewOwner != null)
@@ -59,6 +62,8 @@ namespace EntityTools.Quester.Editor
                     onRedo?.Invoke(this);
                 }
             }
+
+            public bool IsReady => deletingNode.TreeView != null;
 
             public bool Applied { get; private set; }
 

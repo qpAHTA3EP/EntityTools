@@ -37,11 +37,13 @@ using QuesterAction = Astral.Quester.Classes.Action;
 using QuesterCondition = Astral.Quester.Classes.Condition;
 using EntityTools.Patches.Quester;
 using Infrastructure.Classes.Threading;
+using System.Net.Sockets;
 
 namespace EntityTools.Quester.Editor
 {
     public partial class QuesterEditor : XtraForm
     {
+        private EntityViewer _entityViewer;
         private static readonly LinkedList<QuesterEditor> _editors = new LinkedList<QuesterEditor>();
         private static readonly RWLocker _editorsLocker = new RWLocker();
         private static QuesterEditor GetEditor(Profile profile, string fileName, Guid actionId)
@@ -52,7 +54,7 @@ namespace EntityTools.Quester.Editor
                 var fileInfo = new FileInfo(fileName);
                 var fullName = fileInfo.FullName;
 
-                using (var locker = _editorsLocker.UpgradeableReadLock())
+                using (_editorsLocker.UpgradeableReadLock())
                 {
                     LinkedListNode<QuesterEditor> current = _editors.First;
                     while (current != null)
@@ -62,7 +64,7 @@ namespace EntityTools.Quester.Editor
                             || edtr.IsDisposed)
                         {
                             var nextNode = current.Next;
-                            using (var writeLocker = _editorsLocker.ReadLock())
+                            using (_editorsLocker.ReadLock())
                             {
                                 _editors.Remove(current); 
                             }
@@ -83,7 +85,7 @@ namespace EntityTools.Quester.Editor
             if (editor is null)
             {
                 editor = new QuesterEditor(profile, fileName, actionId);
-                using (var writeLocker = _editorsLocker.ReadLock())
+                using (_editorsLocker.ReadLock())
                 {
                     _editors.AddLast(editor); 
                 }
@@ -99,7 +101,7 @@ namespace EntityTools.Quester.Editor
         /// </summary>
         public BaseQuesterProfileProxy Profile => profile;
         private readonly ProfileProxy profile;
-        private Guid startActionId;
+        private readonly Guid startActionId;
 
 
 
@@ -112,6 +114,12 @@ namespace EntityTools.Quester.Editor
         /// Стэк команд для повторения манипуляций с Quester-профилем
         /// </summary>
         private readonly Stack<IEditAct> redoStack = new Stack<IEditAct>();
+        /// <summary>
+        /// Буфер обмена для значения свойств
+        /// </summary>
+        private static readonly Dictionary<Type, object> propertyBuffer = new Dictionary<Type, object>();
+
+        private static List<Vector3> hotSpotsBuffer;
 
         /// <summary>
         /// Функтор, выполняемый при изменении <see cref="pgProperties"/>
@@ -278,7 +286,7 @@ namespace EntityTools.Quester.Editor
         {
             if (profile is null
                 || string.IsNullOrEmpty(profile.ProfilePath))
-                Text = "* New profile";
+                Text = @"* New profile";
             else Text = (profile .Saved ? string.Empty : "* ")
                        + profile.ProfilePath;
         }
@@ -363,9 +371,21 @@ namespace EntityTools.Quester.Editor
                 }
             }
 
-            dockManager.SaveLayoutToXml(FileTools.QuesterEditorSettingsFile);
+            try
+            {
+                dockManager.SaveLayoutToXml(FileTools.QuesterEditorSettingsFile);
+            }
+            catch (Exception exception)
+            {
+                ETLogger.WriteLine(LogType.Error, exception.ToString(), true);
+            }
             Binds.RemoveAction(Keys.F5);
             mapperForm?.Close();
+        }
+
+        private void Log(string message)
+        {
+            txtLog.AppendText($"{Environment.NewLine}[{DateTime.Now:HH:mm:ss}]: {message}");
         }
         #endregion
 
@@ -632,6 +652,7 @@ namespace EntityTools.Quester.Editor
                     DeleteCondition(sender);
                     break;
                 case "Delete all Conditions":
+                    //TODO: Добавить Undo
                     if (XtraMessageBox.Show("Confirm the deletion of all Conditions from the list", "Confirmation",
                         MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation) == DialogResult.Yes)
                     {
@@ -689,7 +710,7 @@ namespace EntityTools.Quester.Editor
 
                 ResetSelectedCondition();
 #if true
-                ApplyEditAct(new DeleteQuesterCondition(conditionNode));
+                ApplyEditAct(new DeleteQuesterCondition(this, conditionNode));
 #else
                 treeConditions.BeginUpdate();
                 conditionNode.Remove();
@@ -779,13 +800,13 @@ namespace EntityTools.Quester.Editor
                 var testInfo = selectedNode.TestInfo();
                 var msg = $"{selectedNode.Text}\t\n{testInfo}\t\nResult: {result}";
                 XtraMessageBox.Show(msg, "Condition Test", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                txtLog.AppendText(msg);
+                Log(msg);
                 return;
             }
 
             XtraMessageBox.Show(
                 "No condition selected.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            txtLog.AppendText("\nNo condition selected.");
+            Log("No condition selected.");
         }
 
         private void TestAllConditions(object sender, EventArgs e = null)
@@ -808,7 +829,7 @@ namespace EntityTools.Quester.Editor
 
                 var msg = stringBuilder.ToString();
                 XtraMessageBox.Show(msg, "Conditions Test", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                txtLog.AppendText($"\n{msg}");
+                Log(msg);
                 return;
             }
 
@@ -868,6 +889,8 @@ namespace EntityTools.Quester.Editor
             treeConditions.EndUpdate();
 
             profile.Saved = false;
+
+            Log($"Insert Condition [{insertingNode.FullPath}]");
         }
 
         private void InvokeConditionCallback()
@@ -944,9 +967,9 @@ namespace EntityTools.Quester.Editor
                 newAction.GatherInfos();
                 var newNode = newAction.MakeTreeNode(profile);
 
-                var selectedNode = treeActions.SelectedNode as ActionBaseTreeNode;
+                var anchorNode = treeActions.SelectedNode as ActionBaseTreeNode;
 
-                InsertAction(selectedNode, newNode, altHeld);
+                InsertAction(anchorNode, newNode, altHeld);
 
                 profile.Saved = false;
 
@@ -981,6 +1004,7 @@ namespace EntityTools.Quester.Editor
             if (treeActions.SelectedNode is ActionBaseTreeNode actionNode)
             { 
                 actionNode.GatherActionInfo(profile);
+                Log($"Gather info for the action [{actionNode.FullPath}].");
                 profile.Saved = false;
             }
         }
@@ -1068,6 +1092,7 @@ namespace EntityTools.Quester.Editor
                     int selectedInd = actionNode.Index;
                     var parentNode = actionNode.Parent as ActionBaseTreeNode;
 
+                    var msg = $"Edit Action [{actionNode.FullPath}] as XML.";
                     treeActions.BeginUpdate();
                     actionNode.Remove();
                     if (parentNode != null)
@@ -1078,6 +1103,8 @@ namespace EntityTools.Quester.Editor
                     else treeActions.Nodes.Insert(selectedInd, newActionNode);
 
                     treeActions.EndUpdate();
+
+                    Log(msg);
 
                     profile.Saved = false;
 
@@ -1167,7 +1194,7 @@ namespace EntityTools.Quester.Editor
                     parentActionPack.UpdateView();
             }
             treeActions.EndUpdate();
-
+            Log($"Insert action [{insertingNode.FullPath}]");
             profile.Saved = false;
         }
 
@@ -1199,11 +1226,13 @@ namespace EntityTools.Quester.Editor
             {
                 case ActionBaseTreeNode actionNode:
                     actionNode.Disabled = !actionNode.Checked;
+                    Log($"{(actionNode.Disabled ? "Disable" : "Enable")} action [{actionNode.Text}]");
                     if (ReferenceEquals(actionNode.Content, pgProperties.SelectedObject))
                         pgProperties.Refresh();
                     break;
                 case ConditionBaseTreeNode conditionNode:
                     conditionNode.Locked = conditionNode.Checked;
+                    Log($"{(conditionNode.Locked ? "Locked" : "Unlocked")} condition [{conditionNode.Text}]");
                     if (ReferenceEquals(conditionNode.Content, pgProperties.SelectedObject))
                         pgProperties.Refresh();
                     break;
@@ -1211,7 +1240,12 @@ namespace EntityTools.Quester.Editor
             profile.Saved = false;
             UpdateWindowCaption();
         }
+        #endregion
 
+
+
+
+        #region PropertyManupulation
         private void handler_PropertyChanged(object sender, PropertyValueChangedEventArgs e)
         {
             //TODO: Переименование CustomRegion'a
@@ -1220,9 +1254,60 @@ namespace EntityTools.Quester.Editor
 
             }
             propertyChangedCallback?.Invoke();
+            Log($"Change property value [{pgProperties.SelectedObject}.{e.ChangedItem.Label}] to '{e.ChangedItem.Value}'");
 
             profile.Saved = false;
             UpdateWindowCaption();
+        }
+
+        private void handler_Properties_ButtonClick(object sender, DevExpress.XtraBars.Docking2010.ButtonEventArgs e)
+        {
+            if (e == null) throw new ArgumentNullException(nameof(e));
+
+            var property = pgProperties.SelectedGridItem?.PropertyDescriptor;
+            if (property is null)
+                return;
+
+            var btn = e.Button;
+            switch (btn.Properties.Caption)
+            {
+                case "Copy":
+                    CopyPropertyValue(property, pgProperties.SelectedObject);
+                    break;
+                case "Paste":
+                    PastePropertyValue(property, pgProperties.SelectedObject);
+                    pgProperties.Refresh();
+                    propertyChangedCallback?.Invoke();
+                    break;
+            }
+        }
+
+        private void CopyPropertyValue(PropertyDescriptor property, object obj)
+        {
+            var type = property.PropertyType;
+            var value = property.GetValue(obj);
+            if (value is null)
+                return;
+            if(!type.IsPrimitive)
+                value = value.CreateDeepCopy();
+
+            if (propertyBuffer.ContainsKey(type))
+            {
+                propertyBuffer[type] = value;
+            }
+            else propertyBuffer.Add(type, value);
+        }
+
+        private void PastePropertyValue(PropertyDescriptor property, object obj)
+        {
+            var type = property.PropertyType;
+            if (propertyBuffer.TryGetValue(type, out object value))
+            {
+                if (!type.IsPrimitive)
+                    value = value.CreateDeepCopy();
+                property.SetValue(obj, value);
+                Log($"Paste value '{value}' to property [{obj}.{property.DisplayName}]");
+            }
         }
         #endregion
 
@@ -1251,7 +1336,7 @@ namespace EntityTools.Quester.Editor
 
             UI_fill();
 
-            txtLog.AppendText($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] Make new Profile.");
+            Log($"Create new Profile.");
         }
 
         private void handler_Profile_Load(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
@@ -1276,7 +1361,7 @@ namespace EntityTools.Quester.Editor
             if (prof != null)
             {
                 profile.SetProfile(prof, path);
-                txtLog.AppendText($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] Profile '{path}' loaded.");
+                Log($"Load profile '{path}'.");
                 UI_fill();
             }
         }
@@ -1287,13 +1372,7 @@ namespace EntityTools.Quester.Editor
             {
                 UploadProfileToEngine();
 
-                txtLog.AppendText(string.Concat("[", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
-                    "] Profile",
-                    string.IsNullOrEmpty(profile.ProfilePath)
-                        ? string.Empty
-                        : " '" + profile.ProfilePath + "'",
-                    " saved.",
-                    Environment.NewLine));
+                Log($"Save profile into file '{profile.ProfilePath}'.");
                 UpdateWindowCaption();
             }
         }
@@ -1304,13 +1383,7 @@ namespace EntityTools.Quester.Editor
             {
                 UploadProfileToEngine();
 
-                txtLog.AppendText(string.Concat("[", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
-                    "] Profile",
-                    string.IsNullOrEmpty(profile.ProfilePath)
-                        ? string.Empty
-                        : " '" + profile.ProfilePath + "'",
-                    " saved.",
-                    Environment.NewLine));
+                Log($"Save profile into file '{profile.ProfilePath}'.");
                 UpdateWindowCaption();
             }
         }
@@ -1326,6 +1399,8 @@ namespace EntityTools.Quester.Editor
 
                 if (actionId != default)
                     AstralAccessors.Quester.Core.CurrentProfile.MainActionPack.SetStartPoint(actionId);
+
+                Log($"Upload profile to Quester-Engine{(actionId != Guid.Empty ? " and set current action to '" + actionId +"'" : "")}.");
             }
         }
 
@@ -1336,21 +1411,11 @@ namespace EntityTools.Quester.Editor
             {
                 UploadProfileToEngine(true);
 
-                txtLog.AppendText(
-                    string.Concat("[", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
-                    "] Profile",
-                    string.IsNullOrEmpty(profile.ProfilePath)
-                        ? string.Empty
-                        : " '" + profile.ProfilePath + "'",
-                    saved ? string.Empty : " saved and",
-                    " uploaded to the Quester-engine.",
-                    Environment.NewLine));
-
                 UpdateWindowCaption();
             }
             else
             {
-                XtraMessageBox.Show("Unable to upload profile into Quester-engine because of saving error.", "Upload error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                XtraMessageBox.Show("Unable to upload profile into Quester-Engine because of saving error.", "Upload error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
         
@@ -1364,15 +1429,6 @@ namespace EntityTools.Quester.Editor
                                  : Guid.Empty;
 
                 UploadProfileToEngine(true, actionId);
-
-                txtLog.AppendText(string.Concat("[", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
-                    "] Profile",
-                    string.IsNullOrEmpty(profile.ProfilePath)
-                        ? string.Empty
-                        : " '" + profile.ProfilePath + "'",
-                    saved ? string.Empty : " saved and",
-                    " uploaded to the Quester-engine.",
-                    Environment.NewLine));
 
                 UpdateWindowCaption();
             }
@@ -1519,9 +1575,11 @@ namespace EntityTools.Quester.Editor
             }
         }
 
-        private void handler_HotSpots_ButtonClick(object sender, [NotNull] DevExpress.XtraBars.Docking2010.ButtonEventArgs e)
+        private void handler_HotSpot_ButtonClick(object sender, [NotNull] DevExpress.XtraBars.Docking2010.ButtonEventArgs e)
         {
-            if (e == null) throw new ArgumentNullException(nameof(e));
+            if (e == null) 
+                throw new ArgumentNullException(nameof(e));
+
             var btn = e.Button;
             switch (btn.Properties.Caption)
             {
@@ -1529,10 +1587,20 @@ namespace EntityTools.Quester.Editor
                     AddHotSpot();
                     break;
                 case "Delete HotSpot":
-                    DeleteHotSpot();
+#if true
+                    ApplyEditAct(new DeleteHotSpots());
+#else
+                    DeleteHotSpot(); 
+#endif
                     break;
                 case "Edit Coordinates":
                     ChangeHotSpotCoordinateEditMode(btn.IsChecked == true);
+                    break;
+                case "Copy HotSpots":
+                    CopyHotSpot();
+                    break;
+                case "Paste HotSpots":
+                    PasteHotSpot();
                     break;
             }
         }
@@ -1559,7 +1627,11 @@ namespace EntityTools.Quester.Editor
                 gridViewHotSpots.BeginUpdate();
                 if (node != null
                     && distance < 10)
-                    hotSpots.Add(node.Position);
+                {
+                    pos = node.Position;
+                    hotSpots.Add(pos);
+
+                }
                 else hotSpots.Add(pos);
 
                 profile.Saved = false;
@@ -1567,6 +1639,8 @@ namespace EntityTools.Quester.Editor
 
                 gridViewHotSpots.RefreshData();
                 gridViewHotSpots.EndUpdate();
+
+                Log($"Add HotSpot <{pos.X:N2}, {pos.Y:N2}, {pos.Z:N2}>");
             }
         }
 
@@ -1576,10 +1650,15 @@ namespace EntityTools.Quester.Editor
             if (gridHotSpots.DataSource is List<Vector3> hotSpots
                 && selectedRows.Length > 0)
             {
+                var msgBuilder = new StringBuilder("Delete HotSpot: ");
                 gridViewHotSpots.BeginUpdate();
                 for (int i = 0; i < selectedRows.Length; i++)
                 {
                     int ind = selectedRows[i] - i;
+                    if (i > 0)
+                        msgBuilder.Append("; ");
+                    var pos = hotSpots[ind];
+                    msgBuilder.Append($"<{pos.X:N2}, {pos.Y:N2}, {pos.Z:N2}>");
                     hotSpots.RemoveAt(ind);
                 }
 
@@ -1588,9 +1667,49 @@ namespace EntityTools.Quester.Editor
                 //TODO Обновление ActionTreeNode при пустом списке HotSpot's
                 gridViewHotSpots.RefreshData();
                 gridViewHotSpots.EndUpdate();
+
+                Log(msgBuilder.ToString());
             }
         }
-        
+
+        private void CopyHotSpot()
+        {
+            var selectedRows = gridViewHotSpots.GetSelectedRows();
+
+            if (selectedRows.Length > 0
+                && gridHotSpots.DataSource is List<Vector3> hotSpots)
+            {
+                hotSpotsBuffer = selectedRows.Select(ind => hotSpots[ind])
+                                             .ToList();
+            }
+        }
+
+        private void PasteHotSpot()
+        {
+            if (!(hotSpotsBuffer?.Count > 0))
+            {
+                XtraMessageBox.Show("No HotSpots in the Clipboard");
+                return;
+            }
+
+            var selectedRows = gridViewHotSpots.GetSelectedRows();
+
+            var ind = selectedRows.Length > 0
+                ? selectedRows[selectedRows.Length - 1]
+                : -1;
+
+            gridViewHotSpots.BeginUpdate();
+            if (gridHotSpots.DataSource is List<Vector3> hotSpots)
+            {
+                if(ind >= 0)
+                    hotSpots.InsertRange(ind, hotSpotsBuffer);
+                else hotSpots.AddRange(hotSpotsBuffer);
+                Log($"Paste {hotSpotsBuffer.Count} HotSpots from the Clipboard.");
+            }
+            gridViewHotSpots.RefreshData();
+            gridViewHotSpots.EndUpdate();
+        }
+
         private void ChangeHotSpotCoordinateEditMode(bool allowEdit)
         {
             gridViewHotSpots.OptionsBehavior.Editable = allowEdit;
@@ -1621,71 +1740,96 @@ namespace EntityTools.Quester.Editor
             switch (btn.Properties.Caption)
             {
                 case "Add Vendor":
-                    {
-                        Entity entity = null;
-                        while (TargetSelectForm.GUIRequest("Get NPC", "Target the NPC and press ok.") == DialogResult.OK)
-                        {
-                            Entity betterEntityToInteract = Interact.GetBetterEntityToInteract();
-                            if (betterEntityToInteract.IsValid)
-                            {
-                                entity = betterEntityToInteract;
-                                break;
-                            }
-                        }
-
-                        if (entity?.IsValid != true)
-                        {
-                            XtraMessageBox.Show("Select an target.");
-                            return;
-                        }
-
-                        var player = EntityManager.LocalPlayer;
-                        NPCInfos npcInfos = new NPCInfos
-                        {
-                            DisplayName = entity.Name,
-                            Position = entity.Location.Clone(),
-                            CostumeName = entity.CostumeRef.CostumeName,
-                            MapName = player.MapState.MapName,
-                            RegionName = player.RegionInternalName
-                        };
-
-                        var vendors = profile.Vendors;
-                        if (!vendors.Contains(npcInfos))
-                        {
-                            vendors.Add(npcInfos);
-                            listVendor.SelectedItem = npcInfos;
-
-                            profile.Saved = false;
-                            UpdateWindowCaption();
-                            return;
-                        }
-
-                        XtraMessageBox.Show("This vendor is already in list.");
-                        break;
-                    }
+                    AddVendor();
+                    return;
                 case "Delete Vendor":
-                    {
-                        if (listVendor.SelectedItem is NPCInfos item)
-                        {
-                            profile.Vendors.Remove(item);
-                            profile.Saved = false;
-                            UpdateWindowCaption();
-                        }
-                        break;
-                    }
+                    DeleteVendor();
+                    break;
+                case "Import Vendors":
+                    ApplyEditAct(new ImportVendors());
+                    break;
             }
+        }
+
+        private void DeleteVendor()
+        {
+            if (listVendor.SelectedItem is NPCInfos vendor)
+            {
+                profile.Vendors.Remove(vendor);
+                profile.Saved = false;
+
+                Log($"Delete vendor [{vendor}].");
+                UpdateWindowCaption();
+            }
+        }
+
+        private void AddVendor()
+        {
+            Entity entity = null;
+            while (TargetSelectForm.GUIRequest("Get NPC", "Target the NPC and press ok.") == DialogResult.OK)
+            {
+                Entity betterEntityToInteract = Interact.GetBetterEntityToInteract();
+                if (betterEntityToInteract.IsValid)
+                {
+                    entity = betterEntityToInteract;
+                    break;
+                }
+            }
+
+            if (entity?.IsValid != true)
+            {
+                XtraMessageBox.Show("Select an target.");
+                return;
+            }
+
+            var player = EntityManager.LocalPlayer;
+            NPCInfos npcInfos = new NPCInfos
+            {
+                DisplayName = entity.Name,
+                Position = entity.Location.Clone(),
+                CostumeName = entity.CostumeRef.CostumeName,
+                MapName = player.MapState.MapName,
+                RegionName = player.RegionInternalName
+            };
+
+            var vendors = profile.Vendors;
+            if (!vendors.Contains(npcInfos))
+            {
+                vendors.Add(npcInfos);
+                listVendor.SelectedItem = npcInfos;
+
+                profile.Saved = false;
+
+                Log($"Add vendor [{npcInfos}].");
+                UpdateWindowCaption();
+                return;
+            }
+
+            XtraMessageBox.Show("This vendor is already in list.");
+            return;
         }
 
         private void handler_CustomRegions_ButtonClick(object sender, DevExpress.XtraBars.Docking2010.ButtonEventArgs e)
         {
             var btn = e.Button;
-            if (btn.Properties.Caption == "Delete CustomRegion")
+            switch (btn.Properties.Caption)
             {
-                if (listCustomRegions.SelectedItem is CustomRegion item)
+                case "Delete CustomRegion":
                 {
-                    profile.CustomRegions.Remove(item);
-                    profile.Saved = false;
-                    UpdateWindowCaption();
+                    if (listCustomRegions.SelectedItem is CustomRegion cr)
+                    {
+                        profile.CustomRegions.Remove(cr);
+                        profile.Saved = false;
+
+                        Log($"Delete CustomRegion '{cr.Name}'.");
+                        UpdateWindowCaption();
+                    }
+                    break;
+                }
+                case "Import CustomRegions":
+                {
+                    ApplyEditAct(new ImportCustomRegions());
+                    break;
                 }
             }
         }
@@ -1696,49 +1840,62 @@ namespace EntityTools.Quester.Editor
             switch (btn.Properties.Caption)
             {
                 case "Add Enemy":
-                    {
-                        string entPattern = string.Empty;
-                        ItemFilterStringType strMatchType = ItemFilterStringType.Simple;
-                        EntityNameType nameType = EntityNameType.InternalName;
-                        var target = EntityViewer.GUIRequest(ref entPattern, ref strMatchType, ref nameType);
-
-                        if (target?.IsValid != true)
-                        {
-                            XtraMessageBox.Show("No valid target.");
-                            return;
-                        }
-
-                        if (target.RelationToPlayer == EntityRelation.Friend)
-                        {
-                            XtraMessageBox.Show("Target should be an Enemy.");
-                            return;
-                        }
-
-                        var blackList = profile.BlackList;
-                        if (!blackList.Contains(target.InternalName))
-                        {
-                            blackList.Add(target.InternalName);
-                            profile.Saved = false;
-                            UpdateWindowCaption();
-                            return;
-                        }
-
-                        XtraMessageBox.Show("Already in list.");
-                        break;
-                    }
+                    AddEnemyToBlackList();
+                    break;
                 case "Delete Enemy":
-                    {
-                        var item = listBlackList.SelectedItem?.ToString();
-                        if (!string.IsNullOrEmpty(item))
-                        {
-                            profile.BlackList.Remove(item);
-                            profile.Saved = false;
-                            UpdateWindowCaption();
-                        }
-                        break;
-                    }
+                    DeleteEnemyFromBlackList();
+                    break;
+                case "Import Enemies":
+                    ApplyEditAct(new ImportEnemies());
+                    break;
             }
         }
+
+        private void DeleteEnemyFromBlackList()
+        {
+            var item = listBlackList.SelectedItem?.ToString();
+            if (!string.IsNullOrEmpty(item))
+            {
+                profile.BlackList.Remove(item);
+                profile.Saved = false;
+                Log($"Delete Enemy '{item}' from BlackList.");
+                UpdateWindowCaption();
+            }
+        }
+
+        private void AddEnemyToBlackList()
+        {
+            string entPattern = string.Empty;
+            ItemFilterStringType strMatchType = ItemFilterStringType.Simple;
+            EntityNameType nameType = EntityNameType.InternalName;
+            var target = EntityViewer.GUIRequest(ref entPattern, ref strMatchType, ref nameType);
+
+            if (target?.IsValid != true)
+            {
+                XtraMessageBox.Show("No valid target.");
+                return;
+            }
+
+            if (target.RelationToPlayer == EntityRelation.Friend)
+            {
+                XtraMessageBox.Show("Target should be an Enemy.");
+                return;
+            }
+
+            var targetInternalName = target.InternalName;
+            var blackList = profile.BlackList;
+            if (!blackList.Contains(targetInternalName))
+            {
+                blackList.Add(targetInternalName);
+                profile.Saved = false;
+                Log(message: $"Add Enemy '{targetInternalName}' into BlackList.");
+                UpdateWindowCaption();
+                return;
+            }
+
+            XtraMessageBox.Show("Already in list.");
+        }
+
         #endregion
 
 
@@ -1953,12 +2110,13 @@ namespace EntityTools.Quester.Editor
         {
             if (undoStack.Count > 0)
             {
-                var action = undoStack.Pop();
-                action.Undo();
+                var editAct = undoStack.Pop();
+                editAct.Undo(this);
+                Log(editAct.UndoLabel);
                 if (undoStack.Count > 0)
                 {
-                    action = undoStack.Peek();
-                    btnUndo.Hint = action.UndoLabel; 
+                    editAct = undoStack.Peek();
+                    btnUndo.Hint = editAct.UndoLabel; 
                 }
                 else btnUndo.Hint = string.Empty;
             }
@@ -1968,7 +2126,13 @@ namespace EntityTools.Quester.Editor
 
         private void ApplyEditAct(IEditAct editAct)
         {
-            editAct.Apply();
+            if (!editAct.IsReady 
+                && !editAct.Prepare(this)) 
+                return;
+
+            editAct.Apply(this);
+
+            Log(editAct.Label);
 
             profile.Saved = false;
             UpdateWindowCaption();
@@ -1979,5 +2143,39 @@ namespace EntityTools.Quester.Editor
             btnRedo.Hint = string.Empty;
         }
         #endregion
+
+
+
+
+        #region ExternalTools
+        private void handler_MissionMonitor(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
+        {
+            var monitor = new MissionMonitorForm { Owner = this };
+            monitor.Show();
+        }
+
+        private void handler_EntityViewer(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
+        {
+            if (_entityViewer is null || _entityViewer.IsDisposed)
+            {
+                _entityViewer = new EntityViewer { Owner = this };
+
+            }
+
+            _entityViewer.WindowState = FormWindowState.Normal;
+            _entityViewer.Show();
+        }
+
+        private void handler_AuraViewer(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
+        {
+            var viewer = new AuraViewer { Owner = this };
+            viewer.Show();
+        }
+        #endregion
+
+        private void panProperties_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

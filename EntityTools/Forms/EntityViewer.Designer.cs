@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.btnSelect = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.dgvEntities = new System.Windows.Forms.DataGridView();
@@ -87,8 +87,8 @@
             this.dgvEntities.AllowUserToAddRows = false;
             this.dgvEntities.AllowUserToDeleteRows = false;
             this.dgvEntities.AllowUserToResizeRows = false;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
-            this.dgvEntities.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Control;
+            this.dgvEntities.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle2;
             this.dgvEntities.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
@@ -220,7 +220,7 @@
             this.tbPattern.DragDrop += new System.Windows.Forms.DragEventHandler(this.tbPattern_DragDrop);
             this.tbPattern.DragEnter += new System.Windows.Forms.DragEventHandler(this.tbPattern_DragEnter);
             // 
-            // EntitySelectForm
+            // EntityViewer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -235,10 +235,10 @@
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnSelect);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
-            this.IconOptions.ShowIcon = false;
+            this.IconOptions.Image = global::EntityTools.Properties.Resources.NPC;
             this.LookAndFeel.UseDefaultLookAndFeel = false;
             this.MinimumSize = new System.Drawing.Size(486, 293);
-            this.Name = "EntitySelectForm";
+            this.Name = "EntityViewer";
             this.Padding = new System.Windows.Forms.Padding(10);
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;

@@ -28,40 +28,14 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.btnSelect = new DevExpress.XtraEditors.SimpleButton();
-            this.btnReload = new DevExpress.XtraEditors.SimpleButton();
             this.lbl = new System.Windows.Forms.Label();
             this.ItemList = new DevExpress.XtraEditors.CheckedListBoxControl();
+            this.btnSelect = new DevExpress.XtraEditors.SimpleButton();
+            this.simpleButton2 = new DevExpress.XtraEditors.SimpleButton();
+            this.btnUncheckAll = new DevExpress.XtraEditors.SimpleButton();
+            this.btnReload = new DevExpress.XtraEditors.SimpleButton();
             ((System.ComponentModel.ISupportInitialize)(this.ItemList)).BeginInit();
             this.SuspendLayout();
-            // 
-            // btnSelect
-            // 
-            this.btnSelect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSelect.ImageOptions.Image = global::EntityTools.Properties.Resources.Valid;
-            this.btnSelect.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
-            this.btnSelect.Location = new System.Drawing.Point(251, 374);
-            this.btnSelect.Name = "btnSelect";
-            this.btnSelect.PaintStyle = DevExpress.XtraEditors.Controls.PaintStyles.Light;
-            this.btnSelect.Size = new System.Drawing.Size(75, 23);
-            this.btnSelect.TabIndex = 0;
-            this.btnSelect.Text = "Select";
-            this.btnSelect.Click += new System.EventHandler(this.handler_Select);
-            // 
-            // btnReload
-            // 
-            this.btnReload.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnReload.ImageOptions.Image = global::EntityTools.Properties.Resources.Refresh;
-            this.btnReload.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
-            this.btnReload.ImageOptions.Location = DevExpress.XtraEditors.ImageLocation.MiddleCenter;
-            this.btnReload.Location = new System.Drawing.Point(12, 374);
-            this.btnReload.Name = "btnReload";
-            this.btnReload.PaintStyle = DevExpress.XtraEditors.Controls.PaintStyles.Light;
-            this.btnReload.Size = new System.Drawing.Size(75, 23);
-            this.btnReload.TabIndex = 1;
-            this.btnReload.Text = "Reload";
-            this.btnReload.ToolTip = "Reload";
-            this.btnReload.Click += new System.EventHandler(this.handler_Reload);
             // 
             // lbl
             // 
@@ -84,6 +58,61 @@
             this.ItemList.SortOrder = System.Windows.Forms.SortOrder.Ascending;
             this.ItemList.TabIndex = 5;
             // 
+            // btnSelect
+            // 
+            this.btnSelect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnSelect.ImageOptions.Image = global::EntityTools.Properties.Resources.Valid;
+            this.btnSelect.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
+            this.btnSelect.Location = new System.Drawing.Point(251, 374);
+            this.btnSelect.Name = "btnSelect";
+            this.btnSelect.PaintStyle = DevExpress.XtraEditors.Controls.PaintStyles.Light;
+            this.btnSelect.Size = new System.Drawing.Size(75, 23);
+            this.btnSelect.TabIndex = 0;
+            this.btnSelect.Text = "Select";
+            this.btnSelect.Click += new System.EventHandler(this.handler_Select);
+            // 
+            // simpleButton2
+            // 
+            this.simpleButton2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.simpleButton2.ImageOptions.Image = global::EntityTools.Properties.Resources.SelAll;
+            this.simpleButton2.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
+            this.simpleButton2.ImageOptions.Location = DevExpress.XtraEditors.ImageLocation.MiddleCenter;
+            this.simpleButton2.Location = new System.Drawing.Point(12, 374);
+            this.simpleButton2.Name = "simpleButton2";
+            this.simpleButton2.PaintStyle = DevExpress.XtraEditors.Controls.PaintStyles.Light;
+            this.simpleButton2.Size = new System.Drawing.Size(23, 23);
+            this.simpleButton2.TabIndex = 1;
+            this.simpleButton2.ToolTip = "Check All items";
+            this.simpleButton2.Click += new System.EventHandler(this.handler_CheckAll);
+            // 
+            // btnUncheckAll
+            // 
+            this.btnUncheckAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnUncheckAll.ImageOptions.Image = global::EntityTools.Properties.Resources.DeselAll;
+            this.btnUncheckAll.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.LeftCenter;
+            this.btnUncheckAll.ImageOptions.Location = DevExpress.XtraEditors.ImageLocation.MiddleCenter;
+            this.btnUncheckAll.Location = new System.Drawing.Point(37, 374);
+            this.btnUncheckAll.Name = "btnUncheckAll";
+            this.btnUncheckAll.PaintStyle = DevExpress.XtraEditors.Controls.PaintStyles.Light;
+            this.btnUncheckAll.Size = new System.Drawing.Size(23, 23);
+            this.btnUncheckAll.TabIndex = 1;
+            this.btnUncheckAll.ToolTip = "Uncheck all items";
+            this.btnUncheckAll.Click += new System.EventHandler(this.handler_UncheckAll);
+            // 
+            // btnReload
+            // 
+            this.btnReload.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnReload.ImageOptions.Image = global::EntityTools.Properties.Resources.Refresh;
+            this.btnReload.ImageOptions.ImageToTextAlignment = DevExpress.XtraEditors.ImageAlignToText.TopCenter;
+            this.btnReload.ImageOptions.Location = DevExpress.XtraEditors.ImageLocation.MiddleCenter;
+            this.btnReload.Location = new System.Drawing.Point(62, 374);
+            this.btnReload.Name = "btnReload";
+            this.btnReload.PaintStyle = DevExpress.XtraEditors.Controls.PaintStyles.Light;
+            this.btnReload.Size = new System.Drawing.Size(23, 23);
+            this.btnReload.TabIndex = 1;
+            this.btnReload.ToolTip = "Reload item list";
+            this.btnReload.Click += new System.EventHandler(this.handler_Reload);
+            // 
             // MultipleItemSelectForm
             // 
             this.AcceptButton = this.btnSelect;
@@ -92,6 +121,8 @@
             this.ClientSize = new System.Drawing.Size(338, 409);
             this.Controls.Add(this.ItemList);
             this.Controls.Add(this.lbl);
+            this.Controls.Add(this.simpleButton2);
+            this.Controls.Add(this.btnUncheckAll);
             this.Controls.Add(this.btnReload);
             this.Controls.Add(this.btnSelect);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
@@ -116,5 +147,7 @@
         internal DevExpress.XtraEditors.SimpleButton btnReload;
         internal System.Windows.Forms.Label lbl;
         private DevExpress.XtraEditors.CheckedListBoxControl ItemList;
+        internal DevExpress.XtraEditors.SimpleButton btnUncheckAll;
+        internal DevExpress.XtraEditors.SimpleButton simpleButton2;
     }
 }

@@ -99,8 +99,6 @@ namespace Infrastructure
                 }
                 #endregion
 
-                internal static void ApplyPatches() { }
-
                 public static void Apply(Harmony harmony)
                 {
                     // TODO Пропатчить Core.LoadAllMeshes

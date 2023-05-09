@@ -610,6 +610,7 @@ namespace EntityTools.Quester.Mapper
             catch (Exception exc)
             {
                 ETLogger.WriteLine(LogType.Error, "MapperFormUpdate catch an exception: " + exc);
+                InterruptAllModifications();
                 var text = exc.Message;
                 if (InvokeRequired)
                     Invoke(new Action(() => Text = text));
@@ -827,8 +828,13 @@ namespace EntityTools.Quester.Mapper
         /// </summary>
         private void InterruptAllModifications(MapperEditMode mode = MapperEditMode.None)
         {
-            if (mode != MapperEditMode.Mapping && _mappingTool?.MappingMode == MappingMode.Stopped)
+            if (mode != MapperEditMode.Mapping && _mappingTool?.MappingMode == MappingMode.Stopped
+                || mode == MapperEditMode.None)
             {
+                if (_mappingTool != null)
+                { 
+                    _mappingTool.MappingMode = MappingMode.Stopped;
+                }
                 btnMappingStop.Checked = true;
             }
             if (mode != MapperEditMode.EditEdges)

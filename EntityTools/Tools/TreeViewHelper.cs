@@ -16,6 +16,10 @@ using EntityTools.UCC.Conditions;
 using EntityTools.UCC.Editor.TreeViewCustomization;
 using QuesterAction = Astral.Quester.Classes.Action;
 using QuesterCondition = Astral.Quester.Classes.Condition;
+using EntityTools.Quester.Editor.Classes;
+using DevExpress.Data.Helpers;
+using DevExpress.Utils.DragDrop;
+using Astral.Grinder.Panels;
 
 namespace EntityTools.Tools
 {
@@ -266,6 +270,7 @@ namespace EntityTools.Tools
         public static ConditionBaseTreeNode MakeTreeNode(
             this Condition condition, 
             BaseQuesterProfileProxy profile,
+            //ActionBaseTreeNode ownedAction,
             bool clone = false)
         {
             if (clone)
@@ -280,7 +285,7 @@ namespace EntityTools.Tools
                 case IsInCustomRegion isInCustomRegion:
                     return new ConditionIsInCustomRegionTreeNode(profile, isInCustomRegion);
                 case IsInCustomRegionSet isInCustomRegionSet:
-                    return new ConditionIsInCustomRegionSetTreeNode(profile, isInCustomRegionSet);
+                    return new ConditionIsInCustomRegionSetTreeNode(profile,/*ownedAction,*/ isInCustomRegionSet);
                 default:
                     if(condition.IsConditionPack())
                         return new ConditionPackTreeNode(profile, condition);
@@ -448,6 +453,12 @@ namespace EntityTools.Tools
             return new TCollection();
         }
 
+        public static bool AllowChildren(this TreeNode node)
+        {
+            return node is ActionPackTreeNode
+                || node is ConditionBaseTreeNode;
+        }
+
         public static ActionBaseTreeNode FindActionNode(this TreeNodeCollection nodes, Guid actionId)
         {
             foreach (ActionBaseTreeNode node in nodes)
@@ -470,6 +481,117 @@ namespace EntityTools.Tools
             return null;
         }
 
+        /// <summary>
+        /// Добавление в коллекцию <paramref name="treeView"/> нового узла <paramref name="insertingNode"/> согласно пути <paramref name="path"/> и признаку <paramref name="altHeld"/>.
+        /// </summary>
+        public static void InsertSmart(
+            this TreeView treeView,
+            TreeNode insertingNode,
+            TreeNodePosition path,
+            bool altHeld = default)
+        {
+            if (treeView is null)
+                throw new ArgumentNullException(nameof(treeView));
+            var anchorNode = treeView.Nodes.Select(path);
+            
+            var nodeCollections = anchorNode.Parent?.Nodes
+                            ?? anchorNode.TreeView.Nodes;
+
+            treeView.InsertSmart(
+                anchorNode,
+                insertingNode,
+                altHeld
+            );
+        }
+
+        /// <summary>
+        /// Добавление в дерево <paramref name="treeView"/> нового узла <paramref name="insertingNode"/> с привязкой к существующему узлу <paramref name="anchorNode"/>,
+        /// в зависимости о допустимости у него дочерних узлов и значения флага <paramref name="altHeld"/>:<br/>
+        /// - допустимы и <paramref name="altHeld"/> не задан: добавляется первым дочерним узлом <paramref name="anchorNode"/><br/>
+        /// - допустимы и <paramref name="altHeld"/> задан: добавляется после <paramref name="anchorNode"/><br/>
+        /// - не допустимы и <paramref name="altHeld"/> не задан: добавляется после <paramref name="anchorNode"/><br/>
+        /// - не допустимы и <paramref name="altHeld"/> задан: добавляется перед <paramref name="anchorNode"/><br/>
+        /// </summary>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="ArgumentException"></exception>
+        public static void InsertSmart(
+            this TreeView treeView,
+            TreeNode anchorNode, 
+            TreeNode insertingNode, 
+            bool altHeld = default)
+        {
+            if (treeView is null)
+                throw new ArgumentNullException(nameof(treeView));
+
+            if (anchorNode != null)
+            {
+                if (!ReferenceEquals(treeView, anchorNode.TreeView))
+                    throw new ArgumentException("The 'AnchorNode' does not attached to the specified 'TreeView'", nameof(anchorNode));
+
+                if (!altHeld && anchorNode.AllowChildren())
+                {
+                    // добавляем новое условие в список его узлов ConditionPackTreeNode
+                    anchorNode.Nodes.Insert(0, insertingNode);
+                }
+                else
+                {
+                    // добавляем новое условие после выделенного узла
+                    if (anchorNode.Parent is null)
+                        treeView.Nodes.Insert(anchorNode.Index + 1, insertingNode);
+                    else anchorNode.Parent.Nodes.Insert(anchorNode.Index + 1, insertingNode);
+                }
+
+            }
+            // добавляем новое условие в конец списка узлов дерева
+            else treeView.Nodes.Add(insertingNode);
+        }
+
+        /// <summary>
+        /// Конструирование узла <paramref name="node"/>
+        /// </summary>
+        public static TreeNodePosition MakePath(this TreeNode node, TreeNodePosition next = null)
+        {
+            var ind = node.Index;
+            var text = node.Text;
+            var parent = node.Parent;
+
+            if (parent is null)
+            {
+                return new TreeNodePosition(ind, text, next);
+            }
+
+            return MakePath(parent,
+                            new TreeNodePosition(ind, text, next));
+        }
+
+        /// <summary>
+        /// Выбор узла дерева, заданного <paramref name="path"/>
+        /// </summary>
+        /// <exception cref="ArgumentException"></exception>
+        public static TreeNode Select(this TreeNodeCollection nodes, TreeNodePosition path)
+        {
+            if (nodes is null)
+                throw new ArgumentException(nameof(nodes));
+
+            if (path is null)
+                return null;
+
+            foreach (TreeNode node in nodes)
+            {
+                if (path.IsMatch(node))
+                {
+                    var pathNext = path.Next;
+                    var children = node.Nodes;
+                    if (children?.Count > 0
+                        && pathNext != null)
+                    {
+                        return children.Select(path);
+                    }
+                    return node;
+                }
+            }
+            return null;
+        }
 
         public class Callback
         {

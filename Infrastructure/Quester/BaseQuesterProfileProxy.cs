@@ -416,8 +416,10 @@ namespace Infrastructure.Quester
         {
             if (profile != null)
             {
+#if false
                 if (ReferenceEquals(RealProfile, profile))
                     return; 
+#endif
                 if (_customRegions != null)
                 {
                     _customRegions.ListChanged -= CustomRegions_Changed;

@@ -103,6 +103,16 @@ namespace EntityTools.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap BodyShape {
+            get {
+                object obj = ResourceManager.GetObject("BodyShape", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap BoxRed {
             get {
                 object obj = ResourceManager.GetObject("BoxRed", resourceCulture);
@@ -223,6 +233,16 @@ namespace EntityTools.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap DeselAll {
+            get {
+                object obj = ResourceManager.GetObject("DeselAll", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Distance {
             get {
                 object obj = ResourceManager.GetObject("Distance", resourceCulture);
@@ -303,6 +323,16 @@ namespace EntityTools.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap EvilEye {
+            get {
+                object obj = ResourceManager.GetObject("EvilEye", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Exclamation {
             get {
                 object obj = ResourceManager.GetObject("Exclamation", resourceCulture);
@@ -346,6 +376,16 @@ namespace EntityTools.Properties {
         internal static System.Drawing.Bitmap Eye {
             get {
                 object obj = ResourceManager.GetObject("Eye", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Face {
+            get {
+                object obj = ResourceManager.GetObject("Face", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -423,6 +463,16 @@ namespace EntityTools.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Monster {
+            get {
+                object obj = ResourceManager.GetObject("Monster", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap New {
             get {
                 object obj = ResourceManager.GetObject("New", resourceCulture);
@@ -466,6 +516,16 @@ namespace EntityTools.Properties {
         internal static System.Drawing.Bitmap NodeTools {
             get {
                 object obj = ResourceManager.GetObject("NodeTools", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap NPC {
+            get {
+                object obj = ResourceManager.GetObject("NPC", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -676,6 +736,16 @@ namespace EntityTools.Properties {
         internal static System.Drawing.Bitmap SaveTo {
             get {
                 object obj = ResourceManager.GetObject("SaveTo", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap SelAll {
+            get {
+                object obj = ResourceManager.GetObject("SelAll", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

@@ -798,7 +798,7 @@ namespace EntityTools.Quester.Mapper
             this.Controls.Add(this.barDockControlTop);
             this.DoubleBuffered = true;
             this.HelpButton = true;
-            this.IconOptions.ShowIcon = false;
+            this.IconOptions.Image = global::EntityTools.Properties.Resources.Road;
             this.LookAndFeel.UseDefaultLookAndFeel = false;
             this.Name = "MapperFormExt";
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;

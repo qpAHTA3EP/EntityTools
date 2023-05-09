@@ -38,6 +38,13 @@ namespace EntityTools.Quester.Actions
         private string _idStr = string.Empty;
         #endregion
 
+        public MoveToTeammate()
+        {
+            _targetProcessor = new TeammateSupportTargetProcessor(SupportOptions, GetSpecialTeammateCheck());
+        }
+
+
+
         #region General
         [Description("The selection of the supported teammate")]
         [Category("General")]

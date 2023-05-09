@@ -1133,7 +1133,7 @@ namespace EntityTools.UCC.Editor
             this.Controls.Add(this.barDockControlRight);
             this.Controls.Add(this.barDockControlBottom);
             this.Controls.Add(this.barDockControlTop);
-            this.IconOptions.ShowIcon = false;
+            this.IconOptions.Image = global::EntityTools.Properties.Resources.Wizard;
             this.LookAndFeel.TouchUIMode = DevExpress.Utils.DefaultBoolean.False;
             this.Name = "UccEditor";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;

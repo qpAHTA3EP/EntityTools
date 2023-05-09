@@ -197,7 +197,7 @@ namespace EntityTools.Forms
             this.Selector.TabIndex = 12;
             this.Selector.SelectedValueChanged += new System.EventHandler(this.handler_TargetSelect);
             // 
-            // AuraSelectForm
+            // AuraViewer
             // 
             this.AcceptButton = this.btnSelect;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -214,7 +214,7 @@ namespace EntityTools.Forms
             this.Controls.Add(this.lblFilters);
             this.Controls.Add(this.lblEntitySelector);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
-            this.IconOptions.ShowIcon = false;
+            this.IconOptions.Image = global::EntityTools.Properties.Resources.EvilEye;
             this.LookAndFeel.UseDefaultLookAndFeel = false;
             this.MinimumSize = new System.Drawing.Size(386, 450);
             this.Name = "AuraViewer";

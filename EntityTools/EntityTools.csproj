@@ -147,7 +147,7 @@
     <Compile Include="Core\Interfaces\IEntityDescriptor.cs" />
     <Compile Include="Core\Interfaces\IPowerCache.cs" />
     <Compile Include="Editors\ChangePluginSettingValueEditor.cs" />
-    <Compile Include="Editors\CheckedListBoxEditor.cs" />
+    <Compile Include="Editors\BagsListEditor.cs" />
     <Compile Include="Editors\CustomRegionCollectionEditor.cs" />
     <Compile Include="Editors\CustomRegionEditor.cs" />
     <Compile Include="Editors\MissionGiverInfoExtendedEditor.cs" />
@@ -158,6 +158,7 @@
     <Compile Include="Editors\PositionEditor.cs" />
     <Compile Include="Editors\RelativeMeshesFilePathEditor.cs" />
     <Compile Include="Editors\RelativeProfileFilePathEditor.cs" />
+    <Compile Include="Editors\OnlineHelpEditor.cs" />
     <Compile Include="Editors\ZRangeEditor.cs" />
     <Compile Include="Editors\TestEditors\TargetSelectorTestEditor.cs" />
     <Compile Include="Forms\AddUccActionForm.cs">
@@ -246,10 +247,27 @@
     </Compile>
     <Compile Include="Quester\Actions\Jumping.cs" />
     <Compile Include="Quester\Editor\Classes\ConditionPackMetadataType.cs" />
+    <Compile Include="Quester\Editor\Classes\TreeNodePosition.cs" />
+    <Compile Include="Quester\Editor\EditAct\ClearHotSpots.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Quester\Editor\EditAct\ImportEnemies.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Quester\Editor\EditAct\ImportVendors.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Quester\Editor\EditAct\ImportCustomRegions.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Quester\Editor\EditAct\InsertQuesterCondition.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Quester\Editor\EditAct\DeleteQuesterCondition.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Quester\Editor\TreeViewCustomization\ConditionIsInCustomRegionSetTreeNode.cs" />
+    <Compile Include="UCC\Actions\ExecuteConsoleCommand.cs" />
     <Compile Include="UCC\Editor\UccEditor.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -651,6 +669,13 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>Patcher.tt.cs</LastGenOutput>
     </Content>
+    <None Include="Resources\SelAll.png" />
+    <None Include="Resources\DeselAll.png" />
+    <None Include="Resources\evileye.png" />
+    <None Include="Resources\monster.png" />
+    <None Include="Resources\bodyshape.png" />
+    <None Include="Resources\NPC.png" />
+    <None Include="Resources\face.png" />
     <None Include="Resources\Quest.png" />
     <None Include="Resources\Zoom.png" />
     <None Include="Resources\UniPath.png" />

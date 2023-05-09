@@ -309,6 +309,7 @@ namespace EntityTools.Core
             this.btnMissionMonitor.FlatAppearance.BorderColor = System.Drawing.SystemColors.ButtonShadow;
             this.btnMissionMonitor.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnMissionMonitor.Font = new System.Drawing.Font("Tahoma", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.btnMissionMonitor.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnMissionMonitor.Location = new System.Drawing.Point(245, 342);
             this.btnMissionMonitor.Name = "btnMissionMonitor";
             this.btnMissionMonitor.Size = new System.Drawing.Size(113, 40);

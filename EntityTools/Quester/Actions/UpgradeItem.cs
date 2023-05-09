@@ -133,24 +133,24 @@ namespace EntityTools.Quester.Actions
         [Description("Mote type required in evolution.")]
         public MoteType Mote { get; set; } = MoteType.None;
 
-        [Category("Options")]
+        [Category("Protection")]
         [Description("The list of the Components to be protected by [Preservations_Ward].")]
         [Editor(typeof(ItemIdFilterEditor), typeof(UITypeEditor))]
-        [DisplayName("ProtectedComponents")]
+        [DisplayName("Components")]
         public ItemFilterCore ProtectedCatalysts { get; set; } = new ItemFilterCore();
         public bool ShouldSerializeProtectedCatalysts() => ProtectedCatalysts.Entries.Count > 0;
 
-        [Category("Options")]
-        [Description("The minimum number of the [Copper] to be protected by [Preservations_Ward].")]
+        [Category("Protection")]
+        [Description("The minimum quantity of the [Copper] to be protected by [Preservations_Ward].")]
         [Editor(typeof(ItemIdFilterEditor), typeof(UITypeEditor))]
-        [DisplayName("ProtectedCopperMinimum")]
+        [DisplayName("CopperMinimum")]
         public uint MinCopper { get; set; }
         public bool ShouldSerializeCopperMin() => MinCopper > 0;
 
-        [Category("Options")]
-        [Description("The minimum number of the [Refinement_Currency] to be protected by [Preservations_Ward].")]
+        [Category("Protection")]
+        [Description("The minimum quantity of the [Refinement_Currency] to be protected by [Preservations_Ward].")]
         [Editor(typeof(ItemIdFilterEditor), typeof(UITypeEditor))]
-        [DisplayName("ProtectedCopperMinimum")]
+        [DisplayName("RefinementCurrencyMinimum")]
         public uint MinRC { get; set; }
         public bool ShouldSerializeMinRC() => MinRC > 0;
 

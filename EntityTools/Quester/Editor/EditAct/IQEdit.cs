@@ -3,14 +3,27 @@
     public interface IEditAct
     {
         /// <summary>
+        /// Подготовка команды
+        /// </summary>
+        /// <param name="editorForm"></param>
+        bool Prepare(QuesterEditor editorForm);
+
+        /// <summary>
         /// Применениие команды редактирования
         /// </summary>
-        void Apply();
+        /// <param name="editorForm"></param>
+        void Apply(QuesterEditor editorForm);
 
         /// <summary>
         /// Отмены команды редактирования
         /// </summary>
-        void Undo();
+        /// <param name="editorForm"></param>
+        void Undo(QuesterEditor editorForm);
+
+        /// <summary>
+        /// Признак готовности команды к применению
+        /// </summary>
+        bool IsReady { get; }
 
         /// <summary>
         /// Признак применения команды 

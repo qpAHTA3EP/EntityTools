@@ -27,7 +27,12 @@ namespace EntityTools.Quester.Editor
                 this.onRedo = onRedo;
             }
 
-            public void Apply()
+            public bool Prepare(QuesterEditor editorForm)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Apply(QuesterEditor editorForm)
             {
                 if (!Applied)
                 {
@@ -55,7 +60,7 @@ namespace EntityTools.Quester.Editor
                 }
             }
 
-            public void Undo()
+            public void Undo(QuesterEditor editorForm)
             {
 #if true
                 if (Applied)
@@ -77,6 +82,8 @@ namespace EntityTools.Quester.Editor
                 throw new NotImplementedException();
 #endif
             }
+
+            public bool IsReady { get; set; }
 
             public bool Applied { get; private set; }
 

@@ -152,5 +152,15 @@ namespace EntityTools.Forms
         {
             fillAction?.Invoke();
         }
+
+        private void handler_UncheckAll(object sender, EventArgs e)
+        {
+            ItemList.UnCheckAll();
+        }
+
+        private void handler_CheckAll(object sender, EventArgs e)
+        {
+            ItemList.CheckAll();
+        }
     }
 }

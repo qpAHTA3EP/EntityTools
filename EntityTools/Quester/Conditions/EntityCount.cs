@@ -139,7 +139,7 @@ namespace EntityTools.Quester.Conditions
             get => _healthCheck; 
             set
             {
-                if (_healthCheck == value)
+                if (_healthCheck != value)
                 {
                     _healthCheck = value;
                     _specialCheck = null;
