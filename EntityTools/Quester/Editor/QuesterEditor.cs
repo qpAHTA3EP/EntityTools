@@ -1644,6 +1644,7 @@ namespace EntityTools.Quester.Editor
             }
         }
 
+#if DeleteHotSoit_Method
         private void DeleteHotSpot()
         {
             var selectedRows = gridViewHotSpots.GetSelectedRows();
@@ -1670,7 +1671,8 @@ namespace EntityTools.Quester.Editor
 
                 Log(msgBuilder.ToString());
             }
-        }
+        } 
+#endif
 
         private void CopyHotSpot()
         {
@@ -1743,7 +1745,7 @@ namespace EntityTools.Quester.Editor
                     AddVendor();
                     return;
                 case "Delete Vendor":
-                    DeleteVendor();
+                    ApplyEditAct(new DeleteVendor());
                     break;
                 case "Import Vendors":
                     ApplyEditAct(new ImportVendors());
@@ -1751,6 +1753,7 @@ namespace EntityTools.Quester.Editor
             }
         }
 
+#if DeleteVendor_Method
         private void DeleteVendor()
         {
             if (listVendor.SelectedItem is NPCInfos vendor)
@@ -1761,7 +1764,8 @@ namespace EntityTools.Quester.Editor
                 Log($"Delete vendor [{vendor}].");
                 UpdateWindowCaption();
             }
-        }
+        } 
+#endif
 
         private void AddVendor()
         {
@@ -1816,14 +1820,7 @@ namespace EntityTools.Quester.Editor
             {
                 case "Delete CustomRegion":
                 {
-                    if (listCustomRegions.SelectedItem is CustomRegion cr)
-                    {
-                        profile.CustomRegions.Remove(cr);
-                        profile.Saved = false;
-
-                        Log($"Delete CustomRegion '{cr.Name}'.");
-                        UpdateWindowCaption();
-                    }
+                    ApplyEditAct(new DeleteCustomRegion());
                     break;
                 }
                 case "Import CustomRegions":
@@ -1843,7 +1840,7 @@ namespace EntityTools.Quester.Editor
                     AddEnemyToBlackList();
                     break;
                 case "Delete Enemy":
-                    DeleteEnemyFromBlackList();
+                    ApplyEditAct(new DeleteIgnoredEnemy());
                     break;
                 case "Import Enemies":
                     ApplyEditAct(new ImportEnemies());
@@ -1851,6 +1848,7 @@ namespace EntityTools.Quester.Editor
             }
         }
 
+#if DeleteEnemyFromBlackList_Method
         private void DeleteEnemyFromBlackList()
         {
             var item = listBlackList.SelectedItem?.ToString();
@@ -1861,7 +1859,8 @@ namespace EntityTools.Quester.Editor
                 Log($"Delete Enemy '{item}' from BlackList.");
                 UpdateWindowCaption();
             }
-        }
+        } 
+#endif
 
         private void AddEnemyToBlackList()
         {

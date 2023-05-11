@@ -251,7 +251,16 @@
     <Compile Include="Quester\Editor\EditAct\ClearHotSpots.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Quester\Editor\EditAct\DeleteCustomRegion.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Quester\Editor\EditAct\DeleteIgnoredEnemy.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Quester\Editor\EditAct\ImportEnemies.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Quester\Editor\EditAct\DeleteVendor.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Quester\Editor\EditAct\ImportVendors.cs">
